@@ -13,10 +13,11 @@ end
 
 local function newArena() end
 local function nextID() end
-local function in_game_txt(arena) end
 
 local arenasID
-local players_in_game = {} --KEY: player name, INDEX: arenaID
+local players_in_game = {}    --KEY: player name, INDEX: arenaID
+local players_in_queue = {}   --KEY: player name, INDEX: arenaID
+local immunity_time = 3
 
 local arena_default_max_players = 4
 local arena_default_min_players = 2
@@ -25,7 +26,7 @@ local arena_default_kill_cap = 10
 arena_lib.arena_default = {
   name = "",
   sign = {},
-  players = {},            --KEY: player name, INDEX: kills, deaths, killstreak
+  players = {},               --KEY: player name, INDEX: kills, deaths, killstreak
   spawn_points = {},
   max_players = arena_default_max_players,
   min_players = arena_default_min_players,
@@ -69,7 +70,8 @@ function arena_lib.remove_arena(sender, arena_name)
   --TODO: -chiedere conferma
 
   -- rimozione cartello coi rispettivi metadati
-  if arena.sign ~= nil then minetest.set_node(arena.sign, {name = "air"}) end
+  if arena.sign ~= nil then
+    minetest.set_node(arena.sign, {name = "air"}) end
 
   arena_lib.send_message_players_in_arena(id, "[Quake] L'arena per la quale eri in coda è stata rimossa... :(")
 
@@ -81,10 +83,19 @@ function arena_lib.remove_arena(sender, arena_name)
 end
 
 
-function arena_lib.is_player_in_arena(pl_name)
 
-  if players_in_game[pl_name] ~= nil then return true
-  else return false end
+function arena_lib.is_player_in_arena(p_name)
+
+  if not players_in_game[p_name] then return false
+  else return true end
+end
+
+
+
+function arena_lib.is_player_in_queue(p_name)
+
+  if not players_in_queue[p_name] then return false
+  else return true end
 end
 
 
@@ -114,6 +125,7 @@ function arena_lib.load_arena(arena_ID)
     player:set_pos(arena.spawn_points[count])
     player:get_inventory():set_list("main",{})
     player:get_inventory():add_item("main", weapon)
+    players_in_queue[pl_name] = nil
     players_in_game[pl_name] = arena_ID       -- registro giocatori nella tabella apposita
 
     count = count +1
@@ -179,6 +191,15 @@ function arena_lib.end_arena(arena)
 end
 
 
+
+function arena_lib.add_to_queue(p_name, arena_ID)
+  players_in_queue[p_name] = arena_ID
+end
+
+function arena_lib.remove_from_queue(p_name)
+  players_in_queue[p_name] = nil
+end
+
 ----------------------------------------------
 --------------------UTILS---------------------
 ----------------------------------------------
@@ -190,6 +211,7 @@ function arena_lib.remove_player_from_arena(p_name)
 
   arena[arena_ID].players[p_name] = nil
   players_in_game[p_name] = nil
+  player_in_queue[p_name] = nil
   arena_lib.send_message_players_in_arena(arena_ID, "[Quake] " .. p_name .. " ha abbandonato la partita")
 
   --TODO: se in arena è rimasto solo un giocatore, ha vinto e end arena
@@ -197,22 +219,34 @@ end
 
 
 function arena_lib.send_message_players_in_arena(arena_ID, msg)
-
   for pl_name, stats in pairs(arena_lib.arenas[arena_ID].players) do
-    minetest.chat_send_player(pl_name, msg)
-  end
-
+    minetest.chat_send_player(pl_name, msg) end
 end
 
 
 function arena_lib.calc_kill_leader(arena, killer)
-
   if arena.players[killer].kills > arena.player[kill_leader].kills then
-    arena.kill_leader = killer
-  end
-
+    arena.kill_leader = killer end
 end
 
+
+function arena_lib.immunity(player)
+
+  local p_name = player:get_player_name()
+  local weapon = player:get_inventory():get_stack("main", 1)
+
+  weapon:get_meta():set_int("immune", 1)
+
+  player:get_inventory():set_stack("main", 1, weapon)
+
+  minetest.after(immunity_time, function()
+    if player:get_inventory():get_stack("main", 1):get_meta():get_int("immune") == 1 then
+      weapon:get_meta():set_int("immune", 0)
+      player:get_inventory():set_stack("main", 1, weapon)
+    end
+  end)
+
+end
 
 ----------------------------------------------
 -----------------GETTERS----------------------
@@ -229,6 +263,11 @@ end
 
 function arena_lib.get_arenaID_by_player(p_name)
   return players_in_game[p_name]
+end
+
+
+function arena_lib.get_queueID_by_player(p_name)
+  return players_in_queue[p_name]
 end
 
 
@@ -255,11 +294,18 @@ function arena_lib.get_random_spawner(arena_ID)
 end
 
 
---[[
-     ------------------------
-         Funzioni locali
-     ------------------------
-]]
+
+----------------------------------------------
+-----------------SETTERS----------------------
+----------------------------------------------
+
+function arena_lib.set_immunity_time(time)
+  immunity_time = time
+end
+
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
 
 --[[ Dato che in Lua non è possibile istanziare le tabelle copiandole, bisogna istanziare ogni campo in una nuova tabella.
      Ricorsivo per le sottotabelle. Codice da => http://lua-users.org/wiki/CopyTable]]
@@ -287,15 +333,4 @@ function nextID()
     if id > n then n = id end
   end
   return n+1
-end
-
-
-function in_game_txt(arena)
-  local txt
-
-  if arena.in_celebration then txt = "Concludendo"
-  elseif arena.in_game then txt = "In partita"
-  else txt = "In attesa" end
-
-  return txt
 end
