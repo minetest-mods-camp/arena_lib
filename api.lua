@@ -162,7 +162,9 @@ function arena_lib.load_celebration(arena_ID, winner_name)
 
 
   -- momento celebrazione
-  minetest.after(3, arena_lib.end_arena(arena))
+  minetest.after(3, function()
+    arena_lib.end_arena(arena)
+  end)
 
 end
 
@@ -209,9 +211,9 @@ function arena_lib.remove_player_from_arena(p_name)
 
   local arena_ID = players_in_game[p_name]
 
-  arena[arena_ID].players[p_name] = nil
+  arena_lib.arenas[arena_ID].players[p_name] = nil
   players_in_game[p_name] = nil
-  player_in_queue[p_name] = nil
+  players_in_queue[p_name] = nil
   arena_lib.send_message_players_in_arena(arena_ID, "[Quake] " .. p_name .. " ha abbandonato la partita")
 
   --TODO: se in arena è rimasto solo un giocatore, ha vinto e end arena
@@ -225,7 +227,10 @@ end
 
 
 function arena_lib.calc_kill_leader(arena, killer)
-  if arena.players[killer].kills > arena.player[kill_leader].kills then
+
+  if arena.kill_leader == "" then arena.kill_leader = killer return end
+
+  if arena.players[killer].kills > arena.players[arena.kill_leader].kills then
     arena.kill_leader = killer end
 end
 
@@ -240,6 +245,7 @@ function arena_lib.immunity(player)
   player:get_inventory():set_stack("main", 1, weapon)
 
   minetest.after(immunity_time, function()
+    if player == nil then return end -- he may disconnect
     if player:get_inventory():get_stack("main", 1):get_meta():get_int("immune") == 1 then
       weapon:get_meta():set_int("immune", 0)
       player:get_inventory():set_stack("main", 1, weapon)
