@@ -110,10 +110,6 @@ function arena_lib.set_sign(sender, arena_name)
   minetest.chat_send_player(sender, "Click sinistro su un cartello per settare l'arena")
 end
 
-function arena_lib.update_storage()
-  storage:set_string("arenas", minetest.serialize(arena_lib.arenas))
-end
-
 
 
 function arena_lib.update_sign(pos, arena)

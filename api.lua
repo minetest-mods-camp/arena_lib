@@ -7,6 +7,10 @@ if minetest.deserialize(storage:get_string("arenas")) ~= nil then
   arena_lib.arenas = minetest.deserialize(storage:get_string("arenas"))
 end
 
+function arena_lib.update_storage()
+  storage:set_string("arenas", minetest.serialize(arena_lib.arenas))
+end
+
 local function newArena() end
 local function nextID() end
 local function in_game_txt(arena) end
