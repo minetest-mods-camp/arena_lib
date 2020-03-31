@@ -19,8 +19,8 @@ local players_in_game = {}    --KEY: player name, INDEX: arenaID
 local players_in_queue = {}   --KEY: player name, INDEX: arenaID
 local immunity_time = 3
 
-local arena_default_max_players = 4
-local arena_default_min_players = 2
+local arena_default_max_players = 2
+local arena_default_min_players = 1
 local arena_default_kill_cap = 10
 
 arena_lib.arena_default = {
@@ -107,7 +107,6 @@ end
 function arena_lib.load_arena(arena_ID)
 
   local count = 1
-  local weapon = ItemStack("quake:railgun")
   local arena = arena_lib.arenas[arena_ID]
 
   -- teletrasporto giocatori e sostituisco l'inventario
@@ -116,20 +115,24 @@ function arena_lib.load_arena(arena_ID)
     local player = minetest.get_player_by_name(pl_name)
 
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    player: set_physics_override({
-              speed = 1.7,
-              jump = 1.5,
-              gravity = 1.15,
-              })
 
     player:set_pos(arena.spawn_points[count])
     player:get_inventory():set_list("main",{})
-    player:get_inventory():add_item("main", weapon)
     players_in_queue[pl_name] = nil
     players_in_game[pl_name] = arena_ID       -- registro giocatori nella tabella apposita
 
     count = count +1
   end
+
+  arena_lib.on_load(arena)
+
+end
+
+
+
+function arena_lib.on_load()
+ --[[override this function on your mod if you wanna add more!
+ Just do: function arena_lib.on_load() yourstuff end]]
 end
 
 
