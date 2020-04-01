@@ -205,6 +205,8 @@ function arena_lib.end_arena(arena)
 
   arena_lib.on_end(arena)
 
+  arena.kill_leader = ""
+
   for pl_name, stats in pairs(arena.players) do
 
     arena.players[pl_name] = nil
