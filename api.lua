@@ -215,7 +215,7 @@ function arena_lib.end_arena(arena)
 
     minetest.get_player_by_name(pl_name):get_inventory():set_list("main", {})
 
-    arena_lib.on_end()
+    arena_lib.on_end(arena)
 
     --TODO: teleport lobby, metti variabile locale
   end
@@ -242,28 +242,28 @@ end
 
 
 
-function arena_lib.on_load()
+function arena_lib.on_load(arena)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_load() yourstuff end]]
 end
 
 
 
-function arena_lib.on_start()
+function arena_lib.on_start(arena)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_load() yourstuff end]]
 end
 
 
 
-function arena_lib.on_celebration()
+function arena_lib.on_celebration(arena_ID, winner_name)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_celebration() yourstuff end]]
 end
 
 
 
-function arena_lib.on_end()
+function arena_lib.on_end(arena)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_end() yourstuff end]]
 end
