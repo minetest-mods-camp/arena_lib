@@ -40,6 +40,7 @@ local prefix = "[Arena_lib] "
 local load_time = 3
 local celebration_time = 3
 local immunity_time = 3
+local immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
 
 
 function arena_lib.settings(def)
@@ -58,6 +59,10 @@ function arena_lib.settings(def)
 
   if def.immunity_time then
     immunity_time = def.immunity_time
+  end
+
+  if def.immunity_slot then
+    immunity_slot = def.immunity_slot
   end
 
 end
@@ -178,7 +183,7 @@ function arena_lib.load_celebration(arena_ID, winner_name)
     local inv = minetest.get_player_by_name(pl_name):get_inventory()
     -- giocatori immortali
     if not inv:contains_item("main", "arena_lib.immunity") then
-      inv:set_stack("main", 8, "arena_lib:immunity")
+      inv:set_stack("main", immunity_slot, "arena_lib:immunity")
     end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
@@ -321,7 +326,7 @@ function arena_lib.immunity(player)
   local immunity_item = ItemStack("arena_lib:immunity")
   local inv = player:get_inventory()
 
-  inv:set_stack("main", 8, immunity_item)
+  inv:set_stack("main", immunity_slot, immunity_item)
 
   minetest.after(immunity_time, function()
     if player == nil then return end -- they may disconnect
@@ -379,6 +384,11 @@ function arena_lib.get_random_spawner(arena_ID)
   return arena_lib.arenas[arena_ID].spawn_points[math.random(1,arena_lib.get_arena_spawners_count(arena_ID))]
 end
 
+
+
+function arena_lib.get_immunity_slot()
+  return immunity_slot
+end
 
 
 ----------------------------------------------
