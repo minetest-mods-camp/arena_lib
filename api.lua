@@ -37,6 +37,8 @@ arena_lib.arena_default = {
   in_celebration = false
 }
 
+
+
 function arena_lib.create_arena(sender, arena_name)
 
   arenasID = nextID()
@@ -115,6 +117,9 @@ function arena_lib.load_arena(arena_ID)
     local player = minetest.get_player_by_name(pl_name)
 
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+    player: set_physics_override({
+              speed = 0,
+              })
 
     player:set_pos(arena.spawn_points[count])
     player:get_inventory():set_list("main",{})
@@ -126,19 +131,17 @@ function arena_lib.load_arena(arena_ID)
 
   arena_lib.on_load(arena)
 
+  minetest.after(3, function()
+    arena_lib.start_arena(arena)
+  end)
+
 end
 
 
 
-function arena_lib.on_load()
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_load() yourstuff end]]
-end
-
-
--- per il player singolo a match iniziato
-function arena_lib.join_arena(arena_ID)
+function arena_lib.start_arena(arena)
   --TODO
+  arena_lib.on_start(arena)
 end
 
 
@@ -163,6 +166,7 @@ function arena_lib.load_celebration(arena_ID, winner_name)
     minetest.chat_send_player(pl_name, "[Quake] " .. winner_name .. " ha vinto la partita")
   end
 
+  arena_lib.on_celebration(arena_ID, winner_name)
 
   -- momento celebrazione
   minetest.after(3, function()
@@ -197,12 +201,49 @@ end
 
 
 
+-- per il player singolo a match iniziato
+function arena_lib.join_arena(arena_ID)
+  --TODO
+end
+
+
+
 function arena_lib.add_to_queue(p_name, arena_ID)
   players_in_queue[p_name] = arena_ID
 end
 
+
+
 function arena_lib.remove_from_queue(p_name)
   players_in_queue[p_name] = nil
+end
+
+
+
+function arena_lib.on_load()
+ --[[override this function on your mod if you wanna add more!
+ Just do: function arena_lib.on_load() yourstuff end]]
+end
+
+
+
+function arena_lib.on_start()
+ --[[override this function on your mod if you wanna add more!
+ Just do: function arena_lib.on_load() yourstuff end]]
+end
+
+
+
+function arena_lib.on_celebration()
+ --[[override this function on your mod if you wanna add more!
+ Just do: function arena_lib.on_celebration() yourstuff end]]
+end
+
+
+
+function arena_lib.on_end()
+ --[[override this function on your mod if you wanna add more!
+ Just do: function arena_lib.on_end() yourstuff end]]
 end
 
 ----------------------------------------------
