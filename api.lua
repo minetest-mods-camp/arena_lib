@@ -37,6 +37,27 @@ arena_lib.arena_default = {
   in_celebration = false
 }
 
+local prefix = "[Arena_lib] "
+local load_time = 3
+local celebration_time = 3
+
+
+function arena_lib.settings(def)
+
+  if def.prefix then
+    prefix = def.prefix
+  end
+
+  if def.load_time then
+    load_time = def.load_time
+  end
+
+  if def.celebration_time then
+    celebration_time = def.celebration_time
+  end
+
+end
+
 
 
 function arena_lib.create_arena(sender, arena_name)
@@ -52,7 +73,7 @@ function arena_lib.create_arena(sender, arena_name)
   arena_lib.arenas[arenasID] = newArena(arena_lib.arena_default)
   arena_lib.arenas[arenasID].name = arena_name
   arena_lib.update_storage()
-  minetest.chat_send_player(sender, "Arena " .. arena_name .. " creata con successo")
+  minetest.chat_send_player(sender, prefix .. "Arena " .. arena_name .. " creata con successo")
 
 end
 
@@ -75,30 +96,15 @@ function arena_lib.remove_arena(sender, arena_name)
   if arena.sign ~= nil then
     minetest.set_node(arena.sign, {name = "air"}) end
 
-  arena_lib.send_message_players_in_arena(id, "[Quake] L'arena per la quale eri in coda è stata rimossa... :(")
+  arena_lib.send_message_players_in_arena(id, prefix .."L'arena per la quale eri in coda è stata rimossa... :(")
 
   -- rimozione arena e aggiornamento storage
   arena_lib.arenas[id] = nil
   arena_lib.update_storage()
-  minetest.chat_send_player(sender, "Arena " .. arena_name .. " rimossa con successo")
+  minetest.chat_send_player(sender, prefix .. "Arena " .. arena_name .. " rimossa con successo")
 
 end
 
-
-
-function arena_lib.is_player_in_arena(p_name)
-
-  if not players_in_game[p_name] then return false
-  else return true end
-end
-
-
-
-function arena_lib.is_player_in_queue(p_name)
-
-  if not players_in_queue[p_name] then return false
-  else return true end
-end
 
 
 ----------------------------------------------
@@ -131,7 +137,7 @@ function arena_lib.load_arena(arena_ID)
 
   arena_lib.on_load(arena)
 
-  minetest.after(3, function()
+  minetest.after(load_time, function()
     arena_lib.start_arena(arena)
   end)
 
@@ -140,7 +146,16 @@ end
 
 
 function arena_lib.start_arena(arena)
-  --TODO
+
+  for pl_name, stats in pairs(arena.players) do
+
+    minetest.get_player_by_name(pl_name):set_physics_override({
+            speed = 1,
+            jump = 1,
+            gravity = 1,
+            })
+  end
+
   arena_lib.on_start(arena)
 end
 
@@ -163,13 +178,13 @@ function arena_lib.load_celebration(arena_ID, winner_name)
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
-    minetest.chat_send_player(pl_name, "[Quake] " .. winner_name .. " ha vinto la partita")
+    minetest.chat_send_player(pl_name, prefix  .. winner_name .. " ha vinto la partita")
   end
 
   arena_lib.on_celebration(arena_ID, winner_name)
 
   -- momento celebrazione
-  minetest.after(3, function()
+  minetest.after(celebration_time, function()
     arena_lib.end_arena(arena)
   end)
 
@@ -189,11 +204,7 @@ function arena_lib.end_arena(arena)
     arena_lib.update_sign(arena.sign, arena)
     arena_lib.update_storage()
 
-    minetest.get_player_by_name(pl_name):set_physics_override({
-            speed = 1,
-            jump = 1,
-            gravity = 1,
-            })
+    arena_lib.on_end()
 
     --TODO: teleport lobby, metti variabile locale
   end
@@ -246,9 +257,26 @@ function arena_lib.on_end()
  Just do: function arena_lib.on_end() yourstuff end]]
 end
 
+
+
 ----------------------------------------------
 --------------------UTILS---------------------
 ----------------------------------------------
+
+function arena_lib.is_player_in_arena(p_name)
+
+  if not players_in_game[p_name] then return false
+  else return true end
+end
+
+
+
+function arena_lib.is_player_in_queue(p_name)
+
+  if not players_in_queue[p_name] then return false
+  else return true end
+end
+
 
 
 function arena_lib.remove_player_from_arena(p_name)
@@ -258,16 +286,18 @@ function arena_lib.remove_player_from_arena(p_name)
   arena_lib.arenas[arena_ID].players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
-  arena_lib.send_message_players_in_arena(arena_ID, "[Quake] " .. p_name .. " ha abbandonato la partita")
+  arena_lib.send_message_players_in_arena(arena_ID, prefix .. p_name .. " ha abbandonato la partita")
 
   --TODO: se in arena è rimasto solo un giocatore, ha vinto e end arena
 end
+
 
 
 function arena_lib.send_message_players_in_arena(arena_ID, msg)
   for pl_name, stats in pairs(arena_lib.arenas[arena_ID].players) do
     minetest.chat_send_player(pl_name, msg) end
 end
+
 
 
 function arena_lib.calc_kill_leader(arena, killer)
@@ -277,6 +307,7 @@ function arena_lib.calc_kill_leader(arena, killer)
   if arena.players[killer].kills > arena.players[arena.kill_leader].kills then
     arena.kill_leader = killer end
 end
+
 
 
 function arena_lib.immunity(player)
@@ -297,6 +328,8 @@ function arena_lib.immunity(player)
   end)
 
 end
+
+
 
 ----------------------------------------------
 -----------------GETTERS----------------------
