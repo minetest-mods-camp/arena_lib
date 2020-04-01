@@ -1,0 +1,34 @@
+minetest.register_on_leaveplayer(function(player)
+
+    local p_name = player:get_player_name()
+    if arena_lib.get_arenaID_by_player(p_name) == nil then return end
+
+    arena_lib.remove_player_from_arena(p_name)
+end)
+
+
+
+minetest.register_on_dieplayer(function(player, reason)
+
+    local p_name = player:get_player_name()
+    if not arena_lib.is_player_in_arena(p_name) then return end
+
+    local arena = arena_lib.arenas[arena_lib.get_arenaID_by_player(p_name)]
+    local p_stats = arena.players[p_name]
+    p_stats.deaths = p_stats.deaths +1
+    p_stats.killstreak = 0
+
+  end)
+
+
+
+minetest.register_on_respawnplayer(function(player)
+
+    local arenaID = arena_lib.get_arenaID_by_player(player:get_player_name())
+    if arenaID == nil then return end
+
+    player:set_pos(arena_lib.get_random_spawner(arenaID))
+    arena_lib.immunity(player)
+    return true -- <=== dovrebbe sovrascrivere la posizione di respawn del giocatore stando all'API riga 4283, ma non lo fa
+
+  end)
