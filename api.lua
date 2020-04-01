@@ -17,7 +17,6 @@ local function nextID() end
 local arenasID
 local players_in_game = {}    --KEY: player name, INDEX: arenaID
 local players_in_queue = {}   --KEY: player name, INDEX: arenaID
-local immunity_time = 3
 
 local arena_default_max_players = 2
 local arena_default_min_players = 1
@@ -40,6 +39,7 @@ arena_lib.arena_default = {
 local prefix = "[Arena_lib] "
 local load_time = 3
 local celebration_time = 3
+local immunity_time = 3
 
 
 function arena_lib.settings(def)
@@ -54,6 +54,10 @@ function arena_lib.settings(def)
 
   if def.celebration_time then
     celebration_time = def.celebration_time
+  end
+
+  if def.immunity_time then
+    immunity_time = def.immunity_time
   end
 
 end
@@ -172,12 +176,12 @@ function arena_lib.load_celebration(arena_ID, winner_name)
   for pl_name, stats in pairs(arena.players) do
 
     local inv = minetest.get_player_by_name(pl_name):get_inventory()
-    local weapon = inv:get_stack("main", 1)
-    local meta = weapon:get_meta():set_int("immune", 1)
-    inv:set_stack("main", 1, weapon)
+    -- giocatori immortali
+    if not inv:contains_item("main", "arena_lib.immunity") then
+      inv:set_stack("main", 8, "arena_lib:immunity")
+    end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-
     minetest.chat_send_player(pl_name, prefix  .. winner_name .. " ha vinto la partita")
   end
 
@@ -203,6 +207,8 @@ function arena_lib.end_arena(arena)
     arena.in_game = false
     arena_lib.update_sign(arena.sign, arena)
     arena_lib.update_storage()
+
+    minetest.get_player_by_name(pl_name):get_inventory():set_list("main", {})
 
     arena_lib.on_end()
 
@@ -312,18 +318,15 @@ end
 
 function arena_lib.immunity(player)
 
-  local p_name = player:get_player_name()
-  local weapon = player:get_inventory():get_stack("main", 1)
+  local immunity_item = ItemStack("arena_lib:immunity")
+  local inv = player:get_inventory()
 
-  weapon:get_meta():set_int("immune", 1)
-
-  player:get_inventory():set_stack("main", 1, weapon)
+  inv:set_stack("main", 8, immunity_item)
 
   minetest.after(immunity_time, function()
-    if player == nil then return end -- he may disconnect
-    if player:get_inventory():get_stack("main", 1):get_meta():get_int("immune") == 1 then
-      weapon:get_meta():set_int("immune", 0)
-      player:get_inventory():set_stack("main", 1, weapon)
+    if player == nil then return end -- they may disconnect
+    if inv:contains_item("main", immunity_item) then
+      inv:remove_item("main", immunity_item)
     end
   end)
 
@@ -382,9 +385,7 @@ end
 -----------------SETTERS----------------------
 ----------------------------------------------
 
-function arena_lib.set_immunity_time(time)
-  immunity_time = time
-end
+
 
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
