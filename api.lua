@@ -203,6 +203,8 @@ end
 
 function arena_lib.end_arena(arena)
 
+  arena_lib.on_end(arena)
+
   for pl_name, stats in pairs(arena.players) do
 
     arena.players[pl_name] = nil
@@ -214,8 +216,6 @@ function arena_lib.end_arena(arena)
     arena_lib.update_storage()
 
     minetest.get_player_by_name(pl_name):get_inventory():set_list("main", {})
-
-    arena_lib.on_end(arena)
 
     --TODO: teleport lobby, metti variabile locale
   end
