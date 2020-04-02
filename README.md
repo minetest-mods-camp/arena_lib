@@ -22,16 +22,6 @@ in your init.lua.
 
 For a in-depth understanding of what you can do with the library, have a look at the API document (TODO).
 
-### Arena phases
-
-An arena comes in 4 phases: 
-- load
-- start
-- celebration
-- end
-
-To add events such as to expand what happens in one of those, there is a function for every arena phase you can easily override: `on_load`, `on_start`, `on_celebration`, `on_end`.
-
 ### Dependencies
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
 
