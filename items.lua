@@ -1,4 +1,4 @@
-minetest.register_tool("arena_lib:immunity", {
+minetest.register_tool(arena_lib.mod_name .. ":immunity", {
 
   description = "Sei immune!",
   inventory_image = "arena_immunity.png",
@@ -10,7 +10,7 @@ minetest.register_tool("arena_lib:immunity", {
 
 --[[sovrascrizione "on_punch" nodo base dei cartelli per farli entrare
     nell'arena se sono cartelli appositi e "on_timer" per teletrasportali in partita quando la queue finisce]]
-minetest.register_tool("arena_lib:create_sign", {
+minetest.register_tool(arena_lib.mod_name .. ":create_sign", {
 
     description = "Left click on a sign to create an entrance or to remove it",
     inventory_image = "arena_createsign.png",

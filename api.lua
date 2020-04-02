@@ -1,11 +1,18 @@
+arena_lib = {}
+arena_lib.arenas = {}
+arena_lib.mod_name = minetest.get_current_modname()
+
+dofile(minetest.get_modpath("quake") .. "/arena_lib/debug_utilities.lua")
+dofile(minetest.get_modpath("quake") .. "/arena_lib/items.lua")
+dofile(minetest.get_modpath("quake") .. "/arena_lib/player_manager.lua")
+dofile(minetest.get_modpath("quake") .. "/arena_lib/signs.lua")
+
 ----------------------------------------------
 --------------GESTIONE STORAGE----------------
 ----------------------------------------------
 
 local storage = minetest.get_mod_storage()
 --storage:set_string("arenas", nil) -- PER RESETTARE LO STORAGE
-
-arena_lib = { arenas = {} }
 
 if minetest.deserialize(storage:get_string("arenas")) ~= nil then
   arena_lib.arenas = minetest.deserialize(storage:get_string("arenas"))

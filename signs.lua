@@ -120,7 +120,7 @@ function arena_lib.set_sign(sender, arena_name)
     return end
 
   -- assegno item creazione arene con ID arena nei metadati da restituire al premere sul cartello
-  local stick = ItemStack("arena_lib:create_sign")
+  local stick = ItemStack(arena_lib.mod_name .. ":create_sign")
   local meta = stick:get_meta()
   meta:set_int("arenaID", arena_ID)
 
