@@ -19,6 +19,9 @@ minetest.override_item("default:sign_wall", {
       local p_name = puncher:get_player_name()
 
       if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
+      if not sign_arena.enabled then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena non è attiva!"))
+      return end
 
       -- se è già in coda o viene fermato (cartello diverso) o si toglie dalla coda (cartello uguale)
       if arena_lib.is_player_in_queue(p_name) then
@@ -116,9 +119,6 @@ function arena_lib.set_sign(sender, arena_name)
   if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
    return end
 
-  if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Gli spawner devono essere quanto i giocatori massimi prima di impostare il cartello!"))
-    return end
-
   -- assegno item creazione arene con ID arena nei metadati da restituire al premere sul cartello
   local stick = ItemStack(arena_lib.mod_name .. ":create_sign")
   local meta = stick:get_meta()
@@ -156,7 +156,8 @@ end
 function in_game_txt(arena)
   local txt
 
-  if arena.in_celebration then txt = "Concludendo"
+  if not arena.enabled then txt = "LAVORI IN CORSO"
+  elseif arena.in_celebration then txt = "Concludendo"
   elseif arena.in_game then txt = "In partita"
   elseif arena.in_loading then txt = "In caricamento"
   else txt = "In attesa" end

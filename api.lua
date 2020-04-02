@@ -47,7 +47,8 @@ local arena_default = {
   in_queue = false,
   in_loading = false,
   in_game = false,
-  in_celebration = false
+  in_celebration = false,
+  enabled = false
 }
 
 local prefix = "[Arena_lib] "
@@ -172,6 +173,21 @@ end
 
 
 
+function arena_lib.set_enabled(sender, arena_ID, enabled)
+
+  local arena = arena_lib.arenas[arena_ID]
+
+  if enabled then
+    if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata"))
+      arena.enabled = false
+    end
+  end
+  --TODO: comando da lanciare ad arena impostata
+end
+
+
+
 ----------------------------------------------
 --------------GESTIONE PARTITA-----------------
 ----------------------------------------------
@@ -281,7 +297,6 @@ end
 
 function arena_lib.end_arena(arena)
 
-  arena_lib.on_end(arena)
   arena.kill_leader = ""
 
   for pl_name, stats in pairs(arena.players) do
@@ -296,6 +311,7 @@ function arena_lib.end_arena(arena)
     --TODO: teleport lobby, metti variabile locale
   end
   arena_lib.update_sign(arena.sign, arena)
+  arena_lib.on_end(arena)
 end
 
 
