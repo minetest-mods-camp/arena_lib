@@ -8,7 +8,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 1) **You DON'T need to create a different folder in your mods path.** Instead, create a folder called `arena_lib` inside your specific mod folder and put all the files of this repo there (mind the textures!).  
   
 2) Add this in your init.lua   
-`dofile(minetest.get_modpath("quake") .. "/arena_lib/api.lua")`
+`dofile(minetest.get_modpath("YOURMODNAME") .. "/arena_lib/api.lua")`
 
 3) You can customize the lib calling
 
