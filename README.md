@@ -12,7 +12,8 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 
 3) You can customize the lib calling
 
-```arena_lib.settings({
+```
+arena_lib.settings({
   prefix = "[whatever] "
   --other parameters
 })
