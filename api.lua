@@ -5,6 +5,8 @@
 local storage = minetest.get_mod_storage()
 --storage:set_string("arenas", nil) -- PER RESETTARE LO STORAGE
 
+arena_lib = { arenas = {} }
+
 if minetest.deserialize(storage:get_string("arenas")) ~= nil then
   arena_lib.arenas = minetest.deserialize(storage:get_string("arenas"))
 end
@@ -18,14 +20,12 @@ local function update_storage() end
 local function new_arena() end
 local function next_ID() end
 
-arena_lib = { arenas = {} }
-
 local arenasID
 local players_in_game = {}    --KEY: player name, INDEX: arenaID
 local players_in_queue = {}   --KEY: player name, INDEX: arenaID
 
-local arena_default_max_players = 2
-local arena_default_min_players = 1
+local arena_default_max_players = 4
+local arena_default_min_players = 2
 local arena_default_kill_cap = 10
 
 local arena_default = {
