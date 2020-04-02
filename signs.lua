@@ -2,7 +2,7 @@
 -- For the item to set signs, being a declaration of a new item, look at items.lua
 --
 
-
+local queue_waiting_time = 5
 
 local function in_game_txt(arena) end
 
@@ -50,31 +50,34 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena è già piena!"))
         return end
 
+      -- se sta caricando
+      if sign_arena.in_loading then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena è in caricamento, riprova tra qualche secondo!"))
+        return end
+
+      -- aggiungo il giocatore e aggiorno il cartello
+      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
+      arena_lib.update_sign(pos, sign_arena)
+
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
-        --TODO: butta dentro alla partita in corso. Sì, si può entrare mentre è in corso -------- arena_lib.join_arena(arenaID)
-
+        arena_lib.join_arena(p_name, arenaID)
         arena_lib.send_message_players_in_arena(arenaID, "[Quake] " .. p_name .. " si è aggiunto alla partita")
         minetest.chat_send_player(p_name, "[Quake] Sei entrato nell'arena " .. sign_arena.name)
+        return
       else
+        arena_lib.add_to_queue(p_name, arenaID)
         arena_lib.send_message_players_in_arena(arenaID, "[Quake] " .. p_name .. " si è aggiunto alla coda")
         minetest.chat_send_player(p_name, "[Quake] Ti sei aggiunto alla coda per " .. sign_arena.name)
       end
 
-      -- aggiungo il giocatore e aggiorno il cartello
-      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
-      arena_lib.add_to_queue(p_name, arenaID)
-      arena_lib.update_storage()
-      arena_lib.update_sign(pos, sign_arena)
-
       local timer = minetest.get_node_timer(pos)
-      local waiting_time = 5
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
       if arena_lib.get_arena_players_count(arenaID) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(arenaID, "[Quake] La partita inizierà tra " .. waiting_time .. " secondi!")
+        arena_lib.send_message_players_in_arena(arenaID, "[Quake] La partita inizierà tra " .. queue_waiting_time .. " secondi!")
         sign_arena.in_queue = true
-        timer:start(waiting_time)
+        timer:start(queue_waiting_time)
       end
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, parte subito
@@ -155,6 +158,7 @@ function in_game_txt(arena)
 
   if arena.in_celebration then txt = "Concludendo"
   elseif arena.in_game then txt = "In partita"
+  elseif arena.in_loading then txt = "In caricamento"
   else txt = "In attesa" end
 
   return txt

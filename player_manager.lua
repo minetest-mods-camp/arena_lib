@@ -29,6 +29,6 @@ minetest.register_on_respawnplayer(function(player)
 
     player:set_pos(arena_lib.get_random_spawner(arenaID))
     arena_lib.immunity(player)
-    return true -- <=== dovrebbe sovrascrivere la posizione di respawn del giocatore stando all'API riga 4283, ma non lo fa
+    return true
 
   end)
