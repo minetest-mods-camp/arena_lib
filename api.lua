@@ -179,11 +179,13 @@ function arena_lib.set_enabled(sender, arena_ID, enabled)
 
   if enabled then
     if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata"))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata!"))
       arena.enabled = false
-    end
+    return end
+
+    arena.enabled = true
+    minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
   end
-  --TODO: comando da lanciare ad arena impostata
 end
 
 
