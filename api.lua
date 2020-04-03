@@ -190,21 +190,20 @@ end
 
 
 
-function arena_lib.set_enabled(sender, arena_ID, enabled)
+function arena_lib.enable_arena(sender, arena_ID)
 
   local arena = arena_lib.arenas[arena_ID]
 
-  if enabled then
-    if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata!"))
-      arena.enabled = false
-    return end
+  if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata!"))
+    arena.enabled = false
+  return end
 
-    arena.enabled = true
-    arena_lib.update_sign(arena.sign, arena)
-    update_storage()
-    minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
-  end
+  arena.enabled = true
+  arena_lib.update_sign(arena.sign, arena)
+  update_storage()
+  minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
+
 end
 
 
