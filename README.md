@@ -20,7 +20,7 @@ arena_lib.settings({
 ```
 in your init.lua.  
 
-For a in-depth understanding of what you can do with the library, have a look at the API document (TODO).
+4) For a in-depth understanding of what you can do with the library, have a look at the [full documentation](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/DOCS.md).
 
 ### Dependencies
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
