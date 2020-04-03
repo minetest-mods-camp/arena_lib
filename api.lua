@@ -27,6 +27,7 @@ if minetest.deserialize(storage:get_string("arenas")) ~= nil then
     arena.kill_leader = ""
     arena.in_queue = false
     arena.in_loading = false
+    arena.in_game = false
     arena.in_celebration = false
 
     minetest.after(0.01, function()
@@ -218,7 +219,6 @@ function arena_lib.enable_arena(sender, arena_ID)
   minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
 
 end
-
 
 
 ----------------------------------------------
