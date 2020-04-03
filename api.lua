@@ -16,6 +16,23 @@ local storage = minetest.get_mod_storage()
 
 if minetest.deserialize(storage:get_string("arenas")) ~= nil then
   arena_lib.arenas = minetest.deserialize(storage:get_string("arenas"))
+
+  -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
+  -- stoppato con partite in corso. L'alternativa è mettere una cosa simile in
+  -- update_storage() copiando ricorsivamente la tabella e rimuovendo il tutto
+  -- nella tabella copiata, ma è più pesante. E non posso metterlo in
+  -- minetest.register_on_shutdown() perché se crasha non viene chiamato
+  for id, arena in pairs(arena_lib.arenas) do
+    arena.players = {}
+    arena.kill_leader = ""
+    arena.in_queue = false
+    arena.in_loading = false
+    arena.in_celebration = false
+
+    minetest.after(0.01, function()
+      arena_lib.update_sign(arena.sign, arena)
+    end)
+  end
 end
 
 
@@ -185,6 +202,7 @@ function arena_lib.set_enabled(sender, arena_ID, enabled)
 
     arena.enabled = true
     arena_lib.update_sign(arena.sign, arena)
+    update_storage()
     minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
   end
 end
