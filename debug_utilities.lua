@@ -4,23 +4,23 @@
 
 
 
-function arena_lib.print_arenas(name)
+function arena_lib.print_arenas(sender)
 
   local n = 0
   for id, arena in pairs(arena_lib.arenas) do
     n = n+1
-    minetest.chat_send_player(name, "ID: " .. id .. ", nome: " .. arena.name )
+    minetest.chat_send_player(sender, "ID: " .. id .. ", nome: " .. arena.name )
   end
 
-  minetest.chat_send_player(name, "Arene totali: " .. n )
+  minetest.chat_send_player(sender, "Arene totali: " .. n )
 
 end
 
 
 
-function arena_lib.print_arena_info(name, arena_name)
+function arena_lib.print_arena_info(sender, arena_name)
   local arena_ID, arena = arena_lib.get_arena_by_name(arena_name)
-  if arena == nil then  minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
+  if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
 
   local p_count = 0
   local names = ""
@@ -51,15 +51,15 @@ end
 
 
 
-function arena_lib.print_arena_stats(name, arena_name)
+function arena_lib.print_arena_stats(sender, arena_name)
 
   local arena_ID, arena = arena_lib.get_arena_by_name(arena_name)
-  if arena == nil then  minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
+  if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
 
   if not arena.in_game and not arena.in_celebration then minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Nessuna partita in corso!")) return end
 
   for pl, stats in pairs(arena.players) do
-    minetest.chat_send_player(name, "Player: " .. pl .. ", kills: " .. stats.kills .. ", deaths: " .. stats.deaths .. ", killstreak: " .. stats.killstreak)
+    minetest.chat_send_player(sender, "Player: " .. pl .. ", kills: " .. stats.kills .. ", deaths: " .. stats.deaths .. ", killstreak: " .. stats.killstreak)
   end
 
 end
