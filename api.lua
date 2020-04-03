@@ -302,8 +302,8 @@ function arena_lib.load_celebration(arena_ID, winner_name)
     local inv = minetest.get_player_by_name(pl_name):get_inventory()
 
     -- giocatori immortali
-    if not inv:contains_item("main", "arena_lib.immunity") then
-      inv:set_stack("main", immunity_slot, "arena_lib:immunity")
+    if not inv:contains_item("main", arena_lib.mod_name .. ":immunity") then
+      inv:set_stack("main", immunity_slot, arena_lib.mod_name .. ":immunity")
     end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
