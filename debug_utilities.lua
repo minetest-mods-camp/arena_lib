@@ -36,16 +36,18 @@ function arena_lib.print_arena_info(sender, arena_name)
     spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos)
   end
 
-  minetest.chat_send_player(name, [[
-    ]] .. "Nome: " .. arena_name .. [[
+  minetest.chat_send_player(sender, [[
+    ]] .. "Nome: " .. minetest.colorize("#eea160", arena_name ) .. [[
     ]] .. "ID: " .. arena_ID .. [[
+    ]] .. "Abilitata: " .. tostring(arena.enabled) .. [[
     ]] .. "Giocatori minimi: " .. arena.min_players .. [[
     ]] .. "Giocatori massimi: " .. arena.max_players .. [[
     ]] .. "Giocatori dentro: " .. p_count .. " ( ".. names .. " )" .. [[
     ]] .. "Kill per la vittoria: " .. arena.kill_cap .. [[
-    ]] .. "In partita: " .. tostring(arena.in_game) .. [[
-    ]] .. "In caricamento: " .. tostring(arena.in_loading) .. [[
     ]] .. "In coda: " .. tostring(arena.in_queue) .. [[
+    ]] .. "In caricamento: " .. tostring(arena.in_loading) .. [[
+    ]] .. "In partita: " .. tostring(arena.in_game) .. [[
+    ]] .. "In celebrazione: " .. tostring(arena.in_celebration) .. [[
     ]] .. "Spawn points: " .. spawners_count .. " ( " .. spawners_pos .. " )" )
 end
 
