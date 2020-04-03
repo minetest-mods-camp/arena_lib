@@ -4,7 +4,7 @@
 
 ## Preamble
 
-Let's start addressing the elephant in the room: "why not creating a separate mod instead of an API for devs? It sounds complicated"  
+Let's start by addressing the elephant in the room: "why not creating a separate mod instead of an API for devs? It sounds complicated"  
   
 Unfortunately creating a separate mod containing a system which stores every mod in a different table to be put inside the storage is a giant headache and not the best thing when it comes to performance. For instance, let's say you want to customize what happens when a player respawns and you have three different minigames relying on arena_lib: specifically, you want to override the respawn behaviour of only ONE of your minigames. But, well, if you do override the respawn event, every minigame will be affected because they depend on the same mod. So you could create a different list for exceptions in case an event gets called... for every possible event. And iterate not only for each mod you have, but also for every exception. Every time someone respawns. Or dies. Or joins. Or leaves. Or, well, you got it. Sounds fun, right? :^))))  
 I tried making the files as clear as possible, separating sections and writing down this separate English markdown file. Also, yes, comments inside the scripts are in Italian because I prefer to focus on the code rather than do an additional, however small, effort to think in another language (AKA I'm Italian). Love you long time, hope it'll be useful to someone.  
@@ -135,4 +135,4 @@ You need to connect the functions of the library with your mod in order to use t
 Something's wrong? Feel free to open an issue, go for a pull request and whatnot. I'd really appreciate it :)
 
 ## 4. About the author(s)
-I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://it.liberapay.com/EticaDigitale/) directly to my educational Italian project (because not everyone speaks English and Italy media don't talk much about these topics). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
+I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://it.liberapay.com/EticaDigitale/) directly to my educational Italian project (because not everyone speaks English and Italian media don't talk about these topics much). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
