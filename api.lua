@@ -161,32 +161,32 @@ end
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori e non possono essere impostati in aria
 -- Indicando lo spawner_ID, si andrà a sovrascrivere lo spawner con quell'ID se esiste
-function arena_lib.set_spawner(p_name, arena_name, spawner_ID)
+function arena_lib.set_spawner(sender, arena_name, spawner_ID)
 
   local id, arena = arena_lib.get_arena_by_name(arena_name)
 
-  if arena == nil then minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
+  if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
     return end
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(id)
 
   if spawn_points_count == arena.max_players and spawner_ID == nil then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] Gli spawn point non possono superare i giocatori massimi! Vuoi cancellarne alcuni con /quakeadmin delspawn <arena>?"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Gli spawn point non possono superare i giocatori massimi! Vuoi cancellarne alcuni con /quakeadmin delspawn <arena>?"))
   return end
 
   if spawner_ID ~= nil and spawner_ID > spawn_points_count then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] Nessuno spawner con quell'ID da sovrascrivere!"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Nessuno spawner con quell'ID da sovrascrivere!"))
   return end
 
-  local pos = vector.floor(minetest.get_player_by_name(p_name):get_pos())   --tolgo i decimali per storare un int
+  local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())   --tolgo i decimali per storare un int
   local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                    -- alzo Y di uno sennò tippa nel blocco
   local pos_feet = {x = pos.x, y = pos.y-1, z = pos.z}
 
-  if minetest.get_node(pos_feet).name == "air" then minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] Non puoi impostare spawn point nell'aria!"))
+  if minetest.get_node(pos_feet).name == "air" then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non puoi impostare spawn point nell'aria!"))
     return end
 
   for id, spawn in pairs(arena.spawn_points) do
-    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] C'è già uno spawn in questo punto!"))
+    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] C'è già uno spawn in questo punto!"))
       return end
   end
 
