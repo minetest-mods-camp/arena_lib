@@ -69,6 +69,7 @@ local arena_default = {
 }
 
 local prefix = "[Arena_lib] "
+local hub_spawn_point = { x = 0, y = 20, z = 0}
 local load_time = 3
 local celebration_time = 3
 local immunity_time = 3
@@ -80,6 +81,10 @@ function arena_lib.settings(def)
 
   if def.prefix then
     prefix = def.prefix
+  end
+
+  if def.hub_spawn_point then
+    hub_spawn_point = def.hub_spawn_point
   end
 
   if def.load_time then
@@ -330,10 +335,12 @@ function arena_lib.end_arena(arena)
     arena.in_celebration = false
     arena.in_game = false
 
-    minetest.get_player_by_name(pl_name):get_inventory():set_list("main", {})
+    local player = minetest.get_player_by_name (pl_name)
 
-    --TODO: teleport lobby, metti variabile locale
+    player:get_inventory():set_list("main", {})
+    player:set_pos(hub_spawn_point)
   end
+
   arena_lib.update_sign(arena.sign, arena)
   arena_lib.on_end(arena, players)
 end
@@ -470,6 +477,12 @@ end
 -----------------GETTERS----------------------
 ----------------------------------------------
 
+function arena_lib.get_hub_spawnpoint()
+  return hub_spawn_point
+end
+
+
+
 function arena_lib.get_arena_by_name(arena_name)
 
   for id, arena in pairs(arena_lib.arenas) do
@@ -479,14 +492,17 @@ function arena_lib.get_arena_by_name(arena_name)
 end
 
 
+
 function arena_lib.get_arenaID_by_player(p_name)
   return players_in_game[p_name]
 end
 
 
+
 function arena_lib.get_queueID_by_player(p_name)
   return players_in_queue[p_name]
 end
+
 
 
 function arena_lib.get_arena_players_count(arena_ID)
@@ -502,9 +518,11 @@ function arena_lib.get_arena_players_count(arena_ID)
 end
 
 
+
 function arena_lib.get_arena_spawners_count(arena_ID)
   return table.maxn(arena_lib.arenas[arena_ID].spawn_points)
 end
+
 
 
 function arena_lib.get_random_spawner(arena_ID)

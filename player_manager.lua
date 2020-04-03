@@ -1,3 +1,10 @@
+minetest.register_on_joinplayer(function(player)
+
+  player:set_pos(arena_lib.get_hub_spawnpoint())
+
+end)
+
+
 minetest.register_on_leaveplayer(function(player)
 
     local p_name = player:get_player_name()
