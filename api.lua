@@ -237,8 +237,9 @@ function arena_lib.join_arena(p_name, arena_ID)
 
   local player = minetest.get_player_by_name(p_name)
 
-  player:set_pos(arena_lib.get_random_spawner(arena_ID))
+  player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   player:get_inventory():set_list("main",{})
+  player:set_pos(arena_lib.get_random_spawner(arena_ID))
   players_in_game[p_name] = arena_ID
 
   arena_lib.on_join(p_name, arena_ID)
