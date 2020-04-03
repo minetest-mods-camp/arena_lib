@@ -1,6 +1,6 @@
 # Arena_lib docs
 
->> Arena_lib is a library for Minetest working as a core for any arena-like minigame you have in mind
+> Arena_lib is a library for Minetest working as a core for any arena-like minigame you have in mind
 
 ## Preamble
 
