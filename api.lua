@@ -184,6 +184,7 @@ function arena_lib.set_enabled(sender, arena_ID, enabled)
     return end
 
     arena.enabled = true
+    arena_lib.update_sign(arena.sign, arena)
     minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
   end
 end
@@ -238,7 +239,7 @@ function arena_lib.join_arena(p_name, arena_ID)
 
   player:set_pos(arena_lib.get_random_spawner(arena_ID))
   player:get_inventory():set_list("main",{})
-  players_in_game[pl_name] = arena_ID
+  players_in_game[p_name] = arena_ID
 
   arena_lib.on_join(p_name, arena_ID)
 end
@@ -301,8 +302,11 @@ function arena_lib.end_arena(arena)
 
   arena.kill_leader = ""
 
+  local players = {}
+
   for pl_name, stats in pairs(arena.players) do
 
+    players[pl_name] = stats
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
     arena.in_celebration = false
@@ -313,7 +317,7 @@ function arena_lib.end_arena(arena)
     --TODO: teleport lobby, metti variabile locale
   end
   arena_lib.update_sign(arena.sign, arena)
-  arena_lib.on_end(arena)
+  arena_lib.on_end(arena, players)
 end
 
 
@@ -397,8 +401,11 @@ function arena_lib.remove_player_from_arena(p_name)
   players_in_queue[p_name] = nil
   arena_lib.send_message_players_in_arena(arena_ID, prefix .. p_name .. " ha abbandonato la partita")
 
-  if arena.get_arena_players_count(arena_ID) == 1 then
-    arena.send_message_players_in_arena(arena_ID, prefix .. "Hai vinto la partita per troppi pochi giocatori")
+  if arena_lib.get_arena_players_count(arena_ID) == 1 then
+    arena_lib.send_message_players_in_arena(arena_ID, prefix .. "Hai vinto la partita per troppi pochi giocatori")
+    for pl_name, stats in pairs(arena.players) do
+      arena_lib.on_celebration(arena_ID, pl_name)
+    end
   end
 end
 
@@ -423,7 +430,7 @@ end
 
 function arena_lib.immunity(player)
 
-  local immunity_item = ItemStack("arena_lib:immunity")
+  local immunity_item = ItemStack(arena_lib.mod_name ..":immunity")
   local inv = player:get_inventory()
 
   inv:set_stack("main", immunity_slot, immunity_item)
