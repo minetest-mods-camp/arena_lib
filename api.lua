@@ -524,6 +524,12 @@ end
 
 
 
+function arena_lib.get_prefix()
+  return prefix
+end
+
+
+
 function arena_lib.get_arena_by_name(arena_name)
 
   for id, arena in pairs(arena_lib.arenas) do

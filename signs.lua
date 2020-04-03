@@ -3,6 +3,11 @@
 --
 
 local queue_waiting_time = 5
+local prefix
+
+minetest.after(0.01, function()
+  prefix = arena_lib.get_prefix()
+end)
 
 local function in_game_txt(arena) end
 
@@ -28,22 +33,20 @@ minetest.override_item("default:sign_wall", {
 
         local queued_ID = arena_lib.get_queueID_by_player(p_name)
 
-        minetest.chat_send_player("singleplayer", "queued_ID = " .. queued_ID .. ", arenaID = " .. arenaID)
-
         if queued_ID ~= arenaID then
-          minetest.chat_send_player(p_name, "[Quake]" .. minetest.colorize("#e6482e", "Devi prima uscire dalla coda di " .. arena_lib.arenas[queued_ID].name .. "!"))
+          minetest.chat_send_player(p_name, prefix .. minetest.colorize("#e6482e", "Devi prima uscire dalla coda di " .. arena_lib.arenas[queued_ID].name .. "!"))
         else
 
           sign_arena.players[p_name] = nil
           arena_lib.update_sign(pos, sign_arena)
           arena_lib.remove_from_queue(p_name)
-          minetest.chat_send_player(p_name, "[Quake] Sei uscito dalla coda")
-          arena_lib.send_message_players_in_arena(arenaID, "[Quake] " .. p_name .. " ha abbandonato la coda")
+          minetest.chat_send_player(p_name, prefix .. "Sei uscito dalla coda")
+          arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " ha abbandonato la coda")
 
           -- se non ci sono più abbastanza giocatori, annullo la coda
           if arena_lib.get_arena_players_count(arenaID) < sign_arena.min_players and sign_arena.in_queue then
             --timer:stop()
-            arena_lib.send_message_players_in_arena(arenaID, "[Quake] La coda è stata annullata per troppi pochi giocatori")
+            arena_lib.send_message_players_in_arena(arenaID, prefix .. "La coda è stata annullata per troppi pochi giocatori")
           end
         end
       return end
@@ -58,27 +61,27 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena è in caricamento, riprova tra qualche secondo!"))
         return end
 
-      -- aggiungo il giocatore e aggiorno il cartello
-      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
-      arena_lib.update_sign(pos, sign_arena)
-
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
         arena_lib.join_arena(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(arenaID, "[Quake] " .. p_name .. " si è aggiunto alla partita")
-        minetest.chat_send_player(p_name, "[Quake] Sei entrato nell'arena " .. sign_arena.name)
+        arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " si è aggiunto alla partita")
+        minetest.chat_send_player(p_name, prefix .. "Sei entrato nell'arena " .. sign_arena.name)
         return
       else
         arena_lib.add_to_queue(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(arenaID, "[Quake] " .. p_name .. " si è aggiunto alla coda")
-        minetest.chat_send_player(p_name, "[Quake] Ti sei aggiunto alla coda per " .. sign_arena.name)
+        arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " si è aggiunto alla coda")
+        minetest.chat_send_player(p_name, prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
       end
+
+      -- aggiungo il giocatore e aggiorno il cartello
+      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
+      arena_lib.update_sign(pos, sign_arena)
 
       local timer = minetest.get_node_timer(pos)
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
       if arena_lib.get_arena_players_count(arenaID) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(arenaID, "[Quake] La partita inizierà tra " .. queue_waiting_time .. " secondi!")
+        arena_lib.send_message_players_in_arena(arenaID, prefix .. "La partita inizierà tra " .. queue_waiting_time .. " secondi!")
         sign_arena.in_queue = true
         timer:start(queue_waiting_time)
       end
