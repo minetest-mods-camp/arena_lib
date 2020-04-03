@@ -221,6 +221,39 @@ function arena_lib.enable_arena(sender, arena_ID)
 end
 
 
+
+function arena_lib.disable_arena(sender, arena_ID)
+
+  local arena = arena_lib.arenas[arena_ID]
+
+  if not arena then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non esiste nessun'arena associata a questo ID!"))
+  return end
+
+  if not arena.enabled then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] L'arena è già disabilitata"))
+  return end
+
+  if arena.in_loading or arena.in_game or arena.in_celebration then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non puoi disabilitare un'arena mentre una partita è in corso!"))
+  return end
+
+  -- se c'è rimasto qualcuno, erano in coda
+  for pl_name, stats in pairs(arena.players) do
+
+    players_in_queue[pl_name] = nil
+    arena.players[pl_name] = nil
+    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", "[!] L'arena per la quale eri in coda è stata disabilitata!"))
+
+  end
+
+  arena.enabled = false
+  arena_lib.update_sign(arena.sign, arena)
+  update_storage()
+  minetest.chat_send_player(sender, prefix .. "L'arena " .. arena.name .. " è stata disabilitata con successo")
+end
+
+
 ----------------------------------------------
 --------------GESTIONE PARTITA-----------------
 ----------------------------------------------
