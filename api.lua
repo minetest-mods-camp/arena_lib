@@ -160,7 +160,8 @@ end
 
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori e non possono essere impostati in aria
-function arena_lib.set_spawner(name, arena_name)
+-- Indicando lo spawner_ID, si andrà a sovrascrivere lo spawner con quell'ID se esiste
+function arena_lib.set_spawner(name, arena_name, spawner_ID)
 
   local id, arena = arena_lib.get_arena_by_name(arena_name)
 
@@ -169,9 +170,13 @@ function arena_lib.set_spawner(name, arena_name)
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(id)
 
-  if spawn_points_count == arena.max_players then
+  if spawn_points_count == arena.max_players and spawner_ID == nil then
     minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Gli spawn point non possono superare i giocatori massimi! Vuoi cancellarne alcuni con /quakeadmin delspawn <arena>?"))
-    return end
+  return end
+
+  if spawner_ID ~= nil and spawner_ID > spawn_points_count then
+    minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Nessuno spawner con quell'ID da sovrascrivere!"))
+  return end
 
   local pos = vector.floor(minetest.get_player_by_name(name):get_pos())   --tolgo i decimali per storare un int
   local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                    -- alzo Y di uno sennò tippa nel blocco
@@ -185,12 +190,15 @@ function arena_lib.set_spawner(name, arena_name)
       return end
   end
 
-  local new_spawn_ID = spawn_points_count +1
+  if spawner_ID ~= nil then
+    arena.spawn_points[spawner_ID] = pos_Y_up
+    minetest.chat_send_player(name, prefix .. "Spawn point " .. spawner_ID .. " sovrascritto con successo" )
+  else
+    arena.spawn_points[spawn_points_count +1] = pos_Y_up
+    minetest.chat_send_player(name, prefix .. "Spawn point " .. spawn_points_count +1 .. " impostato con successo" )
+  end
 
-  arena.spawn_points[new_spawn_ID] = pos_Y_up
   update_storage()
-  minetest.chat_send_player(name, prefix .. "Spawn point " .. new_spawn_ID .. " impostato con successo" )
-
 end
 
 
