@@ -417,6 +417,8 @@ function arena_lib.remove_player_from_arena(p_name)
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
+
+  arena_lib.update_sign(arena.sign, arena)
   arena_lib.send_message_players_in_arena(arena_ID, prefix .. p_name .. " ha abbandonato la partita")
 
   if arena_lib.get_arena_players_count(arena_ID) == 1 then
