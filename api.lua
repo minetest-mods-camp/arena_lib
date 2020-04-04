@@ -2,10 +2,10 @@ arena_lib = {}
 arena_lib.arenas = {}
 arena_lib.mod_name = minetest.get_current_modname()
 
-dofile(minetest.get_modpath("quake") .. "/arena_lib/debug_utilities.lua")
-dofile(minetest.get_modpath("quake") .. "/arena_lib/items.lua")
-dofile(minetest.get_modpath("quake") .. "/arena_lib/player_manager.lua")
-dofile(minetest.get_modpath("quake") .. "/arena_lib/signs.lua")
+dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/debug_utilities.lua")
+dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/items.lua")
+dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/player_manager.lua")
+dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/signs.lua")
 
 ----------------------------------------------
 --------------GESTIONE STORAGE----------------
