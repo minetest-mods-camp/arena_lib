@@ -8,7 +8,9 @@ end)
 minetest.register_on_leaveplayer(function(player)
 
     local p_name = player:get_player_name()
-    if arena_lib.get_arenaID_by_player(p_name) == nil then return end
+    if arena_lib.get_arenaID_by_player(p_name) == nil and arena_lib.get_queueID_by_player(p_name) == nil then return end
+
+    minetest.chat_send_player("Zughy", "Vado sul remove player")
 
     arena_lib.remove_player_from_arena(p_name)
 end)

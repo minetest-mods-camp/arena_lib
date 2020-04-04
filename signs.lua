@@ -45,7 +45,7 @@ minetest.override_item("default:sign_wall", {
 
           -- se non ci sono più abbastanza giocatori, annullo la coda
           if arena_lib.get_arena_players_count(arenaID) < sign_arena.min_players and sign_arena.in_queue then
-            --timer:stop()
+            timer:stop()
             arena_lib.send_message_players_in_arena(arenaID, prefix .. "La coda è stata annullata per troppi pochi giocatori")
           end
         end
@@ -61,6 +61,10 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena è in caricamento, riprova tra qualche secondo!"))
         return end
 
+      -- aggiungo il giocatore e aggiorno il cartello
+      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
+      arena_lib.update_sign(pos, sign_arena)
+
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
         arena_lib.join_arena(p_name, arenaID)
@@ -72,10 +76,6 @@ minetest.override_item("default:sign_wall", {
         arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " si è aggiunto alla coda")
         minetest.chat_send_player(p_name, prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
       end
-
-      -- aggiungo il giocatore e aggiorno il cartello
-      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
-      arena_lib.update_sign(pos, sign_arena)
 
       local timer = minetest.get_node_timer(pos)
 

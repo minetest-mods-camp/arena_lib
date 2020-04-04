@@ -457,7 +457,11 @@ end
 
 function arena_lib.remove_player_from_arena(p_name)
 
-  local arena_ID = players_in_game[p_name]
+  local arena_ID
+    if players_in_game[p_name] == nil then arena_ID = players_in_queue[p_name]
+    else arena_ID = players_in_game[p_name]
+    end
+
   local arena = arena_lib.arenas[arena_ID]
 
   if arena == nil then return end
@@ -469,12 +473,23 @@ function arena_lib.remove_player_from_arena(p_name)
   arena_lib.update_sign(arena.sign, arena)
   arena_lib.send_message_players_in_arena(arena_ID, prefix .. p_name .. " ha abbandonato la partita")
 
-  if arena_lib.get_arena_players_count(arena_ID) == 1 then
+  if arena.in_queue then
+    local timer = minetest.get_node_timer(arena.sign)
+
+    if arena_lib.get_arena_players_count(arena_ID) < arena.min_players then
+      timer:stop()
+      arena.in_queue = false
+      arena_lib.send_message_players_in_arena(arena_ID, prefix .. "La coda è stata annullata per troppi pochi giocatori")
+    end
+
+  elseif arena_lib.get_arena_players_count(arena_ID) == 1 then
+
     arena_lib.send_message_players_in_arena(arena_ID, prefix .. "Hai vinto la partita per troppi pochi giocatori")
     for pl_name, stats in pairs(arena.players) do
       arena_lib.on_celebration(arena_ID, pl_name)
     end
   end
+
 end
 
 
