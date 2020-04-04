@@ -21,10 +21,14 @@ arena_lib.settings({
 ```
 in your init.lua.  
 
-4) For an in-depth understanding of what you can do with the library, have a look at the [full documentation](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/DOCS.md).
+4) For an in-depth understanding of what you can do with the library, have a look at the [full documentation](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/DOCS.md).  
 
 ### Dependencies
+Default
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
 
 ### Known conflicts
-`Beds` or any other mod overriding the default respawn system
+`Beds` or any other mod overriding the default respawn system  
+
+#### Mods relying on arena_lib
+[Quake](https://gitlab.com/zughy-friends-minetest/minetest-quake)
