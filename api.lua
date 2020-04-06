@@ -193,10 +193,10 @@ function arena_lib.set_spawner(sender, arena_name, spawner_ID)
 
   if spawner_ID ~= nil then
     arena.spawn_points[spawner_ID] = pos_Y_up
-    minetest.chat_send_player(name, prefix .. "Spawn point " .. spawner_ID .. " sovrascritto con successo" )
+    minetest.chat_send_player(sender, prefix .. "Spawn point " .. spawner_ID .. " sovrascritto con successo" )
   else
     arena.spawn_points[spawn_points_count +1] = pos_Y_up
-    minetest.chat_send_player(name, prefix .. "Spawn point " .. spawn_points_count +1 .. " impostato con successo" )
+    minetest.chat_send_player(sender, prefix .. "Spawn point " .. spawn_points_count +1 .. " impostato con successo" )
   end
 
   update_storage()
