@@ -112,7 +112,7 @@ end
 ---------------GESTIONE ARENA-----------------
 ----------------------------------------------
 
-function arena_lib.create_arena(sender, arena_name)
+function arena_lib.create_arena(sender, arena_name, min_players, max_players)
 
   arenasID = next_ID()
 
@@ -124,6 +124,10 @@ function arena_lib.create_arena(sender, arena_name)
   -- creo l'arena e la rinomino, aggiornando anche lo storage
   arena_lib.arenas[arenasID] = new_arena(arena_default)
   arena_lib.arenas[arenasID].name = arena_name
+  if min_players and max_players then
+    arena_lib.arenas[arenasID].min_players = min_players
+    arena_lib.arenas[arenasID].max_players = max_players
+  end
   update_storage()
   minetest.chat_send_player(sender, prefix .. "Arena " .. arena_name .. " creata con successo")
 
