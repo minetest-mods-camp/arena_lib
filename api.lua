@@ -31,6 +31,7 @@ if minetest.deserialize(storage:get_string("arenas")) ~= nil then
     arena.in_celebration = false
 
     minetest.after(0.01, function()
+      if not arena.sign.x then return end       --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
       arena_lib.update_sign(arena.sign, arena)
     end)
   end
