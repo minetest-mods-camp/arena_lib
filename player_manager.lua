@@ -27,7 +27,14 @@ minetest.register_on_dieplayer(function(player, reason)
     p_stats.deaths = p_stats.deaths +1
     p_stats.killstreak = 0
 
+    arena_lib.on_death(arena, p_name)
+
   end)
+
+
+function arena_lib.on_death(arena, p_name)
+  --DO STUFF, override me if you need to
+end
 
 
 
