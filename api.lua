@@ -491,7 +491,7 @@ function arena_lib.remove_player_from_arena(p_name)
 
     arena_lib.send_message_players_in_arena(arena_ID, prefix .. "Hai vinto la partita per troppi pochi giocatori")
     for pl_name, stats in pairs(arena.players) do
-      arena_lib.on_celebration(arena_ID, pl_name)
+      arena_lib.load_celebration(arena_ID, pl_name)
     end
   end
 
