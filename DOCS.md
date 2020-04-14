@@ -94,17 +94,16 @@ The 4 functions, intertwined with the previously mentioned phases are:
 * `arena_lib.end_arena(arena)`: at the very end of the celebration phase. It teleports people outside the arena
 
 Overriding these functions is not recommended. Instead, there are 4 respective functions made specifically to customize the behaviour of the formers, sharing the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are:
-* `arena_lib.on_load(arena_ID)` 
+* `arena_lib.on_load(arena)` 
 * `arena_lib.on_start(arena)`
-* `arena_lib.on_celebration(arena_ID, winner_name)`
+* `arena_lib.on_celebration(arena, winner_name)`
 * `arena_lib.on_end(arena, players)`
 
 So for example if we want to add an object in the first slot when they join the pre-match, we can simply do:
 
 ```
-function arena_lib.on_load(arena_ID)
+function arena_lib.on_load(arena)
 
-  local arena = arena_lib.arenas[arena_ID]
   local item = ItemStack("default:dirt")
 
   for pl_name, stats in pairs(arena.players) do
