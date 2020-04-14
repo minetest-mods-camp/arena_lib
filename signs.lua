@@ -41,19 +41,19 @@ minetest.override_item("default:sign_wall", {
           arena_lib.update_sign(pos, sign_arena)
           arena_lib.remove_from_queue(p_name)
           minetest.chat_send_player(p_name, prefix .. "Sei uscito dalla coda")
-          arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " ha abbandonato la coda")
+          arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " ha abbandonato la coda")
 
           -- se non ci sono più abbastanza giocatori, annullo la coda
-          if arena_lib.get_arena_players_count(arenaID) < sign_arena.min_players and sign_arena.in_queue then
+          if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
-            arena_lib.send_message_players_in_arena(arenaID, prefix .. "La coda è stata annullata per troppi pochi giocatori")
+            arena_lib.send_message_players_in_arena(sign_arena, prefix .. "La coda è stata annullata per troppi pochi giocatori")
             arena.in_queue = false
           end
         end
       return end
 
       -- se l'arena è piena
-      if arena_lib.get_arena_players_count(arenaID) == sign_arena.max_players then
+      if arena_lib.get_arena_players_count(sign_arena) == sign_arena.max_players then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena è già piena!"))
         return end
 
@@ -69,26 +69,26 @@ minetest.override_item("default:sign_wall", {
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
         arena_lib.join_arena(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " si è aggiunto alla partita")
+        arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " si è aggiunto alla partita")
         minetest.chat_send_player(p_name, prefix .. "Sei entrato nell'arena " .. sign_arena.name)
         return
       else
         arena_lib.add_to_queue(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(arenaID, prefix .. p_name .. " si è aggiunto alla coda")
+        arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " si è aggiunto alla coda")
         minetest.chat_send_player(p_name, prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
       end
 
       local timer = minetest.get_node_timer(pos)
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
-      if arena_lib.get_arena_players_count(arenaID) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(arenaID, prefix .. "La partita inizierà tra " .. queue_waiting_time .. " secondi!")
+      if arena_lib.get_arena_players_count(sign_arena) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
+        arena_lib.send_message_players_in_arena(sign_arena, prefix .. "La partita inizierà tra " .. queue_waiting_time .. " secondi!")
         sign_arena.in_queue = true
         timer:start(queue_waiting_time)
       end
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, parte subito
-      if arena_lib.get_arena_players_count(arenaID) == sign_arena.max_players and sign_arena.in_queue then
+      if arena_lib.get_arena_players_count(sign_arena) == sign_arena.max_players and sign_arena.in_queue then
         timer:stop()
         timer:start(0.01)
       end
