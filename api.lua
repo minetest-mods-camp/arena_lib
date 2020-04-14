@@ -153,7 +153,7 @@ function arena_lib.remove_arena(sender, arena_name)
   if arena.sign ~= nil then
     minetest.set_node(arena.sign, {name = "air"}) end
 
-  arena_lib.send_message_players_in_arena(id, prefix .."L'arena per la quale eri in coda è stata rimossa... :(")
+  arena_lib.send_message_players_in_arena(arena, prefix .."L'arena per la quale eri in coda è stata rimossa... :(")
 
   -- rimozione arena e aggiornamento storage
   arena_lib.arenas[id] = nil
@@ -304,13 +304,14 @@ end
 function arena_lib.join_arena(p_name, arena_ID)
 
   local player = minetest.get_player_by_name(p_name)
-
+  local arena = arena_lib.arenas[arena_ID]
+  
   player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   player:get_inventory():set_list("main",{})
   player:set_pos(arena_lib.get_random_spawner(arena_ID))
   players_in_game[p_name] = arena_ID
 
-  arena_lib.on_join(p_name, arena_ID)
+  arena_lib.on_join(p_name, arena)
 end
 
 
@@ -356,7 +357,7 @@ function arena_lib.load_celebration(arena_ID, winner_name)
     minetest.chat_send_player(pl_name, prefix  .. winner_name .. " ha vinto la partita")
   end
 
-  arena_lib.on_celebration(arena_ID, winner_name)
+  arena_lib.on_celebration(arena, winner_name)
 
   -- momento celebrazione
   minetest.after(celebration_time, function()
@@ -412,7 +413,7 @@ end
 
 
 
-function arena_lib.on_join(p_name, arena_ID)
+function arena_lib.on_join(p_name, arena)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_join() yourstuff end]]
 end
@@ -426,7 +427,7 @@ end
 
 
 
-function arena_lib.on_celebration(arena_ID, winner_name)
+function arena_lib.on_celebration(arena, winner_name)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_celebration() yourstuff end]]
 end
@@ -476,22 +477,22 @@ function arena_lib.remove_player_from_arena(p_name)
   players_in_queue[p_name] = nil
 
   arena_lib.update_sign(arena.sign, arena)
-  arena_lib.send_message_players_in_arena(arena_ID, prefix .. p_name .. " ha abbandonato la partita")
+  arena_lib.send_message_players_in_arena(arena, prefix .. p_name .. " ha abbandonato la partita")
 
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
 
-    if arena_lib.get_arena_players_count(arena_ID) < arena.min_players then
+    if arena_lib.get_arena_players_count(arena) < arena.min_players then
       timer:stop()
       arena.in_queue = false
-      arena_lib.send_message_players_in_arena(arena_ID, prefix .. "La coda è stata annullata per troppi pochi giocatori")
+      arena_lib.send_message_players_in_arena(arena, prefix .. "La coda è stata annullata per troppi pochi giocatori")
     end
 
-  elseif arena_lib.get_arena_players_count(arena_ID) == 1 then
+  elseif arena_lib.get_arena_players_count(arena) == 1 then
 
-    arena_lib.send_message_players_in_arena(arena_ID, prefix .. "Hai vinto la partita per troppi pochi giocatori")
+    arena_lib.send_message_players_in_arena(arena, prefix .. "Hai vinto la partita per troppi pochi giocatori")
     for pl_name, stats in pairs(arena.players) do
-      arena_lib.load_celebration(arena_ID, pl_name)
+      arena_lib.load_celebration(arena, pl_name)
     end
   end
 
@@ -499,8 +500,8 @@ end
 
 
 
-function arena_lib.send_message_players_in_arena(arena_ID, msg)
-  for pl_name, stats in pairs(arena_lib.arenas[arena_ID].players) do
+function arena_lib.send_message_players_in_arena(arena, msg)
+  for pl_name, stats in pairs(arena.players) do
     minetest.chat_send_player(pl_name, msg) end
 end
 
@@ -572,10 +573,9 @@ end
 
 
 
-function arena_lib.get_arena_players_count(arena_ID)
+function arena_lib.get_arena_players_count(arena)
 
   local count = 0
-  local arena = arena_lib.arenas[arena_ID]
 
   for pl_name, stats in pairs(arena.players) do
     count = count+1
