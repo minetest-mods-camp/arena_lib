@@ -2,7 +2,7 @@
 local players_jumping = {} --KEY: player, VALUE: boolean
 
 --Hopefully waiting on https://github.com/minetest/minetest/issues/9626, in the meanwhile..
-minetest.register_globalstep(function(dtime)
+--[[minetest.register_globalstep(function(dtime)
 
   for pl_name, id in pairs(arena_lib.get_players_in_game()) do
 
@@ -29,10 +29,10 @@ minetest.register_globalstep(function(dtime)
       minetest.after(0.2, function()
         players_jumping[pl_name] = false
       end)
-    end]]
+    end
 
   end
-end)
+end)]]
 
 
 

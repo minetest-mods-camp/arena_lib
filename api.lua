@@ -3,7 +3,7 @@ arena_lib.arenas = {}
 arena_lib.mod_name = minetest.get_current_modname()
 
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/debug_utilities.lua")
-dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/input_manager.lua")
+--dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/input_manager.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/items.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/player_manager.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/signs.lua")
@@ -306,7 +306,7 @@ function arena_lib.join_arena(p_name, arena_ID)
 
   local player = minetest.get_player_by_name(p_name)
   local arena = arena_lib.arenas[arena_ID]
-  
+
   player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   player:get_inventory():set_list("main",{})
   player:set_pos(arena_lib.get_random_spawner(arena_ID))
