@@ -3,6 +3,7 @@ arena_lib.arenas = {}
 arena_lib.mod_name = minetest.get_current_modname()
 
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/debug_utilities.lua")
+dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/input_manager.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/items.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/player_manager.lua")
 dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/signs.lua")
@@ -557,6 +558,12 @@ function arena_lib.get_arena_by_name(arena_name)
     if arena.name == arena_name then
       return id, arena end
   end
+end
+
+
+
+function arena_lib.get_players_in_game()
+  return players_in_game
 end
 
 
