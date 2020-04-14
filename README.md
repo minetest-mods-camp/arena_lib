@@ -6,6 +6,9 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 <a href="https://liberapay.com/EticaDigitale/donate"><img src="https://i.imgur.com/4B2PxjP.png" alt="Support my work"/></a>  
 
 ### Config
+
+> BEWARE! Arena_lib right now works with a minigame only. DO NOT use it for more than one mod in the same client/server or it'll override itself over and over. We're on it to fix it
+
 1) **You DON'T need to create a different folder in your mods path.** Instead, create a folder called `arena_lib` inside your specific mod folder and put all the files of this repo there (mind the textures!).  
   
 2) Add this in your init.lua   
