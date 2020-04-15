@@ -4,10 +4,10 @@
 
 
 
-function arena_lib.print_arenas(sender)
+function arena_lib.print_arenas(sender, mod)
 
   local n = 0
-  for id, arena in pairs(arena_lib.arenas) do
+  for id, arena in pairs(arena_lib.mods[mod].arenas) do
     n = n+1
     minetest.chat_send_player(sender, "ID: " .. id .. ", nome: " .. arena.name )
   end

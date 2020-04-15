@@ -8,7 +8,7 @@ local hub_spawnpoint = { x = 0, y = 20, z = 0}
 ----------------------------------------------
 
 local storage = minetest.get_mod_storage()
---storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
+storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
 if minetest.deserialize(storage:get_string("mods")) ~= nil then
   arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
@@ -44,7 +44,6 @@ local function update_storage() end
 local function new_arena() end
 local function next_ID() end
 
-local arenasID
 local players_in_game = {}    --KEY: player name, INDEX: arenaID
 local players_in_queue = {}   --KEY: player name, INDEX: arenaID
 
@@ -69,12 +68,25 @@ local arena_default = {
 }
 
 
+
+-- per inizializzare. Da lanciare all'inizio di ogni mod
+function arena_lib.initialize(mod_name)
+
+  --Se esiste già in memoria, ignora il resto
+  if arena_lib.mods[mod_name] ~= nil then return end
+
+  arena_lib.mods[mod_name] = {}
+  arena_lib.mods[mod_name].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
+  arena_lib.mods[mod_name].arenasID = 1     -- we start counting from 1, not 0
+
+end
+
+
+
 -- call this in your mod to override the default parameters
 function arena_lib.settings(modname, def)
 
   local mod_tab = arena_lib.mods[modname]
-
-  mod_tab.arenasID
 
   --default parameters
   mod_tab.prefix = "[Arena_lib] "
@@ -112,41 +124,36 @@ end
 
 
 
-function arena_lib.initialize(mod_name)
-
-  if arena_lib.mods[mod_name] ~= nil then return end
-
-  arena_lib.mods[mod_name] = {}
-  arena_lib.mods[mod_name].arenasID = 1
-
-end
-
-
-
 ----------------------------------------------
 ---------------GESTIONE ARENA-----------------
 ----------------------------------------------
 
-function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
+function arena_lib.create_arena(sender, mod_name, arena_name, min_players, max_players)
 
-  local arena = arena_lib.mods[mod]
-
-  arena.arenasID = next_ID()
+  local mod = arena_lib.mods[mod_name]
+  mod.arenasID = next_ID(mod)
 
   -- controllo che non ci siano duplicati
-  if arenasID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
+  if mod.arenasID > 1 and arena_lib.get_arena_by_name(mod_name, arena_name) ~= nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Esiste già un'arena con quel nome!"))
     return end
 
-  -- creo l'arena e la rinomino, aggiornando anche lo storage
-  arena_lib.mods[mod][arenasID] = new_arena(arena_default)
-  arena_lib.arenas[arenasID].name = arena_name
+  -- creo l'arena
+  mod.arenas[mod.arenasID] = new_arena(arena_default)
+
+  local arena = mod.arenas[mod.arenasID]
+
+  -- sovrascrivo con i parametri della funzione
+  arena.name = arena_name
   if min_players and max_players then
-    arena_lib.arenas[arenasID].min_players = min_players
-    arena_lib.arenas[arenasID].max_players = max_players
+    arena.min_players = min_players
+    arena.max_players = max_players
   end
+
+  -- aggiungo allo storage
   update_storage()
-  minetest.chat_send_player(sender, prefix .. "Arena " .. arena_name .. " creata con successo")
+
+  minetest.chat_send_player(sender, mod.prefix .. "Arena " .. arena_name .. " creata con successo")
 
 end
 
@@ -570,7 +577,7 @@ end
 
 function arena_lib.get_arena_by_name(mod, arena_name)
 
-  for id, arena in pairs(arena_lib.mods[mod]) do
+  for id, arena in pairs(arena_lib.mods[mod].arenas) do
     if arena.name == arena_name then
       return id, arena end
   end
@@ -639,7 +646,7 @@ end
 ----------------------------------------------
 
 function update_storage()
-  storage:set_string("arenas", minetest.serialize(arena_lib.arenas))
+  storage:set_string("mods", minetest.serialize(arena_lib.mods))
 end
 
 
@@ -665,10 +672,10 @@ end
 
 --[[ l'ID di base parte da 1 (n+1) per non generare errori, tipo "if arenaID == 0" al verificare se non esiste.
      In una sequenza 0, 1, 2, 3 se si rimuove "2" e si aggiunge un nuovo ID perciò si avrà 0, 1, 3, 4]]
-function next_ID()
+function next_ID(mod)
   local n = 0
-  for id, arena in pairs(arena_lib.arenas) do
+  for id, arena in pairs(mod.arenas) do
     if id > n then n = id end
   end
-  return n+1
+  return n + 1
 end
