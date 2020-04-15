@@ -43,7 +43,7 @@ minetest.override_item("default:sign_wall", {
           if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
             arena_lib.send_message_players_in_arena(sign_arena, prefix .. "La coda è stata annullata per troppi pochi giocatori")
-            arena.in_queue = false
+            sign_arena.in_queue = false
           end
         end
       return end
