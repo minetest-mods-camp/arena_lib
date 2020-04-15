@@ -375,15 +375,16 @@ function arena_lib.end_arena(arena)
 
   local players = {}
 
+  arena.in_celebration = false
+  arena.in_game = false
+
   for pl_name, stats in pairs(arena.players) do
 
     players[pl_name] = stats
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
-    arena.in_celebration = false
-    arena.in_game = false
 
-    local player = minetest.get_player_by_name (pl_name)
+    local player = minetest.get_player_by_name(pl_name)
 
     player:get_inventory():set_list("main", {})
     player:set_pos(hub_spawn_point)
@@ -435,7 +436,7 @@ end
 
 
 
-function arena_lib.on_end(arena)
+function arena_lib.on_end(arena, players)
  --[[override this function on your mod if you wanna add more!
  Just do: function arena_lib.on_end() yourstuff end]]
 end
