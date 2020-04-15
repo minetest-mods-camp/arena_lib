@@ -158,7 +158,7 @@ end
 function in_game_txt(arena)
   local txt
 
-  if not arena.enabled then txt = "LAVORI IN CORSO"
+  if not arena.enabled then txt = "LAVORI\nIN CORSO"
   elseif arena.in_celebration then txt = "Concludendo"
   elseif arena.in_game then txt = "In partita"
   elseif arena.in_loading then txt = "In caricamento"

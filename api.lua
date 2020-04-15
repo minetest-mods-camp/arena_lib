@@ -128,20 +128,20 @@ end
 ---------------GESTIONE ARENA-----------------
 ----------------------------------------------
 
-function arena_lib.create_arena(sender, mod_name, arena_name, min_players, max_players)
+function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
 
-  local mod = arena_lib.mods[mod_name]
-  mod.arenasID = next_ID(mod)
+  local mod_ref = arena_lib.mods[mod]
+  mod_ref.arenasID = next_ID(mod_ref)
 
   -- controllo che non ci siano duplicati
-  if mod.arenasID > 1 and arena_lib.get_arena_by_name(mod_name, arena_name) ~= nil then
+  if mod_ref.arenasID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Esiste già un'arena con quel nome!"))
     return end
 
   -- creo l'arena
-  mod.arenas[mod.arenasID] = new_arena(arena_default)
+  mod_ref.arenas[mod_ref.arenasID] = new_arena(arena_default)
 
-  local arena = mod.arenas[mod.arenasID]
+  local arena = mod_ref.arenas[mod_ref.arenasID]
 
   -- sovrascrivo con i parametri della funzione
   arena.name = arena_name
@@ -153,15 +153,15 @@ function arena_lib.create_arena(sender, mod_name, arena_name, min_players, max_p
   -- aggiungo allo storage
   update_storage()
 
-  minetest.chat_send_player(sender, mod.prefix .. "Arena " .. arena_name .. " creata con successo")
+  minetest.chat_send_player(sender, mod_ref.prefix .. "Arena " .. arena_name .. " creata con successo")
 
 end
 
 
 
-function arena_lib.remove_arena(sender, arena_name)
+function arena_lib.remove_arena(sender, mod, arena_name)
 
-  local id, arena = arena_lib.get_arena_by_name(arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not arena then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non c'è nessun'arena chiamata " .. arena_name .. "!"))
     return end
@@ -176,12 +176,14 @@ function arena_lib.remove_arena(sender, arena_name)
   if arena.sign ~= nil then
     minetest.set_node(arena.sign, {name = "air"}) end
 
-  arena_lib.send_message_players_in_arena(arena, prefix .."L'arena per la quale eri in coda è stata rimossa... :(")
+  local mod_ref = arena_lib.mods[mod]
+
+  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .."L'arena per la quale eri in coda è stata rimossa... :(")
 
   -- rimozione arena e aggiornamento storage
-  arena_lib.arenas[id] = nil
+  mod_ref.arenas[id] = nil
   update_storage()
-  minetest.chat_send_player(sender, prefix .. "Arena " .. arena_name .. " rimossa con successo")
+  minetest.chat_send_player(sender, mod_ref.prefix .. "Arena " .. arena_name .. " rimossa con successo")
 
 end
 
@@ -190,19 +192,23 @@ end
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori e non possono essere impostati in aria
 -- Indicando lo spawner_ID, si andrà a sovrascrivere lo spawner con quell'ID se esiste
-function arena_lib.set_spawner(sender, arena_name, spawner_ID)
+function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
 
-  local id, arena = arena_lib.get_arena_by_name(arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
-    return end
+  -- controllo se esiste l'arena
+  if arena == nil then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
+  return end
 
-  local spawn_points_count = arena_lib.get_arena_spawners_count(id)
+  local spawn_points_count = arena_lib.get_arena_spawners_count(mod, id)
 
+  -- se provo a settare uno spawn point di troppo, annullo
   if spawn_points_count == arena.max_players and spawner_ID == nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Gli spawn point non possono superare i giocatori massimi! Vuoi cancellarne alcuni con /quakeadmin delspawn <arena>?"))
   return end
 
+  -- se l'ID dello spawner da sovrascrivere non corrisponde a nessun altro ID, annullo
   if spawner_ID ~= nil and spawner_ID > spawn_points_count then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Nessuno spawner con quell'ID da sovrascrivere!"))
   return end
@@ -211,20 +217,26 @@ function arena_lib.set_spawner(sender, arena_name, spawner_ID)
   local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                    -- alzo Y di uno sennò tippa nel blocco
   local pos_feet = {x = pos.x, y = pos.y-1, z = pos.z}
 
-  if minetest.get_node(pos_feet).name == "air" then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non puoi impostare spawn point nell'aria!"))
-    return end
+  -- se il blocco sotto i piedi è aria, annullo
+  if minetest.get_node(pos_feet).name == "air" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non puoi impostare spawn point nell'aria!"))
+  return end
 
+  -- se c'è già uno spawner in quel punto, annullo
   for id, spawn in pairs(arena.spawn_points) do
     if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] C'è già uno spawn in questo punto!"))
       return end
   end
 
+  local mod_ref = arena_lib.mods[mod]
+
+  -- sovrascrivo/creo lo spawnpoint
   if spawner_ID ~= nil then
     arena.spawn_points[spawner_ID] = pos_Y_up
-    minetest.chat_send_player(sender, prefix .. "Spawn point " .. spawner_ID .. " sovrascritto con successo" )
+    minetest.chat_send_player(sender, mod_ref.prefix .. "Spawn point " .. spawner_ID .. " sovrascritto con successo" )
   else
     arena.spawn_points[spawn_points_count +1] = pos_Y_up
-    minetest.chat_send_player(sender, prefix .. "Spawn point " .. spawn_points_count +1 .. " impostato con successo" )
+    minetest.chat_send_player(sender, mod_ref.prefix .. "Spawn point " .. spawn_points_count +1 .. " impostato con successo" )
   end
 
   update_storage()
@@ -232,11 +244,18 @@ end
 
 
 
-function arena_lib.enable_arena(sender, arena_ID)
+function arena_lib.enable_arena(sender, mod, arena_ID)
 
-  local arena = arena_lib.arenas[arena_ID]
+  local mod_ref = arena_lib.mods[mod]
+  local arena = mod_ref.arenas[arena_ID]
 
-  if arena_lib.get_arena_spawners_count(arena_ID) < arena.max_players then
+  -- controllo se esiste l'arena
+  if not arena then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non esiste nessun'arena associata a questo ID!"))
+  return end
+
+  -- check requisiti
+  if arena_lib.get_arena_spawners_count(mod, arena_ID) < arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata!"))
     arena.enabled = false
   return end
@@ -244,33 +263,38 @@ function arena_lib.enable_arena(sender, arena_ID)
   arena.enabled = true
   arena_lib.update_sign(arena.sign, arena)
   update_storage()
-  minetest.chat_send_player(sender, prefix .. "Arena abilitata con successo")
+  minetest.chat_send_player(sender, mod_ref.prefix .. "Arena abilitata con successo")
 
 end
 
 
 
-function arena_lib.disable_arena(sender, arena_ID)
+function arena_lib.disable_arena(sender, mod, arena_ID)
 
-  local arena = arena_lib.arenas[arena_ID]
+  local mod_ref = arena_lib.mods[mod]
+  local arena = mod_ref.arenas[arena_ID]
 
+  -- controllo se esiste l'arena
   if not arena then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non esiste nessun'arena associata a questo ID!"))
   return end
 
+  -- se è già disabilitata, annullo
   if not arena.enabled then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] L'arena è già disabilitata"))
   return end
 
+  -- se una partita è in corso, annullo
   if arena.in_loading or arena.in_game or arena.in_celebration then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non puoi disabilitare un'arena mentre una partita è in corso!"))
   return end
 
-  -- se c'è rimasto qualcuno, erano in coda
+  -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
   for pl_name, stats in pairs(arena.players) do
 
     players_in_queue[pl_name] = nil
     arena.players[pl_name] = nil
+    arena.in_queue = false
     minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", "[!] L'arena per la quale eri in coda è stata disabilitata!"))
 
   end
@@ -278,7 +302,7 @@ function arena_lib.disable_arena(sender, arena_ID)
   arena.enabled = false
   arena_lib.update_sign(arena.sign, arena)
   update_storage()
-  minetest.chat_send_player(sender, prefix .. "L'arena " .. arena.name .. " è stata disabilitata con successo")
+  minetest.chat_send_player(sender, mod_ref.prefix .. "L'arena " .. arena.name .. " è stata disabilitata con successo")
 end
 
 
@@ -617,8 +641,8 @@ end
 
 
 
-function arena_lib.get_arena_spawners_count(arena_ID)
-  return table.maxn(arena_lib.arenas[arena_ID].spawn_points)
+function arena_lib.get_arena_spawners_count(mod, arena_ID)
+  return table.maxn(arena_lib.mods[mod].arenas[arena_ID].spawn_points)
 end
 
 
@@ -673,9 +697,9 @@ end
 
 --[[ l'ID di base parte da 1 (n+1) per non generare errori, tipo "if arenaID == 0" al verificare se non esiste.
      In una sequenza 0, 1, 2, 3 se si rimuove "2" e si aggiunge un nuovo ID perciò si avrà 0, 1, 3, 4]]
-function next_ID(mod)
+function next_ID(mod_ref)
   local n = 0
-  for id, arena in pairs(mod.arenas) do
+  for id, arena in pairs(mod_ref.arenas) do
     if id > n then n = id end
   end
   return n + 1

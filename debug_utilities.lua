@@ -18,8 +18,8 @@ end
 
 
 
-function arena_lib.print_arena_info(sender, arena_name)
-  local arena_ID, arena = arena_lib.get_arena_by_name(arena_name)
+function arena_lib.print_arena_info(sender, mod, arena_name)
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
   if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
 
   local p_count = 0
@@ -53,9 +53,9 @@ end
 
 
 
-function arena_lib.print_arena_stats(sender, arena_name)
+function arena_lib.print_arena_stats(sender, mod, arena_name)
 
-  local arena_ID, arena = arena_lib.get_arena_by_name(arena_name)
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
   if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!")) return end
 
   if not arena.in_game and not arena.in_celebration then minetest.chat_send_player(name, minetest.colorize("#e6482e", "[!] Nessuna partita in corso!")) return end
