@@ -219,6 +219,11 @@ function arena_lib.enable_arena(sender, arena_ID)
     arena.enabled = false
   return end
 
+  if not arena.sign.x then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Cartello non impostato, arena disabilitata!"))
+    arena.enabled = false
+  return end
+
   arena.enabled = true
   arena_lib.update_sign(arena.sign, arena)
   update_storage()
