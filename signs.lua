@@ -3,11 +3,6 @@
 --
 
 local queue_waiting_time = 5
-local prefix
-
-minetest.after(0.01, function()
-  prefix = arena_lib.get_prefix()
-end)
 
 local function in_game_txt(arena) end
 
@@ -22,6 +17,7 @@ minetest.override_item("default:sign_wall", {
 
       local sign_arena = arena_lib.arenas[arenaID]
       local p_name = puncher:get_player_name()
+      local prefix = "AGGIUNGIMI PER BENE"
 
       if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
       if not sign_arena.enabled then
@@ -116,16 +112,18 @@ minetest.override_item("default:sign_wall", {
 
 
 
-function arena_lib.set_sign(sender, arena_name)
+function arena_lib.set_sign(mod, sender, arena_name)
 
-  local arena_ID, arena = arena_lib.get_arena_by_name(arena_name)
+
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
    return end
 
   -- assegno item creazione arene con ID arena nei metadati da restituire al premere sul cartello
-  local stick = ItemStack(arena_lib.mod_name .. ":create_sign")
+  local stick = ItemStack("arena_lib:create_sign")
   local meta = stick:get_meta()
+  meta:set_int("mod", mod)
   meta:set_int("arenaID", arena_ID)
 
   minetest.get_player_by_name(sender):set_wielded_item(stick)

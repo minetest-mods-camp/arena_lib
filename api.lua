@@ -1,40 +1,37 @@
 arena_lib = {}
-arena_lib.arenas = {}
-arena_lib.mod_name = minetest.get_current_modname()
+arena_lib.mods = {}
 
-dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/debug_utilities.lua")
---dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/input_manager.lua")
-dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/items.lua")
-dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/player_manager.lua")
-dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/signs.lua")
+local hub_spawnpoint = { x = 0, y = 20, z = 0}
 
 ----------------------------------------------
 --------------GESTIONE STORAGE----------------
 ----------------------------------------------
 
 local storage = minetest.get_mod_storage()
---storage:set_string("arenas", nil) -- PER RESETTARE LO STORAGE
+--storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
-if minetest.deserialize(storage:get_string("arenas")) ~= nil then
-  arena_lib.arenas = minetest.deserialize(storage:get_string("arenas"))
+if minetest.deserialize(storage:get_string("mods")) ~= nil then
+  arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
 
-  -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
-  -- stoppato con partite in corso. L'alternativa è mettere una cosa simile in
-  -- update_storage() copiando ricorsivamente la tabella e rimuovendo il tutto
-  -- nella tabella copiata, ma è più pesante. E non posso metterlo in
-  -- minetest.register_on_shutdown() perché se crasha non viene chiamato
-  for id, arena in pairs(arena_lib.arenas) do
-    arena.players = {}
-    arena.kill_leader = ""
-    arena.in_queue = false
-    arena.in_loading = false
-    arena.in_game = false
-    arena.in_celebration = false
+  for mod, arenas in pairs(arena_lib.mods) do
+    -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
+    -- stoppato con partite in corso. L'alternativa è mettere una cosa simile in
+    -- update_storage() copiando ricorsivamente la tabella e rimuovendo il tutto
+    -- nella tabella copiata, ma è più pesante. E non posso metterlo in
+    -- minetest.register_on_shutdown() perché se crasha non viene chiamato
+    for id, arena in pairs(arenas) do
+      arena.players = {}
+      arena.kill_leader = ""
+      arena.in_queue = false
+      arena.in_loading = false
+      arena.in_game = false
+      arena.in_celebration = false
 
-    minetest.after(0.01, function()
-      if not arena.sign.x then return end       --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
-      arena_lib.update_sign(arena.sign, arena)
-    end)
+      minetest.after(0.01, function()
+        if not arena.sign.x then return end       --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
+        arena_lib.update_sign(arena.sign, arena)
+      end)
+    end
   end
 end
 
@@ -71,40 +68,56 @@ local arena_default = {
   enabled = false
 }
 
-local prefix = "[Arena_lib] "
-local hub_spawn_point = { x = 0, y = 20, z = 0}
-local load_time = 3
-local celebration_time = 3
-local immunity_time = 3
-local immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
 
+-- call this in your mod to override the default parameters
+function arena_lib.settings(modname, def)
 
--- call this in your mod to override the last block of values
-function arena_lib.settings(def)
+  local mod_tab = arena_lib.mods[modname]
+
+  mod_tab.arenasID
+
+  --default parameters
+  mod_tab.prefix = "[Arena_lib] "
+  mod_tab.hub_spawn_point = { x = 0, y = 20, z = 0}
+  mod_tab.load_time = 3           --time in the loading phase (the pre-match)
+  mod_tab.celebration_time = 3    --time in the celebration phase
+  mod_tab.immunity_time = 3
+  mod_tab.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
 
   if def.prefix then
-    prefix = def.prefix
+    mod_tab.prefix = def.prefix
   end
 
   if def.hub_spawn_point then
-    hub_spawn_point = def.hub_spawn_point
+    mod_tab.hub_spawn_point = def.hub_spawn_point
   end
 
   if def.load_time then
-    load_time = def.load_time
+    mod_tab.load_time = def.load_time
   end
 
   if def.celebration_time then
-    celebration_time = def.celebration_time
+    mod_tab.celebration_time = def.celebration_time
   end
 
   if def.immunity_time then
-    immunity_time = def.immunity_time
+    mod_tab.immunity_time = def.immunity_time
   end
 
   if def.immunity_slot then
-    immunity_slot = def.immunity_slot
+    mod_tab.immunity_slot = def.immunity_slot
   end
+
+end
+
+
+
+function arena_lib.initialize(mod_name)
+
+  if arena_lib.mods[mod_name] ~= nil then return end
+
+  arena_lib.mods[mod_name] = {}
+  arena_lib.mods[mod_name].arenasID = 1
 
 end
 
@@ -114,17 +127,19 @@ end
 ---------------GESTIONE ARENA-----------------
 ----------------------------------------------
 
-function arena_lib.create_arena(sender, arena_name, min_players, max_players)
+function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
 
-  arenasID = next_ID()
+  local arena = arena_lib.mods[mod]
+
+  arena.arenasID = next_ID()
 
   -- controllo che non ci siano duplicati
-  if arenasID > 1 and arena_lib.get_arena_by_name(arena_name) ~= nil then
+  if arenasID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Esiste già un'arena con quel nome!"))
     return end
 
   -- creo l'arena e la rinomino, aggiornando anche lo storage
-  arena_lib.arenas[arenasID] = new_arena(arena_default)
+  arena_lib.mods[mod][arenasID] = new_arena(arena_default)
   arena_lib.arenas[arenasID].name = arena_name
   if min_players and max_players then
     arena_lib.arenas[arenasID].min_players = min_players
@@ -541,7 +556,8 @@ end
 ----------------------------------------------
 
 function arena_lib.get_hub_spawnpoint()
-  return hub_spawn_point
+  return hub_spawnpoint
+  --return { x = 0, y = 20, z = 0}
 end
 
 
@@ -552,9 +568,9 @@ end
 
 
 
-function arena_lib.get_arena_by_name(arena_name)
+function arena_lib.get_arena_by_name(mod, arena_name)
 
-  for id, arena in pairs(arena_lib.arenas) do
+  for id, arena in pairs(arena_lib.mods[mod]) do
     if arena.name == arena_name then
       return id, arena end
   end
