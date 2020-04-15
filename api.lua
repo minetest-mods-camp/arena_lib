@@ -1,7 +1,7 @@
 arena_lib = {}
 arena_lib.mods = {}
 
-local hub_spawnpoint = { x = 0, y = 20, z = 0}
+local hub_spawn_point = { x = 0, y = 20, z = 0}
 
 ----------------------------------------------
 --------------GESTIONE STORAGE----------------
@@ -70,14 +70,14 @@ local arena_default = {
 
 
 -- per inizializzare. Da lanciare all'inizio di ogni mod
-function arena_lib.initialize(mod_name)
+function arena_lib.initialize(mod)
 
   --Se esiste già in memoria, ignora il resto
-  if arena_lib.mods[mod_name] ~= nil then return end
+  if arena_lib.mods[mod] ~= nil then return end
 
-  arena_lib.mods[mod_name] = {}
-  arena_lib.mods[mod_name].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
-  arena_lib.mods[mod_name].arenasID = 1     -- we start counting from 1, not 0
+  arena_lib.mods[mod] = {}
+  arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
+  arena_lib.mods[mod].arenasID = 1     -- we start counting from 1, not 0
 
 end
 
@@ -86,38 +86,38 @@ end
 -- call this in your mod to override the default parameters
 function arena_lib.settings(modname, def)
 
-  local mod_tab = arena_lib.mods[modname]
+  local mod_ref = arena_lib.mods[modname]
 
   --default parameters
-  mod_tab.prefix = "[Arena_lib] "
-  mod_tab.hub_spawn_point = { x = 0, y = 20, z = 0}
-  mod_tab.load_time = 3           --time in the loading phase (the pre-match)
-  mod_tab.celebration_time = 3    --time in the celebration phase
-  mod_tab.immunity_time = 3
-  mod_tab.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
+  mod_ref.prefix = "[Arena_lib] "
+  mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
+  mod_ref.load_time = 3           --time in the loading phase (the pre-match)
+  mod_ref.celebration_time = 3    --time in the celebration phase
+  mod_ref.immunity_time = 3
+  mod_ref.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
 
   if def.prefix then
-    mod_tab.prefix = def.prefix
+    mod_ref.prefix = def.prefix
   end
 
   if def.hub_spawn_point then
-    mod_tab.hub_spawn_point = def.hub_spawn_point
+    mod_ref.hub_spawn_point = def.hub_spawn_point
   end
 
   if def.load_time then
-    mod_tab.load_time = def.load_time
+    mod_ref.load_time = def.load_time
   end
 
   if def.celebration_time then
-    mod_tab.celebration_time = def.celebration_time
+    mod_ref.celebration_time = def.celebration_time
   end
 
   if def.immunity_time then
-    mod_tab.immunity_time = def.immunity_time
+    mod_ref.immunity_time = def.immunity_time
   end
 
   if def.immunity_slot then
-    mod_tab.immunity_slot = def.immunity_slot
+    mod_ref.immunity_slot = def.immunity_slot
   end
 
 end
@@ -316,15 +316,16 @@ end
 ----------------------------------------------
 
 -- per tutti i giocatori quando finisce la coda
-function arena_lib.load_arena(arena_ID)
+function arena_lib.load_arena(mod, arena_ID)
 
   local count = 1
-  local arena = arena_lib.arenas[arena_ID]
+  local mod_ref = arena_lib.mods[mod]
+  local arena = mod_ref.arenas[arena_ID]
 
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
 
-  -- teletrasporto giocatori e sostituisco l'inventario
+  -- teletrasporto giocatori, li blocco sul posto, nascondo i nomi e svuoto l'inventario
   for pl_name, stats in pairs(arena.players) do
 
     local player = minetest.get_player_by_name(pl_name)
@@ -342,33 +343,21 @@ function arena_lib.load_arena(arena_ID)
     count = count +1
   end
 
-  arena_lib.on_load(arena)
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_load then
+    mod_ref.on_load(arena)
+  end
 
-  minetest.after(load_time, function()
-    arena_lib.start_arena(arena)
+  -- inizio l'arena dopo tot secondi
+  minetest.after(mod_ref.load_time, function()
+    arena_lib.start_arena(mod_ref, arena)
   end)
 
 end
 
 
 
--- per il player singolo a match iniziato
-function arena_lib.join_arena(p_name, arena_ID)
-
-  local player = minetest.get_player_by_name(p_name)
-  local arena = arena_lib.arenas[arena_ID]
-
-  player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-  player:get_inventory():set_list("main",{})
-  player:set_pos(arena_lib.get_random_spawner(arena_ID))
-  players_in_game[p_name] = arena_ID
-
-  arena_lib.on_join(p_name, arena)
-end
-
-
-
-function arena_lib.start_arena(arena)
+function arena_lib.start_arena(mod_ref, arena)
 
   arena.in_loading = false
   arena.in_game = true
@@ -383,15 +372,38 @@ function arena_lib.start_arena(arena)
             })
   end
 
-  arena_lib.on_start(arena)
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_start then
+    mod_ref.on_start(arena)
+  end
+
 end
 
 
 
---a partita finita
-function arena_lib.load_celebration(arena_ID, winner_name)
+-- per il player singolo a match iniziato
+function arena_lib.join_arena(mod, p_name, arena_ID)
 
-  local arena = arena_lib.arenas[arena_ID]
+  local mod_ref = arena_libs.mods[mod]
+  local player = minetest.get_player_by_name(p_name)
+  local arena = mod_ref.arenas[arena_ID]
+
+  player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+  player:get_inventory():set_list("main",{})
+  player:set_pos(arena_lib.get_random_spawner(arena_ID))
+  players_in_game[p_name] = arena_ID
+
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_join then
+    mod_ref.on_join(p_name, arena)
+  end
+end
+
+
+--a partita finita
+function arena_lib.load_celebration(mod, arena, winner_name)
+
+  local mod_ref = arena_lib.mods[mod]
 
   arena.in_celebration = true
   arena_lib.update_sign(arena.sign, arena)
@@ -401,26 +413,29 @@ function arena_lib.load_celebration(arena_ID, winner_name)
     local inv = minetest.get_player_by_name(pl_name):get_inventory()
 
     -- giocatori immortali
-    if not inv:contains_item("main", arena_lib.mod_name .. ":immunity") then
-      inv:set_stack("main", immunity_slot, arena_lib.mod_name .. ":immunity")
+    if not inv:contains_item("main", "arena_lib:immunity") then
+      inv:set_stack("main", immunity_slot, "arena_lib:immunity")
     end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    minetest.chat_send_player(pl_name, prefix  .. winner_name .. " ha vinto la partita")
+    minetest.chat_send_player(pl_name, mod_ref.prefix  .. winner_name .. " ha vinto la partita")
   end
 
-  arena_lib.on_celebration(arena, winner_name)
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_celebration then
+    mod_ref.on_celebration(arena, winner_name)
+  end
 
-  -- momento celebrazione
+  -- l'arena finisce dopo tot secondi
   minetest.after(celebration_time, function()
-    arena_lib.end_arena(arena)
+    arena_lib.end_arena(mod_ref, arena)
   end)
 
 end
 
 
 
-function arena_lib.end_arena(arena)
+function arena_lib.end_arena(mod_ref, arena)
 
   arena.kill_leader = ""
 
@@ -433,16 +448,20 @@ function arena_lib.end_arena(arena)
 
     players[pl_name] = stats
     arena.players[pl_name] = nil
-    players_in_game[pl_name] = nil
+    players_in_game[pl_name] = nilarenas
 
     local player = minetest.get_player_by_name(pl_name)
 
     player:get_inventory():set_list("main", {})
-    player:set_pos(hub_spawn_point)
+    player:set_pos(mod_ref.hub_spawn_point)
   end
 
   arena_lib.update_sign(arena.sign, arena)
-  arena_lib.on_end(arena, players)
+
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_end then
+    mod_ref.on_end(arena, players)
+  end
 end
 
 
@@ -458,10 +477,8 @@ function arena_lib.remove_from_queue(p_name)
 end
 
 
-
-function arena_lib.on_load(arena)
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_load() yourstuff end]]
+function arena_lib.on_load(mod, func)
+  arena_lib.mods[mod].on_load = func
 end
 
 
@@ -473,23 +490,20 @@ end
 
 
 
-function arena_lib.on_start(arena)
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_load() yourstuff end]]
+function arena_lib.on_start(mod, func)
+ arena_lib.mods[mod].on_start = func
 end
 
 
 
-function arena_lib.on_celebration(arena, winner_name)
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_celebration() yourstuff end]]
+function arena_lib.on_celebration(mod, func)
+ arena_lib.mods[mod].on_celebration = func
 end
 
 
 
-function arena_lib.on_end(arena, players)
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_end() yourstuff end]]
+function arena_lib.on_end(mod, func)
+  arena_lib.mods[mod].on_end = func
 end
 
 
@@ -497,6 +511,8 @@ end
 ----------------------------------------------
 --------------------UTILS---------------------
 ----------------------------------------------
+
+--TODO: rename_arena
 
 function arena_lib.is_player_in_arena(p_name)
 
@@ -593,8 +609,7 @@ end
 ----------------------------------------------
 
 function arena_lib.get_hub_spawnpoint()
-  return hub_spawnpoint
-  --return { x = 0, y = 20, z = 0}
+  return hub_spawn_point
 end
 
 

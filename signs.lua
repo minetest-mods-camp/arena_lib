@@ -65,7 +65,7 @@ minetest.override_item("default:sign_wall", {
 
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
-        arena_lib.join_arena(p_name, arenaID)
+        arena_lib.join_arena(mod, p_name, arenaID)
         arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " si è aggiunto alla partita")
         minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei entrato nell'arena " .. sign_arena.name)
         return
@@ -97,14 +97,15 @@ minetest.override_item("default:sign_wall", {
     -- quello che succede una volta che il timer raggiunge lo 0
     on_timer = function(pos)
 
-      local arenaID = minetest.get_meta(pos):get_int("arenaID")
-      local sign_arena = arena_lib.arenas[arenaID]
+      local mod = minetest.get_meta(pos):get_string("mod")
+      local arena_ID = minetest.get_meta(pos):get_int("arenaID")
+      local sign_arena = arena_lib.mods[mod].arenas[arena_ID]
 
       sign_arena.in_queue = false
       sign_arena.in_game = true
       arena_lib.update_sign(pos, sign_arena)
 
-      arena_lib.load_arena(arenaID)
+      arena_lib.load_arena(mod, arena_ID)
 
       return false
     end,
@@ -121,7 +122,8 @@ function arena_lib.set_sign(sender, mod, arena_name)
   if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
    return end
 
-  -- assegno item creazione arene con ID arena nei metadati da restituire al premere sul cartello
+  -- assegno item creazione arene con nome mod e ID arena nei metadati da restituire al premere sul cartello.
+  -- uso l'ID e non il nome perché (in futuro) si potrà rinominare un'arena
   local stick = ItemStack("arena_lib:create_sign")
   local meta = stick:get_meta()
   meta:set_string("mod", mod)
