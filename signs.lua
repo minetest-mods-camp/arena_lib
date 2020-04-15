@@ -15,9 +15,10 @@ minetest.override_item("default:sign_wall", {
       local arenaID = minetest.get_meta(pos):get_int("arenaID")
       if arenaID == 0 then return end
 
-      local sign_arena = arena_lib.arenas[arenaID]
+      local mod = minetest.get_meta(pos):get_string("mod")
+      local mod_ref = arena_lib.mods[mod]
+      local sign_arena = mod_ref.arenas[arenaID]
       local p_name = puncher:get_player_name()
-      local prefix = "AGGIUNGIMI PER BENE"
 
       if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
       if not sign_arena.enabled then
@@ -30,19 +31,19 @@ minetest.override_item("default:sign_wall", {
         local queued_ID = arena_lib.get_queueID_by_player(p_name)
 
         if queued_ID ~= arenaID then
-          minetest.chat_send_player(p_name, prefix .. minetest.colorize("#e6482e", "Devi prima uscire dalla coda di " .. arena_lib.arenas[queued_ID].name .. "!"))
+          minetest.chat_send_player(p_name, mod_ref.prefix .. minetest.colorize("#e6482e", "Devi prima uscire dalla coda di " .. mod_ref.arenas[queued_ID].name .. "!"))
         else
 
           sign_arena.players[p_name] = nil
           arena_lib.update_sign(pos, sign_arena)
           arena_lib.remove_from_queue(p_name)
-          minetest.chat_send_player(p_name, prefix .. "Sei uscito dalla coda")
-          arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " ha abbandonato la coda")
+          minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei uscito dalla coda")
+          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " ha abbandonato la coda")
 
           -- se non ci sono più abbastanza giocatori, annullo la coda
           if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
-            arena_lib.send_message_players_in_arena(sign_arena, prefix .. "La coda è stata annullata per troppi pochi giocatori")
+            arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. "La coda è stata annullata per troppi pochi giocatori")
             sign_arena.in_queue = false
           end
         end
@@ -65,20 +66,20 @@ minetest.override_item("default:sign_wall", {
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
         arena_lib.join_arena(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " si è aggiunto alla partita")
-        minetest.chat_send_player(p_name, prefix .. "Sei entrato nell'arena " .. sign_arena.name)
+        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " si è aggiunto alla partita")
+        minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei entrato nell'arena " .. sign_arena.name)
         return
       else
         arena_lib.add_to_queue(p_name, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, prefix .. p_name .. " si è aggiunto alla coda")
-        minetest.chat_send_player(p_name, prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
+        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " si è aggiunto alla coda")
+        minetest.chat_send_player(p_name, mod_ref.prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
       end
 
       local timer = minetest.get_node_timer(pos)
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
       if arena_lib.get_arena_players_count(sign_arena) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(sign_arena, prefix .. "La partita inizierà tra " .. queue_waiting_time .. " secondi!")
+        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. "La partita inizierà tra " .. queue_waiting_time .. " secondi!")
         sign_arena.in_queue = true
         timer:start(queue_waiting_time)
       end
@@ -112,7 +113,7 @@ minetest.override_item("default:sign_wall", {
 
 
 
-function arena_lib.set_sign(mod, sender, arena_name)
+function arena_lib.set_sign(sender, mod, arena_name)
 
 
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
@@ -123,7 +124,7 @@ function arena_lib.set_sign(mod, sender, arena_name)
   -- assegno item creazione arene con ID arena nei metadati da restituire al premere sul cartello
   local stick = ItemStack("arena_lib:create_sign")
   local meta = stick:get_meta()
-  meta:set_int("mod", mod)
+  meta:set_string("mod", mod)
   meta:set_int("arenaID", arena_ID)
 
   minetest.get_player_by_name(sender):set_wielded_item(stick)
