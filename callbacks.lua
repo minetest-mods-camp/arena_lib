@@ -4,14 +4,14 @@ end
 
 
 
-function arena_lib.on_join(mod, func)
- arena_lib.mods[mod].on_join = func
+function arena_lib.on_start(mod, func)
+ arena_lib.mods[mod].on_start = func
 end
 
 
 
-function arena_lib.on_start(mod, func)
- arena_lib.mods[mod].on_start = func
+function arena_lib.on_join(mod, func)
+ arena_lib.mods[mod].on_join = func
 end
 
 
