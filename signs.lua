@@ -25,27 +25,35 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] L'arena non è attiva!"))
       return end
 
-      -- se è già in coda o viene fermato (cartello diverso) o si toglie dalla coda (cartello uguale)
+      -- cosa succede se è già in coda da qualche parte
       if arena_lib.is_player_in_queue(p_name) then
+
+        local queued_mod = arena_lib.get_mod_by_player(p_name)
+
+        -- se è in coda in un altro minigioco, annullo
+        if queued_mod ~= mod then
+          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] Sei già in coda per il minigioco " .. queued_mod .. "!"))
+        return end
 
         local queued_ID = arena_lib.get_queueID_by_player(p_name)
 
+        -- se è in coda per lo stesso minigioco ma arena diversa, annullo
         if queued_ID ~= arenaID then
           minetest.chat_send_player(p_name, mod_ref.prefix .. minetest.colorize("#e6482e", "Devi prima uscire dalla coda di " .. mod_ref.arenas[queued_ID].name .. "!"))
-        else
+        return end
 
-          sign_arena.players[p_name] = nil
-          arena_lib.update_sign(pos, sign_arena)
-          arena_lib.remove_from_queue(p_name)
-          minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei uscito dalla coda")
-          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " ha abbandonato la coda")
+        -- sennò la coda era la stessa e rimuovo il giocatore
+        sign_arena.players[p_name] = nil
+        arena_lib.update_sign(pos, sign_arena)
+        arena_lib.remove_from_queue(p_name)
+        minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei uscito dalla coda")
+        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " ha abbandonato la coda")
 
-          -- se non ci sono più abbastanza giocatori, annullo la coda
-          if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
-            minetest.get_node_timer(pos):stop()
-            arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. "La coda è stata annullata per troppi pochi giocatori")
-            sign_arena.in_queue = false
-          end
+        -- se non ci sono più abbastanza giocatori, annullo la coda
+        if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
+          minetest.get_node_timer(pos):stop()
+          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. "La coda è stata annullata per troppi pochi giocatori")
+          sign_arena.in_queue = false
         end
       return end
 
@@ -70,7 +78,7 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, mod_ref.prefix .. "Sei entrato nell'arena " .. sign_arena.name)
         return
       else
-        arena_lib.add_to_queue(p_name, arenaID)
+        arena_lib.add_to_queue(p_name, mod, arenaID)
         arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. p_name .. " si è aggiunto alla coda")
         minetest.chat_send_player(p_name, mod_ref.prefix .. "Ti sei aggiunto alla coda per " .. sign_arena.name)
       end

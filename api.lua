@@ -8,18 +8,19 @@ local hub_spawn_point = { x = 0, y = 20, z = 0}
 ----------------------------------------------
 
 local storage = minetest.get_mod_storage()
-storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
+--storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
 if minetest.deserialize(storage:get_string("mods")) ~= nil then
-  arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
+arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
 
-  for mod, arenas in pairs(arena_lib.mods) do
+  for mod, properties in pairs(arena_lib.mods) do
     -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
     -- stoppato con partite in corso. L'alternativa è mettere una cosa simile in
     -- update_storage() copiando ricorsivamente la tabella e rimuovendo il tutto
     -- nella tabella copiata, ma è più pesante. E non posso metterlo in
     -- minetest.register_on_shutdown() perché se crasha non viene chiamato
-    for id, arena in pairs(arenas) do
+
+    for id, arena in pairs(properties.arenas) do
       arena.players = {}
       arena.kill_leader = ""
       arena.in_queue = false
@@ -44,8 +45,8 @@ local function update_storage() end
 local function new_arena() end
 local function next_ID() end
 
-local players_in_game = {}    --KEY: player name, INDEX: arenaID
-local players_in_queue = {}   --KEY: player name, INDEX: arenaID
+local players_in_game = {}    --KEY: player name, INDEX: {mod, arenaID}
+local players_in_queue = {}   --KEY: player name, INDEX: {mod, arenaID}
 
 local arena_default_max_players = 4
 local arena_default_min_players = 2
@@ -201,7 +202,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Quest'arena non esiste!"))
   return end
 
-  local spawn_points_count = arena_lib.get_arena_spawners_count(mod, id)
+  local spawn_points_count = arena_lib.get_arena_spawners_count(arena)
 
   -- se provo a settare uno spawn point di troppo, annullo
   if spawn_points_count == arena.max_players and spawner_ID == nil then
@@ -254,8 +255,8 @@ function arena_lib.enable_arena(sender, mod, arena_ID)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non esiste nessun'arena associata a questo ID!"))
   return end
 
-  -- check requisiti
-  if arena_lib.get_arena_spawners_count(mod, arena_ID) < arena.max_players then
+  -- check requisiti: spawner e cartello
+  if arena_lib.get_arena_spawners_count(arena) < arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Spawner insufficienti, arena disabilitata!"))
     arena.enabled = false
   return end
@@ -265,6 +266,7 @@ function arena_lib.enable_arena(sender, mod, arena_ID)
     arena.enabled = false
   return end
 
+  -- abilito
   arena.enabled = true
   arena_lib.update_sign(arena.sign, arena)
   update_storage()
@@ -304,6 +306,7 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
 
   end
 
+  -- disabilito
   arena.enabled = false
   arena_lib.update_sign(arena.sign, arena)
   update_storage()
@@ -338,7 +341,7 @@ function arena_lib.load_arena(mod, arena_ID)
     player:set_pos(arena.spawn_points[count])
     player:get_inventory():set_list("main",{})
     players_in_queue[pl_name] = nil
-    players_in_game[pl_name] = arena_ID       -- registro giocatori nella tabella apposita
+    players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}       -- registro giocatori nella tabella apposita
 
     count = count +1
   end
@@ -384,14 +387,14 @@ end
 -- per il player singolo a match iniziato
 function arena_lib.join_arena(mod, p_name, arena_ID)
 
-  local mod_ref = arena_libs.mods[mod]
+  local mod_ref = arena_lib.mods[mod]
   local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
 
   player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   player:get_inventory():set_list("main",{})
   player:set_pos(arena_lib.get_random_spawner(arena_ID))
-  players_in_game[p_name] = arena_ID
+  players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
@@ -448,7 +451,7 @@ function arena_lib.end_arena(mod_ref, arena)
 
     players[pl_name] = stats
     arena.players[pl_name] = nil
-    players_in_game[pl_name] = nilarenas
+    players_in_game[pl_name] = nil
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -466,44 +469,14 @@ end
 
 
 
-function arena_lib.add_to_queue(p_name, arena_ID)
-  players_in_queue[p_name] = arena_ID
+function arena_lib.add_to_queue(p_name, mod, arena_ID)
+  players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
 end
 
 
 
 function arena_lib.remove_from_queue(p_name)
   players_in_queue[p_name] = nil
-end
-
-
-function arena_lib.on_load(mod, func)
-  arena_lib.mods[mod].on_load = func
-end
-
-
-
-function arena_lib.on_join(p_name, arena)
- --[[override this function on your mod if you wanna add more!
- Just do: function arena_lib.on_join() yourstuff end]]
-end
-
-
-
-function arena_lib.on_start(mod, func)
- arena_lib.mods[mod].on_start = func
-end
-
-
-
-function arena_lib.on_celebration(mod, func)
- arena_lib.mods[mod].on_celebration = func
-end
-
-
-
-function arena_lib.on_end(mod, func)
-  arena_lib.mods[mod].on_end = func
 end
 
 
@@ -532,12 +505,17 @@ end
 
 function arena_lib.remove_player_from_arena(p_name)
 
-  local arena_ID
-    if players_in_game[p_name] == nil then arena_ID = players_in_queue[p_name]
-    else arena_ID = players_in_game[p_name]
-    end
+  local mod, arena_ID
 
-  local arena = arena_lib.arenas[arena_ID]
+  -- se non è in partita né in coda, annullo
+  if arena_lib.is_player_in_arena then
+    mod, arena_ID = players_in_game[p_name]
+  elseif arena_lib.is_player_in_queue then
+    mod, arena_ID = players_in_queue[p_name]
+  else return end
+
+  local mod_ref = arena_lib.mods[mod]
+  local arena = mod_ref.arenas[arena_ID]
 
   if arena == nil then return end
 
@@ -546,22 +524,24 @@ function arena_lib.remove_player_from_arena(p_name)
   players_in_queue[p_name] = nil
 
   arena_lib.update_sign(arena.sign, arena)
-  arena_lib.send_message_players_in_arena(arena, prefix .. p_name .. " ha abbandonato la partita")
+  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. p_name .. " ha abbandonato la partita")
 
+  -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
 
     if arena_lib.get_arena_players_count(arena) < arena.min_players then
       timer:stop()
       arena.in_queue = false
-      arena_lib.send_message_players_in_arena(arena, prefix .. "La coda è stata annullata per troppi pochi giocatori")
+      arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. "La coda è stata annullata per troppi pochi giocatori")
     end
 
+  -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena_lib.get_arena_players_count(arena) == 1 then
 
-    arena_lib.send_message_players_in_arena(arena, prefix .. "Hai vinto la partita per troppi pochi giocatori")
+    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. "Hai vinto la partita per troppi pochi giocatori")
     for pl_name, stats in pairs(arena.players) do
-      arena_lib.load_celebration(arena, pl_name)
+      arena_lib.load_celebration(mod, arena, pl_name)
     end
   end
 
@@ -588,13 +568,14 @@ end
 
 function arena_lib.immunity(player)
 
-  local immunity_item = ItemStack(arena_lib.mod_name ..":immunity")
+  local immunity_item = ItemStack("arena_lib:immunity")
   local inv = player:get_inventory()
+  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(player:get_player_name())]
 
-  inv:set_stack("main", immunity_slot, immunity_item)
+  inv:set_stack("main", mod_ref.immunity_slot, immunity_item)
 
   minetest.after(immunity_time, function()
-    if player == nil then return end -- they may disconnect
+    if player == nil then return end          -- they might have disconnected
     if inv:contains_item("main", immunity_item) then
       inv:remove_item("main", immunity_item)
     end
@@ -608,7 +589,7 @@ end
 -----------------GETTERS----------------------
 ----------------------------------------------
 
-function arena_lib.get_hub_spawnpoint()
+function arena_lib.get_hub_spawn_point()
   return hub_spawn_point
 end
 
@@ -636,14 +617,39 @@ end
 
 
 
+function arena_lib.get_mod_by_player(p_name)
+  if arena_lib.is_player_in_arena(p_name) then
+    return players_in_game[p_name].minigame
+  else
+    return players_in_queue[p_name].minigame
+  end
+end
+
+
+
+function arena_lib.get_arena_by_player(p_name)
+
+  local mod, arena_ID
+
+  if arena_lib.is_player_in_arena then
+    mod, arenaID = players_in_game[p_name]
+  else
+    mod, arenaID = players_in_queue[p_name]
+  end
+
+  return arena_lib[mod].arenas[arenaID]
+end
+
+
+
 function arena_lib.get_arenaID_by_player(p_name)
-  return players_in_game[p_name]
+  return players_in_game[p_name].arenaID
 end
 
 
 
 function arena_lib.get_queueID_by_player(p_name)
-  return players_in_queue[p_name]
+  return players_in_queue[p_name].arenaID
 end
 
 
@@ -661,20 +667,20 @@ end
 
 
 
-function arena_lib.get_arena_spawners_count(mod, arena_ID)
-  return table.maxn(arena_lib.mods[mod].arenas[arena_ID].spawn_points)
+function arena_lib.get_arena_spawners_count(arena)
+  return table.maxn(arena.spawn_points)
 end
 
 
 
-function arena_lib.get_random_spawner(arena_ID)
-  return arena_lib.arenas[arena_ID].spawn_points[math.random(1,arena_lib.get_arena_spawners_count(arena_ID))]
+function arena_lib.get_random_spawner(arena)
+  return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))]
 end
 
 
 
-function arena_lib.get_immunity_slot()
-  return immunity_slot
+function arena_lib.get_immunity_slot(mod)
+  return arena_lib.mods[mod].immunity_slot
 end
 
 

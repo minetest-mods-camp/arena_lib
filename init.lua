@@ -1,4 +1,5 @@
 dofile(minetest.get_modpath("arena_lib") .. "/api.lua")
+dofile(minetest.get_modpath("arena_lib") .. "/callbacks.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/debug_utilities.lua")
 --dofile(minetest.get_modpath(arena_lib.mod_name) .. "/arena_lib/input_manager.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/items.lua")
