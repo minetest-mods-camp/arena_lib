@@ -1,7 +1,7 @@
 minetest.register_tool("arena_lib:immunity", {
 
   description = "Sei immune!",
-  inventory_image = "arena_immunity.png",
+  inventory_image = "arenalib_immunity.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
 })
@@ -13,7 +13,7 @@ minetest.register_tool("arena_lib:immunity", {
 minetest.register_tool("arena_lib:create_sign", {
 
     description = "Left click on a sign to create an entrance or to remove it",
-    inventory_image = "arena_createsign.png",
+    inventory_image = "arenalib_createsign.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
     on_use = function(itemstack, user, pointed_thing)
