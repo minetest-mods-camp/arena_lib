@@ -11,7 +11,7 @@ local storage = minetest.get_mod_storage()
 --storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
 if minetest.deserialize(storage:get_string("mods")) ~= nil then
-arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
+  arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
 
   for mod, properties in pairs(arena_lib.mods) do
     -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
@@ -629,7 +629,7 @@ end
 
 function arena_lib.get_arena_by_player(p_name)
 
-  local mod, arena_ID
+  local mod, arenaID
 
   if arena_lib.is_player_in_arena then
     mod, arenaID = players_in_game[p_name]
