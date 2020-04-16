@@ -3,7 +3,7 @@
 > Arena_lib is a library for Minetest working as a core for any arena-like minigame you have in mind
 
 ## 1. Arenas
-It all starts with a table called `arena_lib.mods = {}`. This allows `arena_lib` to be subdvided per mod. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
+It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
 * `sign`: (pos) the position of the sign associated with the arena.
@@ -20,7 +20,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 
 
 
-Being arenas stored by ID, they can be easily retrieved by `arena_libs.arenas[THEARENAID]`.  
+Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
 
 There are two ways to know an arena ID: the first is in-game via the two debug utilities:
 * `arena_lib.print_arenas(sender, mod)`: coincise
