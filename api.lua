@@ -393,7 +393,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
 
   player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   player:get_inventory():set_list("main",{})
-  player:set_pos(arena_lib.get_random_spawner(arena_ID))
+  player:set_pos(arena_lib.get_random_spawner(arena))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
@@ -417,7 +417,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
     -- giocatori immortali
     if not inv:contains_item("main", "arena_lib:immunity") then
-      inv:set_stack("main", immunity_slot, "arena_lib:immunity")
+      inv:set_stack("main", mod_ref.immunity_slot, "arena_lib:immunity")
     end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
@@ -430,7 +430,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   end
 
   -- l'arena finisce dopo tot secondi
-  minetest.after(celebration_time, function()
+  minetest.after(mod_ref.celebration_time, function()
     arena_lib.end_arena(mod_ref, arena)
   end)
 
@@ -508,10 +508,12 @@ function arena_lib.remove_player_from_arena(p_name)
   local mod, arena_ID
 
   -- se non è in partita né in coda, annullo
-  if arena_lib.is_player_in_arena then
-    mod, arena_ID = players_in_game[p_name]
-  elseif arena_lib.is_player_in_queue then
-    mod, arena_ID = players_in_queue[p_name]
+  if arena_lib.is_player_in_arena(p_name) then
+    mod = players_in_game[p_name].minigame
+    arena_ID = players_in_game[p_name].arenaID
+  elseif arena_lib.is_player_in_queue(p_name) then
+    mod = players_in_queue[p_name].minigame
+    arena_ID = players_in_queue[p_name].arenaID
   else return end
 
   local mod_ref = arena_lib.mods[mod]
@@ -570,11 +572,12 @@ function arena_lib.immunity(player)
 
   local immunity_item = ItemStack("arena_lib:immunity")
   local inv = player:get_inventory()
-  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(player:get_player_name())]
+  local p_name = player:get_player_name()
+  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
 
   inv:set_stack("main", mod_ref.immunity_slot, immunity_item)
 
-  minetest.after(immunity_time, function()
+  minetest.after(mod_ref.immunity_time, function()
     if player == nil then return end          -- they might have disconnected
     if inv:contains_item("main", immunity_item) then
       inv:remove_item("main", immunity_item)
@@ -631,13 +634,17 @@ function arena_lib.get_arena_by_player(p_name)
 
   local mod, arenaID
 
-  if arena_lib.is_player_in_arena then
-    mod, arenaID = players_in_game[p_name]
-  else
-    mod, arenaID = players_in_queue[p_name]
+  if arena_lib.is_player_in_arena(p_name) then      -- è in partita
+    mod = players_in_game[p_name].minigame
+    arenaID = players_in_game[p_name].arenaID
+  else                                               -- è in coda
+    mod = players_in_queue[p_name].minigame
+    arenaID = players_in_queue[p_name].arenaID
   end
 
-  return arena_lib[mod].arenas[arenaID]
+  if not mod then return end                         -- se non è né l'uno né l'altro, annullo
+
+  return arena_lib.mods[mod].arenas[arenaID]
 end
 
 

@@ -20,6 +20,7 @@ minetest.register_on_dieplayer(function(player, reason)
     local p_name = player:get_player_name()
     if not arena_lib.is_player_in_arena(p_name) then return end
 
+    local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
     local arena = arena_lib.get_arena_by_player(p_name)
     local p_stats = arena.players[p_name]
     p_stats.deaths = p_stats.deaths +1
@@ -35,9 +36,11 @@ minetest.register_on_dieplayer(function(player, reason)
 
 minetest.register_on_respawnplayer(function(player)
 
-    if not arena_lib.is_player_in_arena then return end
+    local p_name = player:get_player_name()
 
-    local arena = arena_lib.get_arena_by_player(player:get_player_name())
+    if not arena_lib.is_player_in_arena(p_name) then return end
+
+    local arena = arena_lib.get_arena_by_player(p_name)
 
     player:set_pos(arena_lib.get_random_spawner(arena))
     arena_lib.immunity(player)
