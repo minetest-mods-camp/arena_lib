@@ -1,6 +1,8 @@
+local S = minetest.get_translator("arena_lib")
+
 minetest.register_tool("arena_lib:immunity", {
 
-  description = "Sei immune!",
+  description = S("Sei immune!"),
   inventory_image = "arenalib_immunity.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
@@ -12,7 +14,7 @@ minetest.register_tool("arena_lib:immunity", {
     nell'arena se sono cartelli appositi e "on_timer" per teletrasportali in partita quando la queue finisce]]
 minetest.register_tool("arena_lib:create_sign", {
 
-    description = "Left click on a sign to create an entrance or to remove it",
+    description = S("Left click on a sign to create/remove an entrance"),
     inventory_image = "arenalib_createsign.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
@@ -26,7 +28,7 @@ minetest.register_tool("arena_lib:create_sign", {
 
       --controllo se è un cartello
       if not def or def.entity_info == nil then
-        minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", "[!] L'oggetto non è un cartello!"))
+        minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] That's not a sign!")))
       return end
 
       def.number_of_lines = 5
@@ -40,9 +42,9 @@ minetest.register_tool("arena_lib:create_sign", {
         if minetest.serialize(pos) == minetest.serialize(arena.sign) then
           minetest.set_node(pos, {name = "air"})
           arena.sign = {}
-          minetest.chat_send_player(user:get_player_name(), "Cartello dell'arena " .. arena.name .. " rimosso con successo")
+          minetest.chat_send_player(user:get_player_name(), S("Cartello dell'arena @1 rimosso con successo", arena.name))
         else
-          minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", "[!] Esiste già un cartello per quest'arena!"))
+          minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] Esiste già un cartello per quest'arena!")))
         end
       return end
 
