@@ -2,7 +2,7 @@ local S = minetest.get_translator("arena_lib")
 
 minetest.register_tool("arena_lib:immunity", {
 
-  description = S("Sei immune!"),
+  description = S("You're immune!"),
   inventory_image = "arenalib_immunity.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
@@ -14,7 +14,7 @@ minetest.register_tool("arena_lib:immunity", {
     nell'arena se sono cartelli appositi e "on_timer" per teletrasportali in partita quando la queue finisce]]
 minetest.register_tool("arena_lib:create_sign", {
 
-    description = S("Left click on a sign to create/remove an entrance"),
+    description = S("Left click on a sign to create/remove the access to the arena"),
     inventory_image = "arenalib_createsign.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
 
@@ -42,9 +42,9 @@ minetest.register_tool("arena_lib:create_sign", {
         if minetest.serialize(pos) == minetest.serialize(arena.sign) then
           minetest.set_node(pos, {name = "air"})
           arena.sign = {}
-          minetest.chat_send_player(user:get_player_name(), S("Cartello dell'arena @1 rimosso con successo", arena.name))
+          minetest.chat_send_player(user:get_player_name(), S("Sign of arena @1 successfully removed", arena.name))
         else
-          minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] Esiste già un cartello per quest'arena!")))
+          minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
         end
       return end
 
