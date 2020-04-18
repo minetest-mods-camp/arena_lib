@@ -178,6 +178,8 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
 
   -- aggiungo allo storage
   update_storage(false, mod, mod_ref.arenasID, arena)
+  --aggiorno l'ID globale nello storage
+  storage:set_string(mod, minetest.serialize(mod_ref))
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 succesfully created", arena_name))
 
@@ -230,7 +232,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena)
 
-  -- se provo a settare uno spawn point di troppo, annullo
+  -- se provo a settare uno spawn point di troppo, annullohttps://gitlab.com/zughy-friends-minetest/arena_lib/-/milestones/4
   if spawn_points_count == arena.max_players and spawner_ID == nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players! If requested, you can overwrite them specifying the ID of the spawn as a parameter")))
   return end
@@ -735,7 +737,7 @@ function init_storage(mod)
 
   -- aggiungo le arene
   local i = 1
-  for i = 1, arena_lib.mods[mod].arenasID, i+1 do
+  for i = 1, arena_lib.mods[mod].arenasID do
 
     local arena_str = storage:get_string(mod .. "." .. i)
 
@@ -766,7 +768,7 @@ function update_storage(erase, mod, id, arena)
   if erase then
     storage:set_string(entry, "")
   else
-      storage:set_string(entry, minetest.serialize(arena))
+    storage:set_string(entry, minetest.serialize(arena))
   end
 end
 
