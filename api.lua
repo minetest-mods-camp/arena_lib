@@ -232,7 +232,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena)
 
-  -- se provo a settare uno spawn point di troppo, annullohttps://gitlab.com/zughy-friends-minetest/arena_lib/-/milestones/4
+  -- se provo a settare uno spawn point di troppo, annullo
   if spawn_points_count == arena.max_players and spawner_ID == nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players! If requested, you can overwrite them specifying the ID of the spawn as a parameter")))
   return end
