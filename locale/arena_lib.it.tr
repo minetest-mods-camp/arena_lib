@@ -1,4 +1,4 @@
-# version 2.1
+# version 2.2.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -41,6 +41,7 @@ In game: =In partita:
 Celebrating: =In celebrazione: 
 Spawn points: =Spawn points: 
 Properties: =Proprietà: 
+Temp properties: =Proprietà temporanee: 
 [!] No ongoing game! =[!] Nessuna partita in corso!
 Player: =Giocatore: 
 , kills: =, uccisioni: 

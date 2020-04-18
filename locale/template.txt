@@ -41,6 +41,7 @@ In game: =
 Celebrating: =
 Spawn points: =
 Properties: =
+Temp properties: =
 [!] No ongoing game! =
 Player: =
 , kills: =

@@ -117,8 +117,8 @@ function arena_lib.settings(mod, def)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
   mod_ref.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
-  --mod_ref.properties = {}
-  --mod_ref.temp_properties = {}
+  mod_ref.properties = {}
+  mod_ref.temp_properties = {}
 
   if def.prefix then
     mod_ref.prefix = def.prefix
@@ -144,7 +144,39 @@ function arena_lib.settings(mod, def)
     mod_ref.immunity_slot = def.immunity_slot
   end
 
+  if def.properties then
+    mod_ref.properties = def.properties
+  end
+
+  if def.temp_properties then
+    mod_ref.temp_properties = def.temp_properties
+  end
+
   storage:set_string(mod, minetest.serialize(mod_ref))
+
+end
+
+
+--[!!!] add this to your code only if you need to add some new property to your
+-- old arenas
+function arena_lib.update_properties(mod)
+
+  local mod_ref = arena_lib.mods[mod]
+
+  for id, arena in pairs(mod_ref.arenas) do
+
+    for property, v in pairs(mod_ref.properties) do
+      if arena[property] ~= nil then
+        arena[property] = v
+      end
+    end
+
+    for temp_property, v in pairs(mod_ref.temp_properties) do
+      if arena[temp_property] ~= nil then
+        arena[temp_property] = v
+      end
+    end
+  end
 
 end
 
@@ -162,7 +194,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   -- controllo che non ci siano duplicati
   if mod_ref.arenasID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
-    return end
+  return end
 
   -- creo l'arena
   mod_ref.arenas[mod_ref.arenasID] = new_arena(arena_default)
@@ -174,6 +206,16 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   if min_players and max_players then
     arena.min_players = min_players
     arena.max_players = max_players
+  end
+
+  -- aggiungo le proprietà custom
+  for property, value in pairs(mod_ref.properties) do
+    arena[property] = value
+  end
+
+  -- e quelle temp custom
+  for temp_property, value in pairs(mod_ref.temp_properties) do
+    arena[temp_property] = value
   end
 
   -- aggiungo allo storage
@@ -459,22 +501,21 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
   -- l'arena finisce dopo tot secondi
   minetest.after(mod_ref.celebration_time, function()
-    arena_lib.end_arena(mod_ref, arena)
+    arena_lib.end_arena(mod_ref, mod, arena)
   end)
 
 end
 
 
 
-function arena_lib.end_arena(mod_ref, arena)
+function arena_lib.end_arena(mod_ref, mod, arena)
 
   arena.kill_leader = ""
 
+  -- copia da passare a on_end
   local players = {}
 
-  arena.in_celebration = false
-  arena.in_game = false
-
+  -- teletrasporto i giocatori fuori, li copio e resetto l'inventario
   for pl_name, stats in pairs(arena.players) do
 
     players[pl_name] = stats
@@ -487,12 +528,25 @@ function arena_lib.end_arena(mod_ref, arena)
     player:set_pos(mod_ref.hub_spawn_point)
   end
 
-  arena_lib.update_sign(arena.sign, arena)
+  -- resetto le proprietà temporanee
+  for temp_property, _ in pairs(mod_ref.temp_properties) do
+    arena[temp_property] = nil
+  end
+
+  local id = arena_lib.get_arena_by_name(arena.name)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
     mod_ref.on_end(arena, players)
   end
+
+  arena.in_celebration = false
+  arena.in_game = false
+
+  -- aggiorno storage per le properties e cartello
+  update_storage(false, mod, id, arena)
+  arena_lib.update_sign(arena.sign, arena)
+
 end
 
 

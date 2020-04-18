@@ -20,8 +20,13 @@ end
 
 function arena_lib.print_arena_info(sender, mod, arena_name)
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-  if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!"))) return end
+  if arena == nil then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
+  return end
 
+  local mod_ref = arena_lib.mods[mod]
+
+  -- calcolo giocatori
   local p_count = 0
   local names = ""
   for pl, stats in pairs(arena.players) do
@@ -29,11 +34,24 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     names = names .. " " .. pl
   end
 
+  -- calcolo coordinate spawn point
   local spawners_count = 0
   local spawners_pos = ""
   for spawn_id, spawn_pos in pairs(arena.spawn_points) do
     spawners_count = spawners_count + 1
     spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos)
+  end
+
+  --calcolo proprietà
+  local properties = {}
+  for property, value in pairs(mod_ref.properties) do
+    properties[property] = value
+  end
+
+  --calcolo proprietà temporanee
+  local temp_properties = {}
+  for temp_property, value in pairs(mod_ref.temp_properties) do
+    temp_properties[temp_property] = value
   end
 
   minetest.chat_send_player(sender, [[
@@ -48,7 +66,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     ]] .. S("Loading: ") .. tostring(arena.in_loading) .. [[
     ]] .. S("In game: ") .. tostring(arena.in_game) .. [[
     ]] .. S("Celebrating: ") .. tostring(arena.in_celebration) .. [[
-    ]] .. S("Spawn points: ") .. spawners_count .. " ( " .. spawners_pos .. " )" )
+    ]] .. S("Spawn points: ") .. spawners_count .. " ( " .. spawners_pos .. " )" .. [[
+    ]] .. S("Properties: ") .. minetest.serialize(properties) .. [[
+    ]] .. S("Temp properties: ") .. minetest.serialize(temp_properties))
 end
 
 
