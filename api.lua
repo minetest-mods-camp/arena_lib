@@ -12,37 +12,54 @@ local S = minetest.get_translator("arena_lib")
 local storage = minetest.get_mod_storage()
 --storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
-if minetest.deserialize(storage:get_string("mods")) ~= nil then
-  arena_lib.mods = minetest.deserialize(storage:get_string("mods"))
 
-  for mod, properties in pairs(arena_lib.mods) do
-    -- resetto lo stato delle arene, nel caso il server sia crashato o sia stato
-    -- stoppato con partite in corso. L'alternativa è mettere una cosa simile in
-    -- update_storage() copiando ricorsivamente la tabella e rimuovendo il tutto
-    -- nella tabella copiata, ma è più pesante. E non posso metterlo in
-    -- minetest.register_on_shutdown() perché se crasha non viene chiamato
+--------------LEGACY START----------------
+
+-- [!!!] for arena_lib 2.1.0 and lesser: it automatically converts your old arenas
+-- into the new storage ystem. Please start your server at least once if you wanna
+-- keep them as this will be removed in the who-knows-exactly-when upcoming 3.0.0
+local function legacy_storage_conversion()
+
+  local old_table = minetest.deserialize(storage:get_string("mods"))
+
+  if old_table == nil then return end
+
+  for mod, properties in pairs(old_table) do
 
     for id, arena in pairs(properties.arenas) do
-      arena.players = {}
-      arena.kill_leader = ""
-      arena.in_queue = false
-      arena.in_loading = false
-      arena.in_game = false
-      arena.in_celebration = false
 
-      minetest.after(0.01, function()
-        if not arena.sign.x then return end       --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
-        arena_lib.update_sign(arena.sign, arena)
-      end)
+      --salvo ogni arena in una stringa a parte
+      local entry = mod .. "." .. id
+      storage:set_string(entry, minetest.serialize(arena))
+
     end
+
+    -- svuoto le arene per non salvarle insieme alla mod
+    arena_lib.mods[mod] = old_table[mod]
+    arena_lib.mods[mod].arenas = {}
+
+    -- salvo la mod in una stringa a parte
+    storage:set_string(mod, minetest.serialize(arena_lib.mods[mod]))
+
   end
+
+  --svuoto il vecchio storage
+  storage:set_string("mods", "")
 end
 
+
+
+if minetest.deserialize(storage:get_string("mods")) ~= nil then
+  legacy_storage_conversion()
+end
+
+--------------LEGACY END----------------
 
 ----------------------------------------------
 ---------------DICHIARAZIONI------------------
 ----------------------------------------------
 
+local function init_storage() end
 local function update_storage() end
 local function new_arena() end
 local function next_ID() end
@@ -75,6 +92,8 @@ local arena_default = {
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.initialize(mod)
 
+  init_storage(mod)
+
   --Se esiste già in memoria, ignora il resto
   if arena_lib.mods[mod] ~= nil then return end
 
@@ -87,9 +106,9 @@ end
 
 
 -- call this in your mod to override the default parameters
-function arena_lib.settings(modname, def)
+function arena_lib.settings(mod, def)
 
-  local mod_ref = arena_lib.mods[modname]
+  local mod_ref = arena_lib.mods[mod]
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
@@ -98,6 +117,8 @@ function arena_lib.settings(modname, def)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
   mod_ref.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
+  --mod_ref.properties = {}
+  --mod_ref.temp_properties = {}
 
   if def.prefix then
     mod_ref.prefix = def.prefix
@@ -122,6 +143,8 @@ function arena_lib.settings(modname, def)
   if def.immunity_slot then
     mod_ref.immunity_slot = def.immunity_slot
   end
+
+  storage:set_string(mod, minetest.serialize(mod_ref))
 
 end
 
@@ -154,7 +177,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   end
 
   -- aggiungo allo storage
-  update_storage()
+  update_storage(false, mod, mod_ref.arenasID, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 succesfully created", arena_name))
 
@@ -186,7 +209,7 @@ function arena_lib.remove_arena(sender, mod, arena_name)
 
   -- rimozione arena e aggiornamento storage
   mod_ref.arenas[id] = nil
-  update_storage()
+  update_storage(true, mod, id, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully removed", arena_name))
 
 end
@@ -243,7 +266,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
     minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", spawn_points_count +1))
   end
 
-  update_storage()
+  update_storage(false, mod, id, arena)
 end
 
 
@@ -272,7 +295,7 @@ function arena_lib.enable_arena(sender, mod, arena_ID)
   -- abilito
   arena.enabled = true
   arena_lib.update_sign(arena.sign, arena)
-  update_storage()
+  update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena successfully enabled"))
 
 end
@@ -312,7 +335,7 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
   -- disabilito
   arena.enabled = false
   arena_lib.update_sign(arena.sign, arena)
-  update_storage()
+  update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena.name))
 end
 
@@ -700,10 +723,52 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function update_storage()
-  storage:set_string("mods", minetest.serialize(arena_lib.mods))
+
+function init_storage(mod)
+
+  -- aggiungo la mod
+  local mod_ref = minetest.deserialize(storage:get_string(mod))
+
+  if mod_ref == nil then return end
+
+  arena_lib.mods[mod] = mod_ref
+
+  -- aggiungo le arene
+  local i = 1
+  for i = 1, arena_lib.mods[mod].arenasID, i+1 do
+
+    local arena_str = storage:get_string(mod .. "." .. i)
+
+    -- se c'è una stringa con quell'ID, aggiungo l'arena e aggiorno il cartello con associato quell'ID
+    if arena_str ~= "" then
+      local arena = minetest.deserialize(arena_str)
+      arena_lib.mods[mod].arenas[i] = arena
+
+      --signs_lib ha bisogno di un attimo per caricare sennò tira errore
+      minetest.after(0.01, function()
+        if arena.sign.x then      --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
+          arena_lib.update_sign(arena.sign, arena)
+        end
+      end)
+    end
+
+  end
+  minetest.log("action", "[ARENA_LIB] Mini-game " .. mod .. " loaded")
 end
 
+
+
+function update_storage(erase, mod, id, arena)
+
+  -- ogni mod e ogni arena vengono salvate seguendo il formato mod.ID
+  local entry = mod .."." .. id
+
+  if erase then
+    storage:set_string(entry, "")
+  else
+      storage:set_string(entry, minetest.serialize(arena))
+  end
+end
 
 
 --[[ Dato che in Lua non è possibile istanziare le tabelle copiandole, bisogna istanziare ogni campo in una nuova tabella.
