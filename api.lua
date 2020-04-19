@@ -79,7 +79,6 @@ local arena_default = {
   max_players = arena_default_max_players,
   min_players = arena_default_min_players,
   kill_cap = arena_default_kill_cap,
-  kill_leader = "",
   in_queue = false,
   in_loading = false,
   in_game = false,
@@ -510,8 +509,6 @@ end
 
 function arena_lib.end_arena(mod_ref, mod, arena)
 
-  arena.kill_leader = ""
-
   -- copia da passare a on_end
   local players = {}
 
@@ -636,16 +633,6 @@ end
 function arena_lib.send_message_players_in_arena(arena, msg)
   for pl_name, stats in pairs(arena.players) do
     minetest.chat_send_player(pl_name, msg) end
-end
-
-
-
-function arena_lib.calc_kill_leader(arena, killer)
-
-  if arena.kill_leader == "" then arena.kill_leader = killer return end
-
-  if arena.players[killer].kills > arena.players[arena.kill_leader].kills then
-    arena.kill_leader = killer end
 end
 
 
