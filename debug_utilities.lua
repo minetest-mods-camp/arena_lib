@@ -26,6 +26,14 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
 
+  -- calcolo cartello
+  local sign_pos
+  if arena.sign.x ~= nil then
+    sign_pos = arena.sign
+  else
+    sign_pos = {}
+  end
+
   -- calcolo giocatori
   local p_count = 0
   local names = ""
@@ -44,20 +52,21 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   --calcolo proprietà
   local properties = {}
-  for property, value in pairs(mod_ref.properties) do
-    properties[property] = value
+  for property, _ in pairs(mod_ref.properties) do
+    properties[property] = arena[property]
   end
 
   --calcolo proprietà temporanee
   local temp_properties = {}
-  for temp_property, value in pairs(mod_ref.temp_properties) do
-    temp_properties[temp_property] = value
+  for temp_property, _ in pairs(mod_ref.temp_properties) do
+    temp_properties[temp_property] = arena[temp_property]
   end
 
   minetest.chat_send_player(sender, [[
     ]] .. S("Name: ") .. minetest.colorize("#eea160", arena_name ) .. [[
     ]] .. "ID: " .. arena_ID .. [[
     ]] .. S("Enabled: ") .. tostring(arena.enabled) .. [[
+    ]] .. S("Sign: ") .. minetest.serialize(sign_pos) .. [[
     ]] .. S("Players required: ") .. arena.min_players .. [[
     ]] .. S("Players supported: ") .. arena.max_players .. [[
     ]] .. S("Players inside: ") .. p_count .. " ( ".. names .. " )" .. [[

@@ -22,15 +22,23 @@ local function legacy_storage_conversion()
 
   local old_table = minetest.deserialize(storage:get_string("mods"))
 
-  if old_table == nil then return end
-
   for mod, properties in pairs(old_table) do
+
+    minetest.log("action", "[ARENA_LIB] Converting mod " .. mod )
 
     for id, arena in pairs(properties.arenas) do
 
-      --salvo ogni arena in una stringa a parte
+      -- salvo ogni arena in una stringa a parte
+      minetest.log("action", "[ARENA_LIB] Converting arena " .. arena.name )
       local entry = mod .. "." .. id
+      -- azzero parametri temporanei
+      arena.players = {}
+      arena.in_queue = false
+      arena.in_loading = false
+      arena.in_game = false
+      arena.in_celebration = false
       storage:set_string(entry, minetest.serialize(arena))
+      minetest.log("action", "[ARENA_LIB] Arena " .. arena.name .. " converted into " .. entry)
 
     end
 
@@ -41,15 +49,19 @@ local function legacy_storage_conversion()
     -- salvo la mod in una stringa a parte
     storage:set_string(mod, minetest.serialize(arena_lib.mods[mod]))
 
+    minetest.log("action", "[ARENA_LIB] Mod " .. mod .. " converted")
+
   end
 
   --svuoto il vecchio storage
   storage:set_string("mods", "")
+  minetest.log("action", "[ARENA_LIB] Deprecated storage removed")
 end
 
 
 
 if minetest.deserialize(storage:get_string("mods")) ~= nil then
+  minetest.log("action", "[ARENA_LIB] Old storage system found: converting to arena_lib 2.2.0+ system")
   legacy_storage_conversion()
 end
 
@@ -91,6 +103,8 @@ function arena_lib.initialize(mod)
 
   --Se esiste già in memoria, ignora il resto
   if arena_lib.mods[mod] ~= nil then return end
+
+  minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initializing...")
 
   arena_lib.mods[mod] = {}
   arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
@@ -156,20 +170,26 @@ end
 -- old arenas
 function arena_lib.update_properties(mod)
 
+  minetest.log("action", "[ARENA_LIB] Updating properties for arenas in " .. mod)
+
   local mod_ref = arena_lib.mods[mod]
+
+  if mod_ref == nil then
+    minetest.log("error", "[ARENA_LIB] [!] There's no minigame called " .. mod .. ", properties update aborted")
+  return end
 
   for id, arena in pairs(mod_ref.arenas) do
 
     for property, v in pairs(mod_ref.properties) do
-      if arena[property] ~= nil then
+      if arena[property] == nil then
         arena[property] = v
       end
     end
 
+    update_storage(false, mod, id, arena)
+
     for temp_property, v in pairs(mod_ref.temp_properties) do
-      if arena[temp_property] ~= nil then
-        arena[temp_property] = v
-      end
+      arena[temp_property] = v
     end
   end
 
@@ -526,7 +546,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     arena[temp_property] = nil
   end
 
-  local id = arena_lib.get_arena_by_name(arena.name)
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
