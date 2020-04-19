@@ -542,8 +542,16 @@ function arena_lib.end_arena(mod_ref, mod, arena)
   end
 
   -- resetto le proprietà temporanee
-  for temp_property, _ in pairs(mod_ref.temp_properties) do
-    arena[temp_property] = nil
+  for temp_property, v in pairs(mod_ref.temp_properties) do
+    if type(v) == "string" then
+      arena[temp_property] = ""
+    elseif type(v) == "number" then
+      arena[temp_property] = 0
+    elseif type(v) == "boolean" then
+      arena[temp_property] = false
+    elseif type(v) == "table" then
+      arena[temp_property] = {}
+    end
   end
 
   local id = arena_lib.get_arena_by_name(mod, arena.name)
@@ -805,10 +813,15 @@ function init_storage(mod)
 
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
-        if arena.sign.x then      --se non è ancora stato registrato nessun cartello per l'arena, evito il crash
+        if arena.sign.x then                            -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
           arena_lib.update_sign(arena.sign, arena)
         end
       end)
+    else
+      -- se un'arena è stata cancellata, è comunque rimasta in mod_ref (perché
+      -- viene aggiornato solo all'avvio). Per ovviare a ciò, bisogna cancellarle
+      -- all'avvio
+      arena_lib.mods[mod].arenas[i] = nil
     end
 
   end
