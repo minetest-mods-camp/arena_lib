@@ -67,18 +67,14 @@ local function next_ID() end
 local players_in_game = {}    --KEY: player name, INDEX: {mod, arenaID}
 local players_in_queue = {}   --KEY: player name, INDEX: {mod, arenaID}
 
-local arena_default_max_players = 4
-local arena_default_min_players = 2
-local arena_default_kill_cap = 10
-
 local arena_default = {
   name = "",
   sign = {},
   players = {},               --KEY: player name, INDEX: kills, deaths, killstreak
   spawn_points = {},
-  max_players = arena_default_max_players,
-  min_players = arena_default_min_players,
-  kill_cap = arena_default_kill_cap,
+  max_players = 4,
+  min_players = 2,
+  kill_cap = 10,
   in_queue = false,
   in_loading = false,
   in_game = false,
