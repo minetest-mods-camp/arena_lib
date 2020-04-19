@@ -1,6 +1,6 @@
 # Arena_lib docs
 
-> Arena_lib is a library for Minetest working as a core for any arena-like minigame you have in mind
+> You in a hurry? Skip the theory going to point #2
 
 ## 1. Arenas
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
@@ -103,7 +103,7 @@ arena_lib.initialize("yourmod")
 ```
 **Be careful**: the string you put inside the round brackets will be how arena_lib stores your mod inside its memory and what it needs to understand you're refering to that specific mod (that's why almost every function contains "mod" as a parameter). You'll need it when calling for commands.
 
-To customise your mod mod, you can then call `arena_lib.settings`, specifying the mod name as follows:
+To customise your mod, you can then call `arena_lib.settings`, specifying the mod name as follows:
 ```
 arena_lib.settings("mymod", {
   --whatever parameter, such as
@@ -117,6 +117,8 @@ The parameters are:
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
 * `immunity_time`: the duration of the immunity right after respawning. Default is 3
 * `immunity_slot`: the slot whereto put the immunity item. Default is 9 (the first slot of the inventory minus the hotbar)
+* `properties`: explained down below
+* `temp_properties`: explained down below
 
 On the contrary, to customise the _global_ spawn point of your hub, meaning where to spawn players when they join the server, you need to edit the line  
 `local hub_spawn_point = { x = 0, y = 20, z = 0}`  
@@ -150,6 +152,27 @@ arena_lib.on_load("mymod", function(arena)
 end)
 ```
 
+### 2.3 Additional properties
+Let's say now you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the two tables `properties` and `temp_properties`.  
+  
+The difference between the two is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.settings` and write
+```
+arena_lib.settings("mymod", {
+  --whatever stuff we already have
+  temp_properties = {
+    kill_leader = " "
+  }
+```
+and then we can easily access the `kill_leader` field whenever we want from every arena we have, via `theactualarena.kill_leader`, like when creating a function that returns the kill leader of a given arena.
+
+> Beware: you DO need to initialise your properties (temporary and not) or it'll return an error
+
+#### 2.3.1 Updating properties for old arenas
+If you decide to add a new property (temporary or not) to your mod but you had created a few arenas already, you need to update them manually by calling  
+`arena_lib.update_properties("mymod")`  
+right after `arena_lib.settings`. This has to be done manually because it'd be quite heavy to run a check on hypotetically very long strings whenever the server goes online for each mod relying on `arena_lib`. So just add it, run the server, shut it down when it's done loading, remove the call and then you're good to go.
+
+Check out this example of a full config file
 
 ## 3. Collaborating
 Something's wrong? Feel free to open an issue, go for a merge request and whatnot. I'd really appreciate it :)
