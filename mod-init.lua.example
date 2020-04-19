@@ -11,7 +11,7 @@ arena_lib.settings("call of Zughy", {
   }
 })
 
-arena_lib.update_properties("call of Zughy")
+--arena_lib.update_properties("call of Zughy") --REMOVE THE COMMENT IF YOU ADDED NEW PROPERTIES AND YOU NEED TO ADD THEM TO YOUR OLD ARENAS
 
 -- load other scripts
 dofile(minetest.get_modpath("call of Zughy") .. "/foo.lua")

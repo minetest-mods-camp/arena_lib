@@ -153,7 +153,7 @@ end)
 ```
 
 ### 2.3 Additional properties
-Let's say now you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the two tables `properties` and `temp_properties`.  
+Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the two tables `properties` and `temp_properties`.  
   
 The difference between the two is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.settings` and write
 ```
