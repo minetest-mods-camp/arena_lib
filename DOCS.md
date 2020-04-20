@@ -134,7 +134,7 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_celebration(mod, function(arena, winner_name)`
 * `arena_lib.on_end(mod, function(arena, players))`
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
-* `arena_lib.on_death(mod, function(arena, p_name))`: called when a player dies
+* `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 
 Beware: there is a default behaviour already for each one of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 

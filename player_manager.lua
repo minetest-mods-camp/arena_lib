@@ -27,7 +27,7 @@ minetest.register_on_dieplayer(function(player, reason)
     p_stats.killstreak = 0
 
     if mod_ref.on_death then
-      mod_ref.on_death(arena, p_name)
+      mod_ref.on_death(arena, p_name, reason)
     end
 
   end)
