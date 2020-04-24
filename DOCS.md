@@ -89,7 +89,7 @@ The 4 functions, intertwined with the previously mentioned phases are:
 * `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
 * `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
 * `arena_lib.load_celebration(mod, arena, winner_name)`: between the fighting and the celebration phase. Called when the winning conditions are met.
-* `arena_lib.end_arena(mod_ref, arena)`: at the very end of the celebration phase. It teleports people outside the arena
+* `arena_lib.end_arena(mod_ref, mod, arena)`: at the very end of the celebration phase. It teleports people outside the arena
 
 Overriding these functions is not recommended. Instead, there are 4 respective callbacks made specifically to customize the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`, and they are explained later in 2.2.
 
