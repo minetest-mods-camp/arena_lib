@@ -606,10 +606,14 @@ end
 
 
 
-function arena_lib.remove_player_from_arena(p_name)
+function arena_lib.remove_player_from_arena(p_name, is_kicked)
 
   local mod, arena_ID
 
+  if is_kicked == nil then
+    is_kicked = false
+  end
+  
   -- se non è in partita né in coda, annullo
   if arena_lib.is_player_in_arena(p_name) then
     mod = players_in_game[p_name].minigame
@@ -629,8 +633,11 @@ function arena_lib.remove_player_from_arena(p_name)
   players_in_queue[p_name] = nil
 
   arena_lib.update_sign(arena.sign, arena)
-  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has left the game", p_name))
-
+  if is_kicked == false then
+    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has left the game", p_name))
+  else
+    --TODO: send a message to the player
+  end
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
@@ -644,7 +651,11 @@ function arena_lib.remove_player_from_arena(p_name)
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena_lib.get_arena_players_count(arena) == 1 then
 
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You win the game due to not enough players"))
+    if is_kicked == false then
+      arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You win the game due to not enough players"))
+    else
+      --TODO: send a message to the player
+    end
     for pl_name, stats in pairs(arena.players) do
       arena_lib.load_celebration(mod, arena, pl_name)
     end
