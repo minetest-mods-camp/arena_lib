@@ -606,7 +606,7 @@ end
 
 
 
-function arena_lib.remove_player_from_arena(p_name, is_kicked)
+function arena_lib.remove_player_from_arena(p_name, is_eliminated)
 
   local mod, arena_ID
 
@@ -630,8 +630,8 @@ function arena_lib.remove_player_from_arena(p_name, is_kicked)
 
   arena_lib.update_sign(arena.sign, arena)
 
-  if is_kicked then
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has been removed from the game", p_name))
+  if is_eliminated then
+    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has been eliminated", p_name))
   else
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has left the game", p_name))
   end
@@ -649,7 +649,7 @@ function arena_lib.remove_player_from_arena(p_name, is_kicked)
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena_lib.get_arena_players_count(arena) == 1 then
 
-    if is_kicked then
+    if is_eliminated then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
     else
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You win the game due to not enough players"))
