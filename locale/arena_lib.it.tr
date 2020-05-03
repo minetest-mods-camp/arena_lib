@@ -1,7 +1,9 @@
-# version 2.2.0
+# version 2.4.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
+
+# api.lua
 [!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
 Arena @1 succesfully created=Arena @1 creata con successo
 [!] There is no arena named @1!=[!] Non c'è nessun'arena chiamata @1!
@@ -29,6 +31,8 @@ Arena @1 successfully disabled=Arena @1 disabilitata con successo
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
+
+# debug_utilities.lua
 name: =nome: 
 Total arenas: =Arene totali: 
 Name: =Nome: 
@@ -48,12 +52,16 @@ Temp properties: =Proprietà temporanee:
 Player: =Giocatore: 
 , kills: =, uccisioni: 
 , deaths: =, morti: 
-, killstreak: =, killstreak: 
+, killstreak: =, killstreak:  
+
+# items.lua
 You're immune!=Sei immune!
 Left click on a sign to create/remove the access to the arena=Tasto sinistro su un cartello per creare/rimuovere l'accesso all'arena
 [!] That's not a sign!=[!] Questo non è un cartello!
 Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
 [!] There is already a sign for this arena! =[!] Esiste già un cartello per quest'arena!
+
+# signs.lua
 [!] The arena is not enabled!=[!] L'arena non è attiva!
 [!] You're already queueing for minigame @1!=[!] Sei già in coda per il minigioco @1!
 You need to leave the queue of @1 first!=Devi prima uscire dalla coda di @1!
@@ -62,6 +70,7 @@ You have left the queue=Sei uscito dalla coda
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 [!] The arena is already full!=[!] L'arena è già piena!
 [!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
+[!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
 @1 has joined the game=@1 si è aggiunto alla partita
 You've entered the arena @1=Sei entrato nell'arena @1
 @1 has joined the queue=@1 si è aggiunto alla coda

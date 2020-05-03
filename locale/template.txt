@@ -1,7 +1,9 @@
-# version 2.1
+# version 2.4.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
+
+#api.lua
 [!] An arena with that name exists already!=
 Arena @1 succesfully created=
 [!] There is no arena named @1!=
@@ -29,6 +31,8 @@ Arena @1 successfully disabled=
 The queue has been cancelled due to not enough players=
 You're the last player standing: you win!=
 You win the game due to not enough players=
+
+# debug_utilities.lua
 name: =
 Total arenas: =
 Name: =
@@ -49,11 +53,15 @@ Player: =
 , kills: =
 , deaths: =
 , killstreak: =
+
+# items.lua
 You're immune!=
 Left click on a sign to create/remove the access to the arena=
 [!] That's not a sign!=
 Sign of arena @1 successfully removed=
 [!] There is already a sign for this arena! =
+
+# signs.lua
 [!] The arena is not enabled!=
 [!] You're already queueing for minigame @1!=
 You need to leave the queue of @1 first!=
@@ -62,6 +70,7 @@ You have left the queue=
 The queue has been cancelled due to not enough players=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
+[!] This minigame doesn't allow to join while in progress!=
 @1 has joined the game=
 You've entered the arena @1=
 @1 has joined the queue=
