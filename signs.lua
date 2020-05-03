@@ -67,6 +67,11 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is loading, try again in a few seconds!")))
         return end
 
+      -- se è in corso e non permette l'entrata
+      if sign_arena.in_game and mod_ref.join_while_in_progress == false then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't allow to join while in progress!")))
+        return end
+
       -- aggiungo il giocatore e aggiorno il cartello
       sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
       arena_lib.update_sign(pos, sign_arena)
@@ -177,7 +182,7 @@ function in_game_txt(arena)
 
   if not arena.enabled then txt = "WIP"
   elseif arena.in_celebration then txt = "Terminating"
-  elseif arena.in_game then txt = "Ongoing"
+  elseif arena.in_game then txt = "In progress"
   elseif arena.in_loading then txt = "Loading"
   else txt = "Waiting" end
 

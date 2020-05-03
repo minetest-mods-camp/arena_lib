@@ -1,6 +1,7 @@
 arena_lib = {}
 arena_lib.mods = {}
 
+-- TODO: spostarlo in mod Hub
 local hub_spawn_point = { x = 0, y = 20, z = 0}
 
 local S = minetest.get_translator("arena_lib")
@@ -122,6 +123,7 @@ function arena_lib.settings(mod, def)
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
+  mod_ref.join_while_in_progress = false
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
@@ -135,6 +137,10 @@ function arena_lib.settings(mod, def)
 
   if def.hub_spawn_point then
     mod_ref.hub_spawn_point = def.hub_spawn_point
+  end
+
+  if def.join_while_in_progress == true then
+    mod_ref.join_while_in_progress = def.join_while_in_progress
   end
 
   if def.load_time then
