@@ -11,7 +11,6 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `max_players`: (string) default is 4
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `kill_cap`: (int) the goal to win (it'll be expanded for games such as Capture the point)
-* `kill_leader`: (string) who's the actual kill leader
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -113,6 +112,7 @@ arena_lib.settings("mymod", {
 The parameters are:
 * `prefix`: what's gonna appear in most of the lines printed by your mod. Default is `[arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
+* `join_while_in_progress`: whether the minigame allows to join an ongoing match or not. Default is false
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
 * `immunity_time`: the duration of the immunity right after respawning. Default is 3
