@@ -77,8 +77,8 @@ local function update_storage() end
 local function new_arena() end
 local function next_ID() end
 
-local players_in_game = {}    --KEY: player name, INDEX: {mod, arenaID}
-local players_in_queue = {}   --KEY: player name, INDEX: {mod, arenaID}
+local players_in_game = {}    --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
+local players_in_queue = {}   --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
 
 local arena_default = {
   name = "",
@@ -596,18 +596,42 @@ end
 
 --TODO: rename_arena
 
-function arena_lib.is_player_in_arena(p_name)
+-- (p_name, (mod))
+function arena_lib.is_player_in_arena(p_name, mod)
 
-  if not players_in_game[p_name] then return false
-  else return true end
+  if not players_in_game[p_name] then 
+    return false
+  else 
+    
+    -- se il campo mod è specificato, controllo che sia lo stesso
+    if mod ~= nil then
+      if players_in_game[p_name].minigame == mod then return true
+      else return false
+      end
+    end
+    
+    return true 
+    
+  end
 end
 
 
 
 function arena_lib.is_player_in_queue(p_name)
 
-  if not players_in_queue[p_name] then return false
-  else return true end
+  if not players_in_queue[p_name] then 
+    return false
+  else 
+    -- se il campo mod è specificato, controllo che sia lo stesso
+    if mod ~= nil then
+      if players_in_queue[p_name].minigame == mod then return true
+      else return false
+      end
+    end
+    
+    return true 
+    
+  end
 end
 
 
