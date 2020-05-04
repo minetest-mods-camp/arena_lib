@@ -124,6 +124,7 @@ function arena_lib.settings(mod, def)
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.join_while_in_progress = false
+  mod_ref.show_minimap = false
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
@@ -141,6 +142,10 @@ function arena_lib.settings(mod, def)
 
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
+  end
+  
+  if def.show_minimap == true then
+    mod_ref.show_minimap = def.show_minimap
   end
 
   if def.load_time then
@@ -418,9 +423,9 @@ function arena_lib.load_arena(mod, arena_ID)
 
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
-
+  
   -- teletrasporto giocatori, li blocco sul posto, nascondo i nomi e svuoto l'inventario
-  for pl_name, stats in pairs(arena.players) do
+  for pl_name, _ in pairs(arena.players) do
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -433,6 +438,11 @@ function arena_lib.load_arena(mod, arena_ID)
     player:get_inventory():set_list("main",{})
     players_in_queue[pl_name] = nil
     players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}       -- registro giocatori nella tabella apposita
+    
+    -- disattivo eventualmente la minimappa
+    if not mod_ref.show_minimap then
+      player:hud_set_flags({minimap = false})
+    end
 
     count = count +1
   end
@@ -486,6 +496,10 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   player:get_inventory():set_list("main",{})
   player:set_pos(arena_lib.get_random_spawner(arena))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
+  
+  if not mod_ref.show_minimap then
+    player:hud_set_flags({minimap = false})
+  end
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
@@ -534,7 +548,6 @@ function arena_lib.end_arena(mod_ref, mod, arena)
   -- copia da passare a on_end
   local players = {}
 
-  -- teletrasporto i giocatori fuori, li copio e resetto l'inventario
   for pl_name, stats in pairs(arena.players) do
 
     players[pl_name] = stats
@@ -543,8 +556,12 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
     local player = minetest.get_player_by_name(pl_name)
 
+    -- resetto inventario e teletraspoto nella lobby
     player:get_inventory():set_list("main", {})
     player:set_pos(mod_ref.hub_spawn_point)
+    
+    -- riattivo la minimappa eventualmente disattivata
+    player:hud_set_flags({minimap = true})
   end
 
   -- resetto le proprietà temporanee
@@ -653,7 +670,11 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
   local arena = mod_ref.arenas[arena_ID]
 
   if arena == nil then return end
+  
+  -- resetto la minimappa eventualmente disattivata
+  minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
 
+  -- lo rimuovo
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
