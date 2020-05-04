@@ -681,9 +681,14 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
 
   arena_lib.update_sign(arena.sign, arena)
 
-  -- se è eliminato, lo teletrasporto fuori dall'arena
+  -- se è eliminato, lo teletrasporto fuori dall'arena e ripristino il nome
   if is_eliminated then
-    minetest.get_player_by_name(p_name):set_pos(mod_ref.hub_spawn_point)
+    
+    local player = minetest.get_player_by_name(p_name)
+    
+    player:set_pos(mod_ref.hub_spawn_point)
+    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+    
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has been eliminated", p_name))
   else
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has left the game", p_name))
