@@ -113,6 +113,7 @@ The parameters are:
 * `prefix`: what's gonna appear in most of the lines printed by your mod. Default is `[arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match or not. Default is false
+* `show_minimap`: whether to allow players to use the builtin minimap function or not. Default is false
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
 * `immunity_time`: the duration of the immunity right after respawning. Default is 3
