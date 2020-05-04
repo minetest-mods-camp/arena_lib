@@ -176,8 +176,8 @@ Check out this example of a full config file
 
 ### 2.4 Utils
 There are also some other functions which might turn useful. They are:
-* `arena_lib.is_player_in_queue(p_name)`: returns a boolean
-* `arena_lib.is_player_in_arena(p_name)`: returns a boolean
+* `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod.
+* `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above.
 * `arena_lib.remove_player_from_arena(p_name, is_eliminated)`: if is_eliminated is not specified, other players will see that the player has left the match. If it is (true), the message will say the player has been eliminated. The latter comes in handy for games like Murder or TNT Run
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.settings`
