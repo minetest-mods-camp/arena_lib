@@ -125,6 +125,7 @@ function arena_lib.settings(mod, def)
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.join_while_in_progress = false
   mod_ref.show_minimap = false
+  mod_ref.queue_waiting_time = 5
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
@@ -146,6 +147,10 @@ function arena_lib.settings(mod, def)
   
   if def.show_minimap == true then
     mod_ref.show_minimap = def.show_minimap
+  end
+
+  if def.queue_waiting_time then
+    mod_ref.queue_waiting_time = def.queue_waiting_time
   end
 
   if def.load_time then

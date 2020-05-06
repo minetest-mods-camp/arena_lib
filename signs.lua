@@ -2,7 +2,6 @@
 -- For the item to set signs, being a declaration of a new item, look at items.lua
 --
 local S = minetest.get_translator("arena_lib")
-local queue_waiting_time = 5
 
 local function in_game_txt(arena) end
 
@@ -92,9 +91,9 @@ minetest.override_item("default:sign_wall", {
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
       if arena_lib.get_arena_players_count(sign_arena) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The game begins in @1 seconds!", queue_waiting_time))
+        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The game begins in @1 seconds!", mod_ref.queue_waiting_time))
         sign_arena.in_queue = true
-        timer:start(queue_waiting_time)
+        timer:start(mod_ref.queue_waiting_time)
       end
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, parte subito
