@@ -124,6 +124,7 @@ function arena_lib.settings(mod, def)
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.join_while_in_progress = false
+  mod_ref.show_nametags = false
   mod_ref.show_minimap = false
   mod_ref.queue_waiting_time = 5
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
@@ -143,6 +144,10 @@ function arena_lib.settings(mod, def)
 
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
+  end
+  
+  if def.show_nametags == true then
+    mod_ref.show_nametags = def.show_nametags
   end
   
   if def.show_minimap == true then
@@ -429,25 +434,32 @@ function arena_lib.load_arena(mod, arena_ID)
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
   
-  -- teletrasporto giocatori, li blocco sul posto, nascondo i nomi e svuoto l'inventario
+  -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
 
     local player = minetest.get_player_by_name(pl_name)
 
-    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    player: set_physics_override({
-              speed = 0,
-              })
-
-    player:set_pos(arena.spawn_points[count])
-    player:get_inventory():set_list("main",{})
-    players_in_queue[pl_name] = nil
-    players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}       -- registro giocatori nella tabella apposita
+    -- nascondo i nomi se l'opzione è abilitata
+    if not mod_ref.show_nametags then
+      player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+    end
     
     -- disattivo eventualmente la minimappa
     if not mod_ref.show_minimap then
       player:hud_set_flags({minimap = false})
     end
+    
+    -- li blocco sul posto
+    player: set_physics_override({
+              speed = 0,
+              })
+              
+    -- teletrasporto i giocatori e svuoto l'inventario
+    player:set_pos(arena.spawn_points[count])
+    player:get_inventory():set_list("main",{})
+    -- registro giocatori nella tabella apposita
+    players_in_queue[pl_name] = nil
+    players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}
 
     count = count +1
   end
@@ -496,15 +508,20 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   local mod_ref = arena_lib.mods[mod]
   local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
-
-  player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-  player:get_inventory():set_list("main",{})
-  player:set_pos(arena_lib.get_random_spawner(arena))
-  players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
   
+  -- nascondo i nomi se l'opzione è abilitata
+  if not mod_ref.show_nametags then
+    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+  end
+  
+  -- disattivo eventualmente la minimappa
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
   end
+  
+  player:get_inventory():set_list("main",{})
+  player:set_pos(arena_lib.get_random_spawner(arena))
+  players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
