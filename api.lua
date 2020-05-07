@@ -450,7 +450,7 @@ function arena_lib.load_arena(mod, arena_ID)
     end
     
     -- li blocco sul posto
-    player: set_physics_override({
+    player:set_physics_override({
               speed = 0,
               })
               
@@ -481,7 +481,6 @@ end
 function arena_lib.start_arena(mod_ref, arena)
 
   arena.in_loading = false
-  arena.in_game = true
   arena_lib.update_sign(arena.sign, arena)
 
   for pl_name, stats in pairs(arena.players) do

@@ -181,8 +181,9 @@ function in_game_txt(arena)
 
   if not arena.enabled then txt = "WIP"
   elseif arena.in_celebration then txt = "Terminating"
-  elseif arena.in_game then txt = "In progress"
   elseif arena.in_loading then txt = "Loading"
+  elseif arena.in_game then txt = "In progress"
+  
   else txt = "Waiting" end
 
   return txt
