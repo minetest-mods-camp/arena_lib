@@ -100,7 +100,7 @@ Then, you need to initialise the mod for each mod you want to feature arena_lib 
 ```
 arena_lib.initialize("yourmod")
 ```
-**Be careful**: the string you put inside the round brackets will be how arena_lib stores your mod inside its memory and what it needs to understand you're refering to that specific mod (that's why almost every function contains "mod" as a parameter). You'll need it when calling for commands.
+**Be careful**: the string you put inside the round brackets will be how arena_lib stores your mod inside its memory and what it needs in order to understand you're referring to that specific mod (that's why almost every function contains "mod" as a parameter). You'll need it when calling for commands.
 
 To customise your mod, you can then call `arena_lib.settings`, specifying the mod name as follows:
 ```
