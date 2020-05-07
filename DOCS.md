@@ -188,7 +188,12 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.settings`
 
 ## 3. Collaborating
-Something's wrong? Feel free to open an issue, go for a merge request and whatnot. I'd really appreciate it :)
+Something's wrong? Feel free to:
+* open an issue
+* submit a merge request. In this case, PLEASE, do follow milestones. I won't merge features for milestones that are different from the upcoming one (if it's declared)
+* contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
+
+I'd really appreciate it :)
 
 ## 4. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://it.liberapay.com/EticaDigitale/) directly to my educational Italian project (because not everyone speaks English and Italian media don't talk about these topics much). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

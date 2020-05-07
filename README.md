@@ -21,3 +21,9 @@ Default
 #### Mods relying on arena_lib
 [Murder](https://gitlab.com/giov4/minetest-murder-mod)  
 [Quake](https://gitlab.com/zughy-friends-minetest/minetest-quake)
+
+### Want to help?
+Feel free to:
+* open an issue
+* submit a merge request. In this case, PLEASE, do follow milestones. I won't merge features for milestones that are different from the upcoming one (if it's declared)
+* contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
