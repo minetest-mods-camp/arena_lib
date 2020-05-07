@@ -1,6 +1,6 @@
 # Arena_lib docs
 
-> You in a hurry? Skip the theory going to point #2
+> You in a hurry? Skip the theory going to point [#2](#2-configuration)
 
 ## 1. Arenas
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
