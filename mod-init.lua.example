@@ -3,6 +3,8 @@ arena_lib.initialize("call of Zughy")
 arena_lib.settings("call of Zughy", {
   prefix = "[CoZ] ",
   hub_spawn_point = { x = 5, y = 10, z = 4 },
+  queue_waiting_time = 10,
+  show_minimap = true,
   properties = {
     most_wins_player = " ",
   },
