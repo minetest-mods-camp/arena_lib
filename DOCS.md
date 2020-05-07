@@ -94,6 +94,8 @@ Overriding these functions is not recommended. Instead, there are 4 respective c
 
 ## 2. Configuration
 
+> Still a TL;DR? Check out the [example file](mod-init.lua.example)
+
 First of all download the mod and put it in your mods folder.
 
 Then, you need to initialise the mod for each mod you want to feature arena_lib in, inside the init.lua via:
@@ -175,7 +177,7 @@ If you decide to add a new property (temporary or not) to your mod but you had c
 `arena_lib.update_properties("mymod")`  
 right after `arena_lib.settings`. This has to be done manually because it'd be quite heavy to run a check on hypotetically very long strings whenever the server goes online for each mod relying on `arena_lib`. So just add it, run the server, shut it down when it's done loading, remove the call and then you're good to go.
 
-Check out this example of a full config file
+Check out [this example](mod-init.lua.example) of a full config file
 
 ### 2.4 Utils
 There are also some other functions which might turn useful. They are:
