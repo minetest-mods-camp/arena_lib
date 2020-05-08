@@ -1,4 +1,4 @@
-# version 2.4.0
+# version 2.5.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -52,7 +52,6 @@ Temp properties: =
 Player: =
 , kills: =
 , deaths: =
-, killstreak: =
 
 # items.lua
 You're immune!=

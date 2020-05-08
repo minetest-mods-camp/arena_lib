@@ -1,4 +1,4 @@
-# version 2.4.0
+# version 2.5.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -52,7 +52,6 @@ Temp properties: =Proprietà temporanee:
 Player: =Giocatore: 
 , kills: =, uccisioni: 
 , deaths: =, morti: 
-, killstreak: =, killstreak:  
 
 # items.lua
 You're immune!=Sei immune!
