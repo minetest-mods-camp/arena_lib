@@ -23,7 +23,6 @@ minetest.register_on_dieplayer(function(player, reason)
     local arena = arena_lib.get_arena_by_player(p_name)
     local p_stats = arena.players[p_name]
     p_stats.deaths = p_stats.deaths +1
-    p_stats.killstreak = 0
 
     if mod_ref.on_death then
       mod_ref.on_death(arena, p_name, reason)

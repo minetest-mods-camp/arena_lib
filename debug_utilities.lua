@@ -90,7 +90,7 @@ function arena_lib.print_arena_stats(sender, mod, arena_name)
   if not arena.in_game and not arena.in_celebration then minetest.chat_send_player(name, minetest.colorize("#e6482e", S("[!] No ongoing game!"))) return end
 
   for pl, stats in pairs(arena.players) do
-    minetest.chat_send_player(sender, S("Player: ") .. pl .. S(", kills: ") .. stats.kills .. S(", deaths: ") .. stats.deaths .. S(", killstreak: ") .. stats.killstreak)
+    minetest.chat_send_player(sender, S("Player: ") .. pl .. S(", kills: ") .. stats.kills .. S(", deaths: ") .. stats.deaths)
   end
 
 end

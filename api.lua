@@ -83,7 +83,7 @@ local players_in_queue = {}   --KEY: player name, INDEX: {(string) minigame, (in
 local arena_default = {
   name = "",
   sign = {},
-  players = {},               --KEY: player name, INDEX: kills, deaths, killstreak
+  players = {},               --KEY: player name, INDEX: kills, deaths, player_properties
   spawn_points = {},
   max_players = 4,
   min_players = 2,
@@ -133,6 +133,7 @@ function arena_lib.settings(mod, def)
   mod_ref.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
+  mod_ref.player_properties = {}
 
   if def.prefix then
     mod_ref.prefix = def.prefix
@@ -180,6 +181,10 @@ function arena_lib.settings(mod, def)
 
   if def.temp_properties then
     mod_ref.temp_properties = def.temp_properties
+  end
+  
+  if def.player_properties then
+    mod_ref.player_properties = def.player_properties
   end
 
   storage:set_string(mod, minetest.serialize(mod_ref))

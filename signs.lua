@@ -71,8 +71,16 @@ minetest.override_item("default:sign_wall", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't allow to join while in progress!")))
         return end
 
-      -- aggiungo il giocatore e aggiorno il cartello
-      sign_arena.players[p_name] = {kills = 0, deaths = 0, killstreak = 0}
+      -- aggiungo il giocatore ed eventuali proprietà
+      sign_arena.players[p_name] = {kills = 0, deaths = 0}
+      
+      for k, v in pairs(mod_ref.player_properties) do
+        sign_arena.players[p_name][k] = v
+      end
+      
+      minetest.chat_send_player(p_name, minetest.serialize(sign_arena.players[p_name]))
+      
+      -- aggiorno il cartello
       arena_lib.update_sign(pos, sign_arena)
 
       -- notifico i vari giocatori del nuovo player
