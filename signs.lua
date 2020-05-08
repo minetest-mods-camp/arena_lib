@@ -78,8 +78,6 @@ minetest.override_item("default:sign_wall", {
         sign_arena.players[p_name][k] = v
       end
       
-      minetest.chat_send_player(p_name, minetest.serialize(sign_arena.players[p_name]))
-      
       -- aggiorno il cartello
       arena_lib.update_sign(pos, sign_arena)
 
