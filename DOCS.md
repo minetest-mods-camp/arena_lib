@@ -123,7 +123,8 @@ The parameters are:
 * `immunity_time`: the duration of the immunity right after respawning. Default is 3
 * `immunity_slot`: the slot whereto put the immunity item. Default is 9 (the first slot of the inventory minus the hotbar)
 * `properties`: explained down below
-* `temp_properties`: explained down below
+* `temp_properties`: same
+* `player_properties`: same
 
 On the contrary, to customise the _global_ spawn point of your hub, meaning where to spawn players when they join the server, you need to edit the line  
 `local hub_spawn_point = { x = 0, y = 20, z = 0}`  
@@ -158,26 +159,50 @@ end)
 ```
 
 ### 2.3 Additional properties
-Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the two tables `properties` and `temp_properties`.  
-  
-The difference between the two is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.settings` and write
+Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the three tables `properties`, `temp_properties` and `player_properties`. The last one is for players, while the others are for the arena.  
+
+#### 2.3.1 Arenas properties
+The difference between `properties` and `temp_properties` is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.settings` and write
 ```
 arena_lib.settings("mymod", {
   --whatever stuff we already have
   temp_properties = {
     kill_leader = " "
   }
+}
 ```
 and then we can easily access the `kill_leader` field whenever we want from every arena we have, via `theactualarena.kill_leader`, like when creating a function that returns the kill leader of a given arena.
 
-> Beware: you DO need to initialise your properties (temporary and not) or it'll return an error
+> Beware: you DO need to initialise your properties (whatever type) or it'll return an error
 
-#### 2.3.1 Updating properties for old arenas
+##### 2.3.1.1 Updating properties for old arenas
 If you decide to add a new property (temporary or not) to your mod but you had created a few arenas already, you need to update them manually by calling  
 `arena_lib.update_properties("mymod")`  
 right after `arena_lib.settings`. This has to be done manually because it'd be quite heavy to run a check on hypotetically very long strings whenever the server goes online for each mod relying on `arena_lib`. So just add it, run the server, shut it down when it's done loading, remove the call and then you're good to go.
 
-Check out [this example](mod-init.lua.example) of a full config file
+#### 2.3.2 Players properties
+These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
+```
+arena_lib.settings("mymod", {
+  --stuff
+  temp_properties = {
+    kill_leader = " "
+  },
+  player_properties = {
+    killstreak = 0
+  }
+}
+```
+
+Now you can easily access the `killstreak` parameter by retrieving the player inside an arena. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
+```
+arena_lib.on_death("mymod", function(arena, p_name, reason)
+  arena.players[p_name].killstreak = 0
+end)
+
+```
+
+Check out [this example](mod-init.lua.example) for a full configuration file
 
 ### 2.4 Utils
 There are also some other functions which might turn useful. They are:

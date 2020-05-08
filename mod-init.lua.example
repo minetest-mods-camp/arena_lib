@@ -10,6 +10,11 @@ arena_lib.settings("call of Zughy", {
   },
   temp_properties = {
     kill_leader = " ",
+    is_bomb_planted = false
+  },
+  player_properties = {
+    killstreak = 0,
+    has_bomb = false
   }
 })
 
