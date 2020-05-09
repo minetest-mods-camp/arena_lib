@@ -10,7 +10,6 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `players`: (table) where to store players
 * `max_players`: (string) default is 4
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `kill_cap`: (int) the goal to win (it'll be expanded for games such as Capture the point)
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
