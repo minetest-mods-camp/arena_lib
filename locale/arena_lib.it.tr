@@ -62,8 +62,6 @@ Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con success
 
 # signs.lua
 [!] The arena is not enabled!=[!] L'arena non è attiva!
-[!] You're already queueing for minigame @1!=[!] Sei già in coda per il minigioco @1!
-You need to leave the queue of @1 first!=Devi prima uscire dalla coda di @1!
 You have left the queue=Sei uscito dalla coda
 @1 has left the queue=@1 ha abbandonato la coda
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori

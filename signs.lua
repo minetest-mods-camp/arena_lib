@@ -20,49 +20,19 @@ minetest.override_item("default:sign_wall", {
       local p_name = puncher:get_player_name()
 
       if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
+      
+      -- se non è abilitata
       if not sign_arena.enabled then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
-      return end
-
-      -- cosa succede se è già in coda da qualche parte
-      if arena_lib.is_player_in_queue(p_name) then
-
-        local queued_mod = arena_lib.get_mod_by_player(p_name)
-
-        -- se è in coda in un altro minigioco, annullo
-        if queued_mod ~= mod then
-          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You're already queueing for minigame @1!", queued_mod)))
         return end
-
-        local queued_ID = arena_lib.get_queueID_by_player(p_name)
-
-        -- se è in coda per lo stesso minigioco ma arena diversa, annullo
-        if queued_ID ~= arenaID then
-          minetest.chat_send_player(p_name, mod_ref.prefix .. minetest.colorize("#e6482e", S("You need to leave the queue of @1 first!", mod_ref.arenas[queued_ID].name)))
-        return end
-
-        -- sennò la coda era la stessa e rimuovo il giocatore
-        sign_arena.players[p_name] = nil
-        arena_lib.update_sign(pos, sign_arena)
-        arena_lib.remove_from_queue(p_name)
-        minetest.chat_send_player(p_name, mod_ref.prefix .. S("You have left the queue"))
-        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has left the queue", p_name))
-
-        -- se non ci sono più abbastanza giocatori, annullo la coda
-        if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
-          minetest.get_node_timer(pos):stop()
-          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-          sign_arena.in_queue = false
-        end
-      return end
-
+      
       -- se l'arena è piena
       if arena_lib.get_arena_players_count(sign_arena) == sign_arena.max_players then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
         return end
 
-      -- se sta caricando
-      if sign_arena.in_loading then
+      -- se sta caricando o sta finendo
+      if sign_arena.in_loading or sign_arena.in_celebration then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is loading, try again in a few seconds!")))
         return end
 
@@ -70,6 +40,47 @@ minetest.override_item("default:sign_wall", {
       if sign_arena.in_game and mod_ref.join_while_in_progress == false then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't allow to join while in progress!")))
         return end
+
+      -- se è già in coda
+      if arena_lib.is_player_in_queue(p_name) then
+
+        local queued_mod = arena_lib.get_mod_by_player(p_name)
+        local queued_ID = arena_lib.get_queueID_by_player(p_name)
+        
+        -- se la coda è la stessa rimuovo il giocatore...
+        if queued_mod == mod and queued_ID == arenaID then
+          sign_arena.players[p_name] = nil
+          arena_lib.update_sign(pos, sign_arena)
+          arena_lib.remove_from_queue(p_name)
+          minetest.chat_send_player(p_name, mod_ref.prefix .. S("You have left the queue"))
+          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has left the queue", p_name))
+          
+          -- ...e la annullo se non ci sono più abbastanza persone
+          if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
+            minetest.get_node_timer(pos):stop()
+            arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+            sign_arena.in_queue = false
+          end
+          
+          return 
+        end
+        
+        local old_mod_ref = arena_lib.mods[queued_mod]
+        local old_arena = old_mod_ref.arenas[queued_ID]
+        
+        -- sennò lo rimuovo dalla precedente e continuo per aggiungerlo in questa
+        old_arena.players[p_name] = nil
+        arena_lib.remove_from_queue(p_name)
+        arena_lib.update_sign(old_arena.sign, old_arena)
+        arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("@1 has left the queue", p_name))
+        
+        -- annullando la coda della precedente se non ci sono più abbastanza giocatori
+        if arena_lib.get_arena_players_count(old_arena) < old_arena.min_players and old_arena.in_queue then
+          minetest.get_node_timer(old_arena.sign):stop()
+          arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+          old_arena.in_queue = false
+        end
+      end
 
       -- aggiungo il giocatore ed eventuali proprietà
       sign_arena.players[p_name] = {kills = 0, deaths = 0}

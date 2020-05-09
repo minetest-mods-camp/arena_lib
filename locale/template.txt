@@ -62,8 +62,6 @@ Sign of arena @1 successfully removed=
 
 # signs.lua
 [!] The arena is not enabled!=
-[!] You're already queueing for minigame @1!=
-You need to leave the queue of @1 first!=
 You have left the queue=
 @1 has left the queue=
 The queue has been cancelled due to not enough players=
