@@ -6,7 +6,7 @@ arena_lib.settings("call of Zughy", {
   queue_waiting_time = 10,
   show_minimap = true,
   properties = {
-    most_wins_player = " ",
+    planting_locations = {{x=30, y=20, z=40}, {x=5, y=20, z=80}}, --you can override these parameters via your mod, of course
   },
   temp_properties = {
     kill_leader = " ",
