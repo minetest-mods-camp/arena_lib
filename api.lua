@@ -355,6 +355,43 @@ end
 
 
 
+function arena_lib.set_sign(itemstack, user, pos)
+  
+  local mod = itemstack:get_meta():get_string("mod")
+  local arena_ID = itemstack:get_meta():get_int("arenaID")
+  local arena = arena_lib.mods[mod].arenas[arena_ID]
+  
+  -- se l'arena è abilitata annullo
+  if arena.enabled then
+    minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
+    return end
+
+  -- controllo se c'è già un cartello assegnato a quell'arena. Se è lo stesso lo rimuovo, sennò annullo
+  if next(arena.sign) ~= nil then
+    if minetest.serialize(pos) == minetest.serialize(arena.sign) then
+      minetest.set_node(pos, {name = "air"})
+      arena.sign = {}
+      minetest.chat_send_player(user:get_player_name(), S("Sign of arena @1 successfully removed", arena.name))
+      update_storage(false, mod, arena_ID, arena)
+    else
+      minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
+    end
+  return end
+
+  -- cambio la scritta
+  arena_lib.update_sign(pos, arena)
+
+  -- aggiungo il cartello ai cartelli dell'arena
+  arena.sign = pos
+  update_storage(false, mod, arena_ID, arena)
+
+  -- salvo il nome della mod e l'ID come metadato nel cartello
+  minetest.get_meta(pos):set_string("mod", mod)
+  minetest.get_meta(pos):set_int("arenaID", arena_ID)
+end
+
+
+
 function arena_lib.enable_arena(sender, mod, arena_ID)
 
   local mod_ref = arena_lib.mods[mod]
@@ -422,6 +459,9 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
   update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena.name))
 end
+
+
+
 
 
 ----------------------------------------------

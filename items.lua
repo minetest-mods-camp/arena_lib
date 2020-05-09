@@ -1,5 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
+
+
 minetest.register_tool("arena_lib:immunity", {
 
   description = S("You're immune!"),
@@ -10,8 +12,9 @@ minetest.register_tool("arena_lib:immunity", {
 
 
 
---[[sovrascrizione "on_punch" nodo base dei cartelli per farli entrare
-    nell'arena se sono cartelli appositi e "on_timer" per teletrasportali in partita quando la queue finisce]]
+-- sovrascrizione "on_punch" nodo base dei cartelli per farli entrare nell'arena
+-- se sono cartelli appositi e "on_timer" per teletrasportarli in partita quando 
+-- la queue finisce
 minetest.register_tool("arena_lib:create_sign", {
 
     description = S("Left click on a sign to create/remove the access to the arena"),
@@ -30,33 +33,10 @@ minetest.register_tool("arena_lib:create_sign", {
       if not def or def.entity_info == nil then
         minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] That's not a sign!")))
       return end
-
+      
       def.number_of_lines = 5
-
-      local mod = itemstack:get_meta():get_string("mod")
-      local arena_ID = itemstack:get_meta():get_int("arenaID")
-      local arena = arena_lib.mods[mod].arenas[arena_ID]
-
-      -- controllo se c'è già un cartello assegnato a quell'arena. Se è lo stesso lo rimuovo, sennò annullo
-      if next(arena.sign) ~= nil then
-        if minetest.serialize(pos) == minetest.serialize(arena.sign) then
-          minetest.set_node(pos, {name = "air"})
-          arena.sign = {}
-          minetest.chat_send_player(user:get_player_name(), S("Sign of arena @1 successfully removed", arena.name))
-        else
-          minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
-        end
-      return end
-
-      -- cambio la scritta
-      arena_lib.update_sign(pos, arena)
-
-      -- aggiungo il cartello ai cartelli dell'arena
-      arena.sign = pos
-
-      -- salvo il nome della mod e l'ID come metadato nel cartello
-      minetest.get_meta(pos):set_string("mod", mod)
-      minetest.get_meta(pos):set_int("arenaID", arena_ID)
+      
+      arena_lib.set_sign(itemstack, user, pos)
     end,
 
 })

@@ -143,7 +143,7 @@ minetest.override_item("default:sign_wall", {
 
 
 
-function arena_lib.set_sign(sender, mod, arena_name)
+function arena_lib.give_sign_tool(sender, mod, arena_name)
 
 
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
