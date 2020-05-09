@@ -1,4 +1,4 @@
-# version 2.5.0
+# version 2.5.1
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -17,6 +17,9 @@ Arena @1 successfully removed=
 [!] There's already one spawn at this point!=
 Spawn point #@1 successfully overwritten=
 Spawn point #@1 successfully set=
+[!] You must disable the arena first!=
+Sign of arena @1 successfully removed=
+[!] There is already a sign for this arena!=
 [!] There is no arena associated with this ID!=
 [!] Insufficient spawners, the arena has been disabled!=
 [!] Sign not set, the arena has been disabled!=
@@ -57,8 +60,6 @@ Player: =
 You're immune!=
 Left click on a sign to create/remove the access to the arena=
 [!] That's not a sign!=
-Sign of arena @1 successfully removed=
-[!] There is already a sign for this arena! =
 
 # signs.lua
 [!] The arena is not enabled!=

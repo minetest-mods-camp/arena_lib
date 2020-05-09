@@ -1,4 +1,4 @@
-# version 2.5.0
+# version 2.5.1
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -17,6 +17,9 @@ Arena @1 successfully removed=Arena @1 rimossa con successo
 [!] There's already one spawn at this point!=[!] C'è già uno spawn in questo punto!
 Spawn point #@1 successfully overwritten=Spawn point #@1 sovrascritto con successo
 Spawn point #@1 successfully set=Spawn point #@1 impostato con successo
+[!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
+Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
+[!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
 [!] There is no arena associated with this ID!=[!] Non esiste nessun'arena associata a questo ID!
 [!] Insufficient spawners, the arena has been disabled!=[!] Spawner insufficienti, arena disabilitata!
 [!] Sign not set, the arena has been disabled!=[!] Cartello non impostato, arena disabilitata!
@@ -57,8 +60,6 @@ Player: =Giocatore:
 You're immune!=Sei immune!
 Left click on a sign to create/remove the access to the arena=Tasto sinistro su un cartello per creare/rimuovere l'accesso all'arena
 [!] That's not a sign!=[!] Questo non è un cartello!
-Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
-[!] There is already a sign for this arena! =[!] Esiste già un cartello per quest'arena!
 
 # signs.lua
 [!] The arena is not enabled!=[!] L'arena non è attiva!
