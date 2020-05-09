@@ -70,7 +70,6 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     ]] .. S("Players required: ") .. arena.min_players .. [[
     ]] .. S("Players supported: ") .. arena.max_players .. [[
     ]] .. S("Players inside: ") .. p_count .. " ( ".. names .. " )" .. [[
-    ]] .. S("Kills to win: ") .. arena.kill_cap .. [[
     ]] .. S("In queue: ") .. tostring(arena.in_queue) .. [[
     ]] .. S("Loading: ") .. tostring(arena.in_loading) .. [[
     ]] .. S("In game: ") .. tostring(arena.in_game) .. [[

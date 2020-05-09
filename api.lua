@@ -87,7 +87,6 @@ local arena_default = {
   spawn_points = {},
   max_players = 4,
   min_players = 2,
-  kill_cap = 10,
   in_queue = false,
   in_loading = false,
   in_game = false,
@@ -105,7 +104,7 @@ function arena_lib.initialize(mod)
   --Se esiste già in memoria, ignora il resto
   if arena_lib.mods[mod] ~= nil then return end
 
-  minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initializing...")
+  minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initialising...")
 
   arena_lib.mods[mod] = {}
   arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
