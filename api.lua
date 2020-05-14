@@ -762,10 +762,13 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
+    local players_in_arena = arena_lib.get_arena_players_count(arena)
 
-    if arena_lib.get_arena_players_count(arena) < arena.min_players then
+    if players_in_arena < arena.min_players then
       timer:stop()
       arena.in_queue = false
+      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. players_in_arena .. "/" .. arena.max_players .. 
+        " | in attesa di più giocatori... (" .. arena.min_players - players_in_arena .. ")")
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
     end
 

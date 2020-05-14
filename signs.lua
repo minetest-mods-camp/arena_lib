@@ -4,6 +4,8 @@
 local S = minetest.get_translator("arena_lib")
 
 local function in_game_txt(arena) end
+local function HUD_countdown(arena, seconds) end
+local function arena_display_format(arena, players_in_arena, msg) end
 
 
 
@@ -52,14 +54,23 @@ minetest.override_item("default:sign_wall", {
           sign_arena.players[p_name] = nil
           arena_lib.update_sign(pos, sign_arena)
           arena_lib.remove_from_queue(p_name)
+          arena_lib.HUD_hide("all", p_name)
           minetest.chat_send_player(p_name, mod_ref.prefix .. S("You have left the queue"))
           arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has left the queue", p_name))
           
+          local players_in_arena = arena_lib.get_arena_players_count(sign_arena)
+          
           -- ...e la annullo se non ci sono più abbastanza persone
-          if arena_lib.get_arena_players_count(sign_arena) < sign_arena.min_players and sign_arena.in_queue then
+          if players_in_arena < sign_arena.min_players and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
+            arena_lib.HUD_hide("broadcast", sign_arena)
+            arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena, "in attesa di più giocatori... ") .. 
+              "(" .. sign_arena.min_players - players_in_arena .. ")")
             arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
             sign_arena.in_queue = false
+          else
+            -- (il numero giocatori è cambiato, per questo aggiorno)
+            arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena,"Preparati!"))
           end
           
           return 
@@ -74,9 +85,14 @@ minetest.override_item("default:sign_wall", {
         arena_lib.update_sign(old_arena.sign, old_arena)
         arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("@1 has left the queue", p_name))
         
+        local players_in_arena = arena_lib.get_arena_players_count(old_arena)
+        
         -- annullando la coda della precedente se non ci sono più abbastanza giocatori
-        if arena_lib.get_arena_players_count(old_arena) < old_arena.min_players and old_arena.in_queue then
+        if players_in_arena < old_arena.min_players and old_arena.in_queue then
           minetest.get_node_timer(old_arena.sign):stop()
+          arena_lib.HUD_hide("broadcast", old_arena)
+          arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, players_in_arena, "in attesa di più giocatori... ") .. 
+            "(" .. old_arena.min_players - players_in_arena .. ")")
           arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
           old_arena.in_queue = false
         end
@@ -107,14 +123,23 @@ minetest.override_item("default:sign_wall", {
       local timer = minetest.get_node_timer(pos)
 
       -- se ci sono abbastanza giocatori, parte il timer di attesa
-      if arena_lib.get_arena_players_count(sign_arena) == sign_arena.min_players and not sign_arena.in_queue and not sign_arena.in_game then
-        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The game begins in @1 seconds!", mod_ref.queue_waiting_time))
-        sign_arena.in_queue = true
-        timer:start(mod_ref.queue_waiting_time)
+      if not sign_arena.in_queue and not sign_arena.in_game then
+        
+        local players_in_arena = arena_lib.get_arena_players_count(sign_arena)
+        
+        if players_in_arena == sign_arena.min_players then
+          sign_arena.in_queue = true
+          timer:start(mod_ref.queue_waiting_time)
+          HUD_countdown(sign_arena, players_in_arena, mod_ref.queue_waiting_time)
+        elseif players_in_arena < sign_arena.min_players then
+          arena_lib.HUD_send_msg("hotbar", p_name, arena_display_format(sign_arena, players_in_arena, " in attesa di più giocatori... ") .. 
+            "(" .. sign_arena.min_players - players_in_arena .. ")")
+        end
       end
+        
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, parte subito
-      if arena_lib.get_arena_players_count(sign_arena) == sign_arena.max_players and sign_arena.in_queue then
+      if players_in_arena == sign_arena.max_players and sign_arena.in_queue then
         timer:stop()
         timer:start(0.01)
       end
@@ -134,6 +159,7 @@ minetest.override_item("default:sign_wall", {
       sign_arena.in_game = true
       arena_lib.update_sign(pos, sign_arena)
 
+      arena_lib.HUD_hide("all", sign_arena)
       arena_lib.load_arena(mod, arena_ID)
 
       return false
@@ -186,6 +212,30 @@ end
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
+
+function HUD_countdown(arena, players_in_arena, seconds)
+  if not arena.in_queue or seconds == 0 then return end
+  
+  -- dai 3 secondi in giù il messaggio è stampato su broadcast
+  if seconds <= 3 then
+    arena_lib.HUD_send_msg_all("broadcast", arena, S("The game begins in @1 seconds!", seconds))
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_display_format(arena, players_in_arena, "Preparati!"))
+  else
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_display_format(arena, players_in_arena, "" .. seconds .. " secondi all'inzio"))
+  end
+  
+  minetest.after(1, function()
+    HUD_countdown(arena, players_in_arena, seconds-1)
+  end)
+end
+
+
+-- es. Foresta | 3/4 | Il match inizierà a breve
+function arena_display_format(arena, players_in_arena, msg)
+  return arena.name .. " | " .. players_in_arena .. "/" .. arena.max_players .. " | " .. msg
+end
+
+
 
 function in_game_txt(arena)
   local txt
