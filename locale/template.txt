@@ -1,9 +1,9 @@
-# version 2.5.1
+# version 2.6.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
 
-#api.lua
+# api.lua
 [!] An arena with that name exists already!=
 Arena @1 succesfully created=
 [!] There is no arena named @1!=
@@ -31,6 +31,7 @@ Arena @1 successfully disabled=
 @1 wins the game=
 @1 has been eliminated=
 @1 has left the game=
+Waiting for more players...=
 The queue has been cancelled due to not enough players=
 You're the last player standing: you win!=
 You win the game due to not enough players=
@@ -65,6 +66,7 @@ Left click on a sign to create/remove the access to the arena=
 [!] The arena is not enabled!=
 You have left the queue=
 @1 has left the queue=
+Get ready!=
 The queue has been cancelled due to not enough players=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
@@ -74,6 +76,7 @@ You've entered the arena @1=
 @1 has joined the queue=
 You've joined the queue for @1=
 The game begins in @1 seconds!=
+@1 seconds for the match to start=
 Left click on a sign to set the arena=
 # signs_lib gives troubles atm
 #WIP=

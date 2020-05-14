@@ -767,8 +767,8 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
     if players_in_arena < arena.min_players then
       timer:stop()
       arena.in_queue = false
-      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. players_in_arena .. "/" .. arena.max_players .. 
-        " | in attesa di più giocatori... (" .. arena.min_players - players_in_arena .. ")")
+      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. players_in_arena .. "/" .. arena.max_players .. " | " ..
+        S("Waiting for more players...") .. " (" .. arena.min_players - players_in_arena .. ")")
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
     end
 
