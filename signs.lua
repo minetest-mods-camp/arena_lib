@@ -59,7 +59,7 @@ minetest.override_item("default:sign_wall", {
           
           local players_in_arena = arena_lib.get_arena_players_count(sign_arena)
           
-          -- ...e la annullo se non ci sono più abbastanza persone
+          -- ...e annullo la coda se non ci sono più abbastanza persone
           if players_in_arena < sign_arena.min_players and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
             arena_lib.HUD_hide("broadcast", sign_arena)
@@ -67,33 +67,49 @@ minetest.override_item("default:sign_wall", {
               " (" .. sign_arena.min_players - players_in_arena .. ")")
             arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
             sign_arena.in_queue = false
+            
+          -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
+          elseif players_in_arena < sign_arena.min_players then
+            arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena, S("Waiting for more players...")) .. 
+              " (" .. sign_arena.min_players - players_in_arena .. ")")
           else
-            -- (il numero giocatori è cambiato, per questo aggiorno)
-            arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena, S("Get ready!")))
+            local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
+            arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena, S("@1 seconds for the match to start", seconds)))
           end
           
-          return 
-        end
+          return
+          
+        else
+          
+          local old_mod_ref = arena_lib.mods[queued_mod]
+          local old_arena = old_mod_ref.arenas[queued_ID]
+          
+          -- sennò lo rimuovo dalla precedente e continuo per aggiungerlo in questa...
+          old_arena.players[p_name] = nil
+          arena_lib.remove_from_queue(p_name)
+          arena_lib.update_sign(old_arena.sign, old_arena)
+          arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
+          
+          local players_in_arena = arena_lib.get_arena_players_count(old_arena)
+          
+          -- ...annullando la coda della precedente se non ci sono più abbastanza giocatori
+          if players_in_arena < old_arena.min_players and old_arena.in_queue then
+            minetest.get_node_timer(old_arena.sign):stop()
+            arena_lib.HUD_hide("broadcast", old_arena)
+            arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, players_in_arena, S("Waiting for more players...")) .. 
+              " (" .. old_arena.min_players - players_in_arena .. ")")
+            arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+            old_arena.in_queue = false
+            
+          -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
+          elseif players_in_arena < old_arena.min_players and not old_arena.in_queue then
+            arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, players_in_arena, S("Waiting for more players...")) .. 
+              " (" .. old_arena.min_players - players_in_arena .. ")")
+          else
+            local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
+            arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, players_in_arena, S("@1 seconds for the match to start", seconds)))
+          end
         
-        local old_mod_ref = arena_lib.mods[queued_mod]
-        local old_arena = old_mod_ref.arenas[queued_ID]
-        
-        -- sennò lo rimuovo dalla precedente e continuo per aggiungerlo in questa
-        old_arena.players[p_name] = nil
-        arena_lib.remove_from_queue(p_name)
-        arena_lib.update_sign(old_arena.sign, old_arena)
-        arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
-        
-        local players_in_arena = arena_lib.get_arena_players_count(old_arena)
-        
-        -- annullando la coda della precedente se non ci sono più abbastanza giocatori
-        if players_in_arena < old_arena.min_players and old_arena.in_queue then
-          minetest.get_node_timer(old_arena.sign):stop()
-          arena_lib.HUD_hide("broadcast", old_arena)
-          arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, players_in_arena, S("Waiting for more players...")) .. 
-            " (" .. old_arena.min_players - players_in_arena .. ")")
-          arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-          old_arena.in_queue = false
         end
       end
 
@@ -118,18 +134,22 @@ minetest.override_item("default:sign_wall", {
       end
 
       local timer = minetest.get_node_timer(pos)
-
-      -- se ci sono abbastanza giocatori, parte il timer di attesa
+      
+      
+      -- se ci sono abbastanza giocatori e la coda non è partita...
       if not sign_arena.in_queue and not sign_arena.in_game then
         
         local players_in_arena = arena_lib.get_arena_players_count(sign_arena)
         
+        -- ...parte il timer d'attesa
         if players_in_arena == sign_arena.min_players then
           sign_arena.in_queue = true
           timer:start(mod_ref.queue_waiting_time)
           HUD_countdown(sign_arena, players_in_arena, mod_ref.queue_waiting_time)
+          
+        -- sennò aggiorno semplicemente la HUD
         elseif players_in_arena < sign_arena.min_players then
-          arena_lib.HUD_send_msg("hotbar", p_name, arena_display_format(sign_arena, players_in_arena, S("Waiting for more players...")) .. 
+          arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, players_in_arena, S("Waiting for more players...")) .. 
             " (" .. sign_arena.min_players - players_in_arena .. ")")
         end
       end
@@ -141,9 +161,8 @@ minetest.override_item("default:sign_wall", {
         timer:start(0.01)
       end
 
-      --TODO: timer ciclico che avvisa i giocatori quanto tempo manca ogni N secondi
-
     end,
+
 
     -- quello che succede una volta che il timer raggiunge lo 0
     on_timer = function(pos)
