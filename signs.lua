@@ -145,7 +145,7 @@ minetest.override_item("default:sign_wall", {
         if players_in_arena == sign_arena.min_players then
           sign_arena.in_queue = true
           timer:start(mod_ref.queue_waiting_time)
-          HUD_countdown(sign_arena, players_in_arena, mod_ref.queue_waiting_time)
+          HUD_countdown(sign_arena, mod_ref.queue_waiting_time)
           
         -- sennò aggiorno semplicemente la HUD
         elseif players_in_arena < sign_arena.min_players then
@@ -229,8 +229,10 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function HUD_countdown(arena, players_in_arena, seconds)
+function HUD_countdown(arena, seconds)
   if not arena.in_queue or seconds == 0 then return end
+  
+  local players_in_arena = arena_lib.get_arena_players_count(arena)
   
   -- dai 3 secondi in giù il messaggio è stampato su broadcast
   if seconds <= 3 then
@@ -241,7 +243,7 @@ function HUD_countdown(arena, players_in_arena, seconds)
   end
   
   minetest.after(1, function()
-    HUD_countdown(arena, players_in_arena, seconds-1)
+    HUD_countdown(arena, seconds-1)
   end)
 end
 
