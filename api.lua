@@ -125,7 +125,7 @@ function arena_lib.settings(mod, def)
   mod_ref.join_while_in_progress = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
-  mod_ref.queue_waiting_time = 5
+  mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
