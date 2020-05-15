@@ -754,9 +754,10 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
     
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has been eliminated", p_name))
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
   else
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("@1 has left the game", p_name))
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
+-- TODO: ELSEIF quitta then codice colore d69298. Considerare anche se rimuovere del tutto else precedente dato che il gioco avvisa di default
   end
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda

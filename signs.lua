@@ -51,12 +51,11 @@ minetest.override_item("default:sign_wall", {
         
         -- se la coda è la stessa rimuovo il giocatore...
         if queued_mod == mod and queued_ID == arenaID then
+          arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
           sign_arena.players[p_name] = nil
           arena_lib.update_sign(pos, sign_arena)
           arena_lib.remove_from_queue(p_name)
           arena_lib.HUD_hide("all", p_name)
-          minetest.chat_send_player(p_name, mod_ref.prefix .. S("You have left the queue"))
-          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has left the queue", p_name))
           
           local players_in_arena = arena_lib.get_arena_players_count(sign_arena)
           
@@ -83,7 +82,7 @@ minetest.override_item("default:sign_wall", {
         old_arena.players[p_name] = nil
         arena_lib.remove_from_queue(p_name)
         arena_lib.update_sign(old_arena.sign, old_arena)
-        arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("@1 has left the queue", p_name))
+        arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
         
         local players_in_arena = arena_lib.get_arena_players_count(old_arena)
         
@@ -111,13 +110,11 @@ minetest.override_item("default:sign_wall", {
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
         arena_lib.join_arena(mod, p_name, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has joined the game", p_name))
-        minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've entered the arena @1", sign_arena.name))
+        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. p_name))
         return
       else
         arena_lib.add_to_queue(p_name, mod, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("@1 has joined the queue", p_name))
-        minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've joined the queue for @1", sign_arena.name))
+        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c8d692", sign_arena.name .. " > " ..  p_name))
       end
 
       local timer = minetest.get_node_timer(pos)

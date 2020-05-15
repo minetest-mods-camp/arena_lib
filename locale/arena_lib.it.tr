@@ -30,7 +30,7 @@ Arena successfully enabled=Arena abilitata con successo
 Arena @1 successfully disabled=Arena @1 disabilitata con successo
 @1 wins the game=@1 ha vinto la partita
 @1 has been eliminated=@1 è stato eliminato
-@1 has left the game=@1 ha abbandonato la partita
+# TODO: quit option | @1 has left the game=@1 ha abbandonato la partita
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
@@ -64,8 +64,6 @@ Left click on a sign to create/remove the access to the arena=Tasto sinistro su 
 
 # signs.lua
 [!] The arena is not enabled!=[!] L'arena non è attiva!
-You have left the queue=Sei uscito dalla coda
-@1 has left the queue=@1 ha abbandonato la coda
 Get ready!=Preparati!
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 [!] The arena is already full!=[!] L'arena è già piena!
@@ -73,8 +71,6 @@ The queue has been cancelled due to not enough players=La coda è stata annullat
 [!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
 @1 has joined the game=@1 si è aggiunto alla partita
 You've entered the arena @1=Sei entrato nell'arena @1
-@1 has joined the queue=@1 si è aggiunto alla coda
-You've joined the queue for @1=Ti sei aggiunto alla coda per @1
 The game begins in @1 seconds!=La partita inizierà tra @1 secondi!
 @1 seconds for the match to start=@1 secondi all'inizio
 Left click on a sign to set the arena=Click sinistro su un cartello per impostare l'arena
