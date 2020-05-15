@@ -27,3 +27,6 @@ Feel free to:
 * open an issue
 * submit a merge request. In this case, PLEASE, do follow milestones. I won't merge features for milestones that are different from the upcoming one (if it's declared)
 * contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
+
+##### Credits
+countdown sound by [BoxeDave92](https://freesound.org/people/BoxerDave92/sounds/338868/)
