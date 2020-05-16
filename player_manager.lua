@@ -1,6 +1,5 @@
 minetest.register_on_joinplayer(function(player)
-
-  player:set_pos(arena_lib.get_hub_spawn_point())
+  
   arena_lib.HUD_add(player)
 
 end)

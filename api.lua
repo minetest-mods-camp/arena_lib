@@ -1,9 +1,6 @@
 arena_lib = {}
 arena_lib.mods = {}
 
--- TODO: spostarlo in mod Hub
-local hub_spawn_point = { x = 0, y = 20, z = 0}
-
 local S = minetest.get_translator("arena_lib")
 
 ----------------------------------------------
@@ -821,12 +818,6 @@ end
 ----------------------------------------------
 -----------------GETTERS----------------------
 ----------------------------------------------
-
-function arena_lib.get_hub_spawn_point()
-  return hub_spawn_point
-end
-
-
 
 function arena_lib.get_arena_by_name(mod, arena_name)
 
