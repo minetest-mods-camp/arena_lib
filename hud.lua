@@ -49,7 +49,7 @@ end
 
 
 
-function arena_lib.HUD_send_msg(HUD_type, p_name, new_msg, duration, sound)
+function arena_lib.HUD_send_msg(HUD_type, p_name, msg, duration, sound)
   
   local player = minetest.get_player_by_name(p_name)
   local p_HUD = player_huds[p_name]
@@ -57,10 +57,10 @@ function arena_lib.HUD_send_msg(HUD_type, p_name, new_msg, duration, sound)
   -- controllo il tipo di HUD
   if HUD_type == "broadcast" then
     player:hud_change(p_HUD[1], "text", "arenalib_hud_bg.png")
-    player:hud_change(p_HUD[2], "text", new_msg)
+    player:hud_change(p_HUD[2], "text", msg)
   elseif HUD_type == "hotbar" then
     player:hud_change(p_HUD[3], "text", "arenalib_hud_bg2.png")
-    player:hud_change(p_HUD[4], "text", new_msg)
+    player:hud_change(p_HUD[4], "text", msg)
   end
   
   -- riproduco eventuale suono
@@ -75,8 +75,8 @@ function arena_lib.HUD_send_msg(HUD_type, p_name, new_msg, duration, sound)
     minetest.after(duration, function()
       if minetest.get_player_by_name(p_name) == nil then return end
       -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
-      if HUD_type == "broadcast" and player:HUD_get(p_HUD[2]).text ~= new_msg or 
-        HUD_type == "hotbar" and player:HUD_get(p_HUD[4]).text ~= new_msg then 
+      if HUD_type == "broadcast" and player:HUD_get(p_HUD[2]).text ~= msg or 
+        HUD_type == "hotbar" and player:HUD_get(p_HUD[4]).text ~= msg then 
         return end  
             
       arena_lib.HUD_hide(HUD_type, p_name)
@@ -87,7 +87,7 @@ end
 
 
 
-function arena_lib.HUD_send_msg_all(HUD_type, arena, new_msg, duration, sound)
+function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound)
   for pl_name, _ in pairs(arena.players) do
     
     local pl = minetest.get_player_by_name(pl_name)
@@ -96,10 +96,10 @@ function arena_lib.HUD_send_msg_all(HUD_type, arena, new_msg, duration, sound)
     -- controllo il tipo di HUD
     if HUD_type == "broadcast" then
       pl:hud_change(pl_HUD[1], "text", "arenalib_hud_bg.png")
-      pl:hud_change(pl_HUD[2], "text", new_msg)
+      pl:hud_change(pl_HUD[2], "text", msg)
     elseif HUD_type == "hotbar" then
       pl:hud_change(pl_HUD[3], "text", "arenalib_hud_bg2.png")
-      pl:hud_change(pl_HUD[4], "text", new_msg)
+      pl:hud_change(pl_HUD[4], "text", msg)
     end
     
     -- riproduco eventuale suono
@@ -114,8 +114,8 @@ function arena_lib.HUD_send_msg_all(HUD_type, arena, new_msg, duration, sound)
       minetest.after(duration, function()
         if minetest.get_player_by_name(p_name) == nil then return end
         -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
-        if HUD_type == "broadcast" and pl:HUD_get(pl_HUD[2]).text ~= new_msg or 
-          HUD_type == "hotbar" and pl:HUD_get(pl_HUD[4]).text ~= new_msg then 
+        if HUD_type == "broadcast" and pl:HUD_get(pl_HUD[2]).text ~= msg or 
+          HUD_type == "hotbar" and pl:HUD_get(pl_HUD[4]).text ~= msg then 
           return end
           
         arena_lib.HUD_hide(HUD_type, pl_name)

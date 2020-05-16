@@ -203,10 +203,16 @@ end)
 
 Check out [this example](mod-init.lua.example) for a full configuration file
 
-### 2.4 Utils
+#### 2.4 HUD
+`arena_lib` also comes with a double practical HUD: `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following commands:
+* `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>)`: send a message to the specified player in the specified HUD type ("broadcast" or "hotbar"). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD
+* `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>)`: same as above, but for all the players inside the arena
+* `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
+
+### 2.5 Utils
 There are also some other functions which might turn useful. They are:
-* `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod.
-* `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above.
+* `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
+* `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
 * `arena_lib.remove_player_from_arena(p_name, is_eliminated)`: if is_eliminated is not specified, other players will see that the player has left the match. If it is (true), the message will say the player has been eliminated. The latter comes in handy for games like Murder or TNT Run
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.settings`
