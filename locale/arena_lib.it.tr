@@ -1,4 +1,4 @@
-# version 2.6.0
+# version 2.7.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -30,6 +30,8 @@ Arena successfully enabled=Arena abilitata con successo
 Arena @1 successfully disabled=Arena @1 disabilitata con successo
 @1 wins the game=@1 ha vinto la partita
 @1 has been eliminated=@1 è stato eliminato
+@1 has been kicked=@1 è stato cacciato
+@1 has quit the arena=@1 ha abbandonato l'arena
 # TODO: quit option | @1 has left the game=@1 ha abbandonato la partita
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori

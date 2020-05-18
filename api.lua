@@ -719,7 +719,10 @@ end
 
 
 
-function arena_lib.remove_player_from_arena(p_name, is_eliminated)
+function arena_lib.remove_player_from_arena(p_name, reason)
+  -- reason 1 = has been eliminated
+  -- reason 2 = has been kicked
+  -- reason 3 = has quit
 
   local mod, arena_ID
 
@@ -749,17 +752,32 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
   arena_lib.update_sign(arena.sign, arena)
 
   -- se è eliminato, lo teletrasporto fuori dall'arena e ripristino il nome
-  if is_eliminated then
+  if reason ~= nil then
     
     local player = minetest.get_player_by_name(p_name)
     
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
     
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+    if reason == 1 then
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+      if mod_ref.on_eliminate then
+        mod_ref.on_eliminate(p_name)
+      end
+    elseif reason == 2 then
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked", p_name)))
+      if mod_ref.on_kick then
+        mod_ref.on_kick(p_name)
+      end
+    elseif reason == 3 then
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", "<<< " .. S("@1 has quit the arena", p_name)))
+      if mod_ref.on_quit then
+        mod_ref.on_quit(p_name)
+      end
+    end
   else
+    --TODO: considerare se rimuovere questo avviso dato che il server avvisa di base i giocatori
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
--- TODO: ELSEIF quitta then codice colore d69298. Considerare anche se rimuovere del tutto else precedente dato che il gioco avvisa di default
   end
   
   local players_in_arena = arena.players_amount

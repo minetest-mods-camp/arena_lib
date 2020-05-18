@@ -1,4 +1,4 @@
-# version 2.6.0
+# version 2.7.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -30,7 +30,9 @@ Arena successfully enabled=
 Arena @1 successfully disabled=
 @1 wins the game=
 @1 has been eliminated=
-# TODO: quit option | @1 has left the game=
+@1 has been kicked=
+@1 has quit the arena=
+@1 has left the game=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 You're the last player standing: you win!=
