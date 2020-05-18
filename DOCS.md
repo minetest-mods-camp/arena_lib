@@ -8,6 +8,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `name`: (string) the name of the arena, declared when creating it
 * `sign`: (pos) the position of the sign associated with the arena.
 * `players`: (table) where to store players
+* `players_amount`: (int) separately stores how many players are inside the arena/queue
 * `max_players`: (string) default is 4
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `in_queue`: (bool) about phases, look at "Arena phases" down below

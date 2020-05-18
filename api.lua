@@ -81,6 +81,7 @@ local arena_default = {
   name = "",
   sign = {},
   players = {},               --KEY: player name, INDEX: kills, deaths, player_properties
+  players_amount = 0,
   spawn_points = {},
   max_players = 4,
   min_players = 2,
@@ -449,6 +450,8 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
     minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled!")))
 
   end
+  
+  arena.players_amount = 0
 
   -- disabilito
   arena.enabled = false
@@ -615,6 +618,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     players[pl_name] = stats
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
+    arena.players_amount = 0
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -740,6 +744,7 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
+  arena.players_amount = arena.players_amount - 1
 
   arena_lib.update_sign(arena.sign, arena)
 
@@ -756,11 +761,12 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
 -- TODO: ELSEIF quitta then codice colore d69298. Considerare anche se rimuovere del tutto else precedente dato che il gioco avvisa di default
   end
+  
+  local players_in_arena = arena.players_amount
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
-    local players_in_arena = arena_lib.get_arena_players_count(arena)
 
     if players_in_arena < arena.min_players then
       timer:stop()
@@ -771,7 +777,7 @@ function arena_lib.remove_player_from_arena(p_name, is_eliminated)
     end
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
-  elseif arena_lib.get_arena_players_count(arena) == 1 then
+  elseif players_in_arena == 1 then
 
     if is_eliminated then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
@@ -876,19 +882,6 @@ end
 
 
 
-function arena_lib.get_arena_players_count(arena)
-
-  local count = 0
-
-  for pl_name, stats in pairs(arena.players) do
-    count = count+1
-  end
-
-  return count
-end
-
-
-
 function arena_lib.get_arena_spawners_count(arena)
   return table.maxn(arena.spawn_points)
 end
@@ -937,7 +930,12 @@ function init_storage(mod)
     -- se c'è una stringa con quell'ID, aggiungo l'arena e aggiorno il cartello con associato quell'ID
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
+      
+      --TEMP: to remove in 3.0
+      arena.players_amount = 0
+      
       arena_lib.mods[mod].arenas[i] = arena
+      
 
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
