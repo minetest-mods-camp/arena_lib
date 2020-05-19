@@ -733,7 +733,9 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   elseif arena_lib.is_player_in_queue(p_name) then
     mod = players_in_queue[p_name].minigame
     arena_ID = players_in_queue[p_name].arenaID
-  else return end
+  else 
+    minetest.log("warning", "[ARENA_LIB] Can't remove player " .. p_name .. " from any arena")
+    return end
 
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
