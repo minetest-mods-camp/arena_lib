@@ -764,17 +764,17 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
       if mod_ref.on_eliminate then
-        mod_ref.on_eliminate(p_name)
+        mod_ref.on_eliminate(arena, p_name)
       end
     elseif reason == 2 then
       arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked", p_name)))
       if mod_ref.on_kick then
-        mod_ref.on_kick(p_name)
+        mod_ref.on_kick(arena, p_name)
       end
     elseif reason == 3 then
       arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", "<<< " .. S("@1 has quit the arena", p_name)))
       if mod_ref.on_quit then
-        mod_ref.on_quit(p_name)
+        mod_ref.on_quit(arena, p_name)
       end
     end
   else
