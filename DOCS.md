@@ -141,8 +141,11 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players))`
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
+* `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
+* `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from an arena (same as above)
+* `arena_lib.on_quit(mod, function(arena, p_name))`: called when a player quits from an arena (same as above)
 
-Beware: there is a default behaviour already for each one of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
+> Beware: there is a default behaviour already for each one of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
 So for instance, if we want to add an object in the first slot when a player joins the pre-match, we can simply do:
 
@@ -214,7 +217,10 @@ Check out [this example](mod-init.lua.example) for a full configuration file
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
-* `arena_lib.remove_player_from_arena(p_name, is_eliminated)`: if is_eliminated is not specified, other players will see that the player has left the match. If it is (true), the message will say the player has been eliminated. The latter comes in handy for games like Murder or TNT Run
+* `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
+  * `1`: player eliminated. Calls `on_eliminate`
+  * `2`: player kicked. Calls `on_kick`
+  * `3`: player quit. Calls `on_quit`
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.settings`
 
