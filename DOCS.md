@@ -121,7 +121,7 @@ The parameters are:
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
 * `immunity_time`: the duration of the immunity right after respawning. Default is 3
-* `immunity_slot`: the slot whereto put the immunity item. Default is 9 (the first slot of the inventory minus the hotbar)
+* `immunity_slot`: the slot whereto put the immunity item. Default is 8 (the last slot of the hotbar)
 * `properties`: explained down below
 * `temp_properties`: same
 * `player_properties`: same

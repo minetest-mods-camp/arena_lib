@@ -127,7 +127,7 @@ function arena_lib.settings(mod, def)
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
   mod_ref.immunity_time = 3
-  mod_ref.immunity_slot = 9       --people may have tweaked the slots, hence the custom parameter
+  mod_ref.immunity_slot = 8       --people may have tweaked the slots, hence the custom parameter
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
