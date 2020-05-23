@@ -143,11 +143,11 @@ function arena_lib.settings(mod, def)
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
   end
-  
+
   if def.show_nametags == true then
     mod_ref.show_nametags = def.show_nametags
   end
-  
+
   if def.show_minimap == true then
     mod_ref.show_minimap = def.show_minimap
   end
@@ -179,7 +179,7 @@ function arena_lib.settings(mod, def)
   if def.temp_properties then
     mod_ref.temp_properties = def.temp_properties
   end
-  
+
   if def.player_properties then
     mod_ref.player_properties = def.player_properties
   end
@@ -354,11 +354,11 @@ end
 
 
 function arena_lib.set_sign(itemstack, user, pos)
-  
+
   local mod = itemstack:get_meta():get_string("mod")
   local arena_ID = itemstack:get_meta():get_int("arenaID")
   local arena = arena_lib.mods[mod].arenas[arena_ID]
-  
+
   -- se l'arena è abilitata annullo
   if arena.enabled then
     minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
@@ -450,7 +450,7 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
     minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled!")))
 
   end
-  
+
   arena.players_amount = 0
 
   -- disabilito
@@ -477,7 +477,7 @@ function arena_lib.load_arena(mod, arena_ID)
 
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
-  
+
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
 
@@ -487,17 +487,17 @@ function arena_lib.load_arena(mod, arena_ID)
     if not mod_ref.show_nametags then
       player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
     end
-    
+
     -- disattivo eventualmente la minimappa
     if not mod_ref.show_minimap then
       player:hud_set_flags({minimap = false})
     end
-    
+
     -- li blocco sul posto
     player:set_physics_override({
               speed = 0,
               })
-              
+
     -- teletrasporto i giocatori e svuoto l'inventario
     player:set_pos(arena.spawn_points[count])
     player:get_inventory():set_list("main",{})
@@ -551,17 +551,17 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   local mod_ref = arena_lib.mods[mod]
   local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
-  
+
   -- nascondo i nomi se l'opzione è abilitata
   if not mod_ref.show_nametags then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   end
-  
+
   -- disattivo eventualmente la minimappa
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
   end
-  
+
   player:get_inventory():set_list("main",{})
   player:set_pos(arena_lib.get_random_spawner(arena))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
@@ -625,7 +625,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     -- resetto inventario e teletraspoto nella lobby
     player:get_inventory():set_list("main", {})
     player:set_pos(mod_ref.hub_spawn_point)
-    
+
     -- riattivo la minimappa eventualmente disattivata
     player:hud_set_flags({minimap = true})
   end
@@ -682,19 +682,19 @@ end
 -- (p_name, (mod))
 function arena_lib.is_player_in_arena(p_name, mod)
 
-  if not players_in_game[p_name] then 
+  if not players_in_game[p_name] then
     return false
-  else 
-    
+  else
+
     -- se il campo mod è specificato, controllo che sia lo stesso
     if mod ~= nil then
       if players_in_game[p_name].minigame == mod then return true
       else return false
       end
     end
-    
-    return true 
-    
+
+    return true
+
   end
 end
 
@@ -702,18 +702,18 @@ end
 
 function arena_lib.is_player_in_queue(p_name)
 
-  if not players_in_queue[p_name] then 
+  if not players_in_queue[p_name] then
     return false
-  else 
+  else
     -- se il campo mod è specificato, controllo che sia lo stesso
     if mod ~= nil then
       if players_in_queue[p_name].minigame == mod then return true
       else return false
       end
     end
-    
-    return true 
-    
+
+    return true
+
   end
 end
 
@@ -733,7 +733,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   elseif arena_lib.is_player_in_queue(p_name) then
     mod = players_in_queue[p_name].minigame
     arena_ID = players_in_queue[p_name].arenaID
-  else 
+  else
     minetest.log("warning", "[ARENA_LIB] Can't remove player " .. p_name .. " from any arena")
     return end
 
@@ -741,7 +741,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   local arena = mod_ref.arenas[arena_ID]
 
   if arena == nil then return end
-  
+
   -- resetto la minimappa eventualmente disattivata
   minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
 
@@ -755,12 +755,12 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   -- se è eliminato, lo teletrasporto fuori dall'arena e ripristino il nome
   if reason ~= nil then
-    
+
     local player = minetest.get_player_by_name(p_name)
-    
+
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    
+
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
       if mod_ref.on_eliminate then
@@ -781,7 +781,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     --TODO: considerare se rimuovere questo avviso dato che il server avvisa di base i giocatori
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
   end
-  
+
   local players_in_arena = arena.players_amount
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
@@ -891,13 +891,17 @@ end
 
 
 function arena_lib.get_arenaID_by_player(p_name)
-  return players_in_game[p_name].arenaID
+  if players_in_game[p_name] then
+    return players_in_game[p_name].arenaID
+  end
 end
 
 
 
 function arena_lib.get_queueID_by_player(p_name)
-  return players_in_queue[p_name].arenaID
+  if players_in_queue[p_name] then
+    return players_in_queue[p_name].arenaID
+  end
 end
 
 
@@ -950,12 +954,12 @@ function init_storage(mod)
     -- se c'è una stringa con quell'ID, aggiungo l'arena e aggiorno il cartello con associato quell'ID
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
-      
+
       --TEMP: to remove in 3.0
       arena.players_amount = 0
-      
+
       arena_lib.mods[mod].arenas[i] = arena
-      
+
 
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
