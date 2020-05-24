@@ -14,6 +14,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 ### Dependencies
 Default  
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
+(soft) [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager)
 
 ### Known conflicts
 `Beds` or any other mod overriding the default respawn system  

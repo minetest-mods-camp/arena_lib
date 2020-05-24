@@ -9,7 +9,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `sign`: (pos) the position of the sign associated with the arena.
 * `players`: (table) where to store players
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
-* `max_players`: (string) default is 4
+* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
@@ -98,25 +98,19 @@ Overriding these functions is not recommended. Instead, there are 4 respective c
 
 First of all download the mod and put it in your mods folder.
 
-Then, you need to initialise the mod for each mod you want to feature arena_lib in, inside the init.lua via:
+Then, you need to register your minigame in arena_lib, possibly inside the init.lua, via:
 ```
-arena_lib.initialize("yourmod")
+arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
-**Be careful**: the string you put inside the round brackets will be how arena_lib stores your mod inside its memory and what it needs in order to understand you're referring to that specific mod (that's why almost every function contains "mod" as a parameter). You'll need it when calling for commands.
-
-To customise your mod, you can then call `arena_lib.settings`, specifying the mod name as follows:
-```
-arena_lib.settings("mymod", {
-  --whatever parameter, such as
-  -- prefix = "[mymode] ",
-})
-```
-The parameters are:
-* `prefix`: what's gonna appear in most of the lines printed by your mod. Default is `[arena_lib] `
+"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands or callbacks.  
+The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
+* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
+* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled
+* `is_timer_incrementing`: whether the timer decreases as in a countdown or increases as in a stopwatch. It doesn't work if timer is -1. Default is false
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
@@ -126,9 +120,7 @@ The parameters are:
 * `temp_properties`: same
 * `player_properties`: same
 
-On the contrary, to customise the _global_ spawn point of your hub, meaning where to spawn players when they join the server, you need to edit the line  
-`local hub_spawn_point = { x = 0, y = 20, z = 0}`  
-in api.lua, inside the arena_lib folder.
+> Beware: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager)
 
 ### 2.1 Commands
 You need to connect the functions of the library with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library.
@@ -141,11 +133,13 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players))`
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
+* `arena_lib.on_timer_tick(mod, function(arena))`: called every second inside the arena if there is a timer and it's greater than 0
+* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists, reaches 0
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from an arena (same as above)
 * `arena_lib.on_quit(mod, function(arena, p_name))`: called when a player quits from an arena (same as above)
 
-> Beware: there is a default behaviour already for each one of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
+> Beware: there is a default behaviour already for most of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
 So for instance, if we want to add an object in the first slot when a player joins the pre-match, we can simply do:
 

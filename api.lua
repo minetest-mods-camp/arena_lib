@@ -101,7 +101,7 @@ function arena_lib.initialize(mod)
 end
 
 function arena_lib.settings(mod, def)
-  arena_lib.initialize(mod, def)
+  arena_lib.register_minigame(mod, def)
   minetest.log("warning", "[ARENA_LIB] arena_lib.settings is deprecated: rename it in arena_lib.register_minigame")
 end
 
