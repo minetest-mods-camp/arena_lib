@@ -158,7 +158,7 @@ minetest.override_item("default:sign_wall", {
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, accorcio eventualmente la durata
       if players_in_arena == sign_arena.max_players and sign_arena.in_queue then
-        if timer:get_timeout() > 5 then
+        if timer:get_timeout() - timer:get_elapsed() > 5 then
           timer:stop()
           timer:start(5)
         end
