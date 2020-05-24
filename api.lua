@@ -626,6 +626,11 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     player:get_inventory():set_list("main", {})
     player:set_pos(mod_ref.hub_spawn_point)
 
+    -- se ho hub_manager, restituisco gli oggetti
+    if minetest.get_modpath("hub_manager") then
+      hub_manager.set_items(player)
+    end
+
     -- riattivo la minimappa eventualmente disattivata
     player:hud_set_flags({minimap = true})
   end
@@ -741,6 +746,11 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   local arena = mod_ref.arenas[arena_ID]
 
   if arena == nil then return end
+
+  -- se ho hub_manager, restituisco gli oggetti
+  if minetest.get_modpath("hub_manager") then
+    hub_manager.set_items(minetest.get_player_by_name(p_name))
+  end
 
   -- resetto la minimappa eventualmente disattivata
   minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
