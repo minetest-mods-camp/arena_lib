@@ -34,11 +34,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     sign_pos = {}
   end
 
-  -- calcolo giocatori
-  local p_count = 0
+  -- concateno nomi giocatori
   local names = ""
   for pl, stats in pairs(arena.players) do
-    p_count = p_count +1
     names = names .. " " .. pl
   end
 
@@ -48,6 +46,16 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   for spawn_id, spawn_pos in pairs(arena.spawn_points) do
     spawners_count = spawners_count + 1
     spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos)
+  end
+
+  -- calcolo eventuale timer
+  local timer = ""
+  if arena.timer then
+    if arena.timer_current then
+      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")"
+    else
+      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. "--- )"
+    end
   end
 
   --calcolo proprietà
@@ -69,14 +77,17 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     ]] .. S("Sign: ") .. minetest.serialize(sign_pos) .. [[
     ]] .. S("Players required: ") .. arena.min_players .. [[
     ]] .. S("Players supported: ") .. arena.max_players .. [[
-    ]] .. S("Players inside: ") .. p_count .. " ( ".. names .. " )" .. [[
+    ]] .. S("Players inside: ") .. arena.players_amount .. " ( ".. names .. " )" .. [[
     ]] .. S("In queue: ") .. tostring(arena.in_queue) .. [[
     ]] .. S("Loading: ") .. tostring(arena.in_loading) .. [[
     ]] .. S("In game: ") .. tostring(arena.in_game) .. [[
     ]] .. S("Celebrating: ") .. tostring(arena.in_celebration) .. [[
     ]] .. S("Spawn points: ") .. spawners_count .. " ( " .. spawners_pos .. " )" .. [[
+    ]] .. timer .. [[
     ]] .. S("Properties: ") .. minetest.serialize(properties) .. [[
-    ]] .. S("Temp properties: ") .. minetest.serialize(temp_properties))
+    ]] .. S("Temp properties: ") .. minetest.serialize(temp_properties)
+    )
+
 end
 
 
@@ -87,18 +98,18 @@ function arena_lib.print_arena_stats(sender, mod, arena_name)
   if arena == nil then  minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!"))) return end
 
   if not arena.in_game and not arena.in_celebration then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!"))) return end
-  
+
   for pl_name, stats in pairs(arena.players) do
-    
+
     -- calcolo proprietà del giocatore
     local p_properties = ""
     for k, v in pairs(arena_lib.mods[mod].player_properties) do
       p_properties = p_properties .. ",  " .. k .. ": " .. tostring(stats[k])
     end
-    
-    minetest.chat_send_player(sender, 
+
+    minetest.chat_send_player(sender,
       S("Player: ") .. pl_name ..
-      S(",  kills: ") .. stats.kills .. 
+      S(",  kills: ") .. stats.kills ..
       S(",  deaths: ") .. stats.deaths ..
       p_properties)
   end

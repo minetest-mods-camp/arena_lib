@@ -38,6 +38,17 @@ end
 
 
 
+function arena_lib.on_timer_tick(mod, func)
+  arena_lib.mods[mod].on_timer_tick = func
+end
+
+
+
+function arena_lib.on_timeout(mod, func)
+  arena_lib.mods[mod].on_timeout = func
+end
+
+
 -- Leaving the arena
 
 function arena_lib.on_eliminate(mod, func)

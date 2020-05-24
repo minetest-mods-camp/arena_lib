@@ -73,6 +73,7 @@ local function init_storage() end
 local function update_storage() end
 local function new_arena() end
 local function next_ID() end
+local function timer_start() end
 
 local players_in_game = {}    --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
 local players_in_queue = {}   --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
@@ -96,26 +97,32 @@ local arena_default = {
 
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.initialize(mod)
+    minetest.log("warning", "[ARENA_LIB] arena_lib.initialize is deprecated: you don't need it anymore")
+end
 
-  init_storage(mod)
-
-  --Se esiste già in memoria, ignora il resto
-  if arena_lib.mods[mod] ~= nil then return end
-
-  minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initialising...")
-
-  arena_lib.mods[mod] = {}
-  arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
-  arena_lib.mods[mod].arenasID = 1     -- we start counting from 1, not 0
-
+function arena_lib.settings(mod, def)
+  arena_lib.initialize(mod, def)
+  minetest.log("warning", "[ARENA_LIB] arena_lib.settings is deprecated: rename it in arena_lib.register_minigame")
 end
 
 
 
--- call this in your mod to override the default parameters
-function arena_lib.settings(mod, def)
+-- per inizializzare. Da lanciare all'inizio di ogni mod
+function arena_lib.register_minigame(mod, def)
 
-  local mod_ref = arena_lib.mods[mod]
+  local mod_ref = minetest.deserialize(storage:get_string(mod))
+
+  -- se la mod non esiste nello storage, la creo da zero
+  if not mod_ref then
+
+    minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initialising...")
+
+    arena_lib.mods[mod] = {}
+    arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
+    arena_lib.mods[mod].arenasID = 1     -- il contatore degli ID delle arene; inizia da 1
+
+    mod_ref = arena_lib.mods[mod]
+  end
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
@@ -123,6 +130,8 @@ function arena_lib.settings(mod, def)
   mod_ref.join_while_in_progress = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
+  mod_ref.timer = -1
+  mod_ref.is_timer_incrementing = false
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           --time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    --time in the celebration phase
@@ -150,6 +159,13 @@ function arena_lib.settings(mod, def)
 
   if def.show_minimap == true then
     mod_ref.show_minimap = def.show_minimap
+  end
+
+  if def.timer then
+    mod_ref.timer = def.timer
+    if def.is_timer_incrementing == true then
+      mod_ref.is_timer_incrementing = true
+    end
   end
 
   if def.queue_waiting_time then
@@ -185,6 +201,7 @@ function arena_lib.settings(mod, def)
   end
 
   storage:set_string(mod, minetest.serialize(mod_ref))
+  init_storage(mod, mod_ref)
 
 end
 
@@ -536,6 +553,14 @@ function arena_lib.start_arena(mod_ref, arena)
             })
   end
 
+  -- parte l'eventuale timer
+  if mod_ref.timer ~= -1 then
+    arena.timer_current = arena.timer
+    minetest.after(1, function()
+      timer_start(mod_ref, arena)
+    end)
+  end
+
   -- eventuale codice aggiuntivo
   if mod_ref.on_start then
     mod_ref.on_start(arena)
@@ -619,6 +644,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
     arena.players_amount = 0
+    arena.timer_current = nil
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -946,12 +972,7 @@ end
 ----------------------------------------------
 
 
-function init_storage(mod)
-
-  -- aggiungo la mod
-  local mod_ref = minetest.deserialize(storage:get_string(mod))
-
-  if mod_ref == nil then return end
+function init_storage(mod, mod_ref)
 
   arena_lib.mods[mod] = mod_ref
 
@@ -961,19 +982,25 @@ function init_storage(mod)
 
     local arena_str = storage:get_string(mod .. "." .. i)
 
-    -- se c'è una stringa con quell'ID, aggiungo l'arena e aggiorno il cartello con associato quell'ID
+    -- se c'è una stringa con quell'ID, aggiungo l'arena e ne aggiorno l'eventuale cartello
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
 
       --TEMP: to remove in 3.0
       arena.players_amount = 0
 
-      arena_lib.mods[mod].arenas[i] = arena
+      -- controlli timer
+      if mod_ref.timer == -1 and arena.timer then                   -- se avevo abilitato i timer e ora li ho rimossi, li tolgo dalle arene
+        arena.timer = nil
+      elseif mod_ref.timer ~= -1 and not arena.timer then           -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
+        arena.timer = mod_ref.timer
+      end
 
+      arena_lib.mods[mod].arenas[i] = arena
 
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
-        if arena.sign.x then                            -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
+        if arena.sign.x then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
           arena_lib.update_sign(arena.sign, arena)
         end
       end)
@@ -1003,6 +1030,7 @@ function update_storage(erase, mod, id, arena)
 end
 
 
+
 --[[ Dato che in Lua non è possibile istanziare le tabelle copiandole, bisogna istanziare ogni campo in una nuova tabella.
      Ricorsivo per le sottotabelle. Codice da => http://lua-users.org/wiki/CopyTable]]
 function new_arena(orig)
@@ -1030,4 +1058,28 @@ function next_ID(mod_ref)
     if id > n then n = id end
   end
   return n + 1
+end
+
+
+
+function timer_start(mod_ref, arena)
+
+  if arena.on_celebration then return end
+
+  if mod_ref.is_timer_incrementing then
+    arena.timer_current = arena.timer_current + 1
+  else
+    arena.timer_current = arena.timer_current - 1
+  end
+
+  if arena.timer_current <= 0 then
+    mod_ref.on_timeout(arena)
+    return
+  else
+    mod_ref.on_timer_tick(arena)
+  end
+
+  minetest.after(1, function()
+    timer_start(mod_ref, arena)
+  end)
 end
