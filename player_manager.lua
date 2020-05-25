@@ -1,5 +1,5 @@
 minetest.register_on_joinplayer(function(player)
-  
+
   arena_lib.HUD_add(player)
 
 end)

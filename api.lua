@@ -698,7 +698,7 @@ end
 function arena_lib.remove_player_from_arena(p_name, reason)
   -- reason 1 = has been eliminated
   -- reason 2 = has been kicked
-  -- reason 3 = has quit
+  -- reason 3 = has quit the arena
 
   local mod, arena_ID
 
@@ -718,19 +718,6 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   if arena == nil then return end
 
-  -- svuoto eventualmente l'inventario
-  if not mod_ref.keep_inventory then
-    player:get_inventory():set_list("main",{})
-  end
-
-  -- se ho hub_manager, restituisco gli oggetti
-  if minetest.get_modpath("hub_manager") then
-    hub_manager.set_items(minetest.get_player_by_name(p_name))
-  end
-
-  -- resetto la minimappa eventualmente disattivata
-  minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
-
   -- lo rimuovo
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
@@ -739,14 +726,27 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   arena_lib.update_sign(arena.sign, arena)
 
-  -- se è stato rimosso tramite reason
+  -- se una ragione è specificata
   if reason ~= nil then
 
     local player = minetest.get_player_by_name(p_name)
 
+    -- svuoto eventualmente l'inventario
+    if not mod_ref.keep_inventory then
+      player:get_inventory():set_list("main",{})
+    end
+
     -- lo teletrasporto fuori dall'arena e ripristino il nome
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+
+    -- se ho hub_manager, restituisco gli oggetti
+    if minetest.get_modpath("hub_manager") then
+      hub_manager.set_items(minetest.get_player_by_name(p_name))
+    end
+
+    -- resetto la minimappa eventualmente disattivata
+    minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
 
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
@@ -769,22 +769,20 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
   end
 
-  local players_in_arena = arena.players_amount
-
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
     local timer = minetest.get_node_timer(arena.sign)
 
-    if players_in_arena < arena.min_players then
+    if arena.players_amount < arena.min_players then
       timer:stop()
       arena.in_queue = false
-      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. players_in_arena .. "/" .. arena.max_players .. " | " ..
-        S("Waiting for more players...") .. " (" .. arena.min_players - players_in_arena .. ")")
+      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena.max_players .. " | " ..
+        S("Waiting for more players...") .. " (" .. arena.min_players - arena.players_amount .. ")")
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
     end
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
-  elseif players_in_arena == 1 then
+  elseif arena.players_amount == 1 then
 
     if is_eliminated then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
