@@ -1,4 +1,4 @@
-# version 2.7.0
+# version 3.0.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -47,10 +47,12 @@ Sign: =
 Players required: =
 Players supported: =
 Players inside: =
-In queue: =
-Loading: =
-In game: =
-Celebrating: =
+Status: =
+in queue=
+loading=
+in game=
+celebrating=
+waiting=
 Timer: =
 current: =
 Spawn points: =

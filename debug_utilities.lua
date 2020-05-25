@@ -26,6 +26,26 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
 
+  -- concateno nomi giocatori
+  local names = ""
+  for pl, stats in pairs(arena.players) do
+    names = names .. " " .. pl
+  end
+
+  -- calcolo stato arena
+  local status
+  if arena.in_queue then
+    status = S("in queue")
+  elseif arena.in_loading then
+    status = S("loading")
+  elseif arena.in_game then
+    status = S("in game")
+  elseif arena.in_celebration then
+    status = S("celebrating")
+  else
+    status = S("waiting")
+  end
+
   -- calcolo cartello
   local sign_pos
   if arena.sign.x ~= nil then
@@ -34,59 +54,57 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     sign_pos = {}
   end
 
-  -- concateno nomi giocatori
-  local names = ""
-  for pl, stats in pairs(arena.players) do
-    names = names .. " " .. pl
-  end
-
   -- calcolo coordinate spawn point
   local spawners_count = 0
   local spawners_pos = ""
   for spawn_id, spawn_pos in pairs(arena.spawn_points) do
     spawners_count = spawners_count + 1
-    spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos)
+    spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos) .. " "
   end
 
   -- calcolo eventuale timer
   local timer = ""
   if arena.timer then
     if arena.timer_current then
-      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")"
+      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")\n"
     else
-      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. "--- )"
+      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. "--- )\n"
     end
   end
 
   --calcolo proprietà
-  local properties = {}
+  local properties = ""
   for property, _ in pairs(mod_ref.properties) do
-    properties[property] = arena[property]
+    properties = properties .. property .. " = " .. arena[property] .. "; "
   end
 
   --calcolo proprietà temporanee
-  local temp_properties = {}
-  for temp_property, _ in pairs(mod_ref.temp_properties) do
-    temp_properties[temp_property] = arena[temp_property]
+  local temp_properties = ""
+  if arena.in_game == true then
+    for temp_property, _ in pairs(mod_ref.temp_properties) do
+      temp_properties = temp_properties .. temp_property .. " = " .. arena[temp_property] .. "; "
+    end
+  else
+    for temp_property, _ in pairs(mod_ref.temp_properties) do
+      temp_properties = temp_properties .. temp_property .. "; "
+    end
   end
 
-  minetest.chat_send_player(sender, [[
-    ]] .. S("Name: ") .. minetest.colorize("#eea160", arena_name ) .. [[
-    ]] .. "ID: " .. arena_ID .. [[
-    ]] .. S("Enabled: ") .. tostring(arena.enabled) .. [[
-    ]] .. S("Sign: ") .. minetest.serialize(sign_pos) .. [[
-    ]] .. S("Players required: ") .. arena.min_players .. [[
-    ]] .. S("Players supported: ") .. arena.max_players .. [[
-    ]] .. S("Players inside: ") .. arena.players_amount .. " ( ".. names .. " )" .. [[
-    ]] .. S("In queue: ") .. tostring(arena.in_queue) .. [[
-    ]] .. S("Loading: ") .. tostring(arena.in_loading) .. [[
-    ]] .. S("In game: ") .. tostring(arena.in_game) .. [[
-    ]] .. S("Celebrating: ") .. tostring(arena.in_celebration) .. [[
-    ]] .. S("Spawn points: ") .. spawners_count .. " ( " .. spawners_pos .. " )" .. [[
-    ]] .. timer .. [[
-    ]] .. S("Properties: ") .. minetest.serialize(properties) .. [[
-    ]] .. S("Temp properties: ") .. minetest.serialize(temp_properties)
-    )
+  minetest.chat_send_player(sender,
+    minetest.colorize("#cfc6b8", "====================================") .. "\n" ..
+    minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
+    minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
+    minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n" ..
+    minetest.colorize("#eea160", S("Players supported: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n" ..
+    minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. names .. " )") .. "\n" ..
+    minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
+    minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
+    minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", minetest.pos_to_string(sign_pos)) .. "\n" ..
+    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", spawners_count .. " ( " .. spawners_pos .. " )") .. "\n" ..
+    timer ..
+    minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
+    minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties)
+  )
 
 end
 

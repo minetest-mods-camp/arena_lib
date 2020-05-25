@@ -1,4 +1,4 @@
-# version 2.7.0
+# version 3.0.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -47,10 +47,12 @@ Sign: =Cartello:
 Players required: =Giocatori minimi: 
 Players supported: =Giocatori massimi: 
 Players inside: =Giocatori dentro: 
-In queue: =In coda: 
-Loading: =In caricamento: 
-In game: =In partita: 
-Celebrating: =In celebrazione: 
+Status: =Stato: 
+in queue=in coda
+loading=in caricamento
+in game=in partita
+celebrating=in celebrazione
+waiting=in attesa
 Timer: =Timer: 
 current: =corrente: 
 Spawn points: =Spawn points: 
