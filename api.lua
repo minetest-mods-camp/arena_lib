@@ -93,20 +93,6 @@ local arena_default = {
   enabled = false
 }
 
-
-
--- per inizializzare. Da lanciare all'inizio di ogni mod
-function arena_lib.initialize(mod)
-    minetest.log("warning", "[ARENA_LIB] arena_lib.initialize is deprecated: you don't need it anymore")
-end
-
-function arena_lib.settings(mod, def)
-  arena_lib.register_minigame(mod, def)
-  minetest.log("warning", "[ARENA_LIB] arena_lib.settings is deprecated: rename it in arena_lib.register_minigame")
-end
-
-
-
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.register_minigame(mod, def)
 
@@ -1082,4 +1068,25 @@ function timer_start(mod_ref, arena)
   minetest.after(1, function()
     timer_start(mod_ref, arena)
   end)
+end
+
+
+
+
+----------------------------------------------
+------------------DEPRECATED------------------
+----------------------------------------------
+
+function arena_lib.initialize(mod)
+    minetest.log("warning", "[ARENA_LIB] arena_lib.initialize is deprecated: you don't need it anymore")
+end
+
+function arena_lib.settings(mod, def)
+  arena_lib.register_minigame(mod, def)
+  minetest.log("warning", "[ARENA_LIB] arena_lib.settings is deprecated: rename it in arena_lib.register_minigame")
+end
+
+function arena_lib.get_arena_players_count(arena)
+  minetest.log("warning", "[ARENA_LIB] arena_lib.get_arena_players_count is deprecated: use the arena parameter 'players_amount' instead (ie. arena.players_amount) to retrieve the value")
+  return arena.players_amount
 end
