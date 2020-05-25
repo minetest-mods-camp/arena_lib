@@ -2,68 +2,9 @@ arena_lib = {}
 arena_lib.mods = {}
 
 local S = minetest.get_translator("arena_lib")
-
-----------------------------------------------
---------------GESTIONE STORAGE----------------
-----------------------------------------------
-
 local storage = minetest.get_mod_storage()
---storage:set_string("mods", nil) -- PER RESETTARE LO STORAGE
 
 
---------------LEGACY START----------------
-
--- [!!!] for arena_lib 2.1.0 and lesser: it automatically converts your old arenas
--- into the new storage ystem. Please start your server at least once if you wanna
--- keep them as this will be removed in the who-knows-exactly-when upcoming 3.0.0
-local function legacy_storage_conversion()
-
-  local old_table = minetest.deserialize(storage:get_string("mods"))
-
-  for mod, properties in pairs(old_table) do
-
-    minetest.log("action", "[ARENA_LIB] Converting mod " .. mod )
-
-    for id, arena in pairs(properties.arenas) do
-
-      -- salvo ogni arena in una stringa a parte
-      minetest.log("action", "[ARENA_LIB] Converting arena " .. arena.name )
-      local entry = mod .. "." .. id
-      -- azzero parametri temporanei
-      arena.players = {}
-      arena.in_queue = false
-      arena.in_loading = false
-      arena.in_game = false
-      arena.in_celebration = false
-      storage:set_string(entry, minetest.serialize(arena))
-      minetest.log("action", "[ARENA_LIB] Arena " .. arena.name .. " converted into " .. entry)
-
-    end
-
-    -- svuoto le arene per non salvarle insieme alla mod
-    arena_lib.mods[mod] = old_table[mod]
-    arena_lib.mods[mod].arenas = {}
-
-    -- salvo la mod in una stringa a parte
-    storage:set_string(mod, minetest.serialize(arena_lib.mods[mod]))
-
-    minetest.log("action", "[ARENA_LIB] Mod " .. mod .. " converted")
-
-  end
-
-  --svuoto il vecchio storage
-  storage:set_string("mods", "")
-  minetest.log("action", "[ARENA_LIB] Deprecated storage removed")
-end
-
-
-
-if minetest.deserialize(storage:get_string("mods")) ~= nil then
-  minetest.log("action", "[ARENA_LIB] Old storage system found: converting to arena_lib 2.2.0+ system")
-  legacy_storage_conversion()
-end
-
---------------LEGACY END----------------
 
 ----------------------------------------------
 ---------------DICHIARAZIONI------------------
