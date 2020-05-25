@@ -107,6 +107,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
+* `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
 * `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled

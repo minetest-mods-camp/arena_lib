@@ -55,6 +55,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.join_while_in_progress = false
+  mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
   mod_ref.timer = -1
@@ -78,6 +79,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
+  end
+
+  if def.keep_inventory == true then
+    mod_ref.keep_inventory = def.keep_inventory
   end
 
   if def.show_nametags == true then
@@ -442,9 +447,14 @@ function arena_lib.load_arena(mod, arena_ID)
               speed = 0,
               })
 
-    -- teletrasporto i giocatori e svuoto l'inventario
+    -- teletrasporto i giocatori
     player:set_pos(arena.spawn_points[count])
-    player:get_inventory():set_list("main",{})
+
+    -- svuoto eventualmente l'inventario
+    if not mod_ref.keep_inventory then
+      player:get_inventory():set_list("main",{})
+    end
+
     -- registro giocatori nella tabella apposita
     players_in_queue[pl_name] = nil
     players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}
@@ -514,7 +524,11 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:hud_set_flags({minimap = false})
   end
 
-  player:get_inventory():set_list("main",{})
+  -- svuoto eventualmente l'inventario
+  if not mod_ref.keep_inventory then
+    player:get_inventory():set_list("main",{})
+  end
+
   player:set_pos(arena_lib.get_random_spawner(arena))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
@@ -575,8 +589,12 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
     local player = minetest.get_player_by_name(pl_name)
 
-    -- resetto inventario e teletraspoto nella lobby
-    player:get_inventory():set_list("main", {})
+    -- svuoto eventualmente l'inventario
+    if not mod_ref.keep_inventory then
+      player:get_inventory():set_list("main", {})
+    end
+
+    -- teletrasporto nella lobby
     player:set_pos(mod_ref.hub_spawn_point)
 
     -- se ho hub_manager, restituisco gli oggetti
@@ -700,6 +718,11 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   if arena == nil then return end
 
+  -- svuoto eventualmente l'inventario
+  if not mod_ref.keep_inventory then
+    player:get_inventory():set_list("main",{})
+  end
+
   -- se ho hub_manager, restituisco gli oggetti
   if minetest.get_modpath("hub_manager") then
     hub_manager.set_items(minetest.get_player_by_name(p_name))
@@ -716,11 +739,12 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   arena_lib.update_sign(arena.sign, arena)
 
-  -- se è eliminato, lo teletrasporto fuori dall'arena e ripristino il nome
+  -- se è stato rimosso tramite reason
   if reason ~= nil then
 
     local player = minetest.get_player_by_name(p_name)
 
+    -- lo teletrasporto fuori dall'arena e ripristino il nome
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
