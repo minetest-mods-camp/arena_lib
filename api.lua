@@ -863,12 +863,11 @@ function arena_lib.get_arena_by_player(p_name)
   if arena_lib.is_player_in_arena(p_name) then      -- è in partita
     mod = players_in_game[p_name].minigame
     arenaID = players_in_game[p_name].arenaID
-  else                                               -- è in coda
+  elseif arena_lib.is_player_in_queue(p_name) then   -- è in coda
     mod = players_in_queue[p_name].minigame
     arenaID = players_in_queue[p_name].arenaID
-  end
-
-  if not mod then return end                         -- se non è né l'uno né l'altro, annullo
+  else
+    return end
 
   return arena_lib.mods[mod].arenas[arenaID]
 end
