@@ -61,10 +61,10 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.timer = -1
   mod_ref.is_timer_incrementing = false
   mod_ref.queue_waiting_time = 10
-  mod_ref.load_time = 3           --time in the loading phase (the pre-match)
-  mod_ref.celebration_time = 3    --time in the celebration phase
+  mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
+  mod_ref.celebration_time = 3    -- time in the celebration phase
   mod_ref.immunity_time = 3
-  mod_ref.immunity_slot = 8       --people may have tweaked the slots, hence the custom parameter
+  mod_ref.immunity_slot = 8       -- people may have tweaked the slots, hence the custom parameter
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
@@ -817,13 +817,21 @@ function arena_lib.immunity(player)
   local inv = player:get_inventory()
   local p_name = player:get_player_name()
   local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
+  local immunity_ID = 0
 
+  -- aggiungo l'oggetto
   inv:set_stack("main", mod_ref.immunity_slot, immunity_item)
 
+  -- in caso uno spari, perda l'immunità, muoia subito e resusciti, il tempo d'immunità riparte da capo.
+  -- Ne tengo traccia con un metadato che comparo nell'after
+  immunity_ID = player:get_meta():get_int("immunity_ID") + 1
+  player:get_meta():set_int("immunity_ID", immunity_ID)
+
   minetest.after(mod_ref.immunity_time, function()
-    if player == nil then return end          -- they might have disconnected
-    if inv:contains_item("main", immunity_item) then
+    if not player then return end          -- potrebbe essersi disconnesso
+    if inv:contains_item("main", immunity_item) and immunity_ID == player:get_meta():get_int("immunity_ID") then
       inv:remove_item("main", immunity_item)
+      player:get_meta():set_int("immunity_ID", 0)
     end
   end)
 
