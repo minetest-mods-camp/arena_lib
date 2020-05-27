@@ -339,14 +339,19 @@ end
 
 
 
-function arena_lib.enable_arena(sender, mod, arena_ID)
+function arena_lib.enable_arena(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
-  local arena = mod_ref.arenas[arena_ID]
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- controllo se esiste l'arena
   if not arena then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena associated with this ID!")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena named @1!", arena_name)))
+  return end
+
+  -- se è già abilitata, annullo
+  if arena.enabled then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already enabled")))
   return end
 
   -- check requisiti: spawner e cartello
@@ -364,20 +369,20 @@ function arena_lib.enable_arena(sender, mod, arena_ID)
   arena.enabled = true
   arena_lib.update_sign(arena.sign, arena)
   update_storage(false, mod, arena_ID, arena)
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena successfully enabled"))
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
 
 end
 
 
 
-function arena_lib.disable_arena(sender, mod, arena_ID)
+function arena_lib.disable_arena(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
-  local arena = mod_ref.arenas[arena_ID]
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- controllo se esiste l'arena
   if not arena then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena associated with this ID!")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena named @1!", arena_name)))
   return end
 
   -- se è già disabilitata, annullo
@@ -406,7 +411,7 @@ function arena_lib.disable_arena(sender, mod, arena_ID)
   arena.enabled = false
   arena_lib.update_sign(arena.sign, arena)
   update_storage(false, mod, arena_ID, arena)
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena.name))
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
 end
 
 
