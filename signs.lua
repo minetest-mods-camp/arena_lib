@@ -188,27 +188,6 @@ minetest.override_item("default:sign_wall", {
 
 
 
-function arena_lib.give_sign_tool(sender, mod, arena_name)
-
-
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-  if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-   return end
-
-  -- assegno item creazione arene con nome mod e ID arena nei metadati da restituire al premere sul cartello.
-  -- uso l'ID e non il nome perché (in futuro) si potrà rinominare un'arena
-  local stick = ItemStack("arena_lib:create_sign")
-  local meta = stick:get_meta()
-  meta:set_string("mod", mod)
-  meta:set_int("arenaID", arena_ID)
-
-  minetest.get_player_by_name(sender):set_wielded_item(stick)
-  minetest.chat_send_player(sender, S("Left click on a sign to set the arena"))
-end
-
-
-
 function arena_lib.update_sign(pos, arena)
 
   -- non uso il getter perché dovrei richiamare 2 funzioni (ID e count)

@@ -53,6 +53,7 @@ function arena_lib.register_minigame(mod, def)
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
+  mod_ref.teams = {}
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
@@ -71,6 +72,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.prefix then
     mod_ref.prefix = def.prefix
+  end
+
+  if def.teams and type(def.teams) == "table" then
+    mod_ref.teams = def.teams
   end
 
   if def.hub_spawn_point then
@@ -248,36 +253,70 @@ end
 
 
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
--- Non ci possono essere più spawn points del numero massimo di giocatori e non possono essere impostati in aria
--- Indicando lo spawner_ID, si andrà a sovrascrivere lo spawner con quell'ID se esiste
-function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
+-- Non ci possono essere più spawn points del numero massimo di giocatori.
+-- 'param' può essere: "overwrite", "delete", "deleteall"
+function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- controllo se esiste l'arena
+  -- se non esiste l'arena, annullo
   if arena == nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-  return end
+    return end
+
+  -- se non è disabilitata, annullo
+  if arena.enabled then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
+    return end
+
+  -- se è in modalità edit, annullo
+  if arena_lib.is_arena_in_edit_mode(arena_name, sender) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Someone is already editing this arena!")))
+    return end
+
+  local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
+  local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                          -- alzo Y di uno sennò tippa nel blocco
+  local mod_ref = arena_lib.mods[mod]
+
+  -- controllo parametri
+  if param then
+    -- se overwrite, sovrascrivo
+    if param == "overwrite" then
+
+      -- se lo spawner da sovrascrivere non esiste, annullo
+      if arena.spawn_points[ID] == nil then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
+      return end
+
+      arena.spawn_points[ID] = pos_Y_up
+      minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
+
+    -- se delete, cancello
+    elseif param == "delete" then
+
+      if arena.spawn_points[ID] == nil then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
+      return end
+
+      table.remove(arena.spawn_points, ID)
+      minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
+
+    -- se deleteall, li cancello tutti
+    elseif param == "deleteall" then
+      arena.spawn_points = {}
+    else
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
+    end
+  return
+  end
+
+  -- sennò sto creando un nuovo spawner
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena)
 
-  -- se provo a settare uno spawn point di troppo, annullo
-  if spawn_points_count == arena.max_players and spawner_ID == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players! If requested, you can overwrite them specifying the ID of the spawn as a parameter")))
-  return end
-
-  -- se l'ID dello spawner da sovrascrivere non corrisponde a nessun altro ID, annullo
-  if spawner_ID ~= nil and spawner_ID > spawn_points_count then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
-  return end
-
-  local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())   --tolgo i decimali per storare un int
-  local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                    -- alzo Y di uno sennò tippa nel blocco
-  local pos_feet = {x = pos.x, y = pos.y-1, z = pos.z}
-
-  -- se il blocco sotto i piedi è aria, annullo
-  if minetest.get_node(pos_feet).name == "air" then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't set the spawn point in the air!")))
+  -- se provo a impostare uno spawn point di troppo, annullo
+  if spawn_points_count == arena.max_players then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
   return end
 
   -- se c'è già uno spawner in quel punto, annullo
@@ -286,44 +325,93 @@ function arena_lib.set_spawner(sender, mod, arena_name, spawner_ID)
       return end
   end
 
-  local mod_ref = arena_lib.mods[mod]
-
   -- sovrascrivo/creo lo spawnpoint
-  if spawner_ID ~= nil then
-    arena.spawn_points[spawner_ID] = pos_Y_up
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", spawner_ID))
-  else
-    arena.spawn_points[spawn_points_count +1] = pos_Y_up
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", spawn_points_count +1))
-  end
+  arena.spawn_points[spawn_points_count +1] = pos_Y_up
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", spawn_points_count +1))
 
   update_storage(false, mod, id, arena)
 end
 
 
 
-function arena_lib.set_sign(itemstack, user, pos)
+-- 2 approcci: da editor e da linea di comando (chat)
+-- l'editor utilizza sender, pos e remove. Colpisce un cartello (pos) e fa una determinata azione (remove true/false)
+-- la linea di comando usa sender, mod e arena_name. Prende dove guarda il giocatore e si accerta che è un cartello (non richiede quindi hotbar o inventari di alcun tipo)
+function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
 
-  local mod = itemstack:get_meta():get_string("mod")
-  local arena_ID = itemstack:get_meta():get_int("arenaID")
-  local arena = arena_lib.mods[mod].arenas[arena_ID]
+  local arena_ID = 0
+  local arena = {}
 
-  -- se l'arena è abilitata annullo
-  if arena.enabled then
-    minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
+  -- se uso la riga di comando, controllo se sto guardando un cartello
+  if mod then
+    arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+    -- se non esiste, annullo
+    if not arena then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
     return end
 
-  -- controllo se c'è già un cartello assegnato a quell'arena. Se è lo stesso lo rimuovo, sennò annullo
-  if next(arena.sign) ~= nil then
-    if minetest.serialize(pos) == minetest.serialize(arena.sign) then
-      minetest.set_node(pos, {name = "air"})
-      arena.sign = {}
-      minetest.chat_send_player(user:get_player_name(), S("Sign of arena @1 successfully removed", arena.name))
-      update_storage(false, mod, arena_ID, arena)
-    else
-      minetest.chat_send_player(user:get_player_name(), minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
+    -- se l'arena è abilitata annullo
+    if arena.enabled then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
+    return end
+
+    -- se è in modalità edit, annullo
+    if arena_lib.is_arena_in_edit_mode(arena_name, sender) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Someone is already editing this arena!")))
+      return end
+
+    local player = minetest.get_player_by_name(sender)
+    local p_pos = player:get_pos()
+    local p_eye_pos = { x = p_pos.x, y = p_pos.y + 1.475, z = p_pos.z }
+    local to = vector.add(p_eye_pos, vector.multiply(player:get_look_dir(), 5))
+    local ray = Raycast(p_eye_pos, to)
+
+    -- cerco un cartello
+    for hit in ray do
+      if hit.type == "node" then
+        local node = minetest.get_node(hit["under"])
+        if string.match(node.name, "default:sign") then
+          pos = hit["under"]
+          break
+        end
+      end
     end
-  return end
+
+    -- se non ha trovato niente, esco
+    if pos == nil then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not a sign!")))
+    return end
+
+  -- se uso l'editor
+  else
+
+    local player = minetest.get_player_by_name(sender)
+
+    mod = player:get_meta():get_string("arena_lib_editor.mod")
+    arena_ID, arena = arena_lib.get_arena_by_name(mod, player:get_meta():get_string("arena_lib_editor.arena"))
+  end
+
+  -- se c'è già un cartello assegnato
+  if next(arena.sign) ~= nil then
+    -- dal linea di comando non fa distinzione (nil), sennò sto usando lo strumento per rimuovere da editor (remove == true)
+    if remove == nil or remove == true then
+      if minetest.serialize(pos) == minetest.serialize(arena.sign) then
+        minetest.set_node(pos, {name = "air"})
+        arena.sign = {}
+        minetest.chat_send_player(sender, S("Sign of arena @1 successfully removed", arena.name))
+        update_storage(false, mod, arena_ID, arena)
+      else
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This sign doesn't belong to the arena @1!", arena.name)))
+      end
+    elseif remove == false then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] C'è già un cartello per quest'arena!")))
+    end
+  return
+  elseif remove == true then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non c'è nessun cartello da rimuovere assegnato a quest'arena!"))
+    return
+  end
 
   -- cambio la scritta
   arena_lib.update_sign(pos, arena)
@@ -335,6 +423,7 @@ function arena_lib.set_sign(itemstack, user, pos)
   -- salvo il nome della mod e l'ID come metadato nel cartello
   minetest.get_meta(pos):set_string("mod", mod)
   minetest.get_meta(pos):set_int("arenaID", arena_ID)
+
 end
 
 
