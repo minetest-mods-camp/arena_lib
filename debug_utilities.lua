@@ -49,9 +49,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   -- calcolo cartello
   local sign_pos
   if arena.sign.x ~= nil then
-    sign_pos = arena.sign
+    sign_pos = minetest.pos_to_string(arena.sign)
   else
-    sign_pos = {}
+    sign_pos = "---"
   end
 
   -- calcolo coordinate spawn point
@@ -99,7 +99,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. names .. " )") .. "\n" ..
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
-    minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", minetest.pos_to_string(sign_pos)) .. "\n" ..
+    minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", spawners_count .. " ( " .. spawners_pos .. " )") .. "\n" ..
     timer ..
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
