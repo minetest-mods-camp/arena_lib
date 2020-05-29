@@ -21,7 +21,12 @@ minetest.override_item("default:sign_wall", {
       local sign_arena = mod_ref.arenas[arenaID]
       local p_name = puncher:get_player_name()
 
-      if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
+      if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere senza far crashare
+
+      -- se si è nell'editor
+      if arena_lib.is_player_in_edit_mode(p_name) then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
+        return end
 
       -- se non è abilitata
       if not sign_arena.enabled then

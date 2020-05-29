@@ -225,23 +225,16 @@ function arena_lib.remove_arena(sender, mod, arena_name)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not arena then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena named @1!", arena_name)))
-  return end
-
-  if arena.in_game then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is an ongoing match inside the arena @1: impossible to remove!", arena_name)))
-  return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
   --TODO: -chiedere conferma
 
   -- rimozione cartello coi rispettivi metadati
   if arena.sign ~= nil then
-    minetest.set_node(arena.sign, {name = "air"}) end
+    minetest.set_node(arena.sign, {name = "air"})
+    end
 
   local mod_ref = arena_lib.mods[mod]
-
-  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix ..S("The arena you were queueing for has been removed... :("))
 
   -- rimozione arena e aggiornamento storage
   mod_ref.arenas[id] = nil
@@ -259,20 +252,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- se non esiste l'arena, annullo
-  if arena == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-    return end
-
-  -- se non è disabilitata, annullo
-  if arena.enabled then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
-    return end
-
-  -- se è in modalità edit, annullo
-  if arena_lib.is_arena_in_edit_mode(arena_name, sender) then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Someone is already editing this arena!")))
-    return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
   local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
   local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                          -- alzo Y di uno sennò tippa nel blocco
@@ -321,7 +301,8 @@ function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
 
   -- se c'è già uno spawner in quel punto, annullo
   for id, spawn in pairs(arena.spawn_points) do
-    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
+    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
       return end
   end
 
@@ -346,20 +327,7 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
   if mod then
     arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-    -- se non esiste, annullo
-    if not arena then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-    return end
-
-    -- se l'arena è abilitata annullo
-    if arena.enabled then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
-    return end
-
-    -- se è in modalità edit, annullo
-    if arena_lib.is_arena_in_edit_mode(arena_name, sender) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Someone is already editing this arena!")))
-      return end
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
     local player = minetest.get_player_by_name(sender)
     local p_pos = player:get_pos()
@@ -392,6 +360,8 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
     arena_ID, arena = arena_lib.get_arena_by_name(mod, player:get_meta():get_string("arena_lib_editor.arena"))
   end
 
+  local mod_ref = arena_lib.mods[mod]
+
   -- se c'è già un cartello assegnato
   if next(arena.sign) ~= nil then
     -- dal linea di comando non fa distinzione (nil), sennò sto usando lo strumento per rimuovere da editor (remove == true)
@@ -399,17 +369,17 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
       if minetest.serialize(pos) == minetest.serialize(arena.sign) then
         minetest.set_node(pos, {name = "air"})
         arena.sign = {}
-        minetest.chat_send_player(sender, S("Sign of arena @1 successfully removed", arena.name))
+        minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully removed", arena.name))
         update_storage(false, mod, arena_ID, arena)
       else
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This sign doesn't belong to the arena @1!", arena.name)))
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This sign doesn't belong to @1!", arena.name)))
       end
     elseif remove == false then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] C'è già un cartello per quest'arena!")))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
     end
   return
   elseif remove == true then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] Non c'è nessun cartello da rimuovere assegnato a quest'arena!"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no sign to remove assigned to @1!", arena.name)))
     return
   end
 
@@ -424,35 +394,31 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
   minetest.get_meta(pos):set_string("mod", mod)
   minetest.get_meta(pos):set_int("arenaID", arena_ID)
 
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
+
 end
 
 
 
 function arena_lib.enable_arena(sender, mod, arena_name)
 
-  local mod_ref = arena_lib.mods[mod]
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- controllo se esiste l'arena
-  if not arena then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena named @1!", arena_name)))
-  return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
-  -- se è già abilitata, annullo
-  if arena.enabled then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already enabled")))
-  return end
-
-  -- check requisiti: spawner e cartello
+  -- check requisiti: spawner
   if arena_lib.get_arena_spawners_count(arena) < arena.max_players then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Insufficient spawners, the arena has been disabled!")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Insufficient spawners, the arena can't be enabled!")))
     arena.enabled = false
   return end
 
+  -- cartello
   if not arena.sign.x then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Sign not set, the arena has been disabled!")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Sign not set, the arena can't be enabled!")))
     arena.enabled = false
   return end
+
+  local mod_ref = arena_lib.mods[mod]
 
   -- abilito
   arena.enabled = true
@@ -469,14 +435,11 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   local mod_ref = arena_lib.mods[mod]
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- controllo se esiste l'arena
-  if not arena then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no arena named @1!", arena_name)))
-  return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
 
   -- se è già disabilitata, annullo
   if not arena.enabled then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already disabled")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already disabled!")))
   return end
 
   -- se una partita è in corso, annullo
@@ -490,7 +453,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
     players_in_queue[pl_name] = nil
     arena.players[pl_name] = nil
     arena.in_queue = false
-    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled!")))
+    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :()")))
 
   end
 
@@ -853,7 +816,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
         mod_ref.on_kick(arena, p_name)
       end
     elseif reason == 3 then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", "<<< " .. S("@1 has quit the arena", p_name)))
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", "<<< " .. S("@1 has quit the match", p_name)))
       if mod_ref.on_quit then
         mod_ref.on_quit(arena, p_name)
       end

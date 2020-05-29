@@ -1,6 +1,10 @@
+local S = minetest.get_translator("arena_lib")
+
+
+
 minetest.register_tool("arena_lib:editor_spawners", {
 
-    description = "Spawner",
+    description = S("Spawners"),
     inventory_image = "arenalib_editor_spawners.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -8,9 +12,9 @@ minetest.register_tool("arena_lib:editor_spawners", {
 
     on_use = function(itemstack, user)
 
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), "Spawner | ID sel.: 1 (Click dx su slot #2 per cambiare)")
-
       user:get_meta():set_int("arena_lib_editor.spawner_ID", 1)
+      
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", 1))
 
       minetest.after(0, function()
         arena_lib.give_spawners_tools(user)
@@ -23,7 +27,7 @@ minetest.register_tool("arena_lib:editor_spawners", {
 
 minetest.register_tool("arena_lib:editor_signs", {
 
-    description = "Cartelli",
+    description = S("Signs"),
     inventory_image = "arenalib_editor_signs.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -31,7 +35,7 @@ minetest.register_tool("arena_lib:editor_signs", {
 
     on_use = function(itemstack, user)
 
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), "Un cartello per arena")
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("One sign per arena"))
 
       minetest.after(0, function()
         arena_lib.give_signs_tools(user)
@@ -44,7 +48,7 @@ minetest.register_tool("arena_lib:editor_signs", {
 
 minetest.register_tool("arena_lib:editor_info", {
 
-    description = "Info",
+    description = S("Info"),
     inventory_image = "arenalib_editor_info.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -64,7 +68,7 @@ minetest.register_tool("arena_lib:editor_info", {
 
 minetest.register_tool("arena_lib:editor_return", {
 
-    description = "Torna indietro",
+    description = S("Go back"),
     inventory_image = "arenalib_editor_return.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -82,7 +86,7 @@ minetest.register_tool("arena_lib:editor_return", {
 
 minetest.register_tool("arena_lib:editor_quit", {
 
-    description = "Esci dall'editor",
+    description = S("Leave the editor"),
     inventory_image = "arenalib_editor_quit.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
