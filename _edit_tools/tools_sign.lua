@@ -2,9 +2,9 @@ local S = minetest.get_translator("arena_lib")
 local spawners_tools = {
   "arena_lib:sign_add",
   "arena_lib:sign_remove",
+  "",
   "default:sign_wall",
   "default:sign_wall_steel",
-  "",
   "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
@@ -14,7 +14,7 @@ local spawners_tools = {
 
 minetest.register_tool("arena_lib:sign_add", {
 
-    description = S("Left click on a sign to create the access to the arena"),
+    description = S("Add sign"),
     inventory_image = "arenalib_tool_sign_add.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -41,7 +41,7 @@ minetest.register_tool("arena_lib:sign_add", {
 
 minetest.register_tool("arena_lib:sign_remove", {
 
-    description = S("Left click on a sign to remove the access to the arena"),
+    description = S("Remove sign"),
     inventory_image = "arenalib_tool_sign_remove.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,

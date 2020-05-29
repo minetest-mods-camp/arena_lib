@@ -72,7 +72,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
     end
 
     placer:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
-    arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), "Spawner | ID sel.: " .. spawner_ID .. " (Click dx su slot #2 per cambiare)")
+    arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
   end
 
 })
@@ -81,7 +81,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
 
 minetest.register_tool("arena_lib:spawner_deleteall", {
 
-  description = "Cancella tutto",
+  description = S("Delete all spawners"),
   inventory_image = "arenalib_tool_spawner_deleteall.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
   on_place = function() end,
@@ -94,7 +94,7 @@ minetest.register_tool("arena_lib:spawner_deleteall", {
     local p_name = user:get_player_name()
 
     arena_lib.set_spawner(p_name, mod, arena_name, "deleteall")
-    minetest.chat_send_player(user:get_player_name(), "Tutti gli spawn point sono stati rimossi")
+    minetest.chat_send_player(user:get_player_name(), S("All the spawn points has been removed"))
   end
 
 })

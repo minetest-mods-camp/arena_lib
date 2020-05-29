@@ -1,5 +1,6 @@
 local S = minetest.get_translator("arena_lib")
-local in_edit_mode = {} -- arenas names
+local arenas_in_edit_mode = {}      -- KEY: arena name; INDEX: name of the player inside the editor
+local players_in_edit_mode = {}     -- KEY: player name; INDEX: (placeholder, not relevant)
 local editor_tools = {
   "",
   "arena_lib:editor_spawners",
@@ -17,20 +18,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- controllo se esiste l'arena
-  if arena == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-    return end
-
-  -- se è abilitata, annullo
-  if arena.enabled then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must disable the arena first!")))
-    return end
-
-  -- se sta già venendo modificata da qualcuno, annullo
-  if in_edit_mode[arena_name] ~= nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] L'arena sta già venendo modificata da qualcun altro! (" .. in_edit_mode[arena_name] .. ")"))
-    return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
   local player = minetest.get_player_by_name(sender)
 
@@ -42,7 +30,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   arena_lib.show_main_editor(player)
 
   -- metto l'arena in edit mode
-  in_edit_mode[arena_name] = sender
+  arenas_in_edit_mode[arena_name] = sender
+  players_in_edit_mode[sender] = true
 
 end
 
@@ -54,7 +43,8 @@ function arena_lib.quit_editor(player)
 
   if arena_name == "" then return end
 
-  in_edit_mode[arena_name] = nil
+  arenas_in_edit_mode[arena_name] = nil
+  players_in_edit_mode[player:get_player_name()] = nil
 
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
@@ -70,24 +60,42 @@ end
 
 
 
+
+
+----------------------------------------------
+--------------------UTILS---------------------
+----------------------------------------------
+
 function arena_lib.show_main_editor(player)
 
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
 
   player:get_inventory():set_list("main", editor_tools)
-  arena_lib.HUD_send_msg("hotbar", player:get_player_name(), "Arena_lib editor | Stai modificando: " .. arena_name)
+  arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Arena_lib editor | Now editing: @1", arena_name))
 end
 
 
 
-function arena_lib.is_arena_in_edit_mode(arena_name, player_exception)
+function arena_lib.is_arena_in_edit_mode(arena_name)
+  if arenas_in_edit_mode[arena_name] ~= nil then return true
+  else return false end
+end
 
-  if player_exception then
-    if in_edit_mode[arena_name] == player_exception then return false end
-  end
 
-  if in_edit_mode[arena_name] ~= nil then return true
-  else return false
-  end
 
+function arena_lib.is_player_in_edit_mode(p_name)
+  if players_in_edit_mode[p_name] ~= nil then return true
+  else return false end
+end
+
+
+
+
+
+----------------------------------------------
+-----------------GETTERS----------------------
+----------------------------------------------
+
+function arena_lib.get_player_in_edit_mode(arena_name)
+  return arenas_in_edit_mode[arena_name]
 end
