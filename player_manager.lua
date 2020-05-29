@@ -2,6 +2,12 @@ minetest.register_on_joinplayer(function(player)
 
   arena_lib.HUD_add(player)
 
+  -- nel caso fosse crashato il server con qualcuno nell'editor
+  if player:get_meta():get_string("arena_lib_editor.arena") ~= "" then
+    player:get_meta():set_string("arena_lib_editor.mod", "")
+    player:get_meta():set_string("arena_lib_editor.arena", "")
+  end
+
 end)
 
 
@@ -10,6 +16,7 @@ minetest.register_on_leaveplayer(function(player)
     local p_name = player:get_player_name()
 
     arena_lib.remove_player_from_arena(p_name)
+    arena_lib.quit_editor(player)
 end)
 
 
