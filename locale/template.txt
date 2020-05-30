@@ -6,33 +6,32 @@
 # api.lua
 [!] An arena with that name exists already!=
 Arena @1 succesfully created=
-[!] There is no arena named @1!=
-[!] There is an ongoing match inside the arena @1: impossible to remove!=
-The arena you were queueing for has been removed... :(=
 Arena @1 successfully removed=
-[!] This arena doesn't exist!=
-[!] Spawn points can't exceed the maximum number of players! If requested, you can overwrite them specifying the ID of the spawn as a parameter=
 [!] No spawner with that ID to overwrite!=
-[!] You can't set the spawn point in the air!=
-[!] There's already one spawn at this point!=
 Spawn point #@1 successfully overwritten=
+[!] No spawner with that ID to delete!=
+Spawn point #@1 successfully deleted=
+[!] Unknown parameter!=
+[!] Spawn points can't exceed the maximum number of players!=
+[!] There's already a spawn in this point!=
 Spawn point #@1 successfully set=
-[!] You must disable the arena first!=
+[!] That's not a sign!=
 Sign of arena @1 successfully removed=
+[!] This sign doesn't belong to @1!=
 [!] There is already a sign for this arena!=
-[!] The arena is already enabled=
-[!] Insufficient spawners, the arena has been disabled!=
-[!] Sign not set, the arena has been disabled!=
+[!] There is no sign to remove assigned to @1!=
+Sign of arena @1 successfully set=
+[!] Insufficient spawners, the arena can't be enabled!=
+[!] Sign not set, the arena can't be enabled!=
 Arena @1 successfully enabled=
-[!] The arena is already disabled=
+[!] The arena is already disabled!=
 [!] You can't disable an arena during an ongoing game!=
-[!] The arena you were queueing for has been disabled!=
+[!] The arena you were queueing for has been disabled... :(=
 Arena @1 successfully disabled=
 @1 wins the game=
 @1 has been eliminated=
 @1 has been kicked=
-@1 has quit the arena=
-@1 has left the game=
+@1 has quit the match=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 You're the last player standing: you win!=
@@ -41,13 +40,6 @@ You win the game due to not enough players=
 # debug_utilities.lua
 name: =
 Total arenas: =
-Name: =
-Enabled: =
-Sign: =
-Players required: =
-Players supported: =
-Players inside: =
-Status: =
 in queue=
 loading=
 in game=
@@ -55,6 +47,13 @@ celebrating=
 waiting=
 Timer: =
 current: =
+Name: =
+Players required: =
+Players supported: =
+Players inside: =
+Enabled: =
+Status: =
+Sign: =
 Spawn points: =
 Properties: =
 Temp properties: =
@@ -65,24 +64,49 @@ Player: =
 
 # items.lua
 You're immune!=
-Left click on a sign to create/remove the access to the arena=
-[!] That's not a sign!=
 
 # signs.lua
 [!] The arena is not enabled!=
-Get ready!=
-The queue has been cancelled due to not enough players=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
 [!] This minigame doesn't allow to join while in progress!=
-@1 has joined the game=
-You've entered the arena @1=
-The game begins in @1 seconds!=
+Waiting for more players...=
+The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=
-Left click on a sign to set the arena=
+The game begins in @1 seconds!=
+Get ready!=
 # signs_lib gives troubles atm
 #WIP=
 #Terminating=
 #Ongoing=
 #Loading=
 #Waiting=
+
+# utils.lua
+[!] This arena doesn't exist!=
+[!] You must disable the arena first!=
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
+
+# editor_main.lua
+Arena_lib editor | Now editing: @1=
+
+# editor_icons.lua
+Spawners=
+Spawners | sel. ID: @1 (right click slot #2 to change)=
+Signs=
+One sign per arena=
+Info=
+Go back=
+Leave the editor=
+
+
+# tools_spawner.lua
+Add spawner=
+Remove spawner=
+Delete all spawners=
+All the spawn points has been removed=
+
+# tools_sign.lua
+Add sign=
+Remove sign=
+

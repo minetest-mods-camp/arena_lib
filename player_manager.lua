@@ -2,6 +2,20 @@ minetest.register_on_joinplayer(function(player)
 
   arena_lib.HUD_add(player)
 
+  -- nel caso qualcuno si fosse disconnesso da dentro all'editor o fosse crashato il server con qualcuno nell'editor
+  if player:get_inventory():contains_item("main", "arena_lib:editor_quit") then
+
+    local p_meta = player:get_meta()
+
+    p_meta:set_string("arena_lib_editor.mod", "")
+    p_meta:set_string("arena_lib_editor.arena", "")
+    p_meta:set_string("arena_lib_editor.spawner_ID", "")
+
+    if minetest.get_modpath("hub_manager") then return end          -- se c'è hub_manager, ci pensa quest'ultimo allo svuotamento dell'inventario
+
+    player:get_inventory():set_list("main", {})
+  end
+
 end)
 
 
@@ -10,6 +24,7 @@ minetest.register_on_leaveplayer(function(player)
     local p_name = player:get_player_name()
 
     arena_lib.remove_player_from_arena(p_name)
+    arena_lib.quit_editor(player)
 end)
 
 

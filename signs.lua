@@ -21,7 +21,12 @@ minetest.override_item("default:sign_wall", {
       local sign_arena = mod_ref.arenas[arenaID]
       local p_name = puncher:get_player_name()
 
-      if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere e non fa crashare
+      if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere senza far crashare
+
+      -- se si è nell'editor
+      if arena_lib.is_player_in_edit_mode(p_name) then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
+        return end
 
       -- se non è abilitata
       if not sign_arena.enabled then
@@ -185,27 +190,6 @@ minetest.override_item("default:sign_wall", {
     end,
 
 })
-
-
-
-function arena_lib.give_sign_tool(sender, mod, arena_name)
-
-
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-  if arena == nil then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-   return end
-
-  -- assegno item creazione arene con nome mod e ID arena nei metadati da restituire al premere sul cartello.
-  -- uso l'ID e non il nome perché (in futuro) si potrà rinominare un'arena
-  local stick = ItemStack("arena_lib:create_sign")
-  local meta = stick:get_meta()
-  meta:set_string("mod", mod)
-  meta:set_int("arenaID", arena_ID)
-
-  minetest.get_player_by_name(sender):set_wielded_item(stick)
-  minetest.chat_send_player(sender, S("Left click on a sign to set the arena"))
-end
 
 
 
