@@ -12,7 +12,7 @@ local storage = minetest.get_mod_storage()
 
 local function init_storage() end
 local function update_storage() end
-local function new_arena() end
+local function copy_table() end
 local function next_available_ID() end
 local function timer_start() end
 
@@ -198,7 +198,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   return end
 
   -- creo l'arena
-  mod_ref.arenas[ID] = new_arena(arena_default)
+  mod_ref.arenas[ID] = copy_table(arena_default)
 
   local arena = mod_ref.arenas[ID]
 
@@ -499,6 +499,14 @@ function arena_lib.load_arena(mod, arena_ID)
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
 
+  local shuffled_spawners = copy_table(arena.spawn_points)
+
+  -- randomizzo gli spawner
+  for i = #shuffled_spawners, 2, -1 do
+    local j = math.random(i)
+    shuffled_spawners[i], shuffled_spawners[j] = shuffled_spawners[j], shuffled_spawners[i]
+  end
+
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
 
@@ -520,7 +528,7 @@ function arena_lib.load_arena(mod, arena_ID)
               })
 
     -- teletrasporto i giocatori
-    player:set_pos(arena.spawn_points[count])
+    player:set_pos(arena.shuffled_spawners[count])
 
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
@@ -1068,15 +1076,15 @@ end
 
 --[[ Dato che in Lua non è possibile istanziare le tabelle copiandole, bisogna istanziare ogni campo in una nuova tabella.
      Ricorsivo per le sottotabelle. Codice da => http://lua-users.org/wiki/CopyTable]]
-function new_arena(orig)
+function copy_table(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[new_arena(orig_key)] = new_arena(orig_value)
+            copy[copy_table(orig_key)] = copy_table(orig_value)
         end
-        setmetatable(copy, new_arena(getmetatable(orig)))
+        setmetatable(copy, copy_table(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
