@@ -13,7 +13,7 @@ local storage = minetest.get_mod_storage()
 local function init_storage() end
 local function update_storage() end
 local function new_arena() end
-local function next_ID() end
+local function next_available_ID() end
 local function timer_start() end
 
 local players_in_game = {}    --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
@@ -37,19 +37,28 @@ local arena_default = {
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.register_minigame(mod, def)
 
-  local mod_ref = minetest.deserialize(storage:get_string(mod))
+  local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
-  -- se la mod non esiste nello storage, la creo da zero
-  if not mod_ref then
+  --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
+  -- the old storage (2.7.0 and lesser) kept a lot of unneccessary parameters;
+  -- the only one really needed is highest_arena_ID (previously arenasID) to iterate
+  -- in the initialisation (init_storage)
+  local legacy_mod_ref = minetest.deserialize(storage:get_string(mod))
 
-    minetest.log("action", "[ARENA_LIB] new minigame found: " .. mod .. ". Initialising...")
-
-    arena_lib.mods[mod] = {}
-    arena_lib.mods[mod].arenas = {}      -- KEY: (int) arenaID , VALUE: (table) arena properties
-    arena_lib.mods[mod].arenasID = 1     -- il contatore degli ID delle arene; inizia da 1
-
-    mod_ref = arena_lib.mods[mod]
+  if legacy_mod_ref then
+    minetest.log("action", "[ARENA_LIB] cleaning up the remnants of the old storage...")
+    highest_arena_ID = legacy_mod_ref.arenasID
+    storage:set_int(mod .. ".HIGHEST_ARENA_ID", highest_arena_ID)
+    storage:set_string(mod, "")
+    minetest.log("action", "[ARENA_LIB] ...storage fresh and clean!")
   end
+  --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
+
+  arena_lib.mods[mod] = {}
+  arena_lib.mods[mod].arenas = {}           -- KEY: (int) arenaID , VALUE: (table) arena properties
+  arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
+
+  local mod_ref = arena_lib.mods[mod]
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
@@ -137,10 +146,10 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.player_properties = def.player_properties
   end
 
-  storage:set_string(mod, minetest.serialize(mod_ref))
   init_storage(mod, mod_ref)
 
 end
+
 
 
 --[!!!] add this to your code only if you need to add some new property to your
@@ -181,17 +190,17 @@ end
 function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
 
   local mod_ref = arena_lib.mods[mod]
-  mod_ref.arenasID = next_ID(mod_ref)
+  local ID = next_available_ID(mod_ref)
 
   -- controllo che non ci siano duplicati
-  if mod_ref.arenasID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
+  if ID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
   return end
 
   -- creo l'arena
-  mod_ref.arenas[mod_ref.arenasID] = new_arena(arena_default)
+  mod_ref.arenas[ID] = new_arena(arena_default)
 
-  local arena = mod_ref.arenas[mod_ref.arenasID]
+  local arena = mod_ref.arenas[ID]
 
   -- sovrascrivo con i parametri della funzione
   arena.name = arena_name
@@ -210,10 +219,12 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     arena[temp_property] = value
   end
 
+  mod_ref.highest_arena_ID = table.maxn(mod_ref.arenas)
+
   -- aggiungo allo storage
-  update_storage(false, mod, mod_ref.arenasID, arena)
-  --aggiorno l'ID globale nello storage
-  storage:set_string(mod, minetest.serialize(mod_ref))
+  update_storage(false, mod, ID, arena)
+  -- aggiorno l'ID globale nello storage
+  storage:set_int(mod .. ".HIGHEST_ARENA_ID", mod_ref.highest_arena_ID)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 succesfully created", arena_name))
 
@@ -236,9 +247,13 @@ function arena_lib.remove_arena(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
 
-  -- rimozione arena e aggiornamento storage
+  -- rimozione arena e aggiornamento highest_arena_ID
   mod_ref.arenas[id] = nil
-  update_storage(true, mod, id, arena)
+  mod_ref.highest_arena_ID = table.maxn(mod_ref.arenas)
+
+  -- rimozione nello storage
+  update_storage(true, mod, id)
+
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully removed", arena_name))
 
 end
@@ -990,8 +1005,7 @@ function init_storage(mod, mod_ref)
   arena_lib.mods[mod] = mod_ref
 
   -- aggiungo le arene
-  local i = 1
-  for i = 1, arena_lib.mods[mod].arenasID do
+  for i = 1, arena_lib.mods[mod].highest_arena_ID do
 
     local arena_str = storage:get_string(mod .. "." .. i)
 
@@ -999,8 +1013,15 @@ function init_storage(mod, mod_ref)
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
 
-      --TEMP: to remove in 3.0
-      arena.players_amount = 0
+      --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
+      local to_convert = false
+
+      -- add the players_amount parameter for 2.6.0 and lesser versions
+      if not arena.players_amount then
+        to_convert = true
+        arena.players_amount = 0
+      end
+      --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
       -- controlli timer
       if mod_ref.timer == -1 and arena.timer then                   -- se avevo abilitato i timer e ora li ho rimossi, li tolgo dalle arene
@@ -1011,19 +1032,18 @@ function init_storage(mod, mod_ref)
 
       arena_lib.mods[mod].arenas[i] = arena
 
+      if to_convert then
+        update_storage(false, mod, i, arena)
+      end
+
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
         if arena.sign.x then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
           arena_lib.update_sign(arena.sign, arena)
         end
       end)
-    else
-      -- se un'arena è stata cancellata, è comunque rimasta in mod_ref (perché
-      -- viene aggiornato solo all'avvio). Per ovviare a ciò, bisogna cancellarle
-      -- all'avvio
-      arena_lib.mods[mod].arenas[i] = nil
-    end
 
+    end
   end
   minetest.log("action", "[ARENA_LIB] Mini-game " .. mod .. " loaded")
 end
@@ -1037,9 +1057,11 @@ function update_storage(erase, mod, id, arena)
 
   if erase then
     storage:set_string(entry, "")
+    storage:set_string(mod .. ".HIGHEST_ARENA_ID", arena_lib.mods[mod].highest_arena_ID)
   else
     storage:set_string(entry, minetest.serialize(arena))
   end
+
 end
 
 
@@ -1063,14 +1085,14 @@ end
 
 
 
---[[ l'ID di base parte da 1 (n+1) per non generare errori, tipo "if arenaID == 0" al verificare se non esiste.
-     In una sequenza 0, 1, 2, 3 se si rimuove "2" e si aggiunge un nuovo ID perciò si avrà 0, 1, 3, 4]]
-function next_ID(mod_ref)
-  local n = 0
-  for id, arena in pairs(mod_ref.arenas) do
-    if id > n then n = id end
+-- l'ID di base parte da 1 (n+1). Se la sequenza è 1, 3, 4, grazie a ipairs la
+-- funzione vede che manca 2 nella sequenza e ritornerà 2
+function next_available_ID(mod_ref)
+  local id = 0
+  for k, v in ipairs(mod_ref.arenas) do
+    id = k
   end
-  return n + 1
+  return id +1
 end
 
 
