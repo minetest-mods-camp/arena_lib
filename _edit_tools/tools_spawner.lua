@@ -1,11 +1,11 @@
 local S = minetest.get_translator("arena_lib")
 local spawners_tools_team = {
-  "arena_lib:spawner_add",
+  "arena_lib:spawner_team_add",
+  "arena_lib:spawner_team_remove",
+  "arena_lib:spawner_team_switch",
   "",
-  "cambia team",
-  "cancella per team",
   "arena_lib:spawner_deleteall",
-  "",
+  "arena_lib:spawner_team_deleteall",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
 }
@@ -54,7 +54,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
 
-    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, "delete", spawner_ID)
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID)
   end,
 
 
@@ -65,7 +65,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
     local spawner_ID = placer:get_meta():get_int("arena_lib_editor.spawner_ID")
     local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-    if spawner_ID >= #arena.spawn_points then
+    if spawner_ID >= table.maxn(arena.spawn_points) then
       spawner_ID = 1
     else
       spawner_ID = spawner_ID +1
@@ -73,6 +73,99 @@ minetest.register_tool("arena_lib:spawner_remove", {
 
     placer:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
     arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
+  end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spawner_team_add", {
+
+  description = S("Add team spawner"),
+  inventory_image = "arenalib_tool_spawner_team_add.png",
+  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_place = function() end,
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+
+    local mod = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+    local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
+
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, team_ID)
+  end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spawner_team_remove", {
+
+  description = S("Remove team spawner"),
+  inventory_image = "arenalib_tool_spawner_team_remove.png",
+  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+
+    local mod = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+    local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
+    local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
+
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID)
+  end,
+
+
+  on_place = function(itemstack, placer, pointed_thing)
+
+    local mod = placer:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
+    local spawner_ID = placer:get_meta():get_int("arena_lib_editor.spawner_ID")
+    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+    if spawner_ID >= table.maxn(arena.spawn_points) then
+      spawner_ID = 1
+    else
+      spawner_ID = spawner_ID +1
+    end
+
+    placer:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
+    arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
+  end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spawner_team_switch", {
+
+  description = S("Switch team"),
+  inventory_image = "arenalib_tool_spawner_team_switch.png",
+  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_place = function() end,
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+
+    local mod = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+    local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
+    local mod_ref = arena_lib.mods[mod]
+
+    if team_ID >= table.maxn(mod_ref.teams) then
+      team_ID = 1
+    else
+      team_ID = team_ID +1
+    end
+
+    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+    minetest.chat_send_player(user:get_player_name(), S("Selected team: @1", mod_ref.teams[team_ID]))
+
+    user:get_meta():set_int("arena_lib_editor.team_ID", team_ID)
+    user:get_meta():set_int("arena_lib_editor.spawner_ID", 1)
   end
 
 })
@@ -93,8 +186,29 @@ minetest.register_tool("arena_lib:spawner_deleteall", {
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local p_name = user:get_player_name()
 
-    arena_lib.set_spawner(p_name, mod, arena_name, "deleteall")
-    minetest.chat_send_player(user:get_player_name(), S("All the spawn points has been removed"))
+    arena_lib.set_spawner(p_name, mod, arena_name, nil, "deleteall")
+  end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spawner_team_deleteall", {
+
+  description = S("Delete all spawners of the team"),
+  inventory_image = "arenalib_tool_spawner_team_deleteall.png",
+  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_place = function() end,
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+
+    local mod = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+    local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
+    local p_name = user:get_player_name()
+
+    arena_lib.set_spawner(p_name, mod, arena_name, team_ID, "deleteall")
   end
 
 })

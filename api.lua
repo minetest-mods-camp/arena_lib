@@ -12,8 +12,9 @@ local storage = minetest.get_mod_storage()
 
 local function init_storage() end
 local function update_storage() end
-local function new_arena() end
+local function copy_table() end
 local function next_available_ID() end
+local function assign_team_spawner() end
 local function timer_start() end
 
 local players_in_game = {}    --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
@@ -23,8 +24,10 @@ local arena_default = {
   name = "",
   sign = {},
   players = {},               --KEY: player name, INDEX: kills, deaths, player_properties
+  teams = nil,
   players_amount = 0,
-  spawn_points = {},
+  players_amount_per_team = nil,
+  spawn_points = {},          --KEY: ids, INDEX: {position, team}
   max_players = 4,
   min_players = 2,
   in_queue = false,
@@ -78,6 +81,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
+  mod_ref.team_properties = {}
 
   if def.prefix then
     mod_ref.prefix = def.prefix
@@ -146,6 +150,10 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.player_properties = def.player_properties
   end
 
+  if def.team_properties then
+    mod_ref.team_properties = def.team_properties
+  end
+
   init_storage(mod, mod_ref)
 
 end
@@ -198,7 +206,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   return end
 
   -- creo l'arena
-  mod_ref.arenas[ID] = new_arena(arena_default)
+  mod_ref.arenas[ID] = copy_table(arena_default)
 
   local arena = mod_ref.arenas[ID]
 
@@ -209,12 +217,31 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     arena.max_players = max_players
   end
 
-  -- aggiungo le proprietà custom
+  -- eventuali team
+  if next(mod_ref.teams) then
+    arena.teams = {}
+    arena.players_amount_per_team = {}
+
+    for k, t_name in pairs(mod_ref.teams) do
+      arena.teams[k] = {name = t_name}
+      arena.players_amount_per_team[k] = 0
+    
+      -- e loro eventuali proprietà
+      for j, w in pairs(mod_ref.team_properties) do
+        arena.teams[k][j] = w
+      end
+    end
+    
+  else
+    arena.teams = {-1}
+  end
+
+  -- aggiungo eventuali proprietà custom
   for property, value in pairs(mod_ref.properties) do
     arena[property] = value
   end
 
-  -- e quelle temp custom
+  -- temp custom
   for temp_property, value in pairs(mod_ref.temp_properties) do
     arena[temp_property] = value
   end
@@ -263,11 +290,29 @@ end
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
-function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
+function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+
+  local mod_ref = arena_lib.mods[mod]
+  local team
+  local team_ID
+
+  if teamID_or_name then
+    if type(teamID_or_name) == "number" then
+      team_ID = teamID_or_name
+      team = mod_ref.teams[teamID_or_name]
+    elseif type(teamID_or_name) == "string" then
+      team = teamID_or_name
+    end
+
+    -- controllo team
+    if not arena_lib.is_team_declared(mod_ref, team) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
+      return end
+  end
 
   local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
   local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                          -- alzo Y di uno sennò tippa nel blocco
@@ -278,27 +323,49 @@ function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
     -- se overwrite, sovrascrivo
     if param == "overwrite" then
 
-      -- se lo spawner da sovrascrivere non esiste, annullo
-      if arena.spawn_points[ID] == nil then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
-      return end
+      -- è inutile specificare un team. Avviso per non confondere
+      if team then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
+        return end
 
-      arena.spawn_points[ID] = pos_Y_up
+      -- se lo spawner da sovrascrivere non esiste, annullo
+      if arena.spawn_points[ID].pos == nil then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
+        return end
+
+      arena.spawn_points[ID].pos = pos_Y_up
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
 
     -- se delete, cancello
     elseif param == "delete" then
 
+      -- è inutile specificare un team. Avviso per non confondere
+      if team then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
+        return end
+
       if arena.spawn_points[ID] == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
-      return end
+        return end
 
-      table.remove(arena.spawn_points, ID)
+      --TODO: switch migliore dato che ci stanno dentro anche i team
+      arena.spawn_points[ID] = nil
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
 
     -- se deleteall, li cancello tutti
     elseif param == "deleteall" then
-      arena.spawn_points = {}
+
+      if team then
+        for id, spawner in pairs(arena.spawn_points) do
+          if spawner.team == team then
+            arena.spawn_points[id] = nil
+          end
+        end
+        minetest.chat_send_player(sender, S("All the spawn points belonging to team @1 have been removed", team))
+      else
+        arena.spawn_points = {}
+        minetest.chat_send_player(sender, S("All the spawn points have been removed"))
+      end
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
     end
@@ -307,23 +374,63 @@ function arena_lib.set_spawner(sender, mod, arena_name, param, ID)
 
   -- sennò sto creando un nuovo spawner
 
-  local spawn_points_count = arena_lib.get_arena_spawners_count(arena)
+  -- se c'è già uno spawner in quel punto, annullo
+  for id, spawn in pairs(arena.spawn_points) do
+    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn.pos) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
+      return end
+  end
+
+  local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team)    -- (se team è nil, ritorna in automatico i punti spawn totali)
 
   -- se provo a impostare uno spawn point di troppo, annullo
   if spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
   return end
 
-  -- se c'è già uno spawner in quel punto, annullo
-  for id, spawn in pairs(arena.spawn_points) do
-    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
-      return end
+  local next_available_spawnID = 1
+
+  if team then
+    -- ottengo l'ID del team se non mi è stato passato come parametro
+    if type(team_ID) ~= "number" then
+      for i = 1, #arena.teams do
+        if arena.teams[i].name == team then
+          team_ID = i
+        end
+      end
+    end
+
+    -- prendo il primo spawner di quel team
+    next_available_spawnID = 1 + (arena.max_players * (team_ID -1))
+
+    -- se già esiste...
+    if arena.spawn_points[next_available_spawnID] then
+
+      -- ...itero tra gli spawner seguenti finché non ne trovo uno vuoto
+      while next(arena.spawn_points, next_available_spawnID) do
+        -- ma se il next mi trova uno spawner con distacco > 1, vuol dire che sono al capolinea
+        -- perché quello trovato appartiene o a un altro team o è un buco nello stesso team (ottenuto dal cancellare). Rompo l'iterare
+        if next(arena.spawn_points, i) ~= i+1 then
+          break
+        end
+        next_available_spawnID = next_available_spawnID +1
+      end
+
+      -- trovato quello vuoto, porto next_available_spawnID alla sua posizione (+1)
+      next_available_spawnID = next_available_spawnID +1
+    end
+
+  else
+    -- ottengo l'ID del prossimo spawner disponibile
+    for k, v in ipairs(arena.spawn_points) do
+      next_available_spawnID = k +1
+    end
   end
 
-  -- sovrascrivo/creo lo spawnpoint
-  arena.spawn_points[spawn_points_count +1] = pos_Y_up
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", spawn_points_count +1))
+  -- imposto lo spawner
+  arena.spawn_points[next_available_spawnID] = {pos = pos_Y_up, team = team}
+
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
 
   update_storage(false, mod, id, arena)
 end
@@ -421,8 +528,10 @@ function arena_lib.enable_arena(sender, mod, arena_name)
 
   if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
+  local arena_max_players = arena.max_players * #arena.teams
+
   -- check requisiti: spawner
-  if arena_lib.get_arena_spawners_count(arena) < arena.max_players then
+  if arena_lib.get_arena_spawners_count(arena) < arena_max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Insufficient spawners, the arena can't be enabled!")))
     arena.enabled = false
   return end
@@ -432,6 +541,11 @@ function arena_lib.enable_arena(sender, mod, arena_name)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Sign not set, the arena can't be enabled!")))
     arena.enabled = false
   return end
+
+  -- se sono nell'editor, vengo buttato fuori
+  if arena_lib.is_player_in_edit_mode(sender) then
+    arena_lib.quit_editor(minetest.get_player_by_name(sender))
+  end
 
   local mod_ref = arena_lib.mods[mod]
 
@@ -463,16 +577,25 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   return end
 
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
-  for pl_name, stats in pairs(arena.players) do
+  if next(arena.players) then
+    for pl_name, stats in pairs(arena.players) do
 
-    players_in_queue[pl_name] = nil
-    arena.players[pl_name] = nil
-    arena.in_queue = false
-    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :()")))
+      arena_lib.HUD_hide("all", arena)
+      players_in_queue[pl_name] = nil
+      arena.players[pl_name] = nil
+      arena.in_queue = false
+      minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :(")))
+
+    end
+    -- svuoto l'arena
+    arena.players_amount = 0
+    if #arena.teams > 1 then
+      for k, v in pairs(arena.players_amount_per_team) do
+        arena.players_amount_per_team[k] = 0
+      end
+    end
 
   end
-
-  arena.players_amount = 0
 
   -- disabilito
   arena.enabled = false
@@ -492,12 +615,42 @@ end
 -- per tutti i giocatori quando finisce la coda
 function arena_lib.load_arena(mod, arena_ID)
 
+  -- my child, let's talk about some black magic: in order to teleport players in their team spawners, first of all I need to
+  -- sort them by team. Once it's done, I need to skip every spawner of that team if the maximum number of players is not reached:
+  -- otherwise, people will find theirselves in the wrong team (and you don't want that to happen). So I use this int to prevent it,
+  -- which increases of 1 or more every time I look for a spawner, comparing the 'team' spawner value to the player's. This happens
+  -- in assign_team_spawner, which also returns the new value for team_count
+  local team_count = 1
+
   local count = 1
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
 
   arena.in_loading = true
   arena_lib.update_sign(arena.sign, arena)
+
+  local shuffled_spawners = copy_table(arena.spawn_points)
+  local sorted_team_players = {}
+
+  -- randomizzo gli spawner se non è a team
+  if #arena.teams == 1 then
+    for i = #shuffled_spawners, 2, -1 do
+      local j = math.random(i)
+      shuffled_spawners[i], shuffled_spawners[j] = shuffled_spawners[j], shuffled_spawners[i]
+    end
+  -- sennò ordino i giocatori per team
+  else
+    local j = 1
+    for i = 1, #arena.teams do
+      for pl_name, pl_stats in pairs(arena.players) do
+        if pl_stats.teamID == i then
+          sorted_team_players[j] = {name = pl_name, team = arena.teams[pl_stats.teamID].name}
+          j = j +1
+        end
+      end
+    end
+  end
+
 
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
@@ -520,7 +673,11 @@ function arena_lib.load_arena(mod, arena_ID)
               })
 
     -- teletrasporto i giocatori
-    player:set_pos(arena.spawn_points[count])
+    if #arena.teams == 1 then
+      player:set_pos(shuffled_spawners[count].pos)
+    else
+      team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].team)
+    end
 
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
@@ -533,6 +690,7 @@ function arena_lib.load_arena(mod, arena_ID)
 
     count = count +1
   end
+
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_load then
@@ -601,7 +759,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:get_inventory():set_list("main",{})
   end
 
-  player:set_pos(arena_lib.get_random_spawner(arena))
+  player:set_pos(arena_lib.get_random_spawner(arena, p_name))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
@@ -611,13 +769,23 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
 end
 
 
---a partita finita
+-- a partita finita.
+-- winner_name può essere stringa (no team) o tabella di nomi (team)
 function arena_lib.load_celebration(mod, arena, winner_name)
 
   local mod_ref = arena_lib.mods[mod]
+  local winning_message = ""
 
   arena.in_celebration = true
   arena_lib.update_sign(arena.sign, arena)
+  
+  if type(winner_name) == "string" then
+    winning_message = S("@1 wins the game", winner_name)
+  elseif type(winner_name) == "table" then
+    local winner_team_ID = arena.players[winner_name[1]].teamID
+    winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
+  end
+    
 
   for pl_name, stats in pairs(arena.players) do
 
@@ -629,7 +797,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
     end
 
     minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    minetest.chat_send_player(pl_name, mod_ref.prefix  .. S("@1 wins the game", winner_name))
+    minetest.chat_send_player(pl_name, mod_ref.prefix  .. winning_message)
   end
 
   -- eventuale codice aggiuntivo
@@ -690,6 +858,21 @@ function arena_lib.end_arena(mod_ref, mod, arena)
       arena[temp_property] = {}
     end
   end
+  
+  -- e quelle eventuali di team
+  if #arena.teams > 1 then
+    for team_property, v in pairs(arena.team_properties) do
+      if type(v) == "string" then
+        arena[team_property] = ""
+      elseif type(v) == "number" then
+        arena[team_property] = 0
+      elseif type(v) == "boolean" then
+        arena[team_property] = false
+      elseif type(v) == "table" then
+        arena[team_property] = {}
+      end
+    end
+  end
 
   local id = arena_lib.get_arena_by_name(mod, arena.name)
 
@@ -748,13 +931,14 @@ end
 
 
 
-function arena_lib.is_player_in_queue(p_name)
+function arena_lib.is_player_in_queue(p_name, mod)
 
   if not players_in_queue[p_name] then
     return false
   else
+
     -- se il campo mod è specificato, controllo che sia lo stesso
-    if mod ~= nil then
+    if mod then
       if players_in_queue[p_name].minigame == mod then return true
       else return false
       end
@@ -763,6 +947,20 @@ function arena_lib.is_player_in_queue(p_name)
     return true
 
   end
+end
+
+
+
+function arena_lib.is_team_declared(mod_ref, team_name)
+
+  if not mod_ref.teams then return false end
+
+  for _, t_name in pairs(mod_ref.teams) do
+    if team_name == t_name then
+      return true
+    end
+  end
+  return false
 end
 
 
@@ -790,11 +988,16 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   if arena == nil then return end
 
+  local p_team_ID = arena.players[p_name].teamID
+
   -- lo rimuovo
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
   arena.players_amount = arena.players_amount - 1
+  if #arena.teams > 1 then
+    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
+  end
 
   arena_lib.update_sign(arena.sign, arena)
 
@@ -843,16 +1046,40 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
+    
     local timer = minetest.get_node_timer(arena.sign)
+    local arena_min_players = arena.min_players * #arena.teams
+    local arena_max_players = arena.max_players * #arena.teams
 
-    if arena.players_amount < arena.min_players then
+    if arena.players_amount < arena_min_players then
       timer:stop()
       arena.in_queue = false
-      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena.max_players .. " | " ..
-        S("Waiting for more players...") .. " (" .. arena.min_players - arena.players_amount .. ")")
+      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players .. " | " ..
+        S("Waiting for more players...") .. " (" .. arena_min_players - arena.players_amount .. ")")
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
     end
 
+  -- se invece ha i team e sono rimasti solo i giocatori di un team, il loro team vince
+  elseif #arena.teams > 1 and arena.players_amount < arena.min_players * #arena.teams then
+    
+    local team_to_compare
+    
+    for i = 1, #arena.players_amount_per_team do
+      if arena.players_amount_per_team[i] ~= 0 then
+        team_to_compare = i
+        break
+      end
+    end
+    
+    for _, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID ~= team_to_compare then
+        return
+      end
+    end
+    
+    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
+    arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
+  
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
 
@@ -866,7 +1093,6 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       arena_lib.load_celebration(mod, arena, pl_name)
     end
   end
-
 end
 
 
@@ -874,6 +1100,20 @@ end
 function arena_lib.send_message_players_in_arena(arena, msg)
   for pl_name, stats in pairs(arena.players) do
     minetest.chat_send_player(pl_name, msg) end
+end
+
+
+
+function arena_lib.assign_team(arena, p_name)
+  local assigned_team_ID = 1
+
+  for i = 1, #arena.teams do
+    if arena.players_amount_per_team[i] < arena.players_amount_per_team[assigned_team_ID] then
+      assigned_team_ID = i
+    end
+  end
+
+  return assigned_team_ID
 end
 
 
@@ -926,6 +1166,24 @@ end
 
 
 
+-- ritorna tabella di nomi giocatori, o di giocatori se to_players == true
+function arena_lib.get_players_in_team(arena, team_ID, to_players)
+  local players = {}
+  for pl_name, pl_stats in pairs(arena.players) do
+    if pl_stats.teamID == team_ID then
+      if to_players then
+        table.insert(players, minetest.get_player_by_name(pl_name))
+      else
+        table.insert(players, pl_name)
+      end
+    end
+  end
+  
+  return players
+end
+
+
+
 function arena_lib.get_mod_by_player(p_name)
   if arena_lib.is_player_in_arena(p_name) then
     return players_in_game[p_name].minigame
@@ -970,14 +1228,31 @@ end
 
 
 
-function arena_lib.get_arena_spawners_count(arena)
-  return table.maxn(arena.spawn_points)
+function arena_lib.get_arena_spawners_count(arena, team)
+  local count = 0
+  for _, spawner in pairs(arena.spawn_points) do
+    if team then
+      if spawner.team == team then
+        count = count +1
+      end
+    else
+      count = count +1
+    end
+  end
+  return count
 end
 
 
 
-function arena_lib.get_random_spawner(arena)
-  return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))]
+function arena_lib.get_random_spawner(arena, p_name)
+  if #arena.teams > 1 then
+    local team_ID = arena.players[p_name].teamID
+    local min = 1 + (arena.max_players * (team_ID - 1))
+    local max = arena.max_players * team_ID
+    return arena.spawn_points[math.random(min, max)].pos
+  else
+    return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))].pos
+  end
 end
 
 
@@ -1016,17 +1291,50 @@ function init_storage(mod, mod_ref)
       --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
       local to_convert = false
 
-      -- add the players_amount parameter for 2.6.0 and lesser versions
+      -- add the 'players_amount' parameter for 2.6.0 and lesser versions
       if not arena.players_amount then
         to_convert = true
         arena.players_amount = 0
+        minetest.log("action", "[ARENA_LIB] Added '.players_amount' property from 2.7.0")
+      end
+
+      -- spawners conversion from 2.7.0 to 3.0+ version
+      if next(arena.spawn_points) then
+        if arena.spawn_points[next(arena.spawn_points)].x ~= nil then
+          to_convert = true
+          minetest.log("action", "[ARENA_LIB] Converting old spawn points for arena " .. arena.name)
+          for id, coords in pairs(arena.spawn_points) do
+            arena.spawn_points[id] = {pos = coords}
+            minetest.log("action", "[ARENA_LIB] Spawn point #" .. id .. "(" .. minetest.pos_to_string(arena.spawn_points[id].pos) .. ") converted")
+          end
+        end
       end
       --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
-      -- controlli timer
-      if mod_ref.timer == -1 and arena.timer then                   -- se avevo abilitato i timer e ora li ho rimossi, li tolgo dalle arene
+      -- gestione team
+      if #arena.teams > 1 and not next(mod_ref.teams) then               -- se avevo abilitato i team e ora li ho rimossi
+        arena.players_amount_per_team = nil
+        arena.teams = {-1}
+      elseif next(mod_ref.teams) then                                           -- sennò li genero
+        arena.players_amount_per_team = {}
+        arena.teams = {}
+
+        for k, t_name in pairs(mod_ref.teams) do
+          arena.players_amount_per_team[k] = 0
+          arena.teams[k] = {name = t_name}
+          
+          -- e loro eventuali proprietà
+          for j, w in pairs(mod_ref.team_properties) do
+            arena.teams[k][j] = w
+          end
+        end
+        
+      end
+
+      -- gestione timer
+      if mod_ref.timer == -1 and arena.timer then                             -- se avevo abilitato i timer e ora li ho rimossi, li tolgo dalle arene
         arena.timer = nil
-      elseif mod_ref.timer ~= -1 and not arena.timer then           -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
+      elseif mod_ref.timer ~= -1 and not arena.timer then                     -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
         arena.timer = mod_ref.timer
       end
 
@@ -1068,15 +1376,15 @@ end
 
 --[[ Dato che in Lua non è possibile istanziare le tabelle copiandole, bisogna istanziare ogni campo in una nuova tabella.
      Ricorsivo per le sottotabelle. Codice da => http://lua-users.org/wiki/CopyTable]]
-function new_arena(orig)
+function copy_table(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[new_arena(orig_key)] = new_arena(orig_value)
+            copy[copy_table(orig_key)] = copy_table(orig_value)
         end
-        setmetatable(copy, new_arena(getmetatable(orig)))
+        setmetatable(copy, copy_table(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
@@ -1093,6 +1401,20 @@ function next_available_ID(mod_ref)
     id = k
   end
   return id +1
+end
+
+
+
+function assign_team_spawner(spawn_points, ID, p_name, p_team)
+  
+  minetest.log("action", p_team)
+
+  for i = ID, #spawn_points do
+    if p_team == spawn_points[i].team then
+      minetest.get_player_by_name(p_name):set_pos(spawn_points[i].pos)
+      return i+1
+    end
+  end
 end
 
 

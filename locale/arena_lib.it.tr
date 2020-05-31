@@ -7,13 +7,17 @@
 [!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
 Arena @1 succesfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
+[!] This team doesn't exist!=[!] Questo team non esiste!
 [!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
+[!] No team must be specified for this function!=[!] Non va specificato nessun team per questa funzione!
 Spawn point #@1 successfully overwritten=Punto di spawn #@1 sovrascritto con successo
 [!] No spawner with that ID to delete!=[!] Nessuno spawner con quell'ID da cancellare!
+All the spawn points belonging to team @1 have been removed=Tutti i punti di spawn appartenenti al team @1 sono stati rimossi
+All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
 Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
 [!] Unknown parameter!=[!] Parametro non riconosciuto!
-[!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
 [!] There's already a spawn in this point!=[!] C'è già uno spawn in questo punto!
+[!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
 Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
 [!] That's not a sign!=[!] Questo non è un cartello!
 Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
@@ -34,12 +38,15 @@ Arena @1 successfully disabled=Arena @1 disabilitata con successo
 @1 has quit the match=@1 ha abbandonato la partita
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
+There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
 
 # debug_utilities.lua
 name: =nome: 
 Total arenas: =Arene totali: 
+Players required per team: =Giocatori minimi per squadra: 
+Players supported per team: =Giocatori massimi per squadra: 
 in queue=in coda
 loading=in caricamento
 in game=in partita
@@ -48,15 +55,17 @@ waiting=in attesa
 Timer: =Timer: 
 current: =corrente: 
 Name: =Nome: 
-Enabled: =Abilitata: 
+Teams: =Squadre: 
 Players required: =Giocatori minimi: 
 Players supported: =Giocatori massimi: 
 Players inside: =Giocatori dentro: 
+Enabled: =Abilitata: 
 Status: =Stato: 
 Sign: =Cartello: 
 Spawn points: =Punti di spawn: 
 Properties: =Proprietà: 
 Temp properties: =Proprietà temporanee: 
+Team properties: =Proprietà squadra: 
 [!] No ongoing game! =[!] Nessuna partita in corso!
 Player: =Giocatore: 
 , kills: =, uccisioni: 
@@ -67,6 +76,7 @@ You're immune!=Sei immune!
 
 
 # signs.lua
+[!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 [!] The arena is not enabled!=[!] L'arena non è attiva!
 [!] The arena is already full!=[!] L'arena è già piena!
 [!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
@@ -74,6 +84,7 @@ You're immune!=Sei immune!
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 @1 seconds for the match to start=@1 secondi all'inizio
+You've joined team @1=Ti sei unito al team @1
 The game begins in @1 seconds!=La partita inizierà tra @1 secondi!
 Get ready!=Preparati!
 # signs_lib gives troubles atm
@@ -104,8 +115,12 @@ Leave the editor=Esci dall'editor
 # tools_spawner.lua
 Add spawner=Aggiungi spawner
 Remove spawner=Rimuovi spawner
+Add team spawner=Aggiungi spawner squadra
+Remove team spawner=Rimuovi spawner squadra
+Switch team=Cambia squadra
+Selected team: @1=Squadra selezionata: @1
 Delete all spawners=Cancella tutti gli spawner
-All the spawn points has been removed=Tutti i punti di spawn sono stati rimossi
+Delete all spawners of a team=Cancella tutti gli spawner della squadra
 
 # tools_sign.lua
 Add sign=Aggiungi cartello
