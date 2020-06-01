@@ -533,7 +533,7 @@ function arena_lib.load_arena(mod, arena_ID)
               })
 
     -- teletrasporto i giocatori
-    player:set_pos(arena.shuffled_spawners[count])
+    player:set_pos(shuffled_spawners[count])
 
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
@@ -761,7 +761,7 @@ end
 
 
 
-function arena_lib.is_player_in_queue(p_name)
+function arena_lib.is_player_in_queue(p_name, mod)
 
   if not players_in_queue[p_name] then
     return false
