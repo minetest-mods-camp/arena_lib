@@ -433,6 +433,11 @@ function arena_lib.enable_arena(sender, mod, arena_name)
     arena.enabled = false
   return end
 
+  -- se sono nell'editor, vengo buttato fuori
+  if arena_lib.is_player_in_edit_mode(sender) then
+    arena_lib.quit_editor(minetest.get_player_by_name(sender))
+  end
+
   local mod_ref = arena_lib.mods[mod]
 
   -- abilito
