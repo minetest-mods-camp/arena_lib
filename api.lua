@@ -470,10 +470,11 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
   for pl_name, stats in pairs(arena.players) do
 
+    arena_lib.HUD_hide("all", arena)
     players_in_queue[pl_name] = nil
     arena.players[pl_name] = nil
     arena.in_queue = false
-    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :()")))
+    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :(")))
 
   end
 
