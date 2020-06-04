@@ -29,6 +29,16 @@ end)
 
 
 
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+
+    if player:get_inventory():contains_item("main", "arena_lib:immunity") then
+      return 0
+    end
+
+end, true)
+
+
+
 minetest.register_on_dieplayer(function(player, reason)
 
     local p_name = player:get_player_name()
