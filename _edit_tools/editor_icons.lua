@@ -13,7 +13,8 @@ minetest.register_tool("arena_lib:editor_spawners", {
     on_use = function(itemstack, user)
 
       user:get_meta():set_int("arena_lib_editor.spawner_ID", 1)
-      
+      user:get_meta():set_int("arena_lib_editor.team_ID", 1)
+
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", 1))
 
       minetest.after(0, function()

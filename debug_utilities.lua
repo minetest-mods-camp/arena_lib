@@ -25,6 +25,22 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   return end
 
   local mod_ref = arena_lib.mods[mod]
+  local arena_min_players = arena.min_players * #arena.teams
+  local arena_max_players = arena.max_players * #arena.teams
+  local teams = ""
+  local min_players_per_team = ""
+  local max_players_per_team = ""
+
+  -- concateno eventuali team
+  if next(mod_ref.teams) then
+    min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
+    max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
+    for _, t_name in pairs(mod_ref.teams) do
+      teams = teams .. " '" .. t_name .. "'"
+    end
+  else
+    teams = "---"
+  end
 
   -- concateno nomi giocatori
   local names = ""
@@ -55,11 +71,21 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   end
 
   -- calcolo coordinate spawn point
-  local spawners_count = 0
   local spawners_pos = ""
-  for spawn_id, spawn_pos in pairs(arena.spawn_points) do
-    spawners_count = spawners_count + 1
-    spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_pos) .. " "
+  if #arena.teams > 1 then
+    
+    for i = 1, #arena.teams do
+      spawners_pos = spawners_pos .. arena.teams[i].name .. ": "
+      for j = 1 + (arena.max_players * (i-1)), arena.max_players * i  do
+        spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(arena.spawn_points[j].pos) .. " "
+      end
+      spawners_pos = spawners_pos .. ";  "
+    end
+    
+  else
+    for spawn_id, spawn_params in pairs(arena.spawn_points) do
+      spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_params.pos) .. " "
+    end
   end
 
   -- calcolo eventuale timer
@@ -89,21 +115,45 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
       temp_properties = temp_properties .. temp_property .. "; "
     end
   end
+  
+  local team_properties = ""
+  if not next(mod_ref.team_properties) then
+    team_properties = "---"
+  else
+    if arena.in_game == true then
+      for i = 1, #arena.teams do
+        team_properties = team_properties .. arena.teams[i].name .. ": "
+        for team_property, _ in pairs(mod_ref.team_properties) do
+          team_properties = team_properties .. " " .. team_property .. " = " .. arena.teams[i][team_property] .. ";"
+        end
+        team_properties = team_properties .. "|"
+      end
+    else
+      for team_property, _ in pairs(mod_ref.team_properties) do
+        team_properties = team_properties .. team_property .. "; "
+      end
+    end
+  end
+  
 
   minetest.chat_send_player(sender,
     minetest.colorize("#cfc6b8", "====================================") .. "\n" ..
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
     minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
-    minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n" ..
-    minetest.colorize("#eea160", S("Players supported: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n" ..
+    minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
+    min_players_per_team ..
+    max_players_per_team ..
+    minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..
+    minetest.colorize("#eea160", S("Players supported: ")) .. minetest.colorize("#cfc6b8", arena_max_players) .. "\n" ..
     minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. names .. " )") .. "\n" ..
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
-    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", spawners_count .. " ( " .. spawners_pos .. " )") .. "\n" ..
+    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. " )") .. "\n" ..
     timer ..
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
-    minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties)
+    minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
+    minetest.colorize("#eea160", S("Team properties: ")) .. minetest.colorize("#cfc6b8", team_properties)
   )
 
 end

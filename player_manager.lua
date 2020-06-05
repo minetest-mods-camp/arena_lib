@@ -9,7 +9,8 @@ minetest.register_on_joinplayer(function(player)
 
     p_meta:set_string("arena_lib_editor.mod", "")
     p_meta:set_string("arena_lib_editor.arena", "")
-    p_meta:set_string("arena_lib_editor.spawner_ID", "")
+    p_meta:set_int("arena_lib_editor.spawner_ID", 0)
+    p_meta:set_int("arena_lib_editor.team_ID", 0)
 
     if minetest.get_modpath("hub_manager") then return end          -- se c'è hub_manager, ci pensa quest'ultimo allo svuotamento dell'inventario
 
@@ -29,11 +30,27 @@ end)
 
 
 
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
+      
+    local target_name = player:get_player_name()
+    local p_name = hitter:get_player_name()
+    local arena = arena_lib.get_arena_by_player(p_name)
+    
+    if arena and arena.players[p_name].team and arena.players[p_name].team == arena.players[target_name].team then
+      return true
+    end
+  
+end)
+
+
+
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
     if player:get_inventory():contains_item("main", "arena_lib:immunity") then
       return 0
     end
+    
+    return hp_change
 
 end, true)
 
@@ -65,7 +82,7 @@ minetest.register_on_respawnplayer(function(player)
 
     local arena = arena_lib.get_arena_by_player(p_name)
 
-    player:set_pos(arena_lib.get_random_spawner(arena))
+    player:set_pos(arena_lib.get_random_spawner(arena, p_name))
     arena_lib.immunity(player)
     return true
 
