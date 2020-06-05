@@ -3,7 +3,7 @@
 Arena_lib is a library for Minetest working as a core for any arena minigame you have in mind.  
 It comes with an arena manager and a signs system. The latter creates a bridge inside your own server between the hub and your actual mod (deathmatch, capture the flag, assault, you name it). In other words, you don't have to do the boring job and you can focus exclusively on your minigame(s) :*
 
-<a href="https://liberapay.com/EticaDigitale/donate"><img src="https://i.imgur.com/4B2PxjP.png" alt="Support my work"/></a>  
+<a href="https://liberapay.com/Zughy/"><img src="https://i.imgur.com/4B2PxjP.png" alt="Support my work"/></a>  
 
 ### Config
 
