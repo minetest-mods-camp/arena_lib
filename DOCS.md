@@ -241,12 +241,13 @@ Check out [this example](mod-init.lua.example) for a full configuration file
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
+* `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
   * `1`: player eliminated. Calls `on_eliminate`
   * `2`: player kicked. Calls `on_kick`
   * `3`: player quit. Calls `on_quit`
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
-* `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.settings`
+* `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 
 ## 3. Collaborating
 Something's wrong? Feel free to:

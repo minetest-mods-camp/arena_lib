@@ -3,6 +3,7 @@
 --
 local S = minetest.get_translator("arena_lib")
 
+local function assign_team() end
 local function in_game_txt(arena) end
 local function HUD_countdown(arena, seconds) end
 local function arena_display_format(arena, msg) end
@@ -137,7 +138,7 @@ minetest.override_item("default:sign_wall", {
 
       -- determino eventuale team giocatore
       if #sign_arena.teams > 1 then
-        p_team_ID = arena_lib.assign_team(sign_arena, p_name)
+        p_team_ID = assign_team(sign_arena, p_name)
         p_team = sign_arena.teams[p_team_ID].name
         minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
       end
@@ -244,6 +245,20 @@ end
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
+
+function assign_team(arena, p_name)
+  local assigned_team_ID = 1
+
+  for i = 1, #arena.teams do
+    if arena.players_amount_per_team[i] < arena.players_amount_per_team[assigned_team_ID] then
+      assigned_team_ID = i
+    end
+  end
+
+  return assigned_team_ID
+end
+
+
 
 function HUD_countdown(arena, timer)
 

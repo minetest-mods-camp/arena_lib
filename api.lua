@@ -24,7 +24,7 @@ local arena_default = {
   name = "",
   sign = {},
   players = {},               --KEY: player name, INDEX: kills, deaths, player_properties
-  teams = nil,
+  teams = {-1},
   players_amount = 0,
   players_amount_per_team = nil,
   spawn_points = {},          --KEY: ids, INDEX: {position, team}
@@ -231,9 +231,6 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
         arena.teams[k][j] = w
       end
     end
-    
-  else
-    arena.teams = {-1}
   end
 
   -- aggiungo eventuali proprietà custom
@@ -1100,20 +1097,6 @@ end
 function arena_lib.send_message_players_in_arena(arena, msg)
   for pl_name, stats in pairs(arena.players) do
     minetest.chat_send_player(pl_name, msg) end
-end
-
-
-
-function arena_lib.assign_team(arena, p_name)
-  local assigned_team_ID = 1
-
-  for i = 1, #arena.teams do
-    if arena.players_amount_per_team[i] < arena.players_amount_per_team[assigned_team_ID] then
-      assigned_team_ID = i
-    end
-  end
-
-  return assigned_team_ID
 end
 
 
