@@ -225,7 +225,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     for k, t_name in pairs(mod_ref.teams) do
       arena.teams[k] = {name = t_name}
       arena.players_amount_per_team[k] = 0
-    
+
       -- e loro eventuali proprietà
       for j, w in pairs(mod_ref.team_properties) do
         arena.teams[k][j] = w
@@ -407,7 +407,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       while next(arena.spawn_points, next_available_spawnID) do
         -- ma se il next mi trova uno spawner con distacco > 1, vuol dire che sono al capolinea
         -- perché quello trovato appartiene o a un altro team o è un buco nello stesso team (ottenuto dal cancellare). Rompo l'iterare
-        if next(arena.spawn_points, i) ~= i+1 then
+        if next(arena.spawn_points, next_available_spawnID) ~= next_available_spawnID +1 then
           break
         end
         next_available_spawnID = next_available_spawnID +1
@@ -775,14 +775,14 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
   arena.in_celebration = true
   arena_lib.update_sign(arena.sign, arena)
-  
+
   if type(winner_name) == "string" then
     winning_message = S("@1 wins the game", winner_name)
   elseif type(winner_name) == "table" then
     local winner_team_ID = arena.players[winner_name[1]].teamID
     winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
   end
-    
+
 
   for pl_name, stats in pairs(arena.players) do
 
@@ -855,7 +855,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
       arena[temp_property] = {}
     end
   end
-  
+
   -- e quelle eventuali di team
   if #arena.teams > 1 then
     for team_property, v in pairs(arena.team_properties) do
@@ -1043,7 +1043,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
-    
+
     local timer = minetest.get_node_timer(arena.sign)
     local arena_min_players = arena.min_players * #arena.teams
     local arena_max_players = arena.max_players * #arena.teams
@@ -1058,25 +1058,25 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   -- se invece ha i team e sono rimasti solo i giocatori di un team, il loro team vince
   elseif #arena.teams > 1 and arena.players_amount < arena.min_players * #arena.teams then
-    
+
     local team_to_compare
-    
+
     for i = 1, #arena.players_amount_per_team do
       if arena.players_amount_per_team[i] ~= 0 then
         team_to_compare = i
         break
       end
     end
-    
+
     for _, pl_stats in pairs(arena.players) do
       if pl_stats.teamID ~= team_to_compare then
         return
       end
     end
-    
+
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
     arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
-  
+
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
 
@@ -1161,7 +1161,7 @@ function arena_lib.get_players_in_team(arena, team_ID, to_players)
       end
     end
   end
-  
+
   return players
 end
 
@@ -1270,13 +1270,12 @@ function init_storage(mod, mod_ref)
     -- se c'è una stringa con quell'ID, aggiungo l'arena e ne aggiorno l'eventuale cartello
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
+      local to_update = false
 
       --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
-      local to_convert = false
-
       -- add the 'players_amount' parameter for 2.6.0 and lesser versions
       if not arena.players_amount then
-        to_convert = true
+        to_update = true
         arena.players_amount = 0
         minetest.log("action", "[ARENA_LIB] Added '.players_amount' property from 2.7.0")
       end
@@ -1284,7 +1283,7 @@ function init_storage(mod, mod_ref)
       -- spawners conversion from 2.7.0 to 3.0+ version
       if next(arena.spawn_points) then
         if arena.spawn_points[next(arena.spawn_points)].x ~= nil then
-          to_convert = true
+          to_update = true
           minetest.log("action", "[ARENA_LIB] Converting old spawn points for arena " .. arena.name)
           for id, coords in pairs(arena.spawn_points) do
             arena.spawn_points[id] = {pos = coords}
@@ -1295,7 +1294,7 @@ function init_storage(mod, mod_ref)
       --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
       -- gestione team
-      if #arena.teams > 1 and not next(mod_ref.teams) then               -- se avevo abilitato i team e ora li ho rimossi
+      if #arena.teams > 1 and not next(mod_ref.teams) then                      -- se avevo abilitato i team e ora li ho rimossi
         arena.players_amount_per_team = nil
         arena.teams = {-1}
       elseif next(mod_ref.teams) then                                           -- sennò li genero
@@ -1305,13 +1304,23 @@ function init_storage(mod, mod_ref)
         for k, t_name in pairs(mod_ref.teams) do
           arena.players_amount_per_team[k] = 0
           arena.teams[k] = {name = t_name}
-          
+
           -- e loro eventuali proprietà
           for j, w in pairs(mod_ref.team_properties) do
             arena.teams[k][j] = w
           end
         end
-        
+      end
+
+      local arena_max_players = arena.max_players * #arena.teams
+
+      -- resetto spawner se ho cambiato il numero di team
+      if arena_max_players ~= #arena.spawn_points then
+        to_update = true
+        arena.enabled = false
+        arena.spawn_points = {}
+        minetest.log("warning", "[ARENA_LIB] spawn points of arena " .. arena.name ..
+          " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
       end
 
       -- gestione timer
@@ -1323,7 +1332,7 @@ function init_storage(mod, mod_ref)
 
       arena_lib.mods[mod].arenas[i] = arena
 
-      if to_convert then
+      if to_update then
         update_storage(false, mod, i, arena)
       end
 
@@ -1389,7 +1398,7 @@ end
 
 
 function assign_team_spawner(spawn_points, ID, p_name, p_team)
-  
+
   minetest.log("action", p_team)
 
   for i = ID, #spawn_points do
