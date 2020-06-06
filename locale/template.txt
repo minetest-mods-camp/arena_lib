@@ -49,6 +49,7 @@ name: =
 Total arenas: =
 Players required per team: =
 Players supported per team: =
+Players inside per team: =
 in queue=
 loading=
 in game=

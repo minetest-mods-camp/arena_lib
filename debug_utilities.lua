@@ -30,14 +30,17 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local teams = ""
   local min_players_per_team = ""
   local max_players_per_team = ""
+  local players_inside_per_team = ""
 
   -- concateno eventuali team
   if next(mod_ref.teams) then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
     max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
-    for _, t_name in pairs(mod_ref.teams) do
-      teams = teams .. "'" .. t_name .. "' "
+    for i = 1, #mod_ref.teams do
+      teams = teams .. "'" .. mod_ref.teams[i] .. "' "
+      players_inside_per_team = players_inside_per_team .. "'" .. mod_ref.teams[i] .. "' : " .. arena.players_amount_per_team[i] .. " "
     end
+    players_inside_per_team = minetest.colorize("#eea160", S("Players inside per team: ")) .. minetest.colorize("#cfc6b8", players_inside_per_team) .. "\n"
   else
     teams = "---"
   end
@@ -148,6 +151,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..
     minetest.colorize("#eea160", S("Players supported: ")) .. minetest.colorize("#cfc6b8", arena_max_players) .. "\n" ..
     minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. names .. " )") .. "\n" ..
+    players_inside_per_team ..
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..

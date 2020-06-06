@@ -31,25 +31,25 @@ end)
 
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-      
+
     local target_name = player:get_player_name()
     local p_name = hitter:get_player_name()
     local arena = arena_lib.get_arena_by_player(p_name)
-    
-    if arena and arena.players[p_name].team and arena.players[p_name].team == arena.players[target_name].team then
+
+    if arena and arena.players[p_name].teamID and arena.players[p_name].teamID == arena.players[target_name].teamID then
       return true
     end
-  
+
 end)
 
 
 
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
-    if player:get_inventory():contains_item("main", "arena_lib:immunity") then
+    if player:get_inventory():contains_item("main", "arena_lib:immunity") and reason.type ~= "respawn" then
       return 0
     end
-    
+
     return hp_change
 
 end, true)
@@ -82,7 +82,7 @@ minetest.register_on_respawnplayer(function(player)
 
     local arena = arena_lib.get_arena_by_player(p_name)
 
-    player:set_pos(arena_lib.get_random_spawner(arena, p_name))
+    player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
     arena_lib.immunity(player)
     return true
 

@@ -37,6 +37,8 @@ local arena_default = {
   enabled = false
 }
 
+
+
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.register_minigame(mod, def)
 
@@ -232,11 +234,6 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     for k, t_name in pairs(mod_ref.teams) do
       arena.teams[k] = {name = t_name}
       arena.players_amount_per_team[k] = 0
-
-      -- e loro eventuali proprietà
-      for j, w in pairs(mod_ref.team_properties) do
-        arena.teams[k][j] = w
-      end
     end
   end
 
@@ -361,7 +358,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
       if team then
         for id, spawner in pairs(arena.spawn_points) do
-          if spawner.team == team then
+          if spawner.teamID == team_ID then
             arena.spawn_points[id] = nil
           end
         end
@@ -385,7 +382,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       return end
   end
 
-  local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team)    -- (se team è nil, ritorna in automatico i punti spawn totali)
+  local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti spawn totali)
 
   -- se provo a impostare uno spawn point di troppo, annullo
   if spawn_points_count == arena.max_players then
@@ -432,7 +429,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   end
 
   -- imposto lo spawner
-  arena.spawn_points[next_available_spawnID] = {pos = pos_Y_up, team = team}
+  arena.spawn_points[next_available_spawnID] = {pos = pos_Y_up, teamID = team_ID}
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
 
@@ -648,11 +645,17 @@ function arena_lib.load_arena(mod, arena_ID)
     for i = 1, #arena.teams do
       for pl_name, pl_stats in pairs(arena.players) do
         if pl_stats.teamID == i then
-          sorted_team_players[j] = {name = pl_name, team = arena.teams[pl_stats.teamID].name}
+          sorted_team_players[j] = {name = pl_name, teamID = pl_stats.teamID}
           j = j +1
         end
       end
     end
+
+    -- e carico eventuali proprietà dei team
+    for j, w in pairs(mod_ref.team_properties) do
+      arena.teams[k][j] = w
+    end
+
   end
 
 
@@ -680,7 +683,7 @@ function arena_lib.load_arena(mod, arena_ID)
     if #arena.teams == 1 then
       player:set_pos(shuffled_spawners[count].pos)
     else
-      team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].team)
+      team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
     end
 
     -- svuoto eventualmente l'inventario
@@ -763,7 +766,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:get_inventory():set_list("main",{})
   end
 
-  player:set_pos(arena_lib.get_random_spawner(arena, p_name))
+  player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
@@ -830,6 +833,11 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     players_in_game[pl_name] = nil
     arena.players_amount = 0
     arena.timer_current = nil
+    if #arena.teams > 1 then
+      for i = 1, #arena.teams do
+        arena.players_amount_per_team[i] = 0
+      end
+    end
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -863,17 +871,11 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     end
   end
 
-  -- e quelle eventuali di team
+  -- e rimuovo quelle eventuali di team
   if #arena.teams > 1 then
-    for team_property, v in pairs(arena.team_properties) do
-      if type(v) == "string" then
-        arena[team_property] = ""
-      elseif type(v) == "number" then
-        arena[team_property] = 0
-      elseif type(v) == "boolean" then
-        arena[team_property] = false
-      elseif type(v) == "table" then
-        arena[team_property] = {}
+    for i = 1, #arena.teams do
+      for t_property, _ in pairs(mod_ref.team_properties) do
+        arena.teams[i][t_property] = nil
       end
     end
   end
@@ -914,7 +916,7 @@ end
 
 --TODO: rename_arena
 
--- (p_name, (mod))
+-- mod è opzionale
 function arena_lib.is_player_in_arena(p_name, mod)
 
   if not players_in_game[p_name] then
@@ -955,6 +957,15 @@ end
 
 
 
+function arena_lib.is_player_in_same_team(arena, p_name, t_name)
+  if arena.players[p_name].teamID == arena.players[t_name].teamID then return true
+  else return false
+  end
+end
+
+
+
+
 function arena_lib.is_team_declared(mod_ref, team_name)
 
   if not mod_ref.teams then return false end
@@ -984,8 +995,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     mod = players_in_queue[p_name].minigame
     arena_ID = players_in_queue[p_name].arenaID
   else
-    minetest.log("warning", "[ARENA_LIB] Can't remove player " .. p_name .. " from any arena")
-    return end
+  return end
 
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
@@ -1087,7 +1097,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
 
-    if is_eliminated then
+    if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
     else
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You win the game due to not enough players"))
@@ -1177,9 +1187,10 @@ end
 function arena_lib.get_mod_by_player(p_name)
   if arena_lib.is_player_in_arena(p_name) then
     return players_in_game[p_name].minigame
-  else
+  elseif arena_lib.is_player_in_queue(p_name) then
     return players_in_queue[p_name].minigame
-  end
+  else
+    return end
 end
 
 
@@ -1218,11 +1229,11 @@ end
 
 
 
-function arena_lib.get_arena_spawners_count(arena, team)
+function arena_lib.get_arena_spawners_count(arena, team_ID)
   local count = 0
   for _, spawner in pairs(arena.spawn_points) do
-    if team then
-      if spawner.team == team then
+    if team_ID then
+      if spawner.teamID == team_ID then
         count = count +1
       end
     else
@@ -1234,9 +1245,8 @@ end
 
 
 
-function arena_lib.get_random_spawner(arena, p_name)
+function arena_lib.get_random_spawner(arena, team_ID)
   if #arena.teams > 1 then
-    local team_ID = arena.players[p_name].teamID
     local min = 1 + (arena.max_players * (team_ID - 1))
     local max = arena.max_players * team_ID
     return arena.spawn_points[math.random(min, max)].pos
@@ -1247,9 +1257,6 @@ end
 
 
 
-function arena_lib.get_immunity_slot(mod)
-  return arena_lib.mods[mod].immunity_slot
-end
 
 
 ----------------------------------------------
@@ -1298,6 +1305,12 @@ function init_storage(mod, mod_ref)
           end
         end
       end
+
+      -- team conversion for 2.7.0 and lesser versions
+      if not arena.teams then
+        to_update = true
+        arena.teams = {-1}
+      end
       --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
       -- gestione team
@@ -1311,11 +1324,6 @@ function init_storage(mod, mod_ref)
         for k, t_name in pairs(mod_ref.teams) do
           arena.players_amount_per_team[k] = 0
           arena.teams[k] = {name = t_name}
-
-          -- e loro eventuali proprietà
-          for j, w in pairs(mod_ref.team_properties) do
-            arena.teams[k][j] = w
-          end
         end
       end
 
@@ -1404,12 +1412,10 @@ end
 
 
 
-function assign_team_spawner(spawn_points, ID, p_name, p_team)
-
-  minetest.log("action", p_team)
+function assign_team_spawner(spawn_points, ID, p_name, p_team_ID)
 
   for i = ID, #spawn_points do
-    if p_team == spawn_points[i].team then
+    if p_team_ID == spawn_points[i].teamID then
       minetest.get_player_by_name(p_name):set_pos(spawn_points[i].pos)
       return i+1
     end
