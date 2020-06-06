@@ -5,6 +5,7 @@
 
 # api.lua
 [!] An arena with that name exists already!=
+[!] Parameters don't seem right!=
 Arena @1 succesfully created=
 Arena @1 successfully removed=
 [!] This team doesn't exist!=

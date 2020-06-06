@@ -5,6 +5,7 @@
 
 # api.lua
 [!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
+[!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Arena @1 succesfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 [!] This team doesn't exist!=[!] Questo team non esiste!

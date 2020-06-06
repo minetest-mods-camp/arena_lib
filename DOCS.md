@@ -249,6 +249,9 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 
+### 2.6 Things you don't want to do with a light heart
+* Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
+
 ## 3. Collaborating
 Something's wrong? Feel free to:
 * open an [issue](https://gitlab.com/zughy-friends-minetest/arena_lib/-/issues)

@@ -205,6 +205,13 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
   return end
 
+  -- controllo che non abbiano messo parametri assurdi per i giocatori minimi/massimi
+  if min_players and max_players then
+    if min_players > max_players or min_players == 0 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return end
+  end
+
   -- creo l'arena
   mod_ref.arenas[ID] = copy_table(arena_default)
 
