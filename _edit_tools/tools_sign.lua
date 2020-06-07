@@ -4,7 +4,7 @@ local spawners_tools = {
   "arena_lib:sign_remove",
   "",
   "default:sign_wall",
-  "default:sign_wall_steel",
+  "",
   "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
