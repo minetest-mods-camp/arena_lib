@@ -48,6 +48,7 @@ name: =nome:
 Total arenas: =Arene totali: 
 Players required per team: =Giocatori minimi per squadra: 
 Players supported per team: =Giocatori massimi per squadra: 
+Players inside per team: =Giocatori dentro per team: 
 in queue=in coda
 loading=in caricamento
 in game=in partita

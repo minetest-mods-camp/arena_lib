@@ -39,7 +39,7 @@ Better said, these kind of parameters are emptied every time the server starts. 
   
 ### 1.2 Setting up an arena
 Two things are needed to have an arena up to go: spawners and signs. There are two functions for that:  
-* `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number
+* `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
 * `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
 
 #### 1.2.1 Editor
@@ -241,6 +241,7 @@ Check out [this example](mod-init.lua.example) for a full configuration file
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
+* `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
   * `1`: player eliminated. Calls `on_eliminate`
@@ -249,7 +250,18 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 
-### 2.6 Things you don't want to do with a light heart
+### 2.6 Getters
+* `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
+* `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
+* `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
+* `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
+* `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
+* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing in
+* `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
+* `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
+* `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
+
+### 2.7 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 
 ## 3. Collaborating
