@@ -686,6 +686,9 @@ function arena_lib.load_arena(mod, arena_ID)
       team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
     end
 
+    -- li curo
+    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main",{})
@@ -786,6 +789,24 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   arena.in_celebration = true
   arena_lib.update_sign(arena.sign, arena)
 
+  -- per ogni giocatore...
+  for pl_name, stats in pairs(arena.players) do
+
+    local inv = minetest.get_player_by_name(pl_name):get_inventory()
+
+    -- immortalità
+    if not inv:contains_item("main", "arena_lib:immunity") then
+      inv:set_stack("main", mod_ref.immunity_slot, "arena_lib:immunity")
+    end
+
+    local player = minetest.get_player_by_name(pl_name)
+
+    -- ripristino HP e visibilità nome
+    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+  end
+
+  -- determino il messaggio da inviare
   if type(winner_name) == "string" then
     winning_message = S("@1 wins the game", winner_name)
   elseif type(winner_name) == "table" then
@@ -793,19 +814,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
     winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
   end
 
-
-  for pl_name, stats in pairs(arena.players) do
-
-    local inv = minetest.get_player_by_name(pl_name):get_inventory()
-
-    -- giocatori immortali
-    if not inv:contains_item("main", "arena_lib:immunity") then
-      inv:set_stack("main", mod_ref.immunity_slot, "arena_lib:immunity")
-    end
-
-    minetest.get_player_by_name(pl_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    minetest.chat_send_player(pl_name, mod_ref.prefix  .. winning_message)
-  end
+  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix  .. winning_message)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_celebration then
@@ -1002,14 +1011,13 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   if arena == nil then return end
 
-  local p_team_ID = arena.players[p_name].teamID
-
   -- lo rimuovo
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
   arena.players_amount = arena.players_amount - 1
   if #arena.teams > 1 then
+    local p_team_ID = arena.players[p_name].teamID
     arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
   end
 
@@ -1025,8 +1033,9 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       player:get_inventory():set_list("main",{})
     end
 
-    -- lo teletrasporto fuori dall'arena e ripristino il nome
+    -- lo teletrasporto fuori dall'arena e ripristino nome e HP
     player:set_pos(mod_ref.hub_spawn_point)
+    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
     -- se ho hub_manager, restituisco gli oggetti
