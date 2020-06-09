@@ -2,12 +2,15 @@ arena_lib.initialize("call of Zughy")
 
 arena_lib.settings("call of Zughy", {
   prefix = "[CoZ] ",
+  hub_spawn_point = { x = 5, y = 10, z = 4 },
   teams = {
     "red",
     "blue"
   },
-  hub_spawn_point = { x = 5, y = 10, z = 4 },
-  queue_waiting_time = 10,
+  disabled_damage_types = {
+    "fall"
+  },
+  queue_waiting_time = 20,
   show_minimap = true,
   properties = {
     planting_locations = {{x=30, y=20, z=40}, {x=5, y=20, z=80}}, --you can override these parameters via your mod, of course
@@ -21,7 +24,7 @@ arena_lib.settings("call of Zughy", {
     has_bomb = false
   },
   team_properties = {
-    round_won = 0
+    rounds_won = 0
   }
 })
 

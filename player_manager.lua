@@ -46,8 +46,21 @@ end)
 
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
+    local mod = arena_lib.get_mod_by_player(player:get_player_name())
+
+    -- se non è in partita, annullo
+    if not mod then return hp_change end
+
+    -- se è immune, annullo
     if player:get_inventory():contains_item("main", "arena_lib:immunity") and reason.type ~= "respawn" then
       return 0
+    end
+
+    -- se un tipo di danno è disabilitato, annullo
+    for _, disabled_damage in pairs(arena_lib.mods[mod].disabled_damage_types) do
+      if reason.type == disabled_damage then
+        return 0
+      end
     end
 
     return hp_change

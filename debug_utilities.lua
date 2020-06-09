@@ -45,6 +45,16 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     teams = "---"
   end
 
+  -- concateno eventuali danni disabilitati
+  local disabled_damage_types = ""
+  if next(mod_ref.disabled_damage_types) then
+    for _, dmg_type in pairs(mod_ref.disabled_damage_types) do
+      disabled_damage_types = disabled_damage_types .. " " .. dmg_type
+    end
+  else
+    disabled_damage_types = "---"
+  end
+
   -- concateno nomi giocatori
   local names = ""
   for pl, stats in pairs(arena.players) do
@@ -146,6 +156,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
     minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
+    minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n" ..
     min_players_per_team ..
     max_players_per_team ..
     minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..

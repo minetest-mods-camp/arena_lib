@@ -59,6 +59,7 @@ Timer: =
 current: =
 Name: =
 Teams: =
+Disabled damage types: =
 Players required: =
 Players supported: =
 Players inside: =

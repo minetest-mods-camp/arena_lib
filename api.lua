@@ -67,8 +67,9 @@ function arena_lib.register_minigame(mod, def)
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
-  mod_ref.teams = {}
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
+  mod_ref.teams = {}
+  mod_ref.disabled_damage_types = {}
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
@@ -89,12 +90,16 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.prefix = def.prefix
   end
 
+  if def.hub_spawn_point then
+    mod_ref.hub_spawn_point = def.hub_spawn_point
+  end
+
   if def.teams and type(def.teams) == "table" then
     mod_ref.teams = def.teams
   end
 
-  if def.hub_spawn_point then
-    mod_ref.hub_spawn_point = def.hub_spawn_point
+  if def.disabled_damage_types and type(def.disabled_damage_types) == "table" then
+    mod_ref.disabled_damage_types = def.disabled_damage_types
   end
 
   if def.join_while_in_progress == true then

@@ -58,6 +58,7 @@ Timer: =Timer:
 current: =corrente: 
 Name: =Nome: 
 Teams: =Squadre: 
+Disabled damage types: =Tipi di danno disabilitati: 
 Players required: =Giocatori minimi: 
 Players supported: =Giocatori massimi: 
 Players inside: =Giocatori dentro: 
