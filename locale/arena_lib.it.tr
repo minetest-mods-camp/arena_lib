@@ -1,4 +1,4 @@
-# version 3.0.0
+# version 3.1.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -34,6 +34,8 @@ Arena @1 successfully enabled=Arena @1 abilitata con successo
 [!] The arena you were queueing for has been disabled... :(=[!] L'arena per la quale eri in coda è stata disabilitata... :(
 Arena @1 successfully disabled=Arena @1 disabilitata con successo
 @1 wins the game=@1 ha vinto la partita
+Team @1 wins the game=La squadra @1 ha vinto la partita
+[!] You can't quit when a match is terminating!=[!] Non puoi abbandonare durante il concludersi di un match!
 @1 has been eliminated=@1 è stato eliminato
 @1 has been kicked=@1 è stato cacciato
 @1 has quit the match=@1 ha abbandonato la partita
@@ -42,6 +44,10 @@ The queue has been cancelled due to not enough players=La coda è stata annullat
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
+
+# chat.lua
+Quit an ongoing game=Abbandona una partita in corso
+[!] You're not in a match!=[!] Non sei in partita!
 
 # debug_utilities.lua
 name: =nome: 

@@ -1,4 +1,4 @@
-# version 3.0.0
+# version 3.1.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -35,6 +35,7 @@ Arena @1 successfully enabled=
 Arena @1 successfully disabled=
 @1 wins the game=
 Team @1 wins the game=
+[!] You can't quit when a match is terminating!=
 @1 has been eliminated=
 @1 has been kicked=
 @1 has quit the match=
@@ -43,6 +44,10 @@ The queue has been cancelled due to not enough players=
 There are no other teams left, you win!=
 You're the last player standing: you win!=
 You win the game due to not enough players=
+
+# chat.lua
+Quit an ongoing game=
+[!] You're not in a match!=
 
 # debug_utilities.lua
 name: =

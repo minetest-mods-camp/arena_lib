@@ -63,6 +63,12 @@ end
 
 
 
+function arena_lib.on_prequit(mod, func)
+  arena_lib.mods[mod].on_prequit = func
+end
+
+
+
 function arena_lib.on_quit(mod, func)
   arena_lib.mods[mod].on_quit = func
 end

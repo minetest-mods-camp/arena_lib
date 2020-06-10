@@ -979,7 +979,6 @@ end
 
 
 
-
 function arena_lib.is_team_declared(mod_ref, team_name)
 
   if not mod_ref.teams then return false end
@@ -1016,6 +1015,16 @@ function arena_lib.remove_player_from_arena(p_name, reason)
 
   if arena == nil then return end
 
+  -- se provo a rimuovere qualcuno durante la celebrazione, annullo
+  if arena.in_celebration then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e" ,S("[!] You can't quit when a match is terminating!")))
+      return end
+
+  -- se uso /quit e on_prequit ritorna false, annullo
+  if reason == 3 and mod_ref.on_prequit then
+      if mod_ref.on_prequit(arena, p_name) == false then return end
+  end
+
   -- lo rimuovo
   arena.players[p_name] = nil
   players_in_game[p_name] = nil
@@ -1038,9 +1047,9 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       player:get_inventory():set_list("main",{})
     end
 
-    -- lo teletrasporto fuori dall'arena e ripristino nome e HP
-    player:set_pos(mod_ref.hub_spawn_point)
+    -- resetto gli HP, teletrasporto fuori dall'arena e ripristino nome
     player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+    player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
     -- se ho hub_manager, restituisco gli oggetti

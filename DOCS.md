@@ -166,6 +166,7 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from an arena (same as above)
 * `arena_lib.on_quit(mod, function(arena, p_name))`: called when a player quits from an arena (same as above)
+* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful ie. to ask confirmation first, or simply impede a player to quit
 
 > Beware: there is a default behaviour already for most of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
@@ -244,7 +245,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
-* `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
+* `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Doesn't work while in the celebration phase. Reason is an int, and if specified equals to...
   * `1`: player eliminated. Calls `on_eliminate`
   * `2`: player kicked. Calls `on_kick`
   * `3`: player quit. Calls `on_quit`
