@@ -51,9 +51,11 @@ minetest.register_chatcommand("quit", {
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action if you're the only one left!")))
       return end
 
+    local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(name)]
+
     -- se uso /quit e on_prequit ritorna false, annullo
     if mod_ref.on_prequit then
-      if mod_ref.on_prequit(arena, p_name) == false then
+      if mod_ref.on_prequit(arena, name) == false then
       return false end
     end
 

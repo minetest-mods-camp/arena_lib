@@ -797,18 +797,20 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   -- per ogni giocatore...
   for pl_name, stats in pairs(arena.players) do
 
-    local inv = minetest.get_player_by_name(pl_name):get_inventory()
+    local player = minetest.get_player_by_name(pl_name)
+
+    -- ripristino HP e visibilità nome
+    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+
+    local inv = player:get_inventory()
 
     -- immortalità
     if not inv:contains_item("main", "arena_lib:immunity") then
       inv:set_stack("main", mod_ref.immunity_slot, "arena_lib:immunity")
     end
 
-    local player = minetest.get_player_by_name(pl_name)
 
-    -- ripristino HP e visibilità nome
-    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 
   -- determino il messaggio da inviare
