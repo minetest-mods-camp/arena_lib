@@ -151,7 +151,11 @@ The second field, on the contrary, is a table of parameters: they define the ver
 > Beware: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager)
 
 ### 2.1 Commands
-You need to connect the functions of the library with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+A couple of general commands are already declared inside arena_lib, them being: 
+* `/kick player_name`: kicks a player out of an ongoing game. The sender needs the `arenalib_admin` privilege in order to use it
+* `/quit`: quits a game
+
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 2.2 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:

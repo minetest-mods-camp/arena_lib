@@ -259,7 +259,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   -- aggiorno l'ID globale nello storage
   storage:set_int(mod .. ".HIGHEST_ARENA_ID", mod_ref.highest_arena_ID)
 
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 succesfully created", arena_name))
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully created", arena_name))
 
 end
 
@@ -998,44 +998,13 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   -- reason 2 = has been kicked
   -- reason 3 = has quit the arena
 
-  local mod, arena_ID
+  local mod = arena_lib.get_mod_by_player(p_name)
 
-  -- se non è in partita né in coda, annullo
-  if arena_lib.is_player_in_arena(p_name) then
-    mod = players_in_game[p_name].minigame
-    arena_ID = players_in_game[p_name].arenaID
-  elseif arena_lib.is_player_in_queue(p_name) then
-    mod = players_in_queue[p_name].minigame
-    arena_ID = players_in_queue[p_name].arenaID
-  else
-  return end
+  -- se il giocatore non è né in coda né in partita, annullo
+  if not mod then return end
 
   local mod_ref = arena_lib.mods[mod]
-  local arena = mod_ref.arenas[arena_ID]
-
-  if arena == nil then return end
-
-  -- se provo a rimuovere qualcuno durante la celebrazione, annullo
-  if arena.in_celebration then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e" ,S("[!] You can't quit when a match is terminating!")))
-      return end
-
-  -- se uso /quit e on_prequit ritorna false, annullo
-  if reason == 3 and mod_ref.on_prequit then
-      if mod_ref.on_prequit(arena, p_name) == false then return end
-  end
-
-  -- lo rimuovo
-  arena.players[p_name] = nil
-  players_in_game[p_name] = nil
-  players_in_queue[p_name] = nil
-  arena.players_amount = arena.players_amount - 1
-  if #arena.teams > 1 then
-    local p_team_ID = arena.players[p_name].teamID
-    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
-  end
-
-  arena_lib.update_sign(arena.sign, arena)
+  local arena = arena_lib.get_arena_by_player(p_name)
 
   -- se una ragione è specificata
   if reason ~= nil then
@@ -1080,6 +1049,18 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     --TODO: considerare se rimuovere questo avviso dato che il server avvisa di base i giocatori
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
   end
+
+  -- lo rimuovo
+  arena.players[p_name] = nil
+  players_in_game[p_name] = nil
+  players_in_queue[p_name] = nil
+  arena.players_amount = arena.players_amount - 1
+  if #arena.teams > 1 then
+    local p_team_ID = arena.players[p_name].teamID
+    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
+  end
+
+  arena_lib.update_sign(arena.sign, arena)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then

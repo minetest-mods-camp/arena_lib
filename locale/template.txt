@@ -6,7 +6,7 @@
 # api.lua
 [!] An arena with that name exists already!=
 [!] Parameters don't seem right!=
-Arena @1 succesfully created=
+Arena @1 successfully created=
 Arena @1 successfully removed=
 [!] This team doesn't exist!=
 [!] No spawner with that ID to overwrite!=
@@ -35,7 +35,6 @@ Arena @1 successfully enabled=
 Arena @1 successfully disabled=
 @1 wins the game=
 Team @1 wins the game=
-[!] You can't quit when a match is terminating!=
 @1 has been eliminated=
 @1 has been kicked=
 @1 has quit the match=
@@ -46,8 +45,12 @@ You're the last player standing: you win!=
 You win the game due to not enough players=
 
 # chat.lua
+Kick a player from an ongoing game=
+[!] This player is not online!=
+[!] The player must be in a game to perform this action!=
+[!] You must be in a game to perform this action!=
 Quit an ongoing game=
-[!] You're not in a match!=
+[!] You can't perform this action if you're the only one left!=
 
 # debug_utilities.lua
 name: =

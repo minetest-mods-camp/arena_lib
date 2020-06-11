@@ -1,6 +1,3 @@
---
--- For the item to set signs, being a declaration of a new item, look at items.lua
---
 local S = minetest.get_translator("arena_lib")
 
 local function assign_team() end
