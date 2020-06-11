@@ -128,7 +128,7 @@ arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
 "yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands or callbacks.  
 The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
-* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib] `
+* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib]`
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
 * `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt#L4414)
@@ -150,14 +150,17 @@ The second field, on the contrary, is a table of parameters: they define the ver
 
 > Beware: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager)
 
-### 2.1 Commands
+### 2.1 Privileges
+* `arenalib_admin`: allows to use the `/kick` command
+
+### 2.2 Commands
 A couple of general commands are already declared inside arena_lib, them being: 
 * `/kick player_name`: kicks a player out of an ongoing game. The sender needs the `arenalib_admin` privilege in order to use it
 * `/quit`: quits a game
 
 Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
-### 2.2 Callbacks
+### 2.3 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
 * `arena_lib.on_load(mod, function(arena)` (we saw these 4 earlier)
 * `arena_lib.on_start(mod, function(arena))`
@@ -188,10 +191,10 @@ arena_lib.on_load("mymod", function(arena)
 end)
 ```
 
-### 2.3 Additional properties
+### 2.4 Additional properties
 Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the four tables `properties`, `temp_properties`, `player_properties` and `team_properties`. The first two are for the arena, the third is for players and the fourth for teams.  
 
-#### 2.3.1 Arenas properties
+#### 2.4.1 Arenas properties
 The difference between `properties` and `temp_properties` is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.register_minigame(...)` and write
 ```
 arena_lib.register_minigame("mymod", {
@@ -205,12 +208,12 @@ and then we can easily access the `kill_leader` field whenever we want from ever
 
 > Beware: you DO need to initialise your properties (whatever type) or it'll return an error
 
-##### 2.3.1.1 Updating properties for old arenas
+##### 2.4.1.1 Updating properties for old arenas
 If you decide to add a new property (temporary or not) to your mod but you had created a few arenas already, you need to update them manually by calling  
 `arena_lib.update_properties("mymod")`  
 right after `arena_lib.register_minigame(...)`. This has to be done manually because it'd be quite heavy to run a check on hypotetically very long strings whenever the server goes online for each mod relying on `arena_lib`. So just add it, run the server, shut it down when it's done loading, remove the call and then you're good to go.
 
-#### 2.3.2 Players properties
+#### 2.4.2 Players properties
 These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
 ```
 arena_lib.register_minigame("mymod", {
@@ -232,31 +235,32 @@ end)
 
 ```
 
-#### 2.3.3 Team properties
+#### 2.4.3 Team properties
 Same as above, but for teams. For instance, you could count how many rounds of a single match has been won by a specific team, and then call a load_celebration when one of them reaches 3 wins.
 
 Check out [this example](mod-init.lua.example) for a full configuration file
 
-#### 2.4 HUD
+#### 2.5 HUD
 `arena_lib` also comes with a double practical HUD: `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following commands:
 * `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>)`: send a message to the specified player in the specified HUD type ("broadcast" or "hotbar"). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>)`: same as above, but for all the players inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
 
-### 2.5 Utils
+### 2.6 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
-* `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Doesn't work while in the celebration phase. Reason is an int, and if specified equals to...
+* `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
   * `1`: player eliminated. Calls `on_eliminate`
   * `2`: player kicked. Calls `on_kick`
-  * `3`: player quit. Calls `on_quit`
+  * `3`: player quit. Calls `on_quit`  
+Kicks and quits are automatically managed by arena_lib, so in this case it's better to use callbacks
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 
-### 2.6 Getters
+### 2.7 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
 * `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
