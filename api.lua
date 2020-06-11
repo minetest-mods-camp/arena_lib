@@ -774,6 +774,8 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:get_inventory():set_list("main",{})
   end
 
+  -- riempio HP, teletrasporto e aggiungo
+  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
   player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
