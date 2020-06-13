@@ -99,7 +99,7 @@ If all the conditions are met, you'll receive a confirmation. If not, you'll rec
   
 Arenas can be disabled too, via  
 `arena_lib.disable_arena(sender, mod, arena_name)`  
-In order to do that, no game must be taking place in that specific arena.  
+In order to do that, no game must be taking place in that specific arena. It returns true if succesfully disabled.
 
 ### 1.3 Arena phases
 An arena comes in 4 phases, each one of them linked to a specific function:

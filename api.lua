@@ -575,12 +575,12 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   -- se è già disabilitata, annullo
   if not arena.enabled then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already disabled!")))
-  return end
+    return end
 
   -- se una partita è in corso, annullo
   if arena.in_loading or arena.in_game or arena.in_celebration then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't disable an arena during an ongoing game!")))
-  return end
+    return end
 
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
   if next(arena.players) then
@@ -608,6 +608,8 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   arena_lib.update_sign(arena.sign, arena)
   update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
+
+  return true
 end
 
 
