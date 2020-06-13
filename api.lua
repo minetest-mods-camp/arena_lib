@@ -998,6 +998,7 @@ end
 
 
 function arena_lib.remove_player_from_arena(p_name, reason)
+  -- reason 0 = has disconnected
   -- reason 1 = has been eliminated
   -- reason 2 = has been kicked
   -- reason 3 = has quit the arena
@@ -1011,7 +1012,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   local arena = arena_lib.get_arena_by_player(p_name)
 
   -- se una ragione è specificata
-  if reason ~= nil then
+  if reason ~= 0 then
 
     local player = minetest.get_player_by_name(p_name)
 
@@ -1050,8 +1051,10 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       end
     end
   else
-    --TODO: considerare se rimuovere questo avviso dato che il server avvisa di base i giocatori
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
+    if mod_ref.on_disconnect then
+      mod_ref.on_disconnect(arena, p_name)
+    end
   end
 
   -- lo rimuovo
