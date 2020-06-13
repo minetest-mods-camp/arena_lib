@@ -7,8 +7,8 @@ local editor_tools = {
   "arena_lib:editor_signs",
   "",
   "",
-  "",
   "arena_lib:editor_info",
+  "arena_lib:editor_enable",
   "arena_lib:editor_quit"
 }
 

@@ -85,6 +85,26 @@ minetest.register_tool("arena_lib:editor_return", {
 
 
 
+minetest.register_tool("arena_lib:editor_enable", {
+
+    description = S("Enable and leave"),
+    inventory_image = "arenalib_editor_enable.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+
+      arena_lib.enable_arena(user:get_player_name(), mod, arena_name)
+    end
+
+})
+
+
+
 minetest.register_tool("arena_lib:editor_quit", {
 
     description = S("Leave the editor"),

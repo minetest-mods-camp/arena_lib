@@ -44,7 +44,7 @@ Two things are needed to have an arena up to go: spawners and signs. There are t
 
 #### 1.2.1 Editor
 From version 3.0.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
-In order to use the editor, the specified arena must be disabled and no other players must be editing the same arena. The rest is pretty straightforward :D and if you're not sure of what something does, just open the inventory and read its name.  
+In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
 The function calling the editor is  
 `arena_lib.enter_editor(sender, mod, arena_name)`
 
@@ -90,7 +90,7 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 ##### 1.2.2.2 Signs
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign". 
 
-#### 1.2.3 Enabling an arena
+#### 1.2.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  
 `arena_lib.enable_arena(sender, mod, arena_name)`  
 If all the conditions are met, you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:

@@ -1,4 +1,4 @@
-# version 3.1.0
+# version 3.2.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -120,6 +120,7 @@ Signs=Cartelli
 One sign per arena=Un cartello per arena
 Info=Info
 Go back=Torna indietro
+Enable and leave=Abilita ed esci
 Leave the editor=Esci dall'editor
 
 # tools_spawner.lua
