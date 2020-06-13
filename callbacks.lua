@@ -72,3 +72,9 @@ end
 function arena_lib.on_quit(mod, func)
   arena_lib.mods[mod].on_quit = func
 end
+
+
+
+function arena_lib.on_disconnect(mod, func)
+  arena_lib.mods[mod].on_disconnect = func
+end
