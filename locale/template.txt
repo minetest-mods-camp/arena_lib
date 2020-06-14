@@ -43,6 +43,8 @@ The queue has been cancelled due to not enough players=
 There are no other teams left, you win!=
 You're the last player standing: you win!=
 You win the game due to not enough players=
+[!] This action can't be performed with no spawners set!=
+Wooosh!=
 
 # chat.lua
 Kick a player from an ongoing game=

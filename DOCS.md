@@ -90,15 +90,15 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 ##### 1.2.2.2 Signs
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign". 
 
-#### 1.2.2.3 Enabling an arena
+#### 1.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  
-`arena_lib.enable_arena(sender, mod, arena_name)`  
+`arena_lib.enable_arena(sender, mod, arena_name)` or by using the Enable and Leave button in the editor.
 If all the conditions are met, you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
 * all spawn points set
 * sign placed
   
 Arenas can be disabled too, via  
-`arena_lib.disable_arena(sender, mod, arena_name)`  
+`arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
 In order to do that, no game must be taking place in that specific arena. It returns true if succesfully disabled.
 
 ### 1.3 Arena phases
@@ -260,6 +260,7 @@ There are also some other functions which might turn useful. They are:
   * `3`: player quit. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1)
 * `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
+* `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 
 ### 2.7 Getters

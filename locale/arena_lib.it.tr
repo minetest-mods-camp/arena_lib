@@ -43,6 +43,8 @@ The queue has been cancelled due to not enough players=La coda è stata annullat
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
+[!] This action can't be performed with no spawners set!=[!] Quest'azione non può essere eseguita senza punti di spawn impostati!
+Wooosh!=Wooosh!
 
 # chat.lua
 Kick a player from an ongoing game=Caccia un giocatore da una partita in corso

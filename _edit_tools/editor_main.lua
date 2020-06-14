@@ -25,6 +25,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
   end
 
+  arena_lib.teleport_in_arena(sender, mod, arena_name)
+
   local player = minetest.get_player_by_name(sender)
 
   -- imposto i metadati che porto a spasso per l'editor

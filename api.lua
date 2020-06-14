@@ -1131,6 +1131,28 @@ end
 
 
 
+function arena_lib.teleport_in_arena(sender, mod, arena_name)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  -- se non esiste l'arena, annullo
+  if arena == nil then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
+    return end
+
+  if not next(arena.spawn_points) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This action can't be performed with no spawners set!")))
+    return end
+
+  local player = minetest.get_player_by_name(sender)
+
+  player:set_pos(arena.spawn_points[next(arena.spawn_points)].pos)
+  minetest.chat_send_player(sender, S("Wooosh!"))
+
+end
+
+
+
 function arena_lib.immunity(player)
 
   local immunity_item = ItemStack("arena_lib:immunity")
