@@ -1,6 +1,6 @@
 local S = minetest.get_translator("arena_lib")
 local arenas_in_edit_mode = {}      -- KEY: arena name; INDEX: name of the player inside the editor
-local players_in_edit_mode = {}     -- KEY: player name; INDEX: (placeholder, not relevant)
+local players_in_edit_mode = {}     -- KEY: player name; INDEX: player old inventory
 local editor_tools = {
   "",
   "arena_lib:editor_spawners",
@@ -33,12 +33,12 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   player:get_meta():set_string("arena_lib_editor.mod", mod)
   player:get_meta():set_string("arena_lib_editor.arena", arena_name)
 
+  -- metto l'arena in edit mode e salvo l'inventario
+  arenas_in_edit_mode[arena_name] = sender
+  players_in_edit_mode[sender] = player:get_inventory():get_list("main")
+
   -- cambio l'inventario
   arena_lib.show_main_editor(player)
-
-  -- metto l'arena in edit mode
-  arenas_in_edit_mode[arena_name] = sender
-  players_in_edit_mode[sender] = true
 
 end
 
@@ -50,18 +50,21 @@ function arena_lib.quit_editor(player)
 
   if arena_name == "" then return end
 
+  local p_name = player:get_player_name()
+  local inv = players_in_edit_mode[p_name]
+
   arenas_in_edit_mode[arena_name] = nil
-  players_in_edit_mode[player:get_player_name()] = nil
+  players_in_edit_mode[p_name] = nil
 
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
   player:get_meta():set_string("arena_lib_editor.spawner_ID", "")
 
   minetest.after(0, function()
-    player:get_inventory():set_list("main", {})
+    player:get_inventory():set_list("main", inv)
   end)
 
-  arena_lib.HUD_hide("hotbar", player:get_player_name())
+  arena_lib.HUD_hide("hotbar", p_name)
 
 end
 
