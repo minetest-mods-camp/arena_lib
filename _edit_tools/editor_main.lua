@@ -18,11 +18,11 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- se l'arena è abilitata, provo a disabilitarla (ARENA_LIB_EDIT_PRECHECKS_PASSED è già incluso in disable_arena: da qui l'if)
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
+
+  -- se l'arena è abilitata, la disabilito
   if arena.enabled then
-    if not arena_lib.disable_arena(sender, mod, arena_name) then return end
-  else
-    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
+    arena_lib.disable_arena(sender, mod, arena_name)
   end
 
   arena_lib.teleport_in_arena(sender, mod, arena_name)
