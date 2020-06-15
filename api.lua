@@ -656,11 +656,11 @@ function arena_lib.load_arena(mod, arena_ID)
           j = j +1
         end
       end
-    end
 
-    -- e carico eventuali proprietà dei team
-    for j, w in pairs(mod_ref.team_properties) do
-      arena.teams[k][j] = w
+      -- e carico eventuali proprietà per ogni team
+      for k, v in pairs(mod_ref.team_properties) do
+        arena.teams[i][k] = v
+      end
     end
 
   end
@@ -1060,7 +1060,6 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   end
 
   -- lo rimuovo
-  arena.players[p_name] = nil
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
   arena.players_amount = arena.players_amount - 1
@@ -1068,6 +1067,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     local p_team_ID = arena.players[p_name].teamID
     arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
   end
+  arena.players[p_name] = nil
 
   arena_lib.update_sign(arena.sign, arena)
 
