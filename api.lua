@@ -697,6 +697,7 @@ function arena_lib.load_arena(mod, arena_ID)
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main",{})
+      player:get_inventory():set_list("craft",{})
     end
 
     -- registro giocatori nella tabella apposita
@@ -772,6 +773,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   -- svuoto eventualmente l'inventario
   if not mod_ref.keep_inventory then
     player:get_inventory():set_list("main",{})
+    player:get_inventory():set_list("craft",{})
   end
 
   -- riempio HP, teletrasporto e aggiungo
@@ -862,6 +864,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main", {})
+      player:get_inventory():set_list("craft",{})
     end
 
     -- teletrasporto nella lobby
@@ -1019,6 +1022,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     -- svuoto eventualmente l'inventario
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main",{})
+      player:get_inventory():set_list("craft",{})
     end
 
     -- resetto gli HP, teletrasporto fuori dall'arena e ripristino nome

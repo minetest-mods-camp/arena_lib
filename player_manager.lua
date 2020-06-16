@@ -15,6 +15,7 @@ minetest.register_on_joinplayer(function(player)
     if minetest.get_modpath("hub_manager") then return end          -- se c'è hub_manager, ci pensa quest'ultimo allo svuotamento dell'inventario
 
     player:get_inventory():set_list("main", {})
+    player:get_inventory():set_list("craft",{})
   end
 
 end)
