@@ -1084,8 +1084,8 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
     end
 
-  -- se invece ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  elseif #arena.teams > 1 and arena.players_amount < arena.min_players * #arena.teams then
+  -- se invece è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
+  elseif arena.in_game and #arena.teams > 1 and arena.players_amount < arena.min_players * #arena.teams then
 
     local team_to_compare
 
@@ -1105,8 +1105,8 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
     arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
 
-  -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
-  elseif arena.players_amount == 1 then
+  -- se invece è in partita ed erano rimasti solo 2 giocatori in partita, l'altro vince
+elseif arena.in_game and arena.players_amount == 1 then
 
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
