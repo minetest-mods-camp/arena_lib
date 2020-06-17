@@ -679,6 +679,9 @@ function arena_lib.load_arena(mod, arena_ID)
       player:hud_set_flags({minimap = false})
     end
 
+    -- chiudo eventuali formspec
+    minetest.close_formspec(pl_name, "")
+
     -- li blocco sul posto
     player:set_physics_override({
               speed = 0,
