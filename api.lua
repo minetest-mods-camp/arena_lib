@@ -17,17 +17,17 @@ local function next_available_ID() end
 local function assign_team_spawner() end
 local function timer_start() end
 
-local players_in_game = {}    --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
-local players_in_queue = {}   --KEY: player name, INDEX: {(string) minigame, (int) arenaID}
+local players_in_game = {}    --KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_queue = {}   --KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 
 local arena_default = {
   name = "",
   sign = {},
-  players = {},               --KEY: player name, INDEX: kills, deaths, player_properties
+  players = {},               --KEY: player name, VALUE: kills, deaths, player_properties
   teams = {-1},
   players_amount = 0,
   players_amount_per_team = nil,
-  spawn_points = {},          --KEY: ids, INDEX: {position, team}
+  spawn_points = {},          --KEY: ids, VALUE: {position, team}
   max_players = 4,
   min_players = 2,
   in_queue = false,
@@ -356,6 +356,12 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
       --TODO: switch migliore dato che ci stanno dentro anche i team
       arena.spawn_points[ID] = nil
+
+      -- se i waypoint sono mostrati, li aggiorno
+      if arena_lib.are_waypoints_shown(sender) then
+        arena_lib.show_waypoints(sender, arena)
+      end
+
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
 
     -- se deleteall, li cancello tutti
@@ -372,6 +378,12 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         arena.spawn_points = {}
         minetest.chat_send_player(sender, S("All the spawn points have been removed"))
       end
+
+      -- se i waypoint sono mostrati, li aggiorno
+      if arena_lib.are_waypoints_shown(sender) then
+        arena_lib.show_waypoints(sender, arena)
+      end
+
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
     end
@@ -437,6 +449,11 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   -- imposto lo spawner
   arena.spawn_points[next_available_spawnID] = {pos = pos_Y_up, teamID = team_ID}
+
+  -- se i waypoint sono mostrati, li aggiorno
+  if arena_lib.are_waypoints_shown(sender) then
+    arena_lib.show_waypoints(sender, arena)
+  end
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
 

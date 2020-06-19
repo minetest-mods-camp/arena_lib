@@ -1,4 +1,4 @@
-# version 3.2.0
+# version 3.1.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -112,10 +112,13 @@ Get ready!=
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
-# editor_main.lua
+# _hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=
+
+# _editor/editor_main.lua
 Arena_lib editor | Now editing: @1=
 
-# editor_icons.lua
+# _editor/editor_icons.lua
 Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=
@@ -126,7 +129,7 @@ Enable and leave=
 Leave the editor=
 
 
-# tools_spawner.lua
+# _editor/tools_spawner.lua
 Add spawner=
 Remove spawner=
 Add team spawner=
@@ -136,7 +139,7 @@ Selected team: @1=
 Delete all spawners=
 Delete all spawners of the team=
 
-# tools_sign.lua
+# _editor/tools_sign.lua
 Add sign=
 Remove sign=
 

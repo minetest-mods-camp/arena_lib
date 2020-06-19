@@ -1,4 +1,4 @@
-# version 3.2.0
+# version 3.1.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -112,10 +112,13 @@ Get ready!=Preparati!
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 
-# editor_main.lua
+# _hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
+
+# _editor/editor_main.lua
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
-# editor_icons.lua
+# _editor/editor_icons.lua
 Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
 Signs=Cartelli
@@ -125,7 +128,7 @@ Go back=Torna indietro
 Enable and leave=Abilita ed esci
 Leave the editor=Esci dall'editor
 
-# tools_spawner.lua
+# _editor/tools_spawner.lua
 Add spawner=Aggiungi spawner
 Remove spawner=Rimuovi spawner
 Add team spawner=Aggiungi spawner squadra
@@ -135,7 +138,7 @@ Selected team: @1=Squadra selezionata: @1
 Delete all spawners=Cancella tutti gli spawner
 Delete all spawners of a team=Cancella tutti gli spawner della squadra
 
-# tools_sign.lua
+# _editor/tools_sign.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
 

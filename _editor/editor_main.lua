@@ -1,6 +1,6 @@
 local S = minetest.get_translator("arena_lib")
-local arenas_in_edit_mode = {}      -- KEY: arena name; INDEX: name of the player inside the editor
-local players_in_edit_mode = {}     -- KEY: player name; INDEX: {inv (player old inventory), pos (player old position)}
+local arenas_in_edit_mode = {}      -- KEY: arena name; VALUE: name of the player inside the editor
+local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv (player old inventory), pos (player old position)}
 local editor_tools = {
   "",
   "arena_lib:editor_spawners",
@@ -44,8 +44,9 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   arenas_in_edit_mode[arena_name] = sender
   players_in_edit_mode[sender] = { inv = player:get_inventory():get_list("main"), pos = player:get_pos()}
 
-  -- teletrasporto
+  -- teletrasporto e mostro gli spawner
   arena_lib.teleport_in_arena(sender, mod, arena_name)
+  arena_lib.show_waypoints(sender, arena)
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)
@@ -70,6 +71,8 @@ function arena_lib.quit_editor(player)
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
   player:get_meta():set_string("arena_lib_editor.spawner_ID", "")
+
+  arena_lib.remove_waypoints(p_name)
 
   -- se si è disconnesso mi fermo qua
   if not minetest.get_player_by_name(p_name) then return end
