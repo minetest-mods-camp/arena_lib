@@ -1,3 +1,5 @@
+local function change_spawner_ID() end
+
 local S = minetest.get_translator("arena_lib")
 local spawners_tools_team = {
   "arena_lib:spawner_team_add",
@@ -59,20 +61,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
 
 
   on_place = function(itemstack, placer, pointed_thing)
-
-    local mod = placer:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
-    local spawner_ID = placer:get_meta():get_int("arena_lib_editor.spawner_ID")
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-    if spawner_ID >= table.maxn(arena.spawn_points) then
-      spawner_ID = 1
-    else
-      spawner_ID = spawner_ID +1
-    end
-
-    placer:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
-    arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
+    change_spawner_ID(placer)
   end
 
 })
@@ -119,20 +108,7 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
 
 
   on_place = function(itemstack, placer, pointed_thing)
-
-    local mod = placer:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
-    local spawner_ID = placer:get_meta():get_int("arena_lib_editor.spawner_ID")
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-    if spawner_ID >= table.maxn(arena.spawn_points) then
-      spawner_ID = 1
-    else
-      spawner_ID = spawner_ID +1
-    end
-
-    placer:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
-    arena_lib.HUD_send_msg("hotbar", placer:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
+    change_spawner_ID(placer)
   end
 
 })
@@ -227,4 +203,28 @@ function arena_lib.give_spawners_tools(player)
     player:get_inventory():set_list("main", spawners_tools_noteam)
   end
 
+end
+
+
+
+
+
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
+
+function change_spawner_ID(player)
+  local mod = player:get_meta():get_string("arena_lib_editor.mod")
+  local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
+  local spawner_ID = player:get_meta():get_int("arena_lib_editor.spawner_ID")
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if spawner_ID >= table.maxn(arena.spawn_points) then
+    spawner_ID = 1
+  else
+    spawner_ID = spawner_ID +1
+  end
+
+  player:get_meta():set_int("arena_lib_editor.spawner_ID", spawner_ID)
+  arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", spawner_ID))
 end
