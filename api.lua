@@ -375,6 +375,8 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
     end
+
+  update_storage(false, mod, id, arena)
   return
   end
 
