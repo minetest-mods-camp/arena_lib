@@ -293,6 +293,29 @@ end
 
 
 
+function arena_lib.rename_arena(sender, mod, arena_name, new_name)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+
+  -- se esiste già un'arena con il nuovo nome, annullo
+  if arena_lib.get_arena_by_name(mod, new_name) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
+    return end
+
+  local old_name = arena.name
+
+  arena.name = new_name
+  minetest.chat_send_player(sender, "Arena " .. old_name .. " rinominata con successo in " .. new_name)
+
+  -- aggiorno storage e cartello
+  update_storage(false, mod, id, arena)
+  arena_lib.update_sign(arena.sign, arena)
+end
+
+
+
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
@@ -354,7 +377,6 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
         return end
 
-      --TODO: switch migliore dato che ci stanno dentro anche i team
       arena.spawn_points[ID] = nil
 
       -- se i waypoint sono mostrati, li aggiorno
@@ -956,8 +978,6 @@ end
 ----------------------------------------------
 --------------------UTILS---------------------
 ----------------------------------------------
-
---TODO: rename_arena
 
 -- mod è opzionale
 function arena_lib.is_player_in_arena(p_name, mod)

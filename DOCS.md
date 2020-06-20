@@ -101,6 +101,11 @@ Arenas can be disabled too, via
 `arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
 In order to do that, no game must be taking place in that specific arena.
 
+#### 1.2.4 Renaming an arena
+An arena can be renamed via  
+`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
+In order to do so, it must be disabled first.
+
 ### 1.3 Arena phases
 An arena comes in 4 phases, each one of them linked to a specific function:
 * `waiting phase`: it's the queuing process. People hit a sign waiting for other players to play with 
