@@ -63,7 +63,7 @@ minetest.override_item("default:sign_wall", {
           if #sign_arena.teams > 1 then
             sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] -1
           end
-          arena_lib.update_sign(pos, sign_arena)
+          arena_lib.update_sign(sign_arena)
           arena_lib.remove_from_queue(p_name)
           arena_lib.HUD_hide("all", p_name)
 
@@ -103,7 +103,7 @@ minetest.override_item("default:sign_wall", {
             old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] -1
           end
           arena_lib.remove_from_queue(p_name)
-          arena_lib.update_sign(old_arena.sign, old_arena)
+          arena_lib.update_sign(old_arena)
           arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
 
           local players_in_arena = old_arena.players_amount
@@ -152,7 +152,7 @@ minetest.override_item("default:sign_wall", {
       end
 
       -- aggiorno il cartello
-      arena_lib.update_sign(pos, sign_arena)
+      arena_lib.update_sign(sign_arena)
 
       -- notifico i vari giocatori del nuovo player
       if sign_arena.in_game then
@@ -206,7 +206,7 @@ minetest.override_item("default:sign_wall", {
 
       sign_arena.in_queue = false
       sign_arena.in_game = true
-      arena_lib.update_sign(pos, sign_arena)
+      arena_lib.update_sign(sign_arena)
 
       arena_lib.HUD_hide("all", sign_arena)
       arena_lib.load_arena(mod, arena_ID)
@@ -218,7 +218,7 @@ minetest.override_item("default:sign_wall", {
 
 
 
-function arena_lib.update_sign(pos, arena)
+function arena_lib.update_sign(arena)
 
   local p_count = 0
   local t_count = #arena.teams
@@ -228,7 +228,7 @@ function arena_lib.update_sign(pos, arena)
     p_count = p_count +1
   end
 
-  signs_lib.update_sign(pos, {text = [[
+  signs_lib.update_sign(arena.sign, {text = [[
    ]] .. "\n" .. [[
    ]] .. arena.name .. "\n" .. [[
    ]] .. p_count .. "/".. arena.max_players * t_count .. "\n" .. [[

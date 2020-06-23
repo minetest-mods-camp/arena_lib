@@ -309,7 +309,7 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name)
   arena.name = new_name
 
   update_storage(false, mod, id, arena)
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   minetest.chat_send_player(sender, S("Arena @1 successfully renamed in @2", old_name, new_name))
 
@@ -341,7 +341,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall")
 
   update_storage(false, mod, id, arena)
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
 
@@ -585,12 +585,12 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
     return
   end
 
-  -- cambio la scritta
-  arena_lib.update_sign(pos, arena)
-
   -- aggiungo il cartello ai cartelli dell'arena
   arena.sign = pos
   update_storage(false, mod, arena_ID, arena)
+
+  -- cambio la scritta
+  arena_lib.update_sign(arena)
 
   -- salvo il nome della mod e l'ID come metadato nel cartello
   minetest.get_meta(pos):set_string("mod", mod)
@@ -631,7 +631,7 @@ function arena_lib.enable_arena(sender, mod, arena_name)
 
   -- abilito
   arena.enabled = true
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
   update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
 
@@ -679,7 +679,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
 
   -- disabilito
   arena.enabled = false
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
   update_storage(false, mod, arena_ID, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
 end
@@ -707,7 +707,7 @@ function arena_lib.load_arena(mod, arena_ID)
   local arena = mod_ref.arenas[arena_ID]
 
   arena.in_loading = true
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   local shuffled_spawners = copy_table(arena.spawn_points)
   local sorted_team_players = {}
@@ -802,7 +802,7 @@ end
 function arena_lib.start_arena(mod_ref, arena)
 
   arena.in_loading = false
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   for pl_name, stats in pairs(arena.players) do
 
@@ -873,7 +873,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   local winning_message = ""
 
   arena.in_celebration = true
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   -- per ogni giocatore...
   for pl_name, stats in pairs(arena.players) do
@@ -990,7 +990,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
   -- aggiorno storage per le properties e cartello
   update_storage(false, mod, id, arena)
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
 end
 
@@ -1146,7 +1146,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   end
   arena.players[p_name] = nil
 
-  arena_lib.update_sign(arena.sign, arena)
+  arena_lib.update_sign(arena)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
@@ -1466,7 +1466,7 @@ function init_storage(mod, mod_ref)
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
         if arena.sign.x then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
-          arena_lib.update_sign(arena.sign, arena)
+          arena_lib.update_sign(arena)
         end
       end)
 
