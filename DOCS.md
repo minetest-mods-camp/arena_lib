@@ -51,7 +51,10 @@ The function calling the editor is
 #### 1.2.2 CLI
 If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work.
 
-##### 1.2.2.1 Spawners
+##### 1.2.2.1 Players management
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players of a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`).
+
+##### 1.2.2.2 Spawners
 `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
 * `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
 * `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
@@ -87,8 +90,8 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
    [etc.]
 ```
 
-##### 1.2.2.2 Signs
-`arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign". 
+##### 1.2.2.3 Signs
+`arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
 
 #### 1.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  
