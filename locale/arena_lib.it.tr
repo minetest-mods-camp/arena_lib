@@ -8,6 +8,8 @@
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
+Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
+Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
 [!] This team doesn't exist!=[!] Questo team non esiste!
 [!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
 [!] No team must be specified for this function!=[!] Non va specificato nessun team per questa funzione!
@@ -119,6 +121,8 @@ Get ready!=Preparati!
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
 # _editor/editor_icons.lua
+Players=Giocatori
+Players | num to set: @1 (left/right click slot #3 to change)=Giocatori | num: @1 (click sx/dx su slot #3 per cambiare)
 Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
 Signs=Cartelli

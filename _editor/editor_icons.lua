@@ -2,6 +2,29 @@ local S = minetest.get_translator("arena_lib")
 
 
 
+minetest.register_tool("arena_lib:editor_players", {
+
+    description = S("Players"),
+    inventory_image = "arenalib_editor_players.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      user:get_meta():set_int("arena_lib_editor.players_number", 2)
+
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #3 to change)", 2))
+
+      minetest.after(0, function()
+        arena_lib.give_players_tools(user)
+      end)
+    end
+
+})
+
+
+
 minetest.register_tool("arena_lib:editor_spawners", {
 
     description = S("Spawners"),

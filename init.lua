@@ -1,4 +1,4 @@
-local version = "3.1.0-dev"
+local version = "3.2.0"
 
 dofile(minetest.get_modpath("arena_lib") .. "/api.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/callbacks.lua")
@@ -13,6 +13,7 @@ dofile(minetest.get_modpath("arena_lib") .. "/signs.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/utils.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/editor_main.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/editor_icons.lua")
+dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_players.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_sign.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_spawner.lua")
 

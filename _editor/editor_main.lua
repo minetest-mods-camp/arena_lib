@@ -2,7 +2,7 @@ local S = minetest.get_translator("arena_lib")
 local arenas_in_edit_mode = {}      -- KEY: arena name; VALUE: name of the player inside the editor
 local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv (player old inventory), pos (player old position)}
 local editor_tools = {
-  "",
+  "arena_lib:editor_players",
   "arena_lib:editor_spawners",
   "arena_lib:editor_signs",
   "",
@@ -44,8 +44,11 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   arenas_in_edit_mode[arena_name] = sender
   players_in_edit_mode[sender] = { inv = player:get_inventory():get_list("main"), pos = player:get_pos()}
 
-  -- teletrasporto e mostro gli spawner
-  arena_lib.teleport_in_arena(sender, mod, arena_name)
+  -- se c'è almeno uno spawner, teletrasporto
+  if next(arena.spawn_points) then
+    arena_lib.teleport_in_arena(sender, mod, arena_name)
+  end
+
   arena_lib.show_waypoints(sender, arena)
 
   -- cambio l'inventario
@@ -70,11 +73,13 @@ function arena_lib.quit_editor(player)
 
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
-  player:get_meta():set_string("arena_lib_editor.spawner_ID", "")
+  player:get_meta():set_int("arena_lib_editor.players_number", 0)
+  player:get_meta():set_int("arena_lib_editor.spawner_ID", 0)
+  player:get_meta():set_int("arena_lib_editor.team_ID", 0)
 
   arena_lib.remove_waypoints(p_name)
 
-  -- se si è disconnesso mi fermo qua
+  -- se si è disconnesso, mi fermo qua
   if not minetest.get_player_by_name(p_name) then return end
 
   -- teletrasporto

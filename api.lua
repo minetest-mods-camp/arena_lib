@@ -214,7 +214,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
 
   -- controllo che non abbiano messo parametri assurdi per i giocatori minimi/massimi
   if min_players and max_players then
-    if min_players > max_players or min_players == 0 then
+    if min_players > max_players or min_players == 0 or max_players < 2 then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
   end
@@ -307,11 +307,44 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name)
   local old_name = arena.name
 
   arena.name = new_name
-  minetest.chat_send_player(sender, "Arena " .. old_name .. " rinominata con successo in " .. new_name)
 
-  -- aggiorno storage e cartello
   update_storage(false, mod, id, arena)
   arena_lib.update_sign(arena.sign, arena)
+
+  minetest.chat_send_player(sender, S("Arena @1 successfully renamed in @2", old_name, new_name))
+
+end
+
+
+
+function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+
+  -- salvo i vecchi parametri così da poterne modificare anche solo uno senza if lunghissimi
+  local old_min_players = arena.min_players
+  local old_max_players = arena.max_players
+
+  arena.min_players = min_players or arena.min_players
+  arena.max_players = max_players or arena.max_players
+
+  -- se ha parametri assurdi, annullo
+  if arena.min_players > arena.max_players or arena.min_players == 0 or arena.max_players < 2 then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    arena.min_players = old_min_players
+    arena.max_players = old_max_players
+  return end
+
+  -- svuoto i vecchi spawner per evitare problemi
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall")
+
+  update_storage(false, mod, id, arena)
+  arena_lib.update_sign(arena.sign, arena)
+
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
+
 end
 
 

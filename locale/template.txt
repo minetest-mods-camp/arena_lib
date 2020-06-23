@@ -1,4 +1,4 @@
-# version 3.1.0-dev
+# version 3.2.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -8,6 +8,8 @@
 [!] Parameters don't seem right!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
+Arena @1 successfully renamed in @2=
+Players amount successfully changed ( min @1 | max @2 )=
 [!] This team doesn't exist!=
 [!] No spawner with that ID to overwrite!=
 [!] No team must be specified for this function!=
@@ -119,6 +121,8 @@ Get ready!=
 Arena_lib editor | Now editing: @1=
 
 # _editor/editor_icons.lua
+Players=
+Players | num to set: @1 (left/right click slot #3 to change)=
 Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=
