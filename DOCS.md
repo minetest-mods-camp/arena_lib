@@ -139,6 +139,11 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib]`
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
+* `is_team_chat_default`: whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
+* `mod_ref.chat_all_prefix`: prefix for every message sent in arena, team chat aside. Default is none
+* `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
+* `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
+* `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
 * `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt#L4414)
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
@@ -267,7 +272,7 @@ There are also some other functions which might turn useful. They are:
   * `2`: player kicked. Calls `on_kick`
   * `3`: player quit. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1)
-* `arena_lib.send_message_players_in_arena(arena, msg)`: send a message to all the players in that specific arena
+* `arena_lib.send_message_players_in_arena(arena, msg, <teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 

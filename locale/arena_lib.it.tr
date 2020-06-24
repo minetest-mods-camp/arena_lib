@@ -1,9 +1,10 @@
-# version 3.1.0-dev
+# version 3.3.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
 
 # api.lua
+team=squadra
 [!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Arena @1 successfully created=Arena @1 creata con successo

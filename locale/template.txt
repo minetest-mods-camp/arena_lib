@@ -1,9 +1,10 @@
-# version 3.2.0
+# version 3.3.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
 
 # api.lua
+team=
 [!] An arena with that name exists already!=
 [!] Parameters don't seem right!=
 Arena @1 successfully created=

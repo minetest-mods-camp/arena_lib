@@ -17,17 +17,17 @@ local function next_available_ID() end
 local function assign_team_spawner() end
 local function timer_start() end
 
-local players_in_game = {}    --KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_in_queue = {}   --KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_game = {}    -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_queue = {}   -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 
 local arena_default = {
   name = "",
   sign = {},
-  players = {},               --KEY: player name, VALUE: kills, deaths, player_properties
+  players = {},               -- KEY: player name, VALUE: {kills, deaths, teamID, player_properties}
   teams = {-1},
   players_amount = 0,
   players_amount_per_team = nil,
-  spawn_points = {},          --KEY: ids, VALUE: {position, team}
+  spawn_points = {},          -- KEY: ids, VALUE: {position, team}
   max_players = 4,
   min_players = 2,
   in_queue = false,
@@ -69,6 +69,11 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.teams = {}
+  mod_ref.is_team_chat_default = false
+  mod_ref.chat_all_prefix = ""
+  mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
+  mod_ref.chat_all_color = "#ffffff"
+  mod_ref.chat_team_color = "#ddfdff"
   mod_ref.disabled_damage_types = {}
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
@@ -96,6 +101,22 @@ function arena_lib.register_minigame(mod, def)
 
   if def.teams and type(def.teams) == "table" then
     mod_ref.teams = def.teams
+
+    if def.is_team_chat_default == true then
+      mod_ref.is_team_chat_default = def.is_team_chat_default
+    end
+
+    if def.chat_team_prefix then
+      mod_ref.chat_team_prefix = def.chat_team_prefix
+    end
+
+    if def.chat_team_color then
+      mod_ref.chat_team_color = def.chat_team_color
+    end
+  end
+
+  if def.chat_all_color then
+    mod_ref.chat_all_color = def.chat_all_color
   end
 
   if def.disabled_damage_types and type(def.disabled_damage_types) == "table" then
@@ -1201,9 +1222,19 @@ end
 
 
 
-function arena_lib.send_message_players_in_arena(arena, msg)
-  for pl_name, stats in pairs(arena.players) do
-    minetest.chat_send_player(pl_name, msg) end
+function arena_lib.send_message_players_in_arena(arena, msg, teamID)
+
+  if teamID then
+    for pl_name, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID == teamID then
+        minetest.chat_send_player(pl_name, msg)
+      end
+    end
+  else
+    for pl_name, _ in pairs(arena.players) do
+      minetest.chat_send_player(pl_name, msg)
+    end
+  end
 end
 
 
