@@ -115,6 +115,10 @@ function arena_lib.register_minigame(mod, def)
     end
   end
 
+  if def.chat_all_prefix then
+    mod_ref.chat_all_prefix = def.chat_all_prefix
+  end
+
   if def.chat_all_color then
     mod_ref.chat_all_color = def.chat_all_color
   end

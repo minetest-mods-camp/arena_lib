@@ -49,13 +49,16 @@ You win the game due to not enough players=
 [!] This action can't be performed with no spawners set!=
 Wooosh!=
 
-# chat.lua
+# commands.lua
 Kick a player from an ongoing game=
 [!] This player is not online!=
 [!] The player must be in a game to perform this action!=
 [!] You must be in a game to perform this action!=
 Quit an ongoing game=
 [!] You can't perform this action if you're the only one left!=
+Write a message in the arena global chat while in a game=
+Write a message in the arena team chat while in a game (if teams are enabled)=
+[!] Teams are not enabled!=
 
 # debug_utilities.lua
 name: =

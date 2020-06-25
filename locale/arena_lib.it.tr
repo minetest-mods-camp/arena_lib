@@ -49,13 +49,16 @@ You win the game due to not enough players=Hai vinto la partita per troppi pochi
 [!] This action can't be performed with no spawners set!=[!] Quest'azione non può essere eseguita senza punti di spawn impostati!
 Wooosh!=Wooosh!
 
-# chat.lua
+# commands.lua
 Kick a player from an ongoing game=Caccia un giocatore da una partita in corso
 [!] This player is not online!=[!] Questo giocatore non è online!
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
 [!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
 Quit an ongoing game=Abbandona una partita in corso
 [!] You can't perform this action if you're the only one left!=[!] Non puoi eseguire quest'azione se sei l'unico giocatore rimasto!
+Write a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
+Write a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
+[!] Teams are not enabled!=[!] Le squadre non sono abilitate!
 
 # debug_utilities.lua
 name: =nome: 
