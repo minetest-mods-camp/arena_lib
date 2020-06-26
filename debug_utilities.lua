@@ -33,12 +33,12 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local players_inside_per_team = ""
 
   -- concateno eventuali team
-  if next(mod_ref.teams) then
+  if #arena.teams > 1 then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
     max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
-    for i = 1, #mod_ref.teams do
-      teams = teams .. "'" .. mod_ref.teams[i] .. "' "
-      players_inside_per_team = players_inside_per_team .. "'" .. mod_ref.teams[i] .. "' : " .. arena.players_amount_per_team[i] .. " "
+    for i = 1, #arena.teams do
+      teams = teams .. "'" .. arena.teams[i] .. "' "
+      players_inside_per_team = players_inside_per_team .. "'" .. arena.teams[i] .. "' : " .. arena.players_amount_per_team[i] .. " "
     end
     players_inside_per_team = minetest.colorize("#eea160", S("Players inside per team: ")) .. minetest.colorize("#cfc6b8", players_inside_per_team) .. "\n"
   else

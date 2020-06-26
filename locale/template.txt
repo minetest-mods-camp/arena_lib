@@ -127,6 +127,7 @@ Arena_lib editor | Now editing: @1=
 # _editor/editor_icons.lua
 Players=
 Players | num to set: @1 (left/right click slot #3 to change)=
+Values are PER TEAM!=
 Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=

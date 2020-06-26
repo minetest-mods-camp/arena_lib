@@ -12,6 +12,14 @@ minetest.register_tool("arena_lib:editor_players", {
 
     on_use = function(itemstack, user)
 
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+      if #arena.teams > 1 then
+        minetest.chat_send_player(user:get_player_name(), minetest.colorize("#ffdddd", "[arena_lib] " .. S("Values are PER TEAM!")))
+      end
+
       user:get_meta():set_int("arena_lib_editor.players_number", 2)
 
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #3 to change)", 2))

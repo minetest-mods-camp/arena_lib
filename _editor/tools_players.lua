@@ -14,7 +14,7 @@ local players_tools = {
 
 minetest.register_tool("arena_lib:players_min", {
 
-    description = S("Min amount of players"),
+    description = S("Players required"),
     inventory_image = "arenalib_tool_players_min.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -34,7 +34,7 @@ minetest.register_tool("arena_lib:players_min", {
 
 minetest.register_tool("arena_lib:players_max", {
 
-    description = S("Max amount of players"),
+    description = S("Players supported"),
     inventory_image = "arenalib_tool_players_max.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,

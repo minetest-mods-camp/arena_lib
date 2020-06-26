@@ -1229,15 +1229,15 @@ end
 function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_teamID)
 
   if teamID then
-    if not except_teamID then
+    if except_teamID then
       for pl_name, pl_stats in pairs(arena.players) do
-        if pl_stats.teamID == teamID then
+        if pl_stats.teamID ~= teamID then
           minetest.chat_send_player(pl_name, msg)
         end
       end
     else
       for pl_name, pl_stats in pairs(arena.players) do
-        if pl_stats.teamID ~= teamID then
+        if pl_stats.teamID == teamID then
           minetest.chat_send_player(pl_name, msg)
         end
       end
