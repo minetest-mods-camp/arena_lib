@@ -1210,7 +1210,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
 
   -- se invece è in partita ed erano rimasti solo 2 giocatori in partita, l'altro vince
-elseif arena.in_game and arena.players_amount == 1 then
+  elseif arena.in_game and arena.players_amount == 1 then
 
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
@@ -1226,12 +1226,20 @@ end
 
 
 
-function arena_lib.send_message_players_in_arena(arena, msg, teamID)
+function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_teamID)
 
   if teamID then
-    for pl_name, pl_stats in pairs(arena.players) do
-      if pl_stats.teamID == teamID then
-        minetest.chat_send_player(pl_name, msg)
+    if not except_teamID then
+      for pl_name, pl_stats in pairs(arena.players) do
+        if pl_stats.teamID == teamID then
+          minetest.chat_send_player(pl_name, msg)
+        end
+      end
+    else
+      for pl_name, pl_stats in pairs(arena.players) do
+        if pl_stats.teamID ~= teamID then
+          minetest.chat_send_player(pl_name, msg)
+        end
       end
     end
   else

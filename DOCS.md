@@ -272,7 +272,7 @@ There are also some other functions which might turn useful. They are:
   * `2`: player kicked. Calls `on_kick`
   * `3`: player quit. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1)
-* `arena_lib.send_message_players_in_arena(arena, msg, <teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team
+* `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 

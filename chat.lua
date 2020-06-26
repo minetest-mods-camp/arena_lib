@@ -5,8 +5,13 @@ minetest.register_on_chat_message(function(p_name, message)
     local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
     local arena = arena_lib.get_arena_by_player(p_name)
 
-    if #arena.teams > 1 and mod_ref.is_team_chat_default then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID)
+    if #arena.teams > 1 then
+      if mod_ref.is_team_chat_default then
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID)
+      else
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID)
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#ffdddd", mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID, true)
+      end
     else
       arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_all_color, mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message)))
     end
