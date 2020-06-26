@@ -11,6 +11,9 @@ Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
 Players amount successfully changed ( min @1 | max @2 )=
+[!] Teams are not enabled!=
+Teams successfully enabled for the arena @1=
+Teams successfully disabled for the arena @1=
 [!] This team doesn't exist!=
 [!] No spawner with that ID to overwrite!=
 [!] No team must be specified for this function!=
@@ -58,7 +61,6 @@ Quit an ongoing game=
 [!] You can't perform this action if you're the only one left!=
 Write a message in the arena global chat while in a game=
 Write a message in the arena team chat while in a game (if teams are enabled)=
-[!] Teams are not enabled!=
 
 # debug_utilities.lua
 name: =
@@ -137,6 +139,10 @@ Go back=
 Enable and leave=
 Leave the editor=
 
+# _editor/tools_players.lua
+Change the current number=
+Teams: on (click to toggle off)=
+Teams: off (click to toggle on)=
 
 # _editor/tools_spawner.lua
 Add spawner=

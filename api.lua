@@ -25,6 +25,7 @@ local arena_default = {
   sign = {},
   players = {},               -- KEY: player name, VALUE: {kills, deaths, teamID, player_properties}
   teams = {-1},
+  teams_enabled = false,
   players_amount = 0,
   players_amount_per_team = nil,
   spawn_points = {},          -- KEY: ids, VALUE: {position, team}
@@ -257,8 +258,9 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   end
 
   -- eventuali team
-  if next(mod_ref.teams) then
+  if #mod_ref.teams > 1 then
     arena.teams = {}
+    arena.teams_enabled = true
     arena.players_amount_per_team = {}
 
     for k, t_name in pairs(mod_ref.teams) do
@@ -370,6 +372,58 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
 
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
 
+end
+
+
+
+function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)      -- enable can be 0 or 1
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+
+  -- se non ci sono team nella mod, annullo
+  if #arena_lib.mods[mod].teams == 1 then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Teams are not enabled!")))
+    return end
+
+  -- se i team sono già in quello stato, annullo
+  if enable == arena.teams_enabled then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Nothing to do here!")))
+    return end
+
+  -- se abilito
+  if enable == 1 then
+    arena.teams = {}
+    arena.players_amount_per_team = {}
+
+    for k, t_name in pairs(arena_lib.mods[mod].teams) do
+      arena.teams[k] = {name = t_name}
+      arena.players_amount_per_team[k] = 0
+    end
+
+    arena.teams_enabled = true
+
+    minetest.chat_send_player(sender, S("Teams successfully enabled for the arena @1", arena_name))
+
+  -- se disabilito
+  elseif enable == 0 then
+    arena.teams = {-1}
+    arena.players_amount_per_team = nil
+    arena.teams_enabled = false
+    minetest.chat_send_player(sender, S("Teams successfully disabled for the arena @1", arena_name))
+
+  -- sennò ho scritto male e annullo
+  else
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
+  end
+
+  -- svuoto i vecchi spawner per evitare problemi
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall")
+
+  arena_lib.update_sign(arena)
+  update_storage(false, mod, id, arena)
 end
 
 
@@ -694,7 +748,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
     end
     -- svuoto l'arena
     arena.players_amount = 0
-    if #arena.teams > 1 then
+    if arena.teams_enabled then
       for k, v in pairs(arena.players_amount_per_team) do
         arena.players_amount_per_team[k] = 0
       end
@@ -738,7 +792,7 @@ function arena_lib.load_arena(mod, arena_ID)
   local sorted_team_players = {}
 
   -- randomizzo gli spawner se non è a team
-  if #arena.teams == 1 then
+  if not arena.teams_enabled then
     for i = #shuffled_spawners, 2, -1 do
       local j = math.random(i)
       shuffled_spawners[i], shuffled_spawners[j] = shuffled_spawners[j], shuffled_spawners[i]
@@ -787,7 +841,7 @@ function arena_lib.load_arena(mod, arena_ID)
               })
 
     -- teletrasporto i giocatori
-    if #arena.teams == 1 then
+    if not arena.teams_enabled then
       player:set_pos(shuffled_spawners[count].pos)
     else
       team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
@@ -955,7 +1009,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     players_in_game[pl_name] = nil
     arena.players_amount = 0
     arena.timer_current = nil
-    if #arena.teams > 1 then
+    if arena.teams_enabled then
       for i = 1, #arena.teams do
         arena.players_amount_per_team[i] = 0
       end
@@ -995,7 +1049,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
   end
 
   -- e rimuovo quelle eventuali di team
-  if #arena.teams > 1 then
+  if arena.teams_enabled then
     for i = 1, #arena.teams do
       for t_property, _ in pairs(mod_ref.team_properties) do
         arena.teams[i][t_property] = nil
@@ -1165,7 +1219,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
   arena.players_amount = arena.players_amount - 1
-  if #arena.teams > 1 then
+  if arena.teams_enabled then
     local p_team_ID = arena.players[p_name].teamID
     arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
   end
@@ -1189,7 +1243,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     end
 
   -- se invece è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  elseif arena.in_game and #arena.teams > 1 and arena.players_amount < arena.min_players * #arena.teams then
+elseif arena.in_game and arena.teams_enabled and arena.players_amount < arena.min_players * #arena.teams then
 
     local team_to_compare
 
@@ -1401,7 +1455,7 @@ end
 
 
 function arena_lib.get_random_spawner(arena, team_ID)
-  if #arena.teams > 1 then
+  if arena.teams_enabled then
     local min = 1 + (arena.max_players * (team_ID - 1))
     local max = arena.max_players * team_ID
     return arena.spawn_points[math.random(min, max)].pos
@@ -1468,11 +1522,25 @@ function init_storage(mod, mod_ref)
       end
       --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
+      --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
+      -- team per arena for 3.2.0 and lesser versions
+      if arena.teams_enabled == nil then
+        to_update = true
+        if #arena.teams > 1 then
+          arena.teams_enabled = true
+        else
+          arena.teams_enabled = false
+        end
+        minetest.log("action", "[ARENA_LIB] Added '.teams_enabled' property from 3.2.0")
+      end
+      --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
+
       -- gestione team
-      if #arena.teams > 1 and not next(mod_ref.teams) then                      -- se avevo abilitato i team e ora li ho rimossi
+      if arena.teams_enabled and not next(mod_ref.teams) then                   -- se avevo abilitato i team e ora li ho rimossi
         arena.players_amount_per_team = nil
         arena.teams = {-1}
-      elseif next(mod_ref.teams) then                                           -- sennò li genero
+        arena.teams_enabled = false
+      elseif next(mod_ref.teams) and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
         arena.players_amount_per_team = {}
         arena.teams = {}
 

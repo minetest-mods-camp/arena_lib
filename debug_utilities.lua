@@ -33,12 +33,12 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local players_inside_per_team = ""
 
   -- concateno eventuali team
-  if #arena.teams > 1 then
+  if arena.teams_enabled then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
     max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
     for i = 1, #arena.teams do
-      teams = teams .. "'" .. arena.teams[i] .. "' "
-      players_inside_per_team = players_inside_per_team .. "'" .. arena.teams[i] .. "' : " .. arena.players_amount_per_team[i] .. " "
+      teams = teams .. "'" .. arena.teams[i].name .. "' "
+      players_inside_per_team = players_inside_per_team .. "'" .. arena.teams[i].name .. "' : " .. arena.players_amount_per_team[i] .. " "
     end
     players_inside_per_team = minetest.colorize("#eea160", S("Players inside per team: ")) .. minetest.colorize("#cfc6b8", players_inside_per_team) .. "\n"
   else
@@ -85,7 +85,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   -- calcolo coordinate spawn point
   local spawners_pos = ""
-  if #arena.teams > 1 then
+  if arena.teams_enabled then
 
     for i = 1, #arena.teams do
       spawners_pos = spawners_pos .. arena.teams[i].name .. ": "

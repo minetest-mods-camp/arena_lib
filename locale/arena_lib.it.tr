@@ -11,6 +11,9 @@ Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
 Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
+[!] Teams are not enabled!=[!] Le squadre non sono abilitate!
+Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
+Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
 [!] This team doesn't exist!=[!] Questo team non esiste!
 [!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
 [!] No team must be specified for this function!=[!] Non va specificato nessun team per questa funzione!
@@ -58,7 +61,6 @@ Quit an ongoing game=Abbandona una partita in corso
 [!] You can't perform this action if you're the only one left!=[!] Non puoi eseguire quest'azione se sei l'unico giocatore rimasto!
 Write a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
 Write a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
-[!] Teams are not enabled!=[!] Le squadre non sono abilitate!
 
 # debug_utilities.lua
 name: =nome: 
@@ -136,6 +138,11 @@ Info=Info
 Go back=Torna indietro
 Enable and leave=Abilita ed esci
 Leave the editor=Esci dall'editor
+
+# _editor/tools_players.lua
+Change the current number=Cambia il numero attuale
+Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
+Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 
 # _editor/tools_spawner.lua
 Add spawner=Aggiungi spawner

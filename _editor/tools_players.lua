@@ -14,7 +14,7 @@ local players_tools = {
 
 minetest.register_tool("arena_lib:players_min", {
 
-    description = S("Players required"),
+    description = S("Players required: "),
     inventory_image = "arenalib_tool_players_min.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -34,7 +34,7 @@ minetest.register_tool("arena_lib:players_min", {
 
 minetest.register_tool("arena_lib:players_max", {
 
-    description = S("Players supported"),
+    description = S("Players supported: "),
     inventory_image = "arenalib_tool_players_max.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
@@ -71,8 +71,60 @@ minetest.register_tool("arena_lib:players_change", {
 
 
 
-function arena_lib.give_players_tools(player)
+minetest.register_tool("arena_lib:players_teams_on", {
+
+    description = S("Teams: on (click to toggle off)"),
+    inventory_image = "arenalib_tool_players_teams_on.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 0)
+
+      minetest.after(0, function()
+        user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")
+      end)
+    end
+})
+
+
+
+minetest.register_tool("arena_lib:players_teams_off", {
+
+    description = S("Teams: off (click to toggle on)"),
+    inventory_image = "arenalib_tool_players_teams_off.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1)
+
+      minetest.after(0, function()
+        user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")
+      end)
+    end
+})
+
+
+
+function arena_lib.give_players_tools(player, arena)
   player:get_inventory():set_list("main", players_tools)
+
+  if arena.teams_enabled then
+    player:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")
+  else
+    player:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")
+  end
 end
 
 
