@@ -372,6 +372,8 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
 
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
 
+  -- ritorno true per procedere al cambio di stack nell'editor
+  return true
 end
 
 

@@ -25,7 +25,7 @@ minetest.register_tool("arena_lib:editor_players", {
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #3 to change)", 2))
 
       minetest.after(0, function()
-        arena_lib.give_players_tools(user, arena)
+        arena_lib.give_players_tools(user:get_inventory(), arena)
       end)
     end
 

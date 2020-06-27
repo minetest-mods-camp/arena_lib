@@ -1,10 +1,10 @@
 local S = minetest.get_translator("arena_lib")
 local players_tools = {
-  "arena_lib:players_min",
-  "arena_lib:players_max",
+  "",                                 -- arena_lib:players_min
+  "",                                 -- arena_lib:players_max
   "arena_lib:players_change",
   "",
-  "",
+  "",                                 -- arena_lib:players_teams_on/off
   "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
@@ -12,10 +12,11 @@ local players_tools = {
 
 
 
-minetest.register_tool("arena_lib:players_min", {
+minetest.register_node("arena_lib:players_min", {
 
     description = S("Players required: "),
     inventory_image = "arenalib_tool_players_min.png",
+    wield_image = "arenalib_tool_players_min.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
     on_drop = function() end,
@@ -26,16 +27,22 @@ minetest.register_tool("arena_lib:players_min", {
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
       local players_amount = user:get_meta():get_int("arena_lib_editor.players_number")
 
-      arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, players_amount, nil)
+      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, players_amount, nil) then return end
+
+      -- aggiorno lo stack se il cambio è andato a buon fine
+      minetest.after(0, function()
+        user:set_wielded_item("arena_lib:players_min " .. players_amount)
+      end)
     end
 })
 
 
 
-minetest.register_tool("arena_lib:players_max", {
+minetest.register_node("arena_lib:players_max", {
 
     description = S("Players supported: "),
     inventory_image = "arenalib_tool_players_max.png",
+    wield_image = "arenalib_tool_players_max.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
     on_drop = function() end,
@@ -46,7 +53,12 @@ minetest.register_tool("arena_lib:players_max", {
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
       local players_amount = user:get_meta():get_int("arena_lib_editor.players_number")
 
-      arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, players_amount)
+      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, players_amount) then return end
+
+      -- aggiorno lo stack se il cambio è andato a buon fine
+      minetest.after(0, function()
+        user:set_wielded_item("arena_lib:players_max " .. players_amount)
+      end)
     end
 })
 
@@ -117,13 +129,17 @@ minetest.register_tool("arena_lib:players_teams_off", {
 
 
 
-function arena_lib.give_players_tools(player, arena)
-  player:get_inventory():set_list("main", players_tools)
+function arena_lib.give_players_tools(inv, arena)
+
+  inv:set_list("main", players_tools)
+
+  inv:set_stack("main", 1, "arena_lib:players_min " .. arena.min_players)
+  inv:set_stack("main", 2, "arena_lib:players_max " .. arena.max_players)
 
   if arena.teams_enabled then
-    player:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")
+    inv:set_stack("main", 5, "arena_lib:players_teams_on")
   else
-    player:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")
+    inv:set_stack("main", 5, "arena_lib:players_teams_off")
   end
 end
 

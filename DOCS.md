@@ -61,7 +61,7 @@ The function calling the editor is
 If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work.
 
 ##### 1.2.2.1 Players management
-`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players of a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`).
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
 
 ##### 1.2.2.2 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
