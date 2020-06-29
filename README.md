@@ -14,7 +14,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 ### Dependencies
 Default  
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
-(soft) [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server
+(soft) [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server  
 (soft) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 ### Known conflicts
