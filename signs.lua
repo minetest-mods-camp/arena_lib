@@ -162,6 +162,7 @@ minetest.override_item("default:sign_wall", {
             end
 
             for _, pl_name in pairs(party_members) do
+              arena_lib.HUD_hide("broadcast", pl_name)
               arena_lib.remove_from_queue(pl_name)
               arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. pl_name))
               old_arena.players[pl_name] = nil
@@ -173,6 +174,7 @@ minetest.override_item("default:sign_wall", {
               old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] -1
             end
 
+            arena_lib.HUD_hide("broadcast", p_name)
             arena_lib.remove_from_queue(p_name)
             arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. p_name))
             old_arena.players[p_name] = nil
