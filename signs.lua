@@ -1,5 +1,6 @@
 local S = minetest.get_translator("arena_lib")
 
+local function get_players_required() end
 local function assign_team() end
 local function in_game_txt(arena) end
 local function HUD_countdown(arena, seconds) end
@@ -25,6 +26,38 @@ minetest.override_item("default:sign_wall", {
       if arena_lib.is_player_in_edit_mode(p_name) then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
         return end
+
+      -- se c'è parties e si è in gruppo...
+      if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
+
+        -- se non si è il capo gruppo
+        if parties.get_party_leader(p_name) ~= p_name then
+          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can enter the queue!")))
+          return end
+
+        local party_members_amount = #parties.get_party_members(p_name)
+
+        --se non c'è spazio (no team)
+        if not sign_arena.teams_enabled then
+          if party_members_amount > sign_arena.max_players - sign_arena.players_amount then
+            minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no enough space for the whole party!")))
+            return end
+        -- se non c'è spazio (team)
+        else
+
+          local free_space = false
+          for _, amount in pairs(sign_arena.players_amount_per_team) do
+            if party_members_amount <= sign_arena.max_players - amount then
+              free_space = true
+              break
+            end
+          end
+
+          if not free_space then
+            minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no team with enough space for the whole party!")))
+            return end
+        end
+      end
 
       -- se non è abilitata
       if not sign_arena.enabled then
@@ -57,32 +90,53 @@ minetest.override_item("default:sign_wall", {
 
           local p_team_ID = sign_arena.players[p_name].teamID
 
-          arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
-          sign_arena.players[p_name] = nil
-          sign_arena.players_amount = sign_arena.players_amount - 1
-          if #sign_arena.teams > 1 then
-            sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] -1
-          end
-          arena_lib.update_sign(sign_arena)
-          arena_lib.remove_from_queue(p_name)
-          arena_lib.HUD_hide("all", p_name)
+          -- se è un party, rimuovo tutto il gruppo
+          if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
 
-          local players_in_arena = sign_arena.players_amount
-          local arena_min_players = sign_arena.min_players * #sign_arena.teams
+            local party_members = parties.get_party_members(p_name)
+
+            sign_arena.players_amount = sign_arena.players_amount - #party_members
+            if sign_arena.teams_enabled then
+              sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] - #party_members
+            end
+
+            for _, pl_name in pairs(party_members) do
+              arena_lib.HUD_hide("all", pl_name)
+              arena_lib.remove_from_queue(pl_name)
+              arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. pl_name))
+              sign_arena.players[pl_name] = nil
+            end
+
+          -- sennò rimuovo il singolo utente
+          else
+            sign_arena.players_amount = sign_arena.players_amount - 1
+            if sign_arena.teams_enabled then
+              sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] -1
+            end
+
+            arena_lib.HUD_hide("all", p_name)
+            arena_lib.remove_from_queue(p_name)
+            arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
+            sign_arena.players[p_name] = nil
+          end
+
+          arena_lib.update_sign(sign_arena)
+
+          local players_required = get_players_required(sign_arena)
 
           -- ...e annullo la coda se non ci sono più abbastanza persone
-          if players_in_arena < arena_min_players and sign_arena.in_queue then
+          if players_required > 0 and sign_arena.in_queue then
             minetest.get_node_timer(pos):stop()
             arena_lib.HUD_hide("broadcast", sign_arena)
             arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
-              " (" .. arena_min_players - players_in_arena .. ")")
+              " (" .. players_required .. ")")
             arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
             sign_arena.in_queue = false
 
           -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
-          elseif players_in_arena < arena_min_players then
+          elseif players_required > 0 then
             arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
-              " (" .. arena_min_players - players_in_arena .. ")")
+              " (" .. players_required .. ")")
           else
             local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
             arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("@1 seconds for the match to start", seconds)))
@@ -97,31 +151,50 @@ minetest.override_item("default:sign_wall", {
           local old_p_team_ID = old_arena.players[p_name].teamID
 
           -- sennò lo rimuovo dalla precedente e continuo per aggiungerlo in questa...
-          old_arena.players[p_name] = nil
-          old_arena.players_amount = old_arena.players_amount -1
-          if #old_arena.teams > 1 then
-            old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] -1
-          end
-          arena_lib.remove_from_queue(p_name)
-          arena_lib.update_sign(old_arena)
-          arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
+          -- se è un party
+          if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
 
-          local players_in_arena = old_arena.players_amount
-          local arena_min_players = old_arena.min_players * #old_arena.teams
+            local party_members = parties.get_party_members(p_name)
+
+            old_arena.players_amount = old_arena.players_amount - #party_members
+            if old_arena.teams_enabled then
+              old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] - #party_members
+            end
+
+            for _, pl_name in pairs(party_members) do
+              arena_lib.remove_from_queue(pl_name)
+              arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. pl_name))
+              old_arena.players[pl_name] = nil
+            end
+          -- sennò è singolo utente
+          else
+            old_arena.players_amount = old_arena.players_amount -1
+            if #old_arena.teams > 1 then
+              old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] -1
+            end
+
+            arena_lib.remove_from_queue(p_name)
+            arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. p_name))
+            old_arena.players[p_name] = nil
+          end
+
+          arena_lib.update_sign(old_arena)
+
+          local players_required = get_players_required(old_arena)
 
           -- ...annullando la coda della precedente se non ci sono più abbastanza giocatori
-          if players_in_arena < arena_min_players and old_arena.in_queue then
+          if players_required > 0 and old_arena.in_queue then
             minetest.get_node_timer(old_arena.sign):stop()
             arena_lib.HUD_hide("broadcast", old_arena)
             arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("Waiting for more players...")) ..
-              " (" .. arena_min_players - players_in_arena .. ")")
+              " (" .. players_required .. ")")
             arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
             old_arena.in_queue = false
 
           -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
-          elseif players_in_arena < arena_min_players and not old_arena.in_queue then
+          elseif players_required > 0 then
             arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("Waiting for more players...")) ..
-              " (" .. arena_min_players - players_in_arena .. ")")
+              " (" .. players_required .. ")")
           else
             local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
             arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("@1 seconds for the match to start", seconds)))
@@ -131,63 +204,76 @@ minetest.override_item("default:sign_wall", {
       end
 
       local p_team_ID
-      local p_team
 
       -- determino eventuale team giocatore
-      if #sign_arena.teams > 1 then
-        p_team_ID = assign_team(sign_arena, p_name)
-        p_team = sign_arena.teams[p_team_ID].name
-        minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
+      if sign_arena.teams_enabled then
+        p_team_ID = assign_team(mod_ref, sign_arena, p_name)
+      end
+
+      local players_to_add = {}
+
+      -- potrei avere o un giocatore o un intero gruppo da aggiungere. Quindi per evitare mille if, metto a prescindere il/i giocatore/i in una tabella per iterare in alcune operazioni successive
+      if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
+        for k, v in pairs(parties.get_party_members(p_name)) do
+          players_to_add[k] = v
+        end
+      else
+        table.insert(players_to_add, p_name)
       end
 
       -- aggiungo il giocatore ed eventuali proprietà
-      sign_arena.players[p_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
-      sign_arena.players_amount = sign_arena.players_amount +1
-      if #sign_arena.teams > 1 then
-        sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] +1
+      for _, pl_name in pairs(players_to_add) do
+        sign_arena.players[pl_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
+
+        for k, v in pairs(mod_ref.player_properties) do
+          sign_arena.players[pl_name][k] = v
+        end
       end
 
-      for k, v in pairs(mod_ref.player_properties) do
-        sign_arena.players[p_name][k] = v
+      -- aumento il conteggio di giocatori in partita
+      sign_arena.players_amount = sign_arena.players_amount + #players_to_add
+      if sign_arena.teams_enabled then
+        sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] + #players_to_add
       end
 
       -- aggiorno il cartello
       arena_lib.update_sign(sign_arena)
 
       -- notifico i vari giocatori del nuovo player
-      if sign_arena.in_game then
-        arena_lib.join_arena(mod, p_name, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. p_name))
-        return
-      else
-        arena_lib.add_to_queue(p_name, mod, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c8d692", sign_arena.name .. " > " ..  p_name))
+      for _, pl_name in pairs(players_to_add) do
+        if sign_arena.in_game then
+          arena_lib.join_arena(mod, pl_name, arenaID)
+          arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. pl_name))
+          return
+        else
+          arena_lib.add_to_queue(pl_name, mod, arenaID)
+          arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c8d692", sign_arena.name .. " > " ..  pl_name))
+        end
       end
 
       local timer = minetest.get_node_timer(pos)
-      local players_in_arena = sign_arena.players_amount
-      local arena_min_players = sign_arena.min_players * #sign_arena.teams
       local arena_max_players = sign_arena.max_players * #sign_arena.teams
 
       -- se la coda non è partita...
       if not sign_arena.in_queue and not sign_arena.in_game then
 
+        local players_required = get_players_required(sign_arena)
+
         -- ...e ci sono abbastanza giocatori, parte il timer d'attesa
-        if players_in_arena == arena_min_players then
+        if players_required <= 0 then
           sign_arena.in_queue = true
           timer:start(mod_ref.queue_waiting_time)
           HUD_countdown(sign_arena, timer)
 
         -- sennò aggiorno semplicemente la HUD
-      elseif players_in_arena < arena_min_players then
+        else
           arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
-            " (" .. arena_min_players - players_in_arena .. ")")
+            " (" .. players_required .. ")")
         end
       end
 
-
       -- se raggiungo i giocatori massimi e la partita non è iniziata, accorcio eventualmente la durata
-      if players_in_arena == arena_max_players and sign_arena.in_queue then
+      if sign_arena.players_amount == arena_max_players and sign_arena.in_queue then
         if timer:get_timeout() - timer:get_elapsed() > 5 then
           timer:stop()
           timer:start(5)
@@ -195,6 +281,7 @@ minetest.override_item("default:sign_wall", {
       end
 
     end,
+
 
 
     -- quello che succede una volta che il timer raggiunge lo 0
@@ -239,17 +326,53 @@ end
 
 
 
+
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function assign_team(arena, p_name)
+function get_players_required(arena)
+
+  local players_in_arena = arena.players_amount
+  local arena_min_players = arena.min_players * #arena.teams
+  local players_required
+
+  if arena.teams_enabled then
+
+    players_required = 0
+
+    for _, amount in pairs(arena.players_amount_per_team) do
+      if arena.min_players - amount > 0 then
+        players_required = players_required + (arena.min_players - amount)
+      end
+    end
+  else
+    players_required = arena_min_players - players_in_arena
+  end
+
+  return players_required
+end
+
+
+
+function assign_team(mod_ref, arena, p_name)
+
   local assigned_team_ID = 1
 
   for i = 1, #arena.teams do
     if arena.players_amount_per_team[i] < arena.players_amount_per_team[assigned_team_ID] then
       assigned_team_ID = i
     end
+  end
+
+  local p_team = arena.teams[assigned_team_ID].name
+
+  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
+    for _, pl_name in pairs(parties.get_party_members(p_name)) do
+      minetest.chat_send_player(pl_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
+    end
+  else
+    minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
   end
 
   return assigned_team_ID

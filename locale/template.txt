@@ -99,6 +99,9 @@ You're immune!=
 
 # signs.lua
 [!] You must leave the editor first!=
+[!] Only the party leader can enter the queue!=
+[!] There is no enough space for the whole party!=
+[!] There is no team with enough space for the whole party!=
 [!] The arena is not enabled!=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
