@@ -1227,8 +1227,6 @@ function arena_lib.remove_player_from_arena(p_name, reason)
   end
   arena.players[p_name] = nil
 
-  arena_lib.update_sign(arena)
-
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
 
@@ -1245,7 +1243,7 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     end
 
   -- se invece è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-elseif arena.in_game and arena.teams_enabled and arena.players_amount < arena.min_players * #arena.teams then
+  elseif arena.in_game and arena.teams_enabled and arena.players_amount < arena.min_players * #arena.teams then
 
     local team_to_compare
 
@@ -1278,6 +1276,9 @@ elseif arena.in_game and arena.teams_enabled and arena.players_amount < arena.mi
       arena_lib.load_celebration(mod, arena, pl_name)
     end
   end
+
+  arena_lib.update_sign(arena)
+
 end
 
 

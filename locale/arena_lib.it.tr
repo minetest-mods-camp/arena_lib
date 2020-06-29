@@ -1,4 +1,4 @@
-# version 3.3.0-dev
+# version 3.3.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -117,6 +117,7 @@ Get ready!=Preparati!
 #Terminating=Concludendo
 #Ongoing=In partita
 #Loading=In caricamento
+#Queueing=In coda
 #Waiting=In attesa
 
 # utils.lua

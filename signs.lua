@@ -120,8 +120,6 @@ minetest.override_item("default:sign_wall", {
             sign_arena.players[p_name] = nil
           end
 
-          arena_lib.update_sign(sign_arena)
-
           local players_required = get_players_required(sign_arena)
 
           -- ...e annullo la coda se non ci sono più abbastanza persone
@@ -142,6 +140,7 @@ minetest.override_item("default:sign_wall", {
             arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("@1 seconds for the match to start", seconds)))
           end
 
+          arena_lib.update_sign(sign_arena)
           return
 
         else
@@ -180,8 +179,6 @@ minetest.override_item("default:sign_wall", {
             old_arena.players[p_name] = nil
           end
 
-          arena_lib.update_sign(old_arena)
-
           local players_required = get_players_required(old_arena)
 
           -- ...annullando la coda della precedente se non ci sono più abbastanza giocatori
@@ -201,6 +198,8 @@ minetest.override_item("default:sign_wall", {
             local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
             arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("@1 seconds for the match to start", seconds)))
           end
+
+          arena_lib.update_sign(old_arena)
 
         end
       end
@@ -238,9 +237,6 @@ minetest.override_item("default:sign_wall", {
         sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] + #players_to_add
       end
 
-      -- aggiorno il cartello
-      arena_lib.update_sign(sign_arena)
-
       -- notifico i vari giocatori del nuovo player
       for _, pl_name in pairs(players_to_add) do
         if sign_arena.in_game then
@@ -273,6 +269,8 @@ minetest.override_item("default:sign_wall", {
             " (" .. players_required .. ")")
         end
       end
+
+      arena_lib.update_sign(sign_arena)
 
       -- se raggiungo i giocatori massimi e la partita non è iniziata, accorcio eventualmente la durata
       if sign_arena.players_amount == arena_max_players and sign_arena.in_queue then
@@ -423,6 +421,7 @@ function in_game_txt(arena)
   if not arena.enabled then txt = "WIP"
   elseif arena.in_celebration then txt = "Terminating"
   elseif arena.in_loading then txt = "Loading"
+  elseif arena.in_queue then txt = "Queueing"
   elseif arena.in_game then txt = "In progress"
 
   else txt = "Waiting" end
