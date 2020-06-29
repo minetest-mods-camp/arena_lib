@@ -49,7 +49,7 @@ minetest.register_chatcommand("quit", {
 
     -- se è l'ultimo giocatore rimasto, annullo
     if arena.players_amount == 1 then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action if you're the only one left!")))
+      minetest.chat_send_player(name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action if you're the only one left!")))
       return end
 
     local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(name)]
