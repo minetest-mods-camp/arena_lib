@@ -36,7 +36,7 @@ minetest.register_tool("arena_lib:spawner_add", {
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-    arena_lib.set_spawner(user:get_player_name(), mod, arena_name)
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, nil, nil, true)
   end
 
 })
@@ -56,7 +56,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
 
-    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID)
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID, true)
   end,
 
 
@@ -82,7 +82,7 @@ minetest.register_tool("arena_lib:spawner_team_add", {
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
 
-    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, team_ID)
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, team_ID, nil, nil, true)
   end
 
 })
@@ -103,7 +103,7 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
     local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
 
-    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID)
+    arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID, true)
   end,
 
 
@@ -162,7 +162,7 @@ minetest.register_tool("arena_lib:spawner_deleteall", {
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local p_name = user:get_player_name()
 
-    arena_lib.set_spawner(p_name, mod, arena_name, nil, "deleteall")
+    arena_lib.set_spawner(p_name, mod, arena_name, nil, "deleteall", nil, true)
   end
 
 })
@@ -184,7 +184,7 @@ minetest.register_tool("arena_lib:spawner_team_deleteall", {
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
     local p_name = user:get_player_name()
 
-    arena_lib.set_spawner(p_name, mod, arena_name, team_ID, "deleteall")
+    arena_lib.set_spawner(p_name, mod, arena_name, team_ID, "deleteall", nil, true)
   end
 
 })

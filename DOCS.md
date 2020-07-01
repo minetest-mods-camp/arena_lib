@@ -58,7 +58,7 @@ The function calling the editor is
 `arena_lib.enter_editor(sender, mod, arena_name)`
 
 #### 1.2.2 CLI
-If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work.
+If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order run less checks, I chose to odmit it (it's in `set_spawner` too).
 
 ##### 1.2.2.1 Players management
 `arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.

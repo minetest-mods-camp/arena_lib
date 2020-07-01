@@ -344,11 +344,13 @@ end
 
 
 
-function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)
+function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   -- salvo i vecchi parametri così da poterne modificare anche solo uno senza if lunghissimi
   local old_min_players = arena.min_players
@@ -378,11 +380,13 @@ end
 
 
 
-function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)      -- enable can be 0 or 1
+function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_editor)      -- enable can be 0 or 1
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   -- se non ci sono team nella mod, annullo
   if #arena_lib.mods[mod].teams == 1 then
@@ -433,11 +437,13 @@ end
 -- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più spawn points del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
-function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID)
+function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   local mod_ref = arena_lib.mods[mod]
   local team
@@ -683,11 +689,13 @@ end
 
 
 
-function arena_lib.enable_arena(sender, mod, arena_name)
+function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   local arena_max_players = arena.max_players * #arena.teams
 

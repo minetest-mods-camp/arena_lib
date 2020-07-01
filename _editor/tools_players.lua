@@ -27,7 +27,7 @@ minetest.register_node("arena_lib:players_min", {
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
       local players_amount = user:get_meta():get_int("arena_lib_editor.players_number")
 
-      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, players_amount, nil) then return end
+      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, players_amount, nil, true) then return end
 
       -- aggiorno lo stack se il cambio è andato a buon fine
       minetest.after(0, function()
@@ -53,7 +53,7 @@ minetest.register_node("arena_lib:players_max", {
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
       local players_amount = user:get_meta():get_int("arena_lib_editor.players_number")
 
-      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, players_amount) then return end
+      if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, players_amount, true) then return end
 
       -- aggiorno lo stack se il cambio è andato a buon fine
       minetest.after(0, function()
@@ -96,7 +96,7 @@ minetest.register_tool("arena_lib:players_teams_on", {
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 0)
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 0, true)
 
       minetest.after(0, function()
         user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")

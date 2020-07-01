@@ -129,7 +129,7 @@ minetest.register_tool("arena_lib:editor_enable", {
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-      arena_lib.enable_arena(user:get_player_name(), mod, arena_name)
+      arena_lib.enable_arena(user:get_player_name(), mod, arena_name, true)
     end
 
 })
