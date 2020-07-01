@@ -195,9 +195,9 @@ function arena_lib.give_spawners_tools(player)
 
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
-  local teams = arena_lib.mods[mod].teams
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if #teams > 0 then
+  if arena.teams_enabled then
     player:get_inventory():set_list("main", spawners_tools_team)
   else
     player:get_inventory():set_list("main", spawners_tools_noteam)

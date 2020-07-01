@@ -119,7 +119,7 @@ minetest.register_tool("arena_lib:players_teams_off", {
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1)
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1, true)
 
       minetest.after(0, function()
         user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")

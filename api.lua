@@ -426,7 +426,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   end
 
   -- svuoto i vecchi spawner per evitare problemi
-  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall")
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
 
   arena_lib.update_sign(arena)
   update_storage(false, mod, id, arena)
