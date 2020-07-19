@@ -1,21 +1,22 @@
-local version = "3.3.0"
+local version = "3.4.0-dev"
 
 dofile(minetest.get_modpath("arena_lib") .. "/api.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/callbacks.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/chat.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/commands.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/debug_utilities.lua")
-dofile(minetest.get_modpath("arena_lib") .. "/_hud/hud_main.lua")
-dofile(minetest.get_modpath("arena_lib") .. "/_hud/hud_waypoints.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/items.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/player_manager.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/privs.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/signs.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/utils.lua")
+dofile(minetest.get_modpath("arena_lib") .. "/_dependencies/parties.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/editor_main.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/editor_icons.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_players.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_sign.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/_editor/tools_spawner.lua")
+dofile(minetest.get_modpath("arena_lib") .. "/_hud/hud_main.lua")
+dofile(minetest.get_modpath("arena_lib") .. "/_hud/hud_waypoints.lua")
 
-minetest.log("action", "[ARENA_LIB] Mod initialised, version " .. version)
+minetest.log("action", "[ARENA_LIB] Mod initialised, running version " .. version)

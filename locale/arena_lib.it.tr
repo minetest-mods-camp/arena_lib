@@ -1,4 +1,4 @@
-# version 3.3.0
+# version 3.4.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -125,8 +125,11 @@ Get ready!=Preparati!
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 
-# _hud/hud_waypoints.lua
-[!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
+# _dependencies/parties.lua
+[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
+[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
+[!] The party leader must not be in queue to perform this action!=[!] Il capo gruppo non deve essere in coda per eseguire quest'azione!
+[!] The party leader must not be in game to perform this action!=[!] Il capo gruppo non deve essere in partita per eseguire quest'azione!
 
 # _editor/editor_main.lua
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
@@ -162,4 +165,7 @@ Delete all spawners of a team=Cancella tutti gli spawner della squadra
 # _editor/tools_sign.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
+
+# _hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
 

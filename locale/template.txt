@@ -1,4 +1,4 @@
-# version 3.3.0
+# version 3.4.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -125,8 +125,11 @@ Get ready!=
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
-# _hud/hud_waypoints.lua
-[!] Waypoints are not enabled!=
+# _dependencies/parties.lua
+[!] You can't perform this action while in queue!=
+[!] You can't perform this action while in game!=
+[!] The party leader must not be in queue to perform this action!=
+[!] The party leader must not be in game to perform this action!=
 
 # _editor/editor_main.lua
 Arena_lib editor | Now editing: @1=
@@ -163,3 +166,5 @@ Delete all spawners of the team=
 Add sign=
 Remove sign=
 
+# _hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=
