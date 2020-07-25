@@ -384,11 +384,10 @@ function HUD_countdown(arena, timer)
 
   if not arena.in_queue or not timer:is_started() then return end
 
-  local seconds = math.floor(timer:get_timeout() - timer:get_elapsed() + 0.5)
+  local seconds = math.floor(timer:get_timeout() - timer:get_elapsed() + 0.51)
 
   -- dai 5 secondi in giù il messaggio è stampato su broadcast e genero i team
   if seconds <= 5 then
-    --arena_lib.generate_teams(mod_ref, arena)
     arena_lib.HUD_send_msg_all("broadcast", arena, S("The game begins in @1 seconds!", seconds), nil, "arenalib_countdown")
     arena_lib.HUD_send_msg_all("hotbar", arena, arena_display_format(arena, S("Get ready!")))
   else
