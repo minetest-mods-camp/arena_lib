@@ -143,9 +143,10 @@ arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
 "yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands or callbacks.  
 The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
-* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[arena_lib]`
+* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
+* `teams_color_overlay`: a table of [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires team. Default is none
 * `is_team_chat_default`: whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
 * `mod_ref.chat_all_prefix`: prefix for every message sent in arena, team chat aside. Default is none
 * `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)

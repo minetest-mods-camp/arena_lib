@@ -70,6 +70,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.prefix = "[Arena_lib] "
   mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.teams = {}
+  mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
   mod_ref.chat_all_prefix = ""
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
@@ -102,6 +103,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.teams and type(def.teams) == "table" then
     mod_ref.teams = def.teams
+
+    if def.teams_color_overlay then
+      mod_ref.teams_color_overlay = def.teams_color_overlay
+    end
 
     if def.is_team_chat_default == true then
       mod_ref.is_team_chat_default = def.is_team_chat_default
@@ -214,7 +219,6 @@ function arena_lib.update_properties(mod)
     end
 
     update_storage(false, mod, id, arena)
-
     for temp_property, v in pairs(mod_ref.temp_properties) do
       arena[temp_property] = v
     end
@@ -787,7 +791,7 @@ function arena_lib.load_arena(mod, arena_ID)
   -- my child, let's talk about some black magic: in order to teleport players in their team spawners, first of all I need to
   -- sort them by team. Once it's done, I need to skip every spawner of that team if the maximum number of players is not reached:
   -- otherwise, people will find theirselves in the wrong team (and you don't want that to happen). So I use this int to prevent it,
-  -- which increases of 1 or more every time I look for a spawner, comparing the 'team' spawner value to the player's. This happens
+  -- which increases by 1 or more every time I look for a spawner, comparing the 'team' spawner value to the player's. This happens
   -- in assign_team_spawner, which also returns the new value for team_count
   local team_count = 1
 
@@ -849,6 +853,13 @@ function arena_lib.load_arena(mod, arena_ID)
     player:set_physics_override({
               speed = 0,
               })
+
+    -- cambio eventuale colore texture (richiede i team)
+    if arena.teams_enabled and mod_ref.teams_color_overlay then
+     player:set_properties({
+       textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[pl_name].teamID] .. ":85"}
+     })
+    end
 
     -- teletrasporto i giocatori
     if not arena.teams_enabled then
@@ -942,6 +953,13 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:get_inventory():set_list("craft",{})
   end
 
+  -- cambio eventuale colore texture (richiede i team)
+  if arena.teams_enabled and mod_ref.teams_color_overlay then
+    player:set_properties({
+      textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
+    })
+  end
+
   -- riempio HP, teletrasporto e aggiungo
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
   player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
@@ -1031,6 +1049,13 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main", {})
       player:get_inventory():set_list("craft",{})
+    end
+
+    -- resetto eventuali texture
+    if arena.teams_enabled and mod_ref.teams_color_overlay then
+      player:set_properties({
+        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
+      })
     end
 
     -- teletrasporto nella lobby
@@ -1187,6 +1212,13 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     if not mod_ref.keep_inventory then
       player:get_inventory():set_list("main",{})
       player:get_inventory():set_list("craft",{})
+    end
+
+    -- resetto eventuali texture
+    if arena.teams_enabled and mod_ref.teams_color_overlay then
+      player:set_properties({
+        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
+      })
     end
 
     -- resetto gli HP, teletrasporto fuori dall'arena e ripristino nome
