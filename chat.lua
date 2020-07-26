@@ -9,7 +9,7 @@ minetest.register_on_chat_message(function(p_name, message)
       if mod_ref.is_team_chat_default then
         arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID)
       else
-        arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID)
+        arena_lib.send_message_players_in_arena(arena, mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message), arena.players[p_name].teamID)
         arena_lib.send_message_players_in_arena(arena, minetest.colorize("#ffdddd", mod_ref.chat_all_prefix .. minetest.format_chat_message(p_name, message)), arena.players[p_name].teamID, true)
       end
     else
