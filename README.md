@@ -18,7 +18,8 @@ Default
 (soft) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 ### Known conflicts
-`Beds` or any other mod overriding the default respawn system  
+* `Beds` or any other mod overriding the default respawn system
+* `SkinsDB` or any other mod applying a 3D model onto the player, if `teams_color_overlay` is used
 
 #### Mods relying on arena_lib
 [Murder](https://gitlab.com/giov4/minetest-murder-mod)  
