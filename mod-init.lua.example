@@ -5,6 +5,10 @@ arena_lib.register_minigame("call of Zughy", {
     "red",
     "blue"
   },
+  teams_color_overlay = {
+    "crimson",
+    "blue"  
+  },
   is_team_chat_default = true,
   chat_all_prefix = "[All] ",
   disabled_damage_types = {
