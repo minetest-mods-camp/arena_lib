@@ -299,7 +299,7 @@ Default is 0 and these are mostly hardcoded in arena_lib already, so it's advise
 
 ### 2.7 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
-* Any action in the "Players" section of the editor. It'll delete your spawners (same as above)
+* Changing the minimum amount of players aside, any action in the "Players" section of the editor. It'll delete your spawners (same as above)
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

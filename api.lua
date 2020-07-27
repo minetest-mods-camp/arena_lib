@@ -370,8 +370,10 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     arena.max_players = old_max_players
   return end
 
-  -- svuoto i vecchi spawner per evitare problemi
-  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall")
+  -- se i giocatori massimi sono cambiati, svuoto i vecchi spawner per evitare problemi
+  if max_players and old_max_players ~= max_players then
+    arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
+  end
 
   update_storage(false, mod, id, arena)
   arena_lib.update_sign(arena)
