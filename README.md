@@ -33,3 +33,8 @@ Feel free to:
 
 ##### Credits
 countdown sound by [BoxeDave92](https://freesound.org/people/BoxerDave92/sounds/338868/)
+
+---
+
+Images are under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
