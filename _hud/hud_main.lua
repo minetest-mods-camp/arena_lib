@@ -77,8 +77,8 @@ function arena_lib.HUD_send_msg(HUD_type, p_name, msg, duration, sound)
     minetest.after(duration, function()
       if minetest.get_player_by_name(p_name) == nil then return end
       -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
-      if HUD_type == "broadcast" and player:HUD_get(p_HUD[2]).text ~= msg or
-        HUD_type == "hotbar" and player:HUD_get(p_HUD[4]).text ~= msg then
+      if HUD_type == "broadcast" and player:hud_get(p_HUD[2]).text ~= msg or
+        HUD_type == "hotbar" and player:hud_get(p_HUD[4]).text ~= msg then
         return end
 
       arena_lib.HUD_hide(HUD_type, p_name)
@@ -116,8 +116,8 @@ function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound)
       minetest.after(duration, function()
         if minetest.get_player_by_name(p_name) == nil then return end
         -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
-        if HUD_type == "broadcast" and pl:HUD_get(pl_HUD[2]).text ~= msg or
-          HUD_type == "hotbar" and pl:HUD_get(pl_HUD[4]).text ~= msg then
+        if HUD_type == "broadcast" and pl:hud_get(pl_HUD[2]).text ~= msg or
+          HUD_type == "hotbar" and pl:hud_get(pl_HUD[4]).text ~= msg then
           return end
 
         arena_lib.HUD_hide(HUD_type, pl_name)
