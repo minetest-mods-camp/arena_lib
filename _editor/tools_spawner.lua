@@ -48,6 +48,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
   description = S("Remove spawner"),
   inventory_image = "arenalib_tool_spawner_remove.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_place = function() end,
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
@@ -60,7 +61,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
   end,
 
 
-  on_place = function(itemstack, placer, pointed_thing)
+  on_secondary_use = function(itemstack, placer, pointed_thing)
     change_spawner_ID(placer)
   end
 
@@ -94,6 +95,7 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
   description = S("Remove team spawner"),
   inventory_image = "arenalib_tool_spawner_team_remove.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  on_place = function() end,
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
@@ -107,7 +109,7 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
   end,
 
 
-  on_place = function(itemstack, placer, pointed_thing)
+  on_secondary_use = function(itemstack, placer, pointed_thing)
     change_spawner_ID(placer)
   end
 

@@ -76,7 +76,7 @@ minetest.register_tool("arena_lib:players_change", {
       change_players_number(user, true)
     end,
 
-    on_place = function(itemstack, placer, pointed_thing)
+    on_secondary_use = function(itemstack, placer, pointed_thing)
       change_players_number(placer, false)
     end
 })
