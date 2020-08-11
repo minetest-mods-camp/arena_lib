@@ -339,8 +339,12 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name)
 
   arena.name = new_name
 
+  -- aggiorno il cartello, se esiste
+  if arena.sign.x then
+    arena_lib.update_sign(arena)
+  end
+
   update_storage(false, mod, id, arena)
-  arena_lib.update_sign(arena)
 
   minetest.chat_send_player(sender, S("Arena @1 successfully renamed in @2", old_name, new_name))
 
@@ -375,8 +379,12 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
   end
 
+  -- aggiorno il cartello, se esiste
+  if arena.sign.x then
+    arena_lib.update_sign(arena)
+  end
+
   update_storage(false, mod, id, arena)
-  arena_lib.update_sign(arena)
 
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
 
@@ -434,7 +442,11 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   -- svuoto i vecchi spawner per evitare problemi
   arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
 
-  arena_lib.update_sign(arena)
+  -- aggiorno il cartello, se esiste
+  if arena.sign.x then
+    arena_lib.update_sign(arena)
+  end
+
   update_storage(false, mod, id, arena)
 end
 
