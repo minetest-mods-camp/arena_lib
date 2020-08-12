@@ -1075,9 +1075,10 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     -- teletrasporto nella lobby
     player:set_pos(mod_ref.hub_spawn_point)
 
-    -- se ho hub_manager, restituisco gli oggetti
+    -- se ho hub_manager, restituisco gli oggetti e imposto fisica delal lobby
     if minetest.get_modpath("hub_manager") then
       hub_manager.set_items(player)
+      hub_manager.set_hub_physics(player)
     end
 
     -- riattivo la minimappa eventualmente disattivata
@@ -1240,9 +1241,10 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     player:set_pos(mod_ref.hub_spawn_point)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
-    -- se ho hub_manager, restituisco gli oggetti
+    -- se ho hub_manager, restituisco gli oggetti e imposto la fisica della lobby
     if minetest.get_modpath("hub_manager") then
       hub_manager.set_items(minetest.get_player_by_name(p_name))
+      hub_manager.set_hub_physics(player)
     end
 
     -- resetto la minimappa eventualmente disattivata
