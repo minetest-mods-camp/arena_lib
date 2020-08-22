@@ -1,4 +1,3 @@
 default
 signs_lib
-hub_manager?
 parties?
