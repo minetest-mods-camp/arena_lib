@@ -2,8 +2,13 @@ local S = minetest.get_translator("arena_lib")
 
 
 
+----------------------------------------------
+-----------------ADMINS ONLY------------------
+----------------------------------------------
+
 minetest.register_chatcommand("kick", {
 
+  params = "<" .. S("player") .. ">",
   description = S("Kick a player from an ongoing game"),
   privs = {
         arenalib_admin = true,
@@ -34,6 +39,39 @@ minetest.register_chatcommand("kick", {
 })
 
 
+
+minetest.register_chatcommand("forceend", {
+
+  params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",
+  description = S("Forcibly ends an ongoing game"),
+  privs = {
+        arenalib_admin = true,
+    },
+
+  func = function(name, param)
+
+    local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
+
+    -- se i parametri sono errati, annullo
+    if not mod or not arena_name then
+      minetest.chat_send_player(name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return end
+
+    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+    arena_lib.force_arena_ending(mod, arena, name)
+
+  end
+
+})
+
+
+
+
+
+----------------------------------------------
+----------------FOR EVERYONE------------------
+----------------------------------------------
 
 minetest.register_chatcommand("quit", {
 
@@ -67,34 +105,9 @@ minetest.register_chatcommand("quit", {
 
 
 
-minetest.register_chatcommand("forceend", {
-
-  description = S("Forcibly ends an ongoing game"),
-  privs = {
-        arenalib_admin = true,
-    },
-
-  func = function(name, param)
-
-    local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
-
-    -- se i parametri sono errati, annullo
-    if not mod or not arena_name then
-      minetest.chat_send_player(name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return end
-
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-    arena_lib.force_arena_ending(mod, arena, name)
-
-  end
-
-})
-
-
-
 minetest.register_chatcommand("all", {
 
+  params = "<" .. S("message") .. ">",
   description = S("Write a message in the arena global chat while in a game"),
 
   func = function(name, param)
@@ -116,6 +129,7 @@ minetest.register_chatcommand("all", {
 
 minetest.register_chatcommand("t", {
 
+  params = "<" .. S("message") .. ">",
   description = S("Write a message in the arena team chat while in a game (if teams are enabled)"),
 
   func = function(name, param)
