@@ -1234,24 +1234,18 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
     return end
 
-  if sender then
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
-    minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
-  else
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", S("The arena has been forcibly terminated")))
-  end
-
   -- caccio tutti i giocatori
   for pl_name, _ in pairs(arena.players) do
-    arena_lib.remove_player_from_arena(pl_name, 4)
+    arena_lib.remove_player_from_arena(pl_name, 4, sender)
   end
 
   arena_lib.end_arena(mod_ref, mod, arena)
+  minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
 end
 
 
 
-function arena_lib.remove_player_from_arena(p_name, reason)
+function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- reason 0 = has disconnected
   -- reason 1 = has been eliminated
   -- reason 2 = has been kicked
@@ -1298,14 +1292,22 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
 
     if reason == 1 then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+      if executioner then
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
+      else
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+      end
       if mod_ref.on_eliminate then
         mod_ref.on_eliminate(arena, p_name)
       elseif mod_ref.on_quit then
         mod_ref.on_quit(arena, p_name)
       end
     elseif reason == 2 then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked", p_name)))
+      if executioner then
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked by @2", p_name, executioner)))
+      else
+        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked", p_name)))
+      end
       if mod_ref.on_kick then
         mod_ref.on_kick(arena, p_name)
       elseif mod_ref.on_quit then
@@ -1317,6 +1319,11 @@ function arena_lib.remove_player_from_arena(p_name, reason)
         mod_ref.on_quit(arena, p_name)
       end
     elseif reason == 4 then
+      if executioner then
+        minetest.chat_send_player(p_name, minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", executioner)))
+      else
+        minetest.chat_send_player(p_name, minetest.colorize("#d69298", S("The arena has been forcibly terminated")))
+      end
       if mod_ref.on_quit then
         mod_ref.on_quit(arena, p_name, true)
       end

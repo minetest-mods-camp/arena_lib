@@ -33,7 +33,7 @@ minetest.register_chatcommand("kick", {
       return false end
 
     minetest.chat_send_player(sender, S("Player successfully kicked"))
-    arena_lib.remove_player_from_arena(p_name, 2)
+    arena_lib.remove_player_from_arena(p_name, 2, sender)
     return true
   end
 })
@@ -48,18 +48,18 @@ minetest.register_chatcommand("forceend", {
         arenalib_admin = true,
     },
 
-  func = function(name, param)
+  func = function(sender, param)
 
     local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
 
     -- se i parametri sono errati, annullo
     if not mod or not arena_name then
-      minetest.chat_send_player(name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
 
     local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-    arena_lib.force_arena_ending(mod, arena, name)
+    arena_lib.force_arena_ending(mod, arena, sender)
 
   end
 
