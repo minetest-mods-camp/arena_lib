@@ -285,8 +285,8 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game.
 * `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
   * `0`: player disconnected. Calls `on_disconnect`
-  * `1`: player eliminated. Calls `on_eliminate`
-  * `2`: player kicked. Calls `on_kick`
+  * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`
+  * `2`: player kicked. Calls `on_kick` if declared. Otherwise calls `on_quit`
   * `3`: player quit. Calls `on_quit`
   * `4`: forced by the mod. This should NOT be used but internally. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1)
