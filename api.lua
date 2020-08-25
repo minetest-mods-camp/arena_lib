@@ -991,7 +991,6 @@ end
 function arena_lib.load_celebration(mod, arena, winner_name)
 
   local mod_ref = arena_lib.mods[mod]
-  local winning_message = ""
 
   arena.in_celebration = true
   arena_lib.update_sign(arena)
@@ -1014,6 +1013,8 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
 
   end
+
+  local winning_message = ""
 
   -- determino il messaggio da inviare
   if type(winner_name) == "string" then
@@ -1049,13 +1050,6 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     players[pl_name] = stats
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
-    arena.players_amount = 0
-    arena.timer_current = nil
-    if arena.teams_enabled then
-      for i = 1, #arena.teams do
-        arena.players_amount_per_team[i] = 0
-      end
-    end
 
     local player = minetest.get_player_by_name(pl_name)
 
@@ -1085,6 +1079,18 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     player:hud_set_flags({minimap = true})
   end
 
+
+  -- azzero il numero di giocatori
+  arena.players_amount = 0
+  if arena.teams_enabled then
+    for i = 1, #arena.teams do
+      arena.players_amount_per_team[i] = 0
+    end
+  end
+
+  -- azzero il timer
+  arena.timer_current = nil
+
   -- resetto le proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
     if type(v) == "string" then
@@ -1107,15 +1113,16 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     end
   end
 
-  local id = arena_lib.get_arena_by_name(mod, arena.name)
-
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
     mod_ref.on_end(arena, players)
   end
 
+  arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
   arena.in_celebration = false
   arena.in_game = false
+
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- aggiorno storage per le properties e cartello
   update_storage(false, mod, id, arena)
@@ -1132,7 +1139,11 @@ end
 
 
 function arena_lib.remove_from_queue(p_name)
+
+  local arena = arena_lib.get_arena_by_player(p_name)
+
   players_in_queue[p_name] = nil
+  arena.players[p_name] = nil
 end
 
 
@@ -1204,17 +1215,53 @@ end
 
 
 
+function arena_lib.force_arena_ending(mod, arena, sender)
+
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se il minigioco non esiste, annullo
+  if not mod_ref then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame doesn't exist!")))
+    return end
+
+  -- se l'arena non esiste, annullo
+  if not arena then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
+    return end
+
+  -- se l'arena non è in partita, annullo
+  if not arena.in_game then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
+    return end
+
+  if sender then
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
+    minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
+  else
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", S("The arena has been forcibly terminated")))
+  end
+
+  -- caccio tutti i giocatori
+  for pl_name, _ in pairs(arena.players) do
+    arena_lib.remove_player_from_arena(pl_name, 4)
+  end
+
+  arena_lib.end_arena(mod_ref, mod, arena)
+end
+
+
+
 function arena_lib.remove_player_from_arena(p_name, reason)
   -- reason 0 = has disconnected
   -- reason 1 = has been eliminated
   -- reason 2 = has been kicked
   -- reason 3 = has quit the arena
+  -- reason 4 = has been forced to quit the arena
+
+  -- se il giocatore non è in partita, annullo
+  if not arena_lib.is_player_in_arena(p_name) then return end
 
   local mod = arena_lib.get_mod_by_player(p_name)
-
-  -- se il giocatore non è né in coda né in partita, annullo
-  if not mod then return end
-
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
 
@@ -1265,6 +1312,10 @@ function arena_lib.remove_player_from_arena(p_name, reason)
       if mod_ref.on_quit then
         mod_ref.on_quit(arena, p_name)
       end
+    elseif reason == 4 then
+      if mod_ref.on_quit then
+        mod_ref.on_quit(arena, p_name, true)
+      end
     end
   else
     arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
@@ -1282,6 +1333,9 @@ function arena_lib.remove_player_from_arena(p_name, reason)
     arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
   end
   arena.players[p_name] = nil
+
+  -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
+  if reason == 4 then return end
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then

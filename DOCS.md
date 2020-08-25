@@ -175,11 +175,17 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `arenalib_admin`: allows to use the `/kick` command
 
 ### 2.2 Commands
-A couple of general commands are already declared inside arena_lib, them being: 
-* `/kick player_name`: kicks a player out of an ongoing game. The sender needs the `arenalib_admin` privilege in order to use it
+A couple of general commands are already declared inside arena_lib, them being:
+
 * `/quit`: quits a game
-* `/all`: to write in the global chat of an arena
-* `/t`: to write in the team chat of an arena (if teams are enabled)
+* `/all`: writes in the arena global chat
+* `/t`: writes in the arena team chat (if teams are enabled)
+
+#### 2.2.1 Admins only
+A couple more are available for players having the `arenalib_admin` privilege:
+
+* `/kick player_name`: kicks a player out of an ongoing game
+* `/forceend mod arena_name`: forcibly ends an ongoing game
 
 Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
@@ -195,11 +201,11 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists, reaches 0
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from a match (same as above)
-* `arena_lib.on_quit(mod, function(arena, p_name))`: called when a player quits from a match (same as above)
+* `arena_lib.on_quit(mod, function(arena, p_name, is_forced))`: called when a player quits from a match (same as above). `is_forced` is true when the match has been terminated via `force_arena_ending(...)`
 * `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful ie. to ask confirmation first, or simply impede a player to quit
 * `arena_lib.on_disconnect(mod, function(arena, p_name))`: called when a player disconnects while in a match
 
-> Beware: there is a default behaviour already for most of these situations: for instance when a player dies, its deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
+> Beware: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
 So for instance, if we want to add an object in the first slot when a player joins the pre-match, we can simply do:
 
@@ -276,11 +282,13 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
+* `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game.
 * `arena_lib.remove_player_from_arena(p_name, <reason>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and if specified equals to...
   * `0`: player disconnected. Calls `on_disconnect`
   * `1`: player eliminated. Calls `on_eliminate`
   * `2`: player kicked. Calls `on_kick`
   * `3`: player quit. Calls `on_quit`
+  * `4`: forced by the mod. This should NOT be used but internally. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1)
 * `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set

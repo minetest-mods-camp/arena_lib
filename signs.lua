@@ -102,9 +102,8 @@ minetest.override_item("default:sign_wall", {
 
             for _, pl_name in pairs(party_members) do
               arena_lib.HUD_hide("all", pl_name)
-              arena_lib.remove_from_queue(pl_name)
               arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. pl_name))
-              sign_arena.players[pl_name] = nil
+              arena_lib.remove_from_queue(pl_name)
             end
 
           -- sennò rimuovo il singolo utente
@@ -115,9 +114,8 @@ minetest.override_item("default:sign_wall", {
             end
 
             arena_lib.HUD_hide("all", p_name)
-            arena_lib.remove_from_queue(p_name)
             arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
-            sign_arena.players[p_name] = nil
+            arena_lib.remove_from_queue(p_name)
           end
 
           local players_required = get_players_required(sign_arena)
@@ -162,9 +160,8 @@ minetest.override_item("default:sign_wall", {
 
             for _, pl_name in pairs(party_members) do
               arena_lib.HUD_hide("broadcast", pl_name)
-              arena_lib.remove_from_queue(pl_name)
               arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. pl_name))
-              old_arena.players[pl_name] = nil
+              arena_lib.remove_from_queue(pl_name)
             end
           -- sennò è singolo utente
           else
@@ -174,9 +171,8 @@ minetest.override_item("default:sign_wall", {
             end
 
             arena_lib.HUD_hide("broadcast", p_name)
-            arena_lib.remove_from_queue(p_name)
             arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. p_name))
-            old_arena.players[p_name] = nil
+            arena_lib.remove_from_queue(p_name)
           end
 
           local players_required = get_players_required(old_arena)

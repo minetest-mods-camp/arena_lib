@@ -1,4 +1,4 @@
-# version 3.4.0
+# version 3.5.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -42,6 +42,12 @@ Arena @1 successfully enabled=Arena @1 abilitata con successo
 Arena @1 successfully disabled=Arena @1 disabilitata con successo
 @1 wins the game=@1 ha vinto la partita
 Team @1 wins the game=La squadra @1 ha vinto la partita
+[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
+[!] This arena doesn't exist!=[!] Quest'arena non esiste!
+[!] No ongoing game!=[!] Nessuna partita in corso!
+The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
+Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
+The arena has been forcibly terminated=La conclusione della partita è stata forzata
 @1 has been eliminated=@1 è stato eliminato
 @1 has been kicked=@1 è stato cacciato
 @1 has quit the match=@1 ha abbandonato la partita
@@ -59,6 +65,7 @@ Kick a player from an ongoing game=Caccia un giocatore da una partita in corso
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
 [!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
 Quit an ongoing game=Abbandona una partita in corso
+Forcibly ends an ongoing game=Forza la conclusione di una partita in corso
 [!] You can't perform this action if you're the only one left!=[!] Non puoi eseguire quest'azione se sei l'unico giocatore rimasto!
 Write a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
 Write a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
@@ -89,7 +96,6 @@ Spawn points: =Punti di spawn:
 Properties: =Proprietà: 
 Temp properties: =Proprietà temporanee: 
 Team properties: =Proprietà squadra: 
-[!] No ongoing game! =[!] Nessuna partita in corso!
 Player: =Giocatore: 
 , kills: =, uccisioni: 
 , deaths: =, morti: 
@@ -121,7 +127,6 @@ Get ready!=Preparati!
 #Waiting=In attesa
 
 # utils.lua
-[!] This arena doesn't exist!=[!] Quest'arena non esiste!
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 

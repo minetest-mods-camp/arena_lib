@@ -67,6 +67,32 @@ minetest.register_chatcommand("quit", {
 
 
 
+minetest.register_chatcommand("forceend", {
+
+  description = S("Forcibly ends an ongoing game"),
+  privs = {
+        arenalib_admin = true,
+    },
+
+  func = function(name, param)
+
+    local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
+
+    -- se i parametri sono errati, annullo
+    if not mod or not arena_name then
+      minetest.chat_send_player(name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return end
+
+    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+    arena_lib.force_arena_ending(mod, arena, name)
+
+  end
+
+})
+
+
+
 minetest.register_chatcommand("all", {
 
   description = S("Write a message in the arena global chat while in a game"),

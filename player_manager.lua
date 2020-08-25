@@ -31,6 +31,13 @@ minetest.register_on_leaveplayer(function(player)
       arena_lib.remove_player_from_arena(p_name)
     end
 
+    --TODO
+    --[[if arena_lib.is_player_in_arena(p_name) then
+      arena_lib.remove_player_from_arena(p_name)
+    elseif arena_lib.is_player_in_queue(p_name) then
+      arena_lib.remove_from_queue(p_name)
+    end]]
+
     if arena_lib.is_player_in_edit_mode(p_name) then
       arena_lib.quit_editor(player)
     end

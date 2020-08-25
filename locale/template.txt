@@ -1,4 +1,4 @@
-# version 3.4.0
+# version 3.5.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -42,6 +42,12 @@ Arena @1 successfully enabled=
 Arena @1 successfully disabled=
 @1 wins the game=
 Team @1 wins the game=
+[!] This minigame doesn't exist!=
+[!] This arena doesn't exist!=
+[!] No ongoing game!=
+The arena has been forcibly terminated by @1=
+Game in arena @1 successfully terminated=
+The arena has been forcibly terminated=
 @1 has been eliminated=
 @1 has been kicked=
 @1 has quit the match=
@@ -60,6 +66,7 @@ Kick a player from an ongoing game=
 [!] You must be in a game to perform this action!=
 Quit an ongoing game=
 [!] You can't perform this action if you're the only one left!=
+Forcibly ends an ongoing game=
 Write a message in the arena global chat while in a game=
 Write a message in the arena team chat while in a game (if teams are enabled)=
 
@@ -89,7 +96,6 @@ Spawn points: =
 Properties: =
 Temp properties: =
 Team properties: =
-[!] No ongoing game! =
 Player: =
 , kills: =
 , deaths: =
@@ -121,7 +127,6 @@ Get ready!=
 #Waiting=
 
 # utils.lua
-[!] This arena doesn't exist!=
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
