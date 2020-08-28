@@ -114,7 +114,7 @@ function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound)
     -- se duration non è specificata, permane all'infinito
     if duration then
       minetest.after(duration, function()
-        if minetest.get_player_by_name(p_name) == nil then return end
+        if minetest.get_player_by_name(pl_name) == nil then return end
         -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
         if HUD_type == "broadcast" and pl:hud_get(pl_HUD[2]).text ~= msg or
           HUD_type == "hotbar" and pl:hud_get(pl_HUD[4]).text ~= msg then
