@@ -1,6 +1,7 @@
+local S = minetest.get_translator("arena_lib")
+
 local function change_spawner_ID() end
 
-local S = minetest.get_translator("arena_lib")
 local spawners_tools_team = {
   "arena_lib:spawner_team_add",
   "arena_lib:spawner_team_remove",

@@ -78,6 +78,27 @@ minetest.register_tool("arena_lib:editor_signs", {
 
 
 
+minetest.register_tool("arena_lib:editor_settings", {
+
+    description = S("Settings"),
+    inventory_image = "arenalib_editor_settings.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Arena settings"))
+
+      minetest.after(0, function()
+        arena_lib.give_settings_tools(user)
+      end)
+    end
+
+})
+
+
+
 minetest.register_tool("arena_lib:editor_info", {
 
     description = S("Info"),

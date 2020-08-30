@@ -163,6 +163,10 @@ Change the current number=
 Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 
+# _editor/tools_settings.lua
+Rename arena=
+Arena properties=
+
 # _editor/tools_spawner.lua
 Add spawner=
 Remove spawner=

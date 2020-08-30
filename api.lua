@@ -324,11 +324,13 @@ end
 
 
 
-function arena_lib.rename_arena(sender, mod, arena_name, new_name)
+function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   -- se esiste già un'arena con il nuovo nome, annullo
   if arena_lib.get_arena_by_name(mod, new_name) then
@@ -347,6 +349,7 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, S("Arena @1 successfully renamed in @2", old_name, new_name))
+  return true
 
 end
 

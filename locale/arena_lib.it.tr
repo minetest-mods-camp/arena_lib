@@ -163,6 +163,10 @@ Change the current number=Cambia il numero attuale
 Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 
+# _editor/tools_settings.lua
+Rename arena=Rinomina arena
+Arena properties=Proprietà arena
+
 # _editor/tools_spawner.lua
 Add spawner=Aggiungi spawner
 Remove spawner=Rimuovi spawner
