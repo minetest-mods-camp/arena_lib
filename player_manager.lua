@@ -115,30 +115,3 @@ minetest.register_on_respawnplayer(function(player)
     return true
 
   end)
-
-
-
-  minetest.register_on_player_receive_fields(function(player, formname, fields)
-
-    if formname ~= "arena_lib:settings_rename" and formname ~= "arena_lib:settings_editor" then return end
-
-    local p_name      =   player:get_player_name()
-    local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name  =   player:get_meta():get_string("arena_lib_editor.arena")
-
-    -- GUI per rinominare arena
-    if formname == "arena_lib:settings_rename" then
-
-      if fields.rename_confirm or fields.key_enter then
-        if arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then
-          player:get_meta():set_string("arena_lib_editor.arena", fields.rename)
-          minetest.close_formspec(p_name, formname)
-        end
-      end
-
-    -- GUI per modificare proprietà
-    else
-
-    end
-
-  end)

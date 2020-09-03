@@ -17,7 +17,7 @@ function arena_lib.show_waypoints(p_name, arena)
       local caption = "#" .. ID
 
       -- se ci sono team, lo specifico nel nome
-      if #arena.teams > 1 then
+      if arena.teams_enabled then
         caption = caption .. ", " .. arena.teams[spawn.teamID].name
       end
 
