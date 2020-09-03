@@ -68,7 +68,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 
 ##### 1.2.2.3 Arenas properties
 Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
-`arena_lib.change_arena_properties(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string.
+`arena_lib.change_arena_properties(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
 
 ##### 1.2.2.4 Spawners
 `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  

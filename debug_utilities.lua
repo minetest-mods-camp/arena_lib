@@ -3,6 +3,8 @@
 ---
 local S = minetest.get_translator("arena_lib")
 
+local function value_to_string() end
+
 
 function arena_lib.print_arenas(sender, mod)
 
@@ -116,14 +118,16 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   --calcolo proprietà
   local properties = ""
   for property, _ in pairs(mod_ref.properties) do
-    properties = properties .. property .. " = " .. arena[property] .. "; "
+    local value = value_to_string(arena[property])
+    properties = properties .. property .. " = " .. value .. "; "
   end
 
   --calcolo proprietà temporanee
   local temp_properties = ""
   if arena.in_game == true then
     for temp_property, _ in pairs(mod_ref.temp_properties) do
-      temp_properties = temp_properties .. temp_property .. " = " .. arena[temp_property] .. "; "
+      local value = value_to_string(arena[temp_property])
+      temp_properties = temp_properties .. temp_property .. " = " .. value .. "; "
     end
   else
     for temp_property, _ in pairs(mod_ref.temp_properties) do
@@ -139,7 +143,8 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
       for i = 1, #arena.teams do
         team_properties = team_properties .. arena.teams[i].name .. ": "
         for team_property, _ in pairs(mod_ref.team_properties) do
-          team_properties = team_properties .. " " .. team_property .. " = " .. arena.teams[i][team_property] .. ";"
+          local value = value_to_string(arena.teams[i][team_property])
+          team_properties = team_properties .. " " .. team_property .. " = " .. value .. ";"
         end
         team_properties = team_properties .. "|"
       end
@@ -204,4 +209,20 @@ function arena_lib.print_arena_stats(sender, mod, arena_name)
       p_properties)
   end
 
+end
+
+
+
+
+
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
+
+function value_to_string(value)
+  if type(value) == "table" then
+    return tostring(dump(value)):gsub("\n", "")
+  else
+    return tostring(value)
+  end
 end
