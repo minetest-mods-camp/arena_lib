@@ -355,6 +355,48 @@ end
 
 
 
+function arena_lib.change_arena_properties(sender, mod, arena_name, property, new_value, in_editor)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  -- se la proprietà non esiste
+  if arena[property] == nil then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  local func, error_msg = loadstring("return (" .. new_value .. ")")
+
+  -- se non ritorna una sintassi corretta
+  if not func then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] " .. error_msg))
+    return end
+
+  setfenv(func, {})
+
+  local good, result = pcall(func)
+
+  -- se le operazioni della funzione causano errori
+  if not good then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] " .. result))
+    return end
+
+  -- se il tipo è diverso dal precedente
+  if type(arena[property]) ~= type(result) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change property type!")))
+    return end
+
+  arena[property] = result
+  update_storage(false, mod, id, arena)
+
+  minetest.chat_send_player(sender, S("Property @1 successfully overwritten", property))
+end
+
+
+
 function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)

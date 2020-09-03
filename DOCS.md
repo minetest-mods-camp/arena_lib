@@ -66,7 +66,11 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 ##### 1.2.2.2 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
 
-##### 1.2.2.3 Spawners
+##### 1.2.2.3 Arenas properties
+Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
+`arena_lib.change_arena_properties(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string.
+
+##### 1.2.2.4 Spawners
 `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
 * `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
 * `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
@@ -102,7 +106,7 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
    [etc.]
 ```
 
-##### 1.2.2.4 Signs
+##### 1.2.2.5 Signs
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
 
 #### 1.2.3 Enabling an arena
