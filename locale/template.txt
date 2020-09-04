@@ -10,6 +10,8 @@ team=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
+[!] You can't change property type!=
+Property @1 successfully overwritten=
 Players amount successfully changed ( min @1 | max @2 )=
 [!] Teams are not enabled!=
 [!] Nothing to do here!=
@@ -153,6 +155,8 @@ Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=
 One sign per arena=
+Settings=
+Arena settings=
 Info=
 Go back=
 Enable and leave=
@@ -166,6 +170,10 @@ Teams: off (click to toggle on)=
 # _editor/tools_settings.lua
 Rename arena=
 Arena properties=
+Delete arena=
+Overwrite=
+Cancel=
+Yes=
 
 # _editor/tools_spawner.lua
 Add spawner=

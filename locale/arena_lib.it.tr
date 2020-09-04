@@ -10,6 +10,8 @@ team=squadra
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
+[!] You can't change property type!=[!] Non puoi cambiare il tipo della proprietà!
+Property @1 successfully overwritten=Proprietà @1 sovrascritta con successo
 Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
 [!] Teams are not enabled!=[!] Le squadre non sono abilitate!
 [!] Nothing to do here!=[!] È già tutto a posto qui!
@@ -153,6 +155,8 @@ Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
 Signs=Cartelli
 One sign per arena=Un cartello per arena
+Settings=Impostazioni
+Arena settings=Impostazioni arena
 Info=Info
 Go back=Torna indietro
 Enable and leave=Abilita ed esci
@@ -166,6 +170,10 @@ Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 # _editor/tools_settings.lua
 Rename arena=Rinomina arena
 Arena properties=Proprietà arena
+Delete arena=Cancella arena
+Overwrite=Sovrascrivi
+Cancel=Annulla
+Yes=Sì
 
 # _editor/tools_spawner.lua
 Add spawner=Aggiungi spawner

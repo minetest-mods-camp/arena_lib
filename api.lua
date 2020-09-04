@@ -296,13 +296,13 @@ end
 
 
 
-function arena_lib.remove_arena(sender, mod, arena_name)
+function arena_lib.remove_arena(sender, mod, arena_name, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
-
-  --TODO: -chiedere conferma
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
 
   -- rimozione cartello coi rispettivi metadati
   if arena.sign ~= nil then
