@@ -227,9 +227,10 @@ end)
 
 ### 2.4 Additional properties
 Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the four tables `properties`, `temp_properties`, `player_properties` and `team_properties`. The first two are for the arena, the third is for players and the fourth for teams.  
+No matter the type of property, they're all shared between arenas. Better said, their values can change, but there can't be an arena with more or less properties than another.
 
 #### 2.4.1 Arenas properties
-The difference between `properties` and `temp_properties` is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the latter won't and it's reset every time a match ends. So in our case, we don't want the kill leader to be stored outside the arena, thus we go to our `arena_lib.register_minigame(...)` and write
+The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
 ```
 arena_lib.register_minigame("mymod", {
   --whatever stuff we already have
@@ -238,14 +239,12 @@ arena_lib.register_minigame("mymod", {
   }
 }
 ```
-and then we can easily access the `kill_leader` field whenever we want from every arena we have, via `theactualarena.kill_leader`, like when creating a function that returns the kill leader of a given arena.
+in doing so, we can easily access the `kill_leader` field whenever we want from every arena we have, via `ourarena.kill_leader`. E.g. when creating a function calculating the arena kill leader
 
 > Beware: you DO need to initialise your properties (whatever type) or it'll return an error
 
 ##### 2.4.1.1 Updating properties for old arenas
-If you decide to add a new property (temporary or not) to your mod but you had created a few arenas already, you need to update them manually by calling  
-`arena_lib.update_properties("mymod")`  
-right after `arena_lib.register_minigame(...)`. This has to be done manually because it'd be quite heavy to run a check on hypotetically very long strings whenever the server goes online for each mod relying on `arena_lib`. So just add it, run the server, shut it down when it's done loading, remove the call and then you're good to go.
+This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena, so if you're not sure about what you're doing, do a backup first.
 
 #### 2.4.2 Players properties
 These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
@@ -312,7 +311,8 @@ Executioner can be passed to tell who removed the player. By default, this happe
 
 ### 2.7 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
-* Changing the minimum amount of players aside, any action in the "Players" section of the editor. It'll delete your spawners (same as above)
+* Any action in the "Players" section of the editor, aside changing their minimum amount: it'll delete your spawners (same as above)
+* Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

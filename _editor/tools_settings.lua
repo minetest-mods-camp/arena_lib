@@ -3,6 +3,7 @@ local FS = minetest.formspec_escape
 
 local function get_rename_formspec() end
 local function get_properties_formspec() end
+local function get_delete_formspec() end
 local function value_to_string() end
 
 local settings_tools = {

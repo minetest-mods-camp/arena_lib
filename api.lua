@@ -12,6 +12,7 @@ local storage = minetest.get_mod_storage()
 
 local function init_storage() end
 local function update_storage() end
+local function check_for_properties() end
 local function copy_table() end
 local function next_available_ID() end
 local function assign_team_spawner() end
@@ -198,34 +199,6 @@ end
 
 
 
---[!!!] add this to your code only if you need to add some new property to your
--- old arenas
-function arena_lib.update_properties(mod)
-
-  minetest.log("action", "[ARENA_LIB] Updating properties for arenas in " .. mod)
-
-  local mod_ref = arena_lib.mods[mod]
-
-  if mod_ref == nil then
-    minetest.log("error", "[ARENA_LIB] [!] There's no minigame called " .. mod .. ", properties update aborted")
-  return end
-
-  for id, arena in pairs(mod_ref.arenas) do
-
-    for property, v in pairs(mod_ref.properties) do
-      if arena[property] == nil then
-        arena[property] = v
-      end
-    end
-
-    update_storage(false, mod, id, arena)
-    for temp_property, v in pairs(mod_ref.temp_properties) do
-      arena[temp_property] = v
-    end
-  end
-
-end
-
 
 
 ----------------------------------------------
@@ -273,14 +246,9 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     end
   end
 
-  -- aggiungo eventuali proprietà custom
+  -- aggiungo eventuali proprietà
   for property, value in pairs(mod_ref.properties) do
     arena[property] = value
-  end
-
-  -- temp custom
-  for temp_property, value in pairs(mod_ref.temp_properties) do
-    arena[temp_property] = value
   end
 
   mod_ref.highest_arena_ID = table.maxn(mod_ref.arenas)
@@ -864,6 +832,11 @@ function arena_lib.load_arena(mod, arena_ID)
   local shuffled_spawners = copy_table(arena.spawn_points)
   local sorted_team_players = {}
 
+  -- aggiungo eventuali proprietà temporanee
+  for temp_property, v in pairs(mod_ref.temp_properties) do
+    arena[temp_property] = v
+  end
+
   -- randomizzo gli spawner se non è a team
   if not arena.teams_enabled then
     for i = #shuffled_spawners, 2, -1 do
@@ -881,7 +854,7 @@ function arena_lib.load_arena(mod, arena_ID)
         end
       end
 
-      -- e carico eventuali proprietà per ogni team
+      -- e aggiungo eventuali proprietà per ogni team
       for k, v in pairs(mod_ref.team_properties) do
         arena.teams[i][k] = v
       end
@@ -1136,20 +1109,12 @@ function arena_lib.end_arena(mod_ref, mod, arena)
   -- azzero il timer
   arena.timer_current = nil
 
-  -- resetto le proprietà temporanee
+  -- rimuovo eventuali proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
-    if type(v) == "string" then
-      arena[temp_property] = ""
-    elseif type(v) == "number" then
-      arena[temp_property] = 0
-    elseif type(v) == "boolean" then
-      arena[temp_property] = false
-    elseif type(v) == "table" then
-      arena[temp_property] = {}
-    end
+    arena[temp_property] = nil
   end
 
-  -- e rimuovo quelle eventuali di team
+  -- e quelle eventuali di team
   if arena.teams_enabled then
     for i = 1, #arena.teams do
       for t_property, _ in pairs(mod_ref.team_properties) do
@@ -1754,6 +1719,8 @@ function init_storage(mod, mod_ref)
 
     end
   end
+
+  check_for_properties(mod, mod_ref)
   minetest.log("action", "[ARENA_LIB] Mini-game " .. mod .. " loaded")
 end
 
@@ -1771,6 +1738,102 @@ function update_storage(erase, mod, id, arena)
     storage:set_string(entry, minetest.serialize(arena))
   end
 
+end
+
+
+
+-- le proprietà vengono salvate nello storage senza valori, in una coppia id-proprietà. Sia per leggerezza, sia perché non c'è bisogno di paragonarne i valori
+function check_for_properties(mod, mod_ref)
+
+  local old_properties = storage:get_string(mod .. ".PROPERTIES")
+  local has_old_properties = old_properties ~= ""
+  local has_new_properties = next(mod_ref.properties) ~= nil
+
+  -- se non ce n'erano prima e non ce ne sono ora, annullo
+  if not has_old_properties and not has_new_properties then
+    return
+
+  -- se non c'erano prima e ora ci sono, proseguo
+  elseif not has_old_properties and has_new_properties then
+    minetest.log("action", "[ARENA_LIB] Properties have been declared. Proceeding to add them")
+
+  -- se c'erano prima e ora non ci sono più, svuoto e annullo
+  elseif has_old_properties and not has_new_properties then
+
+    for property, _ in pairs(minetest.deserialize(old_properties)) do
+      for id, arena in pairs(mod_ref.arenas) do
+        arena[property] = nil
+        update_storage(false, mod, id, arena)
+      end
+    end
+
+    minetest.log("action", "[ARENA_LIB] There are no properties left in the declaration of the mini-game. They've been removed from arenas")
+    storage:set_string(mod .. ".PROPERTIES", "")
+    return
+
+  -- se c'erano sia prima che ora, le confronto
+  else
+
+    local new_properties_table = {}
+
+    for property, _ in pairs(mod_ref.properties) do
+      table.insert(new_properties_table, property)
+    end
+
+    -- se sono uguali in tutto e per tutto, termino qui
+    if old_properties ~= minetest.serialize(new_properties_table) then
+      minetest.log("action", "[ARENA_LIB] Properties have changed. Proceeding to modify old arenas")
+    else
+      return end
+
+  end
+
+  local old_table = minetest.deserialize(old_properties)
+  local old_properties_table = {}
+
+  -- converto la tabella dello storage in modo che sia compatibile con mod_ref, spostando le proprietà sulle chiavi
+  if old_table then
+    for _, property in pairs(old_table) do
+      old_properties_table[property] = true
+    end
+  end
+
+  -- aggiungo le nuove proprietà
+  for property, v in pairs(mod_ref.properties) do
+
+    if old_properties_table[property] == nil then
+      minetest.log("action", "[ARENA_LIB] Adding property " .. property)
+
+      for id, arena in pairs(mod_ref.arenas) do
+        arena[property] = v
+        update_storage(false, mod, id, arena)
+      end
+    end
+
+  end
+
+  -- rimuovo quelle non più presenti
+  for old_property, _ in pairs(old_properties_table) do
+
+    if mod_ref.properties[old_property] == nil then
+      minetest.log("action", "[ARENA_LIB] Removing property " .. old_property)
+
+      for id, arena in pairs(mod_ref.arenas) do
+        arena[old_property] = nil
+        update_storage(false, mod, id, arena)
+      end
+    end
+
+  end
+
+  local new_properties_table = {}
+
+  -- inverto le proprietà di mod_ref da chiavi a valori per registrarle nello storage
+  for property, _ in pairs(mod_ref.properties) do
+    table.insert(new_properties_table, property)
+  end
+
+  storage:set_string(mod .. ".PROPERTIES", minetest.serialize(new_properties_table))
 end
 
 
@@ -1847,6 +1910,7 @@ end
 ------------------DEPRECATED------------------
 ----------------------------------------------
 
+-- to remove in 4.0
 function arena_lib.initialize(mod)
     minetest.log("warning", "[ARENA_LIB] arena_lib.initialize is deprecated: you don't need it anymore")
 end
@@ -1859,4 +1923,9 @@ end
 function arena_lib.get_arena_players_count(arena)
   minetest.log("warning", "[ARENA_LIB] arena_lib.get_arena_players_count is deprecated: use the arena parameter 'players_amount' instead (ie. arena.players_amount) to retrieve the value")
   return arena.players_amount
+end
+
+-- to remove in 5.0
+function arena_lib.update_properties(mod)
+  minetest.log("warning", "[ARENA_LIB] arena_lib.update_properties is deprecated: properties are now updated automatically, pretty handy, init? :D")
 end
