@@ -136,7 +136,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   end
 
   local team_properties = ""
-  if not next(mod_ref.team_properties) then
+  if not arena.teams_enabled then
     team_properties = "---"
   else
     if arena.in_game == true then
