@@ -323,7 +323,7 @@ end
 
 
 
-function arena_lib.change_arena_properties(sender, mod, arena_name, property, new_value, in_editor)
+function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -333,34 +333,42 @@ function arena_lib.change_arena_properties(sender, mod, arena_name, property, ne
 
   -- se la proprietà non esiste
   if arena[property] == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Properties - Parameters don't seem right!") end
     return end
 
-  local func, error_msg = loadstring("return (" .. new_value .. ")")
+  -- se da editor, converto la stringa nel tipo corrispettivo
+  if in_editor then
+    local func, error_msg = loadstring("return (" .. new_value .. ")")
 
-  -- se non ritorna una sintassi corretta
-  if not func then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] " .. error_msg))
-    return end
+    -- se non ritorna una sintassi corretta
+    if not func then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[SYNTAX!] " .. error_msg))
+      return end
 
-  setfenv(func, {})
+    setfenv(func, {})
 
-  local good, result = pcall(func)
+    local good, result = pcall(func)
 
-  -- se le operazioni della funzione causano errori
-  if not good then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] " .. result))
-    return end
+    -- se le operazioni della funzione causano errori
+    if not good then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[RUNTIME!] " .. result))
+      return end
+
+    new_value = result
+  end
 
   -- se il tipo è diverso dal precedente
-  if type(arena[property]) ~= type(result) then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change property type!")))
+  if type(arena[property]) ~= type(new_value) then
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change property type!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Properties - You can't change property type!") end
     return end
 
-  arena[property] = result
+  arena[property] = new_value
   update_storage(false, mod, id, arena)
 
-  minetest.chat_send_player(sender, S("Property @1 successfully overwritten", property))
+  if sender then minetest.chat_send_player(sender, S("Property @1 successfully overwritten", property))
+  else minetest.log("action", "[ARENA_LIB] Property " .. property .. " successfully overwritten") end
 end
 
 

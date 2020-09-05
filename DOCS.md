@@ -243,7 +243,11 @@ in doing so, we can easily access the `kill_leader` field whenever we want from 
 
 > Beware: you DO need to initialise your properties (whatever type) or it'll return an error
 
-##### 2.4.1.1 Updating properties for old arenas
+##### 2.4.1.1 Updating non temporary properties via code
+Let's say you want to change a property from your mod. A naive approach would be doing `yourarena.property = something`. This, though, won't update it in the storage, so when you restart the server it'll still have the old value.  
+Instead, the right way to permanently update a property for an arena is calling `arena_lib.change_arena_property(<sender>, mod, arena_name, property, new_value)`. If `sender` is nil, the output message will be printed in the log.
+
+##### 2.4.1.2 Updating properties for old arenas
 This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena, so if you're not sure about what you're doing, do a backup first.
 
 #### 2.4.2 Players properties
