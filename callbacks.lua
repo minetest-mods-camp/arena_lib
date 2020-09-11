@@ -1,3 +1,17 @@
+-- Arena management
+
+function arena_lib.on_enable(mod, func)
+  arena_lib.mods[mod].on_enable = func
+end
+
+
+
+function arena_lib.on_disable(mod, func)
+  arena_lib.mods[mod].on_disable = func
+end
+
+
+
 -- Arena phases
 
 function arena_lib.on_load(mod, func)

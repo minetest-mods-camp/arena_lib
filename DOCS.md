@@ -195,6 +195,8 @@ Those aside, you need to connect a few functions with your mod in order to use t
 
 ### 2.3 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
+* `arena_lib.on_enable(mod, function(arena, p_name)`: use it to run more checks before enabling an arena. Must return true if all conditions are met
+* `arena_lib.on_disable(mod, function(arena, p_name)`: use it to run more checks before disabling an arena. Must return true if all conditions are met
 * `arena_lib.on_load(mod, function(arena)` (we saw these 4 earlier)
 * `arena_lib.on_start(mod, function(arena))`
 * `arena_lib.on_celebration(mod, function(arena, winner_name)`

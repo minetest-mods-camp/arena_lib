@@ -750,12 +750,17 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
     arena.enabled = false
   return end
 
+  local mod_ref = arena_lib.mods[mod]
+
+  -- eventuali controlli personalizzati
+  if mod_ref.on_enable then
+    if not mod_ref.on_enable(arena, sender) then return end
+  end
+
   -- se sono nell'editor, vengo buttato fuori
   if arena_lib.is_player_in_edit_mode(sender) then
     arena_lib.quit_editor(minetest.get_player_by_name(sender))
   end
-
-  local mod_ref = arena_lib.mods[mod]
 
   -- abilito
   arena.enabled = true
@@ -783,6 +788,11 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   if arena.in_loading or arena.in_game or arena.in_celebration then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't disable an arena during an ongoing game!")))
     return end
+
+  -- eventuali controlli personalizzati
+  if mod_ref.on_disable then
+    if not mod_ref.on_disable(arena, sender) then return end
+  end
 
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
   if next(arena.players) then
@@ -1910,6 +1920,7 @@ function timer_start(mod_ref, arena)
     timer_start(mod_ref, arena)
   end)
 end
+
 
 
 
