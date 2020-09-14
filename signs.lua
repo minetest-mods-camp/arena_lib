@@ -10,6 +10,8 @@ local function arena_display_format(arena, msg) end
 
 minetest.override_item("default:sign_wall", {
 
+    on_dig = function() end,
+
     on_punch = function(pos, node, puncher, pointed_thing)
 
       local arenaID = minetest.get_meta(pos):get_int("arenaID")
