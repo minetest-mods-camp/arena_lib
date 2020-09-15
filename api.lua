@@ -502,8 +502,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       return end
   end
 
-  local pos = vector.floor(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
-  local pos_Y_up = {x = pos.x, y = pos.y+1, z = pos.z}                          -- alzo Y di uno sennò tippa nel blocco
+  local pos = vector.round(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
   local mod_ref = arena_lib.mods[mod]
 
   -- controllo parametri
@@ -521,7 +520,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
         return end
 
-      arena.spawn_points[ID].pos = pos_Y_up
+      arena.spawn_points[ID].pos = pos
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
 
     -- se delete, cancello
@@ -577,7 +576,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   -- se c'è già uno spawner in quel punto, annullo
   for id, spawn in pairs(arena.spawn_points) do
-    if minetest.serialize(pos_Y_up) == minetest.serialize(spawn.pos) then
+    if minetest.serialize(pos) == minetest.serialize(spawn.pos) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
       return end
   end
@@ -629,7 +628,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   end
 
   -- imposto lo spawner
-  arena.spawn_points[next_available_spawnID] = {pos = pos_Y_up, teamID = team_ID}
+  arena.spawn_points[next_available_spawnID] = {pos = pos, teamID = team_ID}
 
   -- se i waypoint sono mostrati, li aggiorno
   if arena_lib.are_waypoints_shown(sender) then
