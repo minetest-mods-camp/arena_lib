@@ -303,6 +303,8 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
 * `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
+* `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
+* `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
 ### 2.7 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
@@ -314,6 +316,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
+* `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
 ### 2.7 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)

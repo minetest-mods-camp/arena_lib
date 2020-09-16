@@ -113,15 +113,13 @@ end
 
 
 function arena_lib.is_arena_in_edit_mode(arena_name)
-  if arenas_in_edit_mode[arena_name] ~= nil then return true
-  else return false end
+  return arenas_in_edit_mode[arena_name] ~= nil
 end
 
 
 
 function arena_lib.is_player_in_edit_mode(p_name)
-  if players_in_edit_mode[p_name] ~= nil then return true
-  else return false end
+  return players_in_edit_mode[p_name] ~= nil
 end
 
 
