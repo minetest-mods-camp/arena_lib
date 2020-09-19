@@ -13,7 +13,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `timer`: (int) default is nil, but it can be changed as we'll see in a moment
+* `timer`: (int) inherited by the mod's timer value, it can be changed later, per arena. When it's disabled, it's nil.
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -67,7 +67,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 ##### 1.2.2.2 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
 
-##### 1.2.2.3 Timer
+##### 1.2.2.3 Timers
 `arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. If `timer` is -1, it'll be disabled and set to `nil`.
 
 ##### 1.2.2.4 Arenas properties
@@ -165,6 +165,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
+* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled. If -1, by default arenas timers will be nil. If not, they'll inherit the same value
 * `is_timer_incrementing`: whether arenas' timers decrease as in a countdown or increase as in a stopwatch. Default is false
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3

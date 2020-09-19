@@ -32,6 +32,7 @@ local arena_default = {
   spawn_points = {},          -- KEY: ids, VALUE: {position, team}
   max_players = 4,
   min_players = 2,
+  timer = nil,
   in_queue = false,
   in_loading = false,
   in_game = false,
@@ -82,6 +83,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
+  mod_ref.timer = -1
   mod_ref.is_timer_incrementing = false
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
@@ -147,6 +149,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.show_minimap == true then
     mod_ref.show_minimap = def.show_minimap
+  end
+
+  if def.timer then
+    mod_ref.timer = def.timer
   end
 
   if def.is_timer_incrementing == true then
@@ -240,6 +246,11 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
       arena.teams[k] = {name = t_name}
       arena.players_amount_per_team[k] = 0
     end
+  end
+
+  -- eventuale timer
+  if mod_ref.timer ~= -1 then
+    arena.timer = mod_ref.timer
   end
 
   -- aggiungo eventuali proprietà
@@ -1912,8 +1923,6 @@ end
 function timer_start(mod_ref, arena)
 
   if arena.on_celebration then return end
-
-  minetest.chat_send_player("singleplayer", arena.timer_current)
 
   if mod_ref.is_timer_incrementing then
     arena.timer_current = arena.timer_current + 1
