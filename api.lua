@@ -1922,7 +1922,7 @@ end
 
 function timer_start(mod_ref, arena)
 
-  if arena.on_celebration then return end
+  if arena.on_celebration or not arena.in_game then return end
 
   if mod_ref.is_timer_incrementing then
     arena.timer_current = arena.timer_current + 1

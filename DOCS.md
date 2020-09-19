@@ -165,7 +165,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
-* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled. If -1, by default arenas timers will be nil. If not, they'll inherit the same value
+* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled. If disabled, new arenas won't have a timer. If not, they'll inherit the same value
 * `is_timer_incrementing`: whether arenas' timers decrease as in a countdown or increase as in a stopwatch. Default is false
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
