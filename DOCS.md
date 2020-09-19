@@ -8,11 +8,12 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `name`: (string) the name of the arena, declared when creating it
 * `sign`: (pos) the position of the sign associated with the arena.
 * `players`: (table) where to store players
-* `teams`: (table) where to store teams. If there are none, is {-1}
+* `teams`: (table) where to store teams. If there are none, it's {-1}
 * `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
+* `timer`: (int) default is nil, but it can be changed as we'll see in a moment
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -66,11 +67,14 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 ##### 1.2.2.2 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
 
-##### 1.2.2.3 Arenas properties
+##### 1.2.2.3 Timer
+`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. If `timer` is -1, it'll be disabled and set to `nil`.
+
+##### 1.2.2.4 Arenas properties
 Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
 `arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
 
-##### 1.2.2.4 Spawners
+##### 1.2.2.5 Spawners
 `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
 * `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
 * `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
@@ -161,8 +165,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
-* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled
-* `is_timer_incrementing`: whether the timer decreases as in a countdown or increases as in a stopwatch. It doesn't work if timer is -1. Default is false
+* `is_timer_incrementing`: whether arenas' timers decrease as in a countdown or increase as in a stopwatch. Default is false
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3

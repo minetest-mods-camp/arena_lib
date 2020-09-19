@@ -109,9 +109,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local timer = ""
   if arena.timer then
     if arena.timer_current then
-      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")\n"
+      timer = minetest.colorize("#eea160", S("Timer: ")) .. minetest.colorize("#cfc6b8", arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")") .. "\n"
     else
-      timer = S("Timer: ") .. arena.timer .. " (" .. S("current: ") .. "--- )\n"
+      timer = minetest.colorize("#eea160", S("Timer: ")) .. minetest.colorize("#cfc6b8", arena.timer .. " (" .. S("current: ") .. " --- )") .. "\n"
     end
   end
 

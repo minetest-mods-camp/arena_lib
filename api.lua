@@ -82,7 +82,6 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
-  mod_ref.timer = -1
   mod_ref.is_timer_incrementing = false
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
@@ -150,11 +149,8 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.show_minimap = def.show_minimap
   end
 
-  if def.timer then
-    mod_ref.timer = def.timer
-    if def.is_timer_incrementing == true then
-      mod_ref.is_timer_incrementing = true
-    end
+  if def.is_timer_incrementing == true then
+    mod_ref.is_timer_incrementing = true
   end
 
   if def.queue_waiting_time then
@@ -727,6 +723,28 @@ end
 
 
 
+function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
+
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se è da disabilitare
+  if timer == -1 then
+    arena.timer = nil
+    minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer successfully disabled", arena_name))
+  else
+    arena.timer = timer
+    minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2s", arena_name, timer))
+  end
+end
+
+
+
 function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
@@ -963,7 +981,7 @@ function arena_lib.start_arena(mod_ref, arena)
   end
 
   -- parte l'eventuale timer
-  if mod_ref.timer ~= -1 then
+  if arena.timer then
     arena.timer_current = arena.timer
     minetest.after(1, function()
       timer_start(mod_ref, arena)
@@ -1714,13 +1732,6 @@ function init_storage(mod, mod_ref)
           " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
       end
 
-      -- gestione timer
-      if mod_ref.timer == -1 and arena.timer then                             -- se avevo abilitato i timer e ora li ho rimossi, li tolgo dalle arene
-        arena.timer = nil
-      elseif mod_ref.timer ~= -1 and not arena.timer then                     -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
-        arena.timer = mod_ref.timer
-      end
-
       arena_lib.mods[mod].arenas[i] = arena
 
       if to_update then
@@ -1901,6 +1912,8 @@ end
 function timer_start(mod_ref, arena)
 
   if arena.on_celebration then return end
+
+  minetest.chat_send_player("singleplayer", arena.timer_current)
 
   if mod_ref.is_timer_incrementing then
     arena.timer_current = arena.timer_current + 1
