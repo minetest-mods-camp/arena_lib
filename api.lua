@@ -431,7 +431,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   end
 
   -- se non ci sono team nella mod, annullo
-  if #arena_lib.mods[mod].teams == 1 then
+  if not next(arena_lib.mods[mod].teams) then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Teams are not enabled!")))
     return end
 

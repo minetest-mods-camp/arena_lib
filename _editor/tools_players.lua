@@ -129,12 +129,17 @@ minetest.register_tool("arena_lib:players_teams_off", {
 
 
 
-function arena_lib.give_players_tools(inv, arena)
+function arena_lib.give_players_tools(inv, mod, arena)
 
   inv:set_list("main", players_tools)
 
   inv:set_stack("main", 1, "arena_lib:players_min " .. arena.min_players)
   inv:set_stack("main", 2, "arena_lib:players_max " .. arena.max_players)
+
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se non ha le squadre, non do l'oggetto per attivarle/disattivarle
+  if not next(mod_ref.teams) then return end
 
   if arena.teams_enabled then
     inv:set_stack("main", 5, "arena_lib:players_teams_on")
