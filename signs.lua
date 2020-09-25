@@ -25,6 +25,13 @@ signs_lib.register_sign("arena_lib:sign", {
 	vert_scaling = 1.38,
 	number_of_lines = 5,
 
+	on_dig = function(pos, node, digger)
+      if minetest.get_meta(pos):get_int("arenaID") ~= 0 then
+        return end
+
+      minetest.node_dig(pos,node,digger)
+    end,
+
 
   on_punch = function(pos, node, puncher, pointed_thing)
 
