@@ -673,7 +673,7 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
     for hit in ray do
       if hit.type == "node" then
         local node = minetest.get_node(hit["under"])
-        if string.match(node.name, "default:sign") then
+        if string.match(node.name, "arena_lib:sign") then
           pos = hit["under"]
           break
         end
@@ -682,7 +682,7 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
 
     -- se non ha trovato niente, esco
     if pos == nil then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not a sign!")))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
     return end
 
   -- se uso l'editor

@@ -3,7 +3,7 @@ local spawners_tools = {
   "arena_lib:sign_add",
   "arena_lib:sign_remove",
   "",
-  "default:sign_wall",
+  "arena_lib:sign",
   "",
   "",
   "arena_lib:editor_return",
@@ -31,7 +31,7 @@ minetest.register_tool("arena_lib:sign_add", {
 
       -- controllo se è un cartello
       if not def or def.entity_info == nil then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] That's not a sign!")))
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
       return end
 
       arena_lib.set_sign(p_name, pos, false)
@@ -52,13 +52,14 @@ minetest.register_tool("arena_lib:sign_remove", {
       local pos = minetest.get_pointed_thing_position(pointed_thing)
       if pos == nil then return end -- nel caso sia aria, sennò crasha
 
-      local node = minetest.get_node(pos)
-      local def = minetest.registered_items[node.name]
+      local node_name = minetest.get_node(pos).name
       local p_name = user:get_player_name()
 
+      minetest.chat_send_player(p_name, node_name)
+
       -- controllo se è un cartello
-      if not def or def.entity_info == nil then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] That's not a sign!")))
+      if node_name ~= "arena_lib:sign" then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
       return end
 
       arena_lib.set_sign(p_name, pos, true)

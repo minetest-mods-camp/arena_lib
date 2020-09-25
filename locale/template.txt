@@ -29,7 +29,7 @@ All the spawn points have been removed=
 [!] There's already a spawn in this point!=
 [!] Spawn points can't exceed the maximum number of players!=
 Spawn point #@1 successfully set=
-[!] That's not a sign!=
+[!] That's not an arena_lib sign!=
 Sign of arena @1 successfully removed=
 [!] This sign doesn't belong to @1!=
 [!] There is already a sign for this arena!=
@@ -112,6 +112,7 @@ Player: =
 You're immune!=
 
 # signs.lua
+Arena sign=
 [!] You must leave the editor first!=
 [!] Only the party leader can enter the queue!=
 [!] There is no enough space for the whole party!=
@@ -126,13 +127,6 @@ The queue has been cancelled due to not enough players=
 You've joined team @1=
 The game begins in @1 seconds!=
 Get ready!=
-# signs_lib gives troubles atm
-#WIP=
-#Terminating=
-#Ongoing=
-#Loading=
-#Queueing=
-#Waiting=
 
 # utils.lua
 [!] You must disable the arena first!=

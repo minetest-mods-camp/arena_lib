@@ -29,7 +29,7 @@ Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
 [!] There's already a spawn in this point!=[!] C'è già uno spawn in questo punto!
 [!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
 Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
-[!] That's not a sign!=[!] Questo non è un cartello!
+[!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
 Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
 [!] This sign doesn't belong to @1!=[!] Questo cartello non appartiene a @1!
 [!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
@@ -112,6 +112,7 @@ Player: =Giocatore:
 You're immune!=Sei immune!
 
 # signs.lua
+Arena sign=Cartello dell'arena
 [!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 [!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
 [!] There is no enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
@@ -126,13 +127,6 @@ The queue has been cancelled due to not enough players=La coda è stata annullat
 You've joined team @1=Ti sei unito alla squadra @1
 The game begins in @1 seconds!=La partita inizierà tra @1 secondi!
 Get ready!=Preparati!
-# signs_lib gives troubles atm
-#WIP=LAVORI@\nIN CORSO
-#Terminating=Concludendo
-#Ongoing=In partita
-#Loading=In caricamento
-#Queueing=In coda
-#Waiting=In attesa
 
 # utils.lua
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
