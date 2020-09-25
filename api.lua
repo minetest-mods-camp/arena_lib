@@ -317,7 +317,7 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
   arena.name = new_name
 
   -- aggiorno il cartello, se esiste
-  if arena.sign.x then
+  if next(arena.sign) then
     arena_lib.update_sign(arena)
   end
 
@@ -408,7 +408,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   end
 
   -- aggiorno il cartello, se esiste
-  if arena.sign.x then
+  if next(arena.sign) then
     arena_lib.update_sign(arena)
   end
 
@@ -471,7 +471,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
 
   -- aggiorno il cartello, se esiste
-  if arena.sign.x then
+  if next(arena.sign) then
     arena_lib.update_sign(arena)
   end
 
@@ -773,7 +773,7 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
   return end
 
   -- cartello
-  if not arena.sign.x then
+  if not next(arena.sign) then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Sign not set, the arena can't be enabled!")))
     arena.enabled = false
   return end
@@ -1751,7 +1751,7 @@ function init_storage(mod, mod_ref)
 
       --signs_lib ha bisogno di un attimo per caricare sennò tira errore
       minetest.after(0.01, function()
-        if arena.sign.x then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
+        if next(arena.sign) then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
           arena_lib.update_sign(arena)
         end
       end)

@@ -1,4 +1,4 @@
-# version 3.6.0-dev
+# version 3.6.0
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -19,10 +19,10 @@ Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'
 Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
 [!] This team doesn't exist!=[!] Questo team non esiste!
 [!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
-[!] No team must be specified for this function!=[!] Non va specificato nessun team per questa funzione!
+[!] No team must be specified for this function!=[!] Non va specificata nessuna squadra per questa funzione!
 Spawn point #@1 successfully overwritten=Punto di spawn #@1 sovrascritto con successo
 [!] No spawner with that ID to delete!=[!] Nessuno spawner con quell'ID da cancellare!
-All the spawn points belonging to team @1 have been removed=Tutti i punti di spawn appartenenti al team @1 sono stati rimossi
+All the spawn points belonging to team @1 have been removed=Tutti i punti di spawn appartenenti alla squadra @1 sono stati rimossi
 All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
 Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
 [!] Unknown parameter!=[!] Parametro non riconosciuto!

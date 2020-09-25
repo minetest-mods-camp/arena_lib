@@ -79,7 +79,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   -- calcolo cartello
   local sign_pos
-  if arena.sign.x ~= nil then
+  if next(arena.sign) then
     sign_pos = minetest.pos_to_string(arena.sign)
   else
     sign_pos = "---"
