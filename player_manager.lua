@@ -51,7 +51,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
     local p_name = hitter:get_player_name()
     local arena = arena_lib.get_arena_by_player(p_name)
 
-    if arena and arena.players[p_name].teamID and arena.players[p_name].teamID == arena.players[target_name].teamID then
+    if arena and arena.in_game and arena.players[p_name].teamID and arena.players[p_name].teamID == arena.players[target_name].teamID then
       return true
     end
 
