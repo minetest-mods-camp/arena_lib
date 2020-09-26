@@ -1,4 +1,4 @@
-# version 3.6.0
+# version 3.7.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -6,6 +6,7 @@
 # api.lua
 team=
 [!] An arena with that name exists already!=
+[!] The name contains unsupported characters!=
 [!] Parameters don't seem right!=
 Arena @1 successfully created=
 Arena @1 successfully removed=

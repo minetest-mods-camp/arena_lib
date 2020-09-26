@@ -15,6 +15,7 @@ local function update_storage() end
 local function check_for_properties() end
 local function copy_table() end
 local function next_available_ID() end
+local function is_arena_name_allowed() end
 local function assign_team_spawner() end
 local function timer_start() end
 
@@ -212,10 +213,8 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   local mod_ref = arena_lib.mods[mod]
   local ID = next_available_ID(mod_ref)
 
-  -- controllo che non ci siano duplicati
-  if ID > 1 and arena_lib.get_arena_by_name(mod, arena_name) ~= nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
-  return end
+  -- controllo nome
+  if not is_arena_name_allowed(sender, mod, arena_name) then return end
 
   -- controllo che non abbiano messo parametri assurdi per i giocatori minimi/massimi
   if min_players and max_players then
@@ -307,10 +306,8 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  -- se esiste già un'arena con il nuovo nome, annullo
-  if arena_lib.get_arena_by_name(mod, new_name) then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
-    return end
+  -- controllo nome
+  if not is_arena_name_allowed(sender, mod, new_name) then return end
 
   local old_name = arena.name
 
@@ -1904,6 +1901,25 @@ function next_available_ID(mod_ref)
     id = k
   end
   return id +1
+end
+
+
+
+function is_arena_name_allowed(sender, mod, arena_name)
+
+  -- se esiste già un'arena con quel nome, annullo
+  if arena_lib.get_arena_by_name(mod, arena_name) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] An arena with that name exists already!")))
+    return end
+
+  local matched_string = string.match(arena_name, "([%w%p%s]+)")
+
+  -- se contiene caratteri non supportati da signs_lib o termina con uno spazio, annullo
+  if arena_name ~= matched_string or string.match(arena_name, "#") ~= nil or arena_name:sub(#arena_name, -1) == " " then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The name contains unsupported characters!")))
+    return end
+
+  return true
 end
 
 
