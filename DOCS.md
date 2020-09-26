@@ -208,7 +208,7 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_timer_tick(mod, function(arena))`: called every second inside the arena if there is a timer and it's greater than 0
-* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists, reaches 0
+* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists, reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from a match (same as above)
 * `arena_lib.on_quit(mod, function(arena, p_name, is_forced))`: called when a player quits from a match (same as above). `is_forced` is true when the match has been terminated via `force_arena_ending(...)`

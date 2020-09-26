@@ -5,8 +5,6 @@
 
 # api.lua
 team=
-[!] An arena with that name exists already!=
-[!] The name contains unsupported characters!=
 [!] Parameters don't seem right!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
@@ -63,6 +61,9 @@ You're the last player standing: you win!=
 You win the game due to not enough players=
 [!] This action can't be performed with no spawners set!=
 Wooosh!=
+[!] An arena with that name exists already!=
+[!] The name contains unsupported characters!=
+[!] on_timeout callback must be declared to properly use a decreasing timer!=
 
 # commands.lua
 player=

@@ -5,8 +5,6 @@
 
 # api.lua
 team=squadra
-[!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
-[!] The name contains unsupported characters!=[!] Il nome contiene caratteri non supportati!
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
@@ -63,6 +61,9 @@ You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in part
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
 [!] This action can't be performed with no spawners set!=[!] Quest'azione non può essere eseguita senza punti di spawn impostati!
 Wooosh!=Wooosh!
+[!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
+[!] The name contains unsupported characters!=[!] Il nome contiene caratteri non supportati!
+[!] on_timeout callback must be declared to properly use a decreasing timer!=[!] il callback on_timeout deve essere dichiarato per poter usare correttamente un timer decrescente!
 
 # commands.lua
 player=giocatore
