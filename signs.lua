@@ -54,7 +54,7 @@ signs_lib.register_sign("arena_lib:sign", {
     if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
 
       -- se non si è il capo gruppo
-      if parties.get_party_leader(p_name) ~= p_name then
+      if not parties.is_player_party_leader(p_name) then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can enter the queue!")))
         return end
 
@@ -115,6 +115,11 @@ signs_lib.register_sign("arena_lib:sign", {
 
         -- se è un party, rimuovo tutto il gruppo
         if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
+
+					-- (se è il capogruppo, sennò annullo)
+					if not parties.is_player_party_leader(p_name) then
+						minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can leave the queue!")))
+					  return end
 
           local party_members = parties.get_party_members(p_name)
 

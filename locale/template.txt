@@ -123,6 +123,7 @@ Arena sign=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
 [!] This minigame doesn't allow to join while in progress!=
+[!] Only the party leader can leave the queue!=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=
