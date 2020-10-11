@@ -3,21 +3,52 @@ local FS = minetest.formspec_escape
 
 local function get_rename_formspec() end
 local function get_properties_formspec() end
+local function get_timer_formspec() end
 local function get_delete_formspec() end
 local function value_to_string() end
 
 local settings_tools = {
   "arena_lib:settings_rename",
   "arena_lib:settings_properties",
+  "",                                       -- timer_off/_on
+  "",
   "arena_lib:settings_delete",
-  "",
-  "",
   "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
 }
 
 local sel_property_attr = {}     --KEY: p_name; VALUE: {id = idx, name = property_name}
+
+
+
+minetest.register_craftitem("arena_lib:timer", {
+
+    description = S("Timer: on"),
+    inventory_image = "arenalib_tool_settings_timer.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec())
+    end,
+
+    on_secondary_use = function(itemstack, placer, pointed_thing)
+
+      local mod = placer:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local inv = placer:get_inventory()
+
+      arena_lib.set_timer(placer:get_player_name(), mod, arena_name, -1, true)
+
+      minetest.after(0, function()
+        inv:set_stack("main", 1, "arena_lib:timer_off")
+      end)
+    end
+
+})
 
 
 
@@ -31,8 +62,7 @@ minetest.register_tool("arena_lib:settings_rename", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-      local p_name = user:get_player_name()
-      minetest.show_formspec(p_name, "arena_lib:settings_rename", get_rename_formspec(p_name))
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename", get_rename_formspec())
     end
 })
 
@@ -80,6 +110,17 @@ minetest.register_tool("arena_lib:settings_delete", {
 
 function arena_lib.give_settings_tools(user)
   user:get_inventory():set_list("main", settings_tools)
+
+  local inv = user:get_inventory()
+  local mod = user:get_meta():get_string("arena_lib_editor.mod")
+  local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  local mod_ref = arena_lib.mods[mod]
+
+  if mod_ref.time_mode == 2 then
+    inv:set_stack("main", 3, "arena_lib:timer")
+  end
 end
 
 
@@ -89,6 +130,22 @@ end
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
+
+function get_rename_formspec()
+
+  local formspec = {
+    "size[5.2,0.4]",
+    "no_prepend[]",
+    "bgcolor[;neither]",
+    "field[0.2,0.25;4,1;rename;;]",
+    "button[3.8,-0.05;1.7,1;rename_confirm;" .. S("Rename arena") .. "]",
+    "field_close_on_enter[rename;false]"
+  }
+
+  return table.concat(formspec, "")
+end
+
+
 
 function get_properties_formspec(p_name, mod, arena, sel_idx)
 
@@ -134,15 +191,15 @@ end
 
 
 
-function get_rename_formspec(p_name)
+function get_timer_formspec()
 
   local formspec = {
     "size[5.2,0.4]",
     "no_prepend[]",
     "bgcolor[;neither]",
-    "field[0.2,0.25;4,1;rename;;]",
-    "button[3.8,-0.05;1.7,1;rename_confirm;" .. S("Rename arena") .. "]",
-    "field_close_on_enter[rename;false]"
+    "field[0.2,0.25;4,1;set_timer;;]",
+    "button[3.8,-0.05;1.7,1;timer_confirm;" .. S("Set timer") .. "]",
+    "field_close_on_enter[set_timer;false]"
   }
 
   return table.concat(formspec, "")
@@ -191,14 +248,30 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 
-  if formname ~= "arena_lib:settings_rename" and formname ~= "arena_lib:settings_properties" and formname ~= "arena_lib:settings_delete" then return end
+  if formname ~= "arena_lib:settings_timer" and formname ~= "arena_lib:settings_rename"
+  and formname ~= "arena_lib:settings_properties" and formname ~= "arena_lib:settings_delete" then return end
 
   local p_name      =   player:get_player_name()
   local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name  =   player:get_meta():get_string("arena_lib_editor.arena")
 
+  -- GUI per timer
+  if formname == "arena_lib:settings_timer" then
+
+    if fields.timer_confirm or fields.key_enter then
+
+      local timer = tonumber(fields.set_timer)
+
+      if timer == nil or timer < 1 then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+        return end
+
+      arena_lib.set_timer(p_name, mod, arena_name, timer, true)
+      minetest.close_formspec(p_name, formname)
+    end
+
   -- GUI per rinominare arena
-  if formname == "arena_lib:settings_rename" then
+  elseif formname == "arena_lib:settings_rename" then
 
     if fields.rename_confirm or fields.key_enter then
       if arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then
@@ -239,10 +312,5 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       minetest.close_formspec(p_name, formname)
     end
 
-
   end
-
-
-
-
 end)

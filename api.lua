@@ -17,7 +17,7 @@ local function copy_table() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
 local function assign_team_spawner() end
-local function timer_start() end
+local function time_start() end
 
 local players_in_game = {}    -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}   -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -33,7 +33,8 @@ local arena_default = {
   spawn_points = {},          -- KEY: ids, VALUE: {position, team}
   max_players = 4,
   min_players = 2,
-  timer = nil,
+  initial_time = nil,
+  current_time = nil,
   in_queue = false,
   in_loading = false,
   in_game = false,
@@ -63,6 +64,18 @@ function arena_lib.register_minigame(mod, def)
   end
   --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
+  --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
+  if def.is_timer_incrementing then
+    minetest.log("warning", "[ARENA_LIB] is_timer_incrementing is deprecated. Use time_mode = 1 instead")
+    def.time_mode = 1
+  end
+
+  if def.timer then
+    minetest.log("warning", "[ARENA_LIB] timer is deprecated. Use time_mode = 2 instead")
+    def.time_mode = 2
+  end
+  --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
+
   arena_lib.mods[mod] = {}
   arena_lib.mods[mod].arenas = {}           -- KEY: (int) arenaID , VALUE: (table) arena properties
   arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
@@ -84,8 +97,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
-  mod_ref.timer = -1
-  mod_ref.is_timer_incrementing = false
+  mod_ref.time_mode = 0
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    -- time in the celebration phase
@@ -152,12 +164,8 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.show_minimap = def.show_minimap
   end
 
-  if def.timer then
-    mod_ref.timer = def.timer
-  end
-
-  if def.is_timer_incrementing == true then
-    mod_ref.is_timer_incrementing = true
+  if def.time_mode then
+    mod_ref.time_mode = def.time_mode
   end
 
   if def.queue_waiting_time then
@@ -247,9 +255,11 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     end
   end
 
-  -- eventuale timer
-  if mod_ref.timer ~= -1 then
-    arena.timer = mod_ref.timer
+  -- eventuale tempo
+  if mod_ref.time_mode == 1 then
+    arena.initial_time = 0
+  elseif mod_ref.time_mode == 2 then
+    arena.initial_time = 300
   end
 
   -- aggiungo eventuali proprietà
@@ -741,14 +751,18 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
 
   local mod_ref = arena_lib.mods[mod]
 
-  -- se è da disabilitare
-  if timer == -1 then
-    arena.timer = nil
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer successfully disabled", arena_name))
-  else
-    arena.timer = timer
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2s", arena_name, timer))
-  end
+  -- se la mod non supporta i timer
+  if mod_ref.time_mode ~= 2 then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Timers are currently disabled! (you need time_mode = 2)")))
+    return end
+
+  -- se è inferiore a 1
+  if timer < 1 then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  arena.initial_time = timer
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2s", arena_name, timer))
 end
 
 
@@ -988,11 +1002,11 @@ function arena_lib.start_arena(mod_ref, arena)
             })
   end
 
-  -- parte l'eventuale timer
-  if arena.timer then
-    arena.timer_current = arena.timer
+  -- parte l'eventuale tempo
+  if mod_ref.time_mode > 0 then
+    arena.current_time = arena.initial_time
     minetest.after(1, function()
-      timer_start(mod_ref, arena)
+      time_start(mod_ref, arena)
     end)
   end
 
@@ -1150,7 +1164,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
   end
 
   -- azzero il timer
-  arena.timer_current = nil
+  arena.current_time = nil
 
   -- rimuovo eventuali proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
@@ -1685,32 +1699,39 @@ function init_storage(mod, mod_ref)
       -- spawners conversion from 2.7.0 to 3.0+ version
       if next(arena.spawn_points) then
         if arena.spawn_points[next(arena.spawn_points)].x ~= nil then
-          to_update = true
           minetest.log("action", "[ARENA_LIB] Converting old spawn points for arena " .. arena.name)
           for id, coords in pairs(arena.spawn_points) do
             arena.spawn_points[id] = {pos = coords}
             minetest.log("action", "[ARENA_LIB] Spawn point #" .. id .. "(" .. minetest.pos_to_string(arena.spawn_points[id].pos) .. ") converted")
           end
+          to_update = true
         end
       end
 
       -- team conversion for 2.7.0 and lesser versions
       if not arena.teams then
-        to_update = true
         arena.teams = {-1}
+        to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
       -- team per arena for 3.2.0 and lesser versions
       if arena.teams_enabled == nil then
-        to_update = true
         if #arena.teams > 1 then
           arena.teams_enabled = true
         else
           arena.teams_enabled = false
         end
         minetest.log("action", "[ARENA_LIB] Added '.teams_enabled' property from 3.2.0")
+        to_update = true
+      end
+
+      -- refactoring arena.timer in arena.initial_time for 3.6.0 and lesser versions
+      if arena.timer then
+        arena.initial_time = arena.timer
+        arena.timer = nil
+        to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
 
@@ -1736,8 +1757,23 @@ function init_storage(mod, mod_ref)
         to_update = true
         arena.enabled = false
         arena.spawn_points = {}
-        minetest.log("warning", "[ARENA_LIB] spawn points of arena " .. arena.name ..
+        minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
           " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
+      end
+
+      -- gestione tempo
+      if mod_ref.time_mode == 0 and arena.initial_time then                     -- se avevo abilitato il tempo e ora l'ho rimosso, lo tolgo dalle arene
+        arena.initial_time = nil
+        to_update = true
+      elseif mod_ref.time_mode ~= 0 and not arena.initial_time then             -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
+        arena.initial_time = mod_ref.time_mode == 1 and 0 or 300
+        to_update = true
+      elseif mod_ref.time_mode == 1 and arena.initial_time > 0 then             -- se ho disabilitato i timer e le arene ce li avevano, porto il tempo a 0
+        arena.initial_time = 0
+        to_update = true
+      elseif mod_ref.time_mode == 2 and arena.initial_time == 0 then            -- se ho abilitato i timer e le arene partivano da 0, imposto il timer a 5 minuti
+        arena.initial_time = 300
+        to_update = true
       end
 
       arena_lib.mods[mod].arenas[i] = arena
@@ -1936,26 +1972,26 @@ end
 
 
 
-function timer_start(mod_ref, arena)
+function time_start(mod_ref, arena)
 
   if arena.on_celebration or not arena.in_game then return end
 
-  if mod_ref.is_timer_incrementing then
-    arena.timer_current = arena.timer_current + 1
+  if mod_ref.time_mode == 1 then
+    arena.current_time = arena.current_time + 1
   else
-    arena.timer_current = arena.timer_current - 1
+    arena.current_time = arena.current_time - 1
   end
 
-  if arena.timer_current <= 0 then
+  if arena.current_time <= 0 then
     assert(mod_ref.on_timeout, "[ARENA_LIB] " .. S("[!] on_timeout callback must be declared to properly use a decreasing timer!"))
     mod_ref.on_timeout(arena)
     return
   else
-    mod_ref.on_timer_tick(arena)
+    mod_ref.on_time_tick(arena)
   end
 
   minetest.after(1, function()
-    timer_start(mod_ref, arena)
+    time_start(mod_ref, arena)
   end)
 end
 
@@ -1985,4 +2021,9 @@ end
 -- to remove in 5.0
 function arena_lib.update_properties(mod)
   minetest.log("warning", "[ARENA_LIB] arena_lib.update_properties is deprecated: properties are now updated automatically, pretty handy, init? :D")
+end
+
+function arena_lib.on_timer_tick(mod, func)
+  minetest.log("warning", "[ARENA_LIB] on_timer_tick is deprecated. Please use on_time_tick instead")
+  arena_lib.mods[mod].on_time_tick = func
 end

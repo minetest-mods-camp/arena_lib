@@ -105,14 +105,11 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     end
   end
 
-  -- calcolo eventuale timer
-  local timer = ""
-  if arena.timer then
-    if arena.timer_current then
-      timer = minetest.colorize("#eea160", S("Timer: ")) .. minetest.colorize("#cfc6b8", arena.timer .. " (" .. S("current: ") .. arena.timer_current .. ")") .. "\n"
-    else
-      timer = minetest.colorize("#eea160", S("Timer: ")) .. minetest.colorize("#cfc6b8", arena.timer .. " (" .. S("current: ") .. " --- )") .. "\n"
-    end
+  -- calcolo eventuale tempo
+  local time = ""
+  if mod_ref.time_mode ~= 0 then
+    local current_time = not arena.current_time and "---" or arena.current_time
+    time = minetest.colorize("#eea160", S("Initial time: ")) .. minetest.colorize("#cfc6b8", arena.initial_time .. " (" .. S("current: ") .. current_time .. ")") .. "\n"
   end
 
   --calcolo proprietà
@@ -172,7 +169,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n" ..
-    timer ..
+    time ..
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
     minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
     minetest.colorize("#eea160", S("Team properties: ")) .. minetest.colorize("#cfc6b8", team_properties)

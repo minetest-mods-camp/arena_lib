@@ -52,8 +52,8 @@ end
 
 
 
-function arena_lib.on_timer_tick(mod, func)
-  arena_lib.mods[mod].on_timer_tick = func
+function arena_lib.on_time_tick(mod, func)
+  arena_lib.mods[mod].on_time_tick = func
 end
 
 

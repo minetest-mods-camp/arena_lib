@@ -13,7 +13,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `timer`: (int) inherited by the mod's timer value, it can be changed later, per arena. When it's disabled, it's nil.
+* `initial_time`: (int) in seconds. It's nil when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's nil
+* `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -68,7 +69,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
 
 ##### 1.2.2.3 Timers
-`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. If `timer` is -1, it'll be disabled and set to `nil`.
+`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (explained further below).
 
 ##### 1.2.2.4 Arenas properties
 Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
@@ -165,8 +166,10 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
 * `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
-* `timer`: an eventual timer, in seconds. Default is -1, meaning it's disabled. If disabled, new arenas won't have a timer. If not, they'll inherit the same value
-* `is_timer_incrementing`: whether arenas' timers decrease as in a countdown or increase as in a stopwatch. Default is false
+* `time_mode`: whether arenas will keep track of the time or not.
+  * `0`: no time tracking at all (default)
+  * `1`: incremental time (0, 1, 2, ...)
+  * `2`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
@@ -207,8 +210,8 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players))`
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
-* `arena_lib.on_timer_tick(mod, function(arena))`: called every second inside the arena if there is a timer and it's greater than 0
-* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists, reaches 0. Not declaring it will make the server crash when time runs out
+* `arena_lib.on_time_tick(mod, function(arena))`: called every second inside the arena if `time_mode` is 2.
+* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = 2`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from a match (same as above)
 * `arena_lib.on_quit(mod, function(arena, p_name, is_forced))`: called when a player quits from a match (same as above). `is_forced` is true when the match has been terminated via `force_arena_ending(...)`
@@ -324,8 +327,9 @@ Executioner can be passed to tell who removed the player. By default, this happe
 
 ### 2.7 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
-* Any action in the "Players" section of the editor, aside changing their minimum amount: it'll delete your spawners (same as above)
+* Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
+* Disabling timers (`time_mode = 2` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up.
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

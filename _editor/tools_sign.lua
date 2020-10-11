@@ -55,8 +55,6 @@ minetest.register_tool("arena_lib:sign_remove", {
       local node_name = minetest.get_node(pos).name
       local p_name = user:get_player_name()
 
-      minetest.chat_send_player(p_name, node_name)
-
       -- controllo se è un cartello
       if node_name ~= "arena_lib:sign" then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
