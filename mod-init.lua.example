@@ -1,4 +1,4 @@
-arena_lib.register_minigame("call of Zughy", {
+arena_lib.register_minigame("Call of Zughy", {
   prefix = "[CoZ] ",
   hub_spawn_point = { x = 5, y = 10, z = 4 },
   teams = {
@@ -16,8 +16,9 @@ arena_lib.register_minigame("call of Zughy", {
   },
   queue_waiting_time = 20,
   show_minimap = true,
+  time_mode = 1,
   properties = {
-    planting_locations = {{x=30, y=20, z=40}, {x=5, y=20, z=80}}, --you can override these parameters via your mod, of course
+    planting_locations = {{x=30, y=20, z=40}, {x=5, y=20, z=80}}, -- you can override these parameters via your mod, of course
   },
   temp_properties = {
     kill_leader = " ",
@@ -32,8 +33,6 @@ arena_lib.register_minigame("call of Zughy", {
   }
 })
 
---arena_lib.update_properties("call of Zughy") --REMOVE THE COMMENT IF YOU ADDED NEW PROPERTIES AND YOU NEED TO ADD THEM TO YOUR OLD ARENAS
-
 -- load other scripts
-dofile(minetest.get_modpath("call of Zughy") .. "/foo.lua")
-dofile(minetest.get_modpath("call of Zughy") .. "/whatever.lua")
+dofile(minetest.get_modpath("call_of_zughy") .. "/foo.lua")
+dofile(minetest.get_modpath("call_of_zughy") .. "/whatever.lua")
