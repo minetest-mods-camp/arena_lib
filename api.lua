@@ -49,21 +49,6 @@ function arena_lib.register_minigame(mod, def)
 
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
-  --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
-  -- the old storage (2.7.0 and lesser) kept a lot of unneccessary parameters;
-  -- the only one really needed is highest_arena_ID (previously arenasID) to iterate
-  -- in the initialisation (init_storage)
-  local legacy_mod_ref = minetest.deserialize(storage:get_string(mod))
-
-  if legacy_mod_ref then
-    minetest.log("action", "[ARENA_LIB] cleaning up the remnants of the old storage...")
-    highest_arena_ID = legacy_mod_ref.arenasID
-    storage:set_int(mod .. ".HIGHEST_ARENA_ID", highest_arena_ID)
-    storage:set_string(mod, "")
-    minetest.log("action", "[ARENA_LIB] ...storage fresh and clean!")
-  end
-  --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
-
   --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
   if def.is_timer_incrementing then
     minetest.log("warning", "[ARENA_LIB] is_timer_incrementing is deprecated. Use time_mode = 1 instead")
@@ -753,7 +738,7 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
 
   -- se la mod non supporta i timer
   if mod_ref.time_mode ~= 2 then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Timers are currently disabled! (you need time_mode = 2)")))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] [!] Timers are not enabled in this mod!") .. " (time_mode = 2)"))
     return end
 
   -- se è inferiore a 1
@@ -762,7 +747,7 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
     return end
 
   arena.initial_time = timer
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2s", arena_name, timer))
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2 seconds", arena_name, timer))
 end
 
 
@@ -1687,33 +1672,6 @@ function init_storage(mod, mod_ref)
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
       local to_update = false
-
-      --v------------------ LEGACY UPDATE, to remove in 4.0 -------------------v
-      -- add the 'players_amount' parameter for 2.6.0 and lesser versions
-      if not arena.players_amount then
-        to_update = true
-        arena.players_amount = 0
-        minetest.log("action", "[ARENA_LIB] Added '.players_amount' property from 2.7.0")
-      end
-
-      -- spawners conversion from 2.7.0 to 3.0+ version
-      if next(arena.spawn_points) then
-        if arena.spawn_points[next(arena.spawn_points)].x ~= nil then
-          minetest.log("action", "[ARENA_LIB] Converting old spawn points for arena " .. arena.name)
-          for id, coords in pairs(arena.spawn_points) do
-            arena.spawn_points[id] = {pos = coords}
-            minetest.log("action", "[ARENA_LIB] Spawn point #" .. id .. "(" .. minetest.pos_to_string(arena.spawn_points[id].pos) .. ") converted")
-          end
-          to_update = true
-        end
-      end
-
-      -- team conversion for 2.7.0 and lesser versions
-      if not arena.teams then
-        arena.teams = {-1}
-        to_update = true
-      end
-      --^------------------ LEGACY UPDATE, to remove in 4.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
       -- team per arena for 3.2.0 and lesser versions
