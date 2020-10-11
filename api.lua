@@ -1961,21 +1961,6 @@ end
 ------------------DEPRECATED------------------
 ----------------------------------------------
 
--- to remove in 4.0
-function arena_lib.initialize(mod)
-    minetest.log("warning", "[ARENA_LIB] arena_lib.initialize is deprecated: you don't need it anymore")
-end
-
-function arena_lib.settings(mod, def)
-  arena_lib.register_minigame(mod, def)
-  minetest.log("warning", "[ARENA_LIB] arena_lib.settings is deprecated: rename it in arena_lib.register_minigame")
-end
-
-function arena_lib.get_arena_players_count(arena)
-  minetest.log("warning", "[ARENA_LIB] arena_lib.get_arena_players_count is deprecated: use the arena parameter 'players_amount' instead (ie. arena.players_amount) to retrieve the value")
-  return arena.players_amount
-end
-
 -- to remove in 5.0
 function arena_lib.update_properties(mod)
   minetest.log("warning", "[ARENA_LIB] arena_lib.update_properties is deprecated: properties are now updated automatically, pretty handy, init? :D")
