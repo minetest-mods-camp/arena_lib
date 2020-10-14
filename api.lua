@@ -1129,7 +1129,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     -- teletrasporto nella lobby
     player:set_pos(mod_ref.hub_spawn_point)
 
-    -- se ho hub_manager, restituisco gli oggetti e imposto fisica delal lobby
+    -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
     if minetest.get_modpath("hub_manager") then
       hub_manager.set_items(player)
       hub_manager.set_hub_physics(player)
@@ -1832,6 +1832,9 @@ function check_for_properties(mod, mod_ref)
   for property, v in pairs(mod_ref.properties) do
 
     if old_properties_table[property] == nil then
+
+      assert(arena_default[property], "[ARENA_LIB] Custom property " .. property .. " can't be added " ..
+                                      " as it has the same name of an arena default property. Please change name")
       minetest.log("action", "[ARENA_LIB] Adding property " .. property)
 
       for id, arena in pairs(mod_ref.arenas) do
