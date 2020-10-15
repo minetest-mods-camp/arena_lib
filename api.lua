@@ -1790,7 +1790,7 @@ function check_for_properties(mod, mod_ref)
 
     if old_properties_table[property] == nil then
 
-      assert(arena_default[property], "[ARENA_LIB] Custom property " .. property .. " can't be added " ..
+      assert(arena_default[property] == nil, "[ARENA_LIB] Custom property " .. property .. " can't be added " ..
                                       " as it has the same name of an arena default property. Please change name")
       minetest.log("action", "[ARENA_LIB] Adding property " .. property)
 
