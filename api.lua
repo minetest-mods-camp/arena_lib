@@ -59,6 +59,10 @@ function arena_lib.register_minigame(mod, def)
     minetest.log("warning", "[ARENA_LIB] timer is deprecated. Use time_mode = 2 instead")
     def.time_mode = 2
   end
+
+  if def.immunity_time or def.immunity_slot then
+    minetest.log("warning", "[ARENA_LIB] Immunity has been removed from arena_lib as a lot of minigames don't need it. It shall be implemented by modders in their own mods")
+  end
   --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
 
   arena_lib.mods[mod] = {}
@@ -86,8 +90,6 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    -- time in the celebration phase
-  mod_ref.immunity_time = 3
-  mod_ref.immunity_slot = 8       -- people may have tweaked the slots, hence the custom parameter
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
@@ -163,14 +165,6 @@ function arena_lib.register_minigame(mod, def)
 
   if def.celebration_time then
     mod_ref.celebration_time = def.celebration_time
-  end
-
-  if def.immunity_time then
-    mod_ref.immunity_time = def.immunity_time
-  end
-
-  if def.immunity_slot then
-    mod_ref.immunity_slot = def.immunity_slot
   end
 
   if def.properties then
@@ -1055,23 +1049,12 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   arena.in_celebration = true
   arena_lib.update_sign(arena)
 
-  -- per ogni giocatore...
+  -- ripristino HP e visibilità nome di ogni giocatore
   for pl_name, stats in pairs(arena.players) do
-
     local player = minetest.get_player_by_name(pl_name)
 
-    -- ripristino HP e visibilità nome
     player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-
-    local inv = player:get_inventory()
-
-    -- immortalità
-    if not inv:contains_item("main", "arena_lib:immunity") then
-      inv:set_stack("main", mod_ref.immunity_slot, "arena_lib:immunity")
-    end
-
-
   end
 
   local winning_message = ""
@@ -1502,32 +1485,6 @@ function arena_lib.teleport_in_arena(sender, mod, arena_name)
 end
 
 
-
-function arena_lib.immunity(player)
-
-  local immunity_item = ItemStack("arena_lib:immunity")
-  local inv = player:get_inventory()
-  local p_name = player:get_player_name()
-  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
-  local immunity_ID = 0
-
-  -- aggiungo l'oggetto
-  inv:set_stack("main", mod_ref.immunity_slot, immunity_item)
-
-  -- in caso uno spari, perda l'immunità, muoia subito e resusciti, il tempo d'immunità riparte da capo.
-  -- Ne tengo traccia con un metadato che comparo nell'after
-  immunity_ID = player:get_meta():get_int("immunity_ID") + 1
-  player:get_meta():set_int("immunity_ID", immunity_ID)
-
-  minetest.after(mod_ref.immunity_time, function()
-    if not player then return end          -- potrebbe essersi disconnesso
-    if inv:contains_item("main", immunity_item) and immunity_ID == player:get_meta():get_int("immunity_ID") then
-      inv:remove_item("main", immunity_item)
-      player:get_meta():set_int("immunity_ID", 0)
-    end
-  end)
-
-end
 
 
 

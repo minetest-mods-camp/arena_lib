@@ -173,8 +173,6 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
-* `immunity_time`: the duration of the immunity right after respawning. Default is 3
-* `immunity_slot`: the slot whereto put the immunity item. Default is 8 (the last slot of the hotbar)
 * `properties`: explained down below
 * `temp_properties`: same
 * `player_properties`: same
@@ -309,7 +307,6 @@ Default is 0 and these are mostly hardcoded in arena_lib already, so it's advise
 Executioner can be passed to tell who removed the player. By default, this happens when someone uses /kick and /forceend, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
-* `arena_lib.immunity(player)`: grants immunity to the specified player. It lasts till the `immunity_time` declared in `arena_lib.register_minigame`
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
