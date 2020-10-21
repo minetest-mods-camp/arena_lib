@@ -895,9 +895,7 @@ function arena_lib.load_arena(mod, arena_ID)
         arena.teams[i][k] = v
       end
     end
-
   end
-
 
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
@@ -929,6 +927,15 @@ function arena_lib.load_arena(mod, arena_ID)
      })
     end
 
+    -- assegno eventuali proprietà giocatori
+    for k, v in pairs(mod_ref.player_properties) do
+      if type(v) == "table" then
+        arena.players[pl_name][k] = copy_table(v)
+      else
+        arena.players[pl_name][k] = v
+      end
+    end
+
     -- teletrasporto i giocatori
     if not arena.teams_enabled then
       player:set_pos(shuffled_spawners[count].pos)
@@ -951,7 +958,6 @@ function arena_lib.load_arena(mod, arena_ID)
 
     count = count +1
   end
-
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_load then

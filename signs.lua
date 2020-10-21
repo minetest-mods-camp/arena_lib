@@ -246,13 +246,9 @@ signs_lib.register_sign("arena_lib:sign", {
       table.insert(players_to_add, p_name)
     end
 
-    -- aggiungo il giocatore ed eventuali proprietà
+    -- aggiungo il giocatore
     for _, pl_name in pairs(players_to_add) do
       sign_arena.players[pl_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
-
-      for k, v in pairs(mod_ref.player_properties) do
-        sign_arena.players[pl_name][k] = v
-      end
     end
 
     -- aumento il conteggio di giocatori in partita
