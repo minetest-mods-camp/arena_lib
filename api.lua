@@ -1929,10 +1929,10 @@ end
 
 -- to remove in 5.0
 function arena_lib.update_properties(mod)
-  minetest.log("warning", "[ARENA_LIB] arena_lib.update_properties is deprecated: properties are now updated automatically, pretty handy, init? :D")
+  minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") arena_lib.update_properties is deprecated: properties are now updated automatically, pretty handy, init? :D")
 end
 
 function arena_lib.on_timer_tick(mod, func)
-  minetest.log("warning", "[ARENA_LIB] on_timer_tick is deprecated. Please use on_time_tick instead")
+  minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") on_timer_tick is deprecated. Please use on_time_tick instead")
   arena_lib.mods[mod].on_time_tick = func
 end
