@@ -1,8 +1,43 @@
 # Arena_lib docs
 
-> Not the theory-kind of person? Skip it going to point [#2](#2-configuration) (but I highly suggest you at least the arena phases in 1.3)
+# Table of Contents
+* [1. Arenas](#1-arenas)
+    * [1.1 Creating and removing arenas](#11-creating-and-removing-arenas)
+        * [1.1.1 Storing arenas](#111-storing-arenas)
+        * [1.1.2 Renaming an arena](#112-renaming-an-arena)
+    * [1.2 Setting up an arena](#12-setting-up-an-arena)
+        * [1.2.1 Editor](#121-editor)
+        * [1.2.2 CLI](#122-cli)
+            * [1.2.2.1 Players management](#1221-players-management)
+            * [1.2.2.2 Enabling/Disabling teams](#1222-enablingdisabling-teams)
+            * [1.2.2.3 Timers](#1223-timers)
+            * [1.2.2.4 Arena properties](#1224-arena-properties)
+            * [1.2.2.5 Spawners](#1225-spawners)
+            * [1.2.2.6 Signs](#1226-signs)
+        * [1.2.3 Enabling an arena](#123-enabling-an-arena)
+    * [1.3 Arena phases](#13-arena-phases)
+* [2. Configuration](#2-configuration)
+    * [2.1 Privileges](#21-privileges)
+    * [2.2 Commands](#22-commands)
+        * [2.2.1 Admins only](#221-admins-only)
+    * [2.3 Callbacks](#23-callbacks)
+    * [2.4 Additional properties](#24-additional-properties)
+        * [2.4.1 Arena properties](#241-arena-properties)
+            * [2.4.1.1 Updating non temporary properties via code](#2411-updating-non-temporary-properties-via-code)
+            * [2.4.1.2 Updating properties for old arenas](#2412-updating-properties-for-old-arenas)
+        * [2.4.2 Player properties](#242-player-properties)
+        * [2.4.3 Team properties](#243-team-properties)
+    * [2.5 HUD](#25-hud)
+    * [2.6 Extendable editor](#26-extendable-editor)
+    * [2.7 Utils](#27-utils)
+    * [2.8 Getters](#28-getters)
+    * [2.9 Things you don't want to do with a light heart](#29-things-you-dont-want-to-do-with-a-light-heart)
+* [3. About the author(s)](#3-about-the-authors)
 
 ## 1. Arenas
+
+> Not the theory-kind of person? Skip it going to point [#2](#2-configuration) (but I highly suggest you at least the arena phases in 1.3)
+
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
@@ -35,7 +70,7 @@ The second is via code by the functions:
 > Beware: this is an API. It means all the functions illustrated here must be connected to your mod BY YOU. Nonetheless, I've created both an in-game editor to let you skip most of these steps and linked a configuration file example (that uses commands) close to the end. In short: I got you :)
 
 ### 1.1 Creating and removing arenas
-There are two functions for it and they all need to be connected to some command in your mod. The functions are
+There are two functions for it and they all need to be connected to some command in your mod. These functions are
 * `arena_lib.create_arena(sender, mod, arena_name, <min_players>, <max_players>)`: it doesn't accept duplicates. Sender is a string, fields between < > are optional 
 * `arena_lib.remove_arena(mod, arena_name)`: if a game is taking place in it, it won't go through
 
@@ -71,7 +106,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 ##### 1.2.2.3 Timers
 `arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (explained further below).
 
-##### 1.2.2.4 Arenas properties
+##### 1.2.2.4 Arena properties
 Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
 `arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
 
@@ -111,7 +146,7 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
    [etc.]
 ```
 
-##### 1.2.2.5 Signs
+##### 1.2.2.6 Signs
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
 
 #### 1.2.3 Enabling an arena
@@ -236,7 +271,7 @@ end)
 Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the four tables `properties`, `temp_properties`, `player_properties` and `team_properties`. The first two are for the arena, the third is for players and the fourth for teams.  
 No matter the type of property, they're all shared between arenas. Better said, their values can change, but there can't be an arena with more or less properties than another.
 
-#### 2.4.1 Arenas properties
+#### 2.4.1 Arena properties
 The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
 ```
 arena_lib.register_minigame("mymod", {
@@ -255,9 +290,9 @@ Let's say you want to change a property from your mod. A naive approach would be
 Instead, the right way to permanently update a property for an arena is calling `arena_lib.change_arena_property(<sender>, mod, arena_name, property, new_value)`. If `sender` is nil, the output message will be printed in the log.
 
 ##### 2.4.1.2 Updating properties for old arenas
-This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena, so if you're not sure about what you're doing, do a backup first.
+This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena; so if you're not sure about what you're doing, do a backup first.
 
-#### 2.4.2 Players properties
+#### 2.4.2 Player properties
 These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
 ```
 arena_lib.register_minigame("mymod", {
@@ -343,4 +378,4 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * Disabling timers (`time_mode = 2` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up.
 
 ## 3. About the author(s)
-I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
+I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
