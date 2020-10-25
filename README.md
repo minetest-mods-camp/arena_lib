@@ -25,7 +25,8 @@ Default
 
 #### Mods relying on arena_lib
 [Murder](https://gitlab.com/giov4/minetest-murder-mod)  
-[Quake](https://gitlab.com/zughy-friends-minetest/minetest-quake)
+[Quake](https://gitlab.com/zughy-friends-minetest/minetest-quake)  
+[Skywars](https://gitlab.com/zughy-friends-minetest/skywars)
 
 ### Want to help?
 Feel free to:
@@ -34,9 +35,5 @@ Feel free to:
 * contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
 
 ##### Credits
+Images by me. They're under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 countdown sound by [BoxeDave92](https://freesound.org/people/BoxerDave92/sounds/338868/)
-
----
-
-Images are under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
-
