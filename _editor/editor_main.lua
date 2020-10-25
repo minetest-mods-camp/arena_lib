@@ -14,6 +14,46 @@ local editor_tools = {
 
 
 
+function arena_lib.register_editor_section(mod, def)
+
+  local name = def.name or "Rename me via `name = something`"
+  local hotbar_msg = def.hotbar_message or "Rename me via `hotbar_message = something`"
+
+  -- non posso tradurla perché chiamata all'avvio ¯\_(ツ)_/¯
+  assert(type(def.give_items) == "function", "[ARENA_LIB] (" .. mod .. ") give_items function missing in register_editor_section!")
+
+  minetest.register_tool(mod .. ":arenalib_editor_slot_custom", {
+
+      description = name,
+      inventory_image = def.icon,
+      groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+      on_place = function() end,
+      on_drop = function() end,
+
+      on_use = function(itemstack, user)
+
+        local mod = user:get_meta():get_string("arena_lib_editor.mod")
+        local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+        local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+        local item_list = def.give_items(itemstack, user, arena)
+
+        if not item_list then return end
+
+        arena_lib.HUD_send_msg("hotbar", user:get_player_name(), hotbar_msg)
+
+        local inv = user:get_inventory()
+
+        minetest.after(0, function()
+          inv:set_list("main", item_list)
+          inv:set_stack("main", 7, "arena_lib:editor_return")
+          inv:set_stack("main", 8, "arena_lib:editor_quit")
+        end)
+      end
+  })
+end
+
+
+
 function arena_lib.enter_editor(sender, mod, arena_name)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
@@ -104,9 +144,14 @@ end
 
 function arena_lib.show_main_editor(player)
 
+  local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
 
   player:get_inventory():set_list("main", editor_tools)
+  if minetest.registered_items[mod .. ":arenalib_editor_slot_custom"] then
+    player:get_inventory():set_stack("main", 5, mod .. ":arenalib_editor_slot_custom")
+  end
+
   arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Arena_lib editor | Now editing: @1", arena_name))
 end
 

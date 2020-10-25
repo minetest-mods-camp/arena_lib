@@ -54,7 +54,7 @@ Two things are needed to have an arena up to go: spawners and signs. There are t
 * `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
 
 #### 1.2.1 Editor
-From version 3.0.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
+Since 3.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
 In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
 The function calling the editor is  
 `arena_lib.enter_editor(sender, mod, arena_name)`
@@ -150,7 +150,7 @@ Then, you need to register your minigame in arena_lib, possibly inside the init.
 ```
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
-"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands or callbacks.  
+"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter).You'll need it when calling for commands or callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
 The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
 * `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
@@ -290,7 +290,21 @@ Check out [this example](mod-init.lua.example) for a full configuration file
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>)`: same as above, but for all the players inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
 
-### 2.6 Utils
+#### 2.6 Extendable editor
+Since 4.0, every minigame can extend the editor with an additional custom section on the 5th slot. To do that, the function is
+```
+arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
+```
+On the contrary of when an arena is registered, every parameter here is mandatory. They are:
+* `name`: the name of the item that will represent the section
+* `icon`: the icon of the item that will represent the section
+* `hotbar_message`: the message that will appear in the hotbar HUD once the section has been opened
+* `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or nil if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly
+
+When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/_editor/tools_players.lua)
+
+
+### 2.7 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
@@ -310,7 +324,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
-### 2.7 Getters
+### 2.8 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
 * `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
@@ -322,7 +336,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
-### 2.7 Things you don't want to do with a light heart
+### 2.9 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
