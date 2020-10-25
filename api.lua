@@ -51,17 +51,17 @@ function arena_lib.register_minigame(mod, def)
 
   --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
   if def.is_timer_incrementing then
-    minetest.log("warning", "[ARENA_LIB] is_timer_incrementing is deprecated. Use time_mode = 1 instead")
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") is_timer_incrementing is deprecated. Use time_mode = 1 instead")
     def.time_mode = 1
   end
 
   if def.timer then
-    minetest.log("warning", "[ARENA_LIB] timer is deprecated. Use time_mode = 2 instead")
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") timer is deprecated. Use time_mode = 2 instead")
     def.time_mode = 2
   end
 
   if def.immunity_time or def.immunity_slot then
-    minetest.log("warning", "[ARENA_LIB] Immunity has been removed from arena_lib as a lot of minigames don't need it. It shall be implemented by modders in their own mods")
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") Immunity has been removed from arena_lib as a lot of minigames don't need it. It shall be implemented by modders in their own mods")
   end
   --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
 
