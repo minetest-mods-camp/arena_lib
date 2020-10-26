@@ -1034,6 +1034,15 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     })
   end
 
+  -- assegno eventuali proprietà giocatore
+  for k, v in pairs(mod_ref.player_properties) do
+    if type(v) == "table" then
+      arena.players[p_name][k] = copy_table(v)
+    else
+      arena.players[p_name][k] = v
+    end
+  end
+
   -- riempio HP, teletrasporto e aggiungo
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
   player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
