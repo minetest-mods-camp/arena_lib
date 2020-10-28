@@ -6,7 +6,7 @@ local S = minetest.get_translator("arena_lib")
 -----------------ADMINS ONLY------------------
 ----------------------------------------------
 
-minetest.register_chatcommand("kick", {
+minetest.register_chatcommand("arenakick", {
 
   params = "<" .. S("player") .. ">",
   description = S("Kick a player from an ongoing game"),

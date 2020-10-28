@@ -216,7 +216,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 > Beware: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
 
 ### 2.1 Privileges
-* `arenalib_admin`: allows to use the `/kick` command
+* `arenalib_admin`: allows to use the `/arenakick` command
 
 ### 2.2 Commands
 A couple of general commands are already declared inside arena_lib, them being:
@@ -228,7 +228,7 @@ A couple of general commands are already declared inside arena_lib, them being:
 #### 2.2.1 Admins only
 A couple more are available for players having the `arenalib_admin` privilege:
 
-* `/kick player_name`: kicks a player out of an ongoing game
+* `/arenakick player_name`: kicks a player out of an ongoing game
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 
 Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
@@ -353,7 +353,7 @@ There are also some other functions which might turn useful. They are:
   * `3`: player quit. Calls `on_quit`
   * `4`: forced by the mod. This should NOT be used but internally. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1).  
-Executioner can be passed to tell who removed the player. By default, this happens when someone uses /kick and /forceend, so that these commands can't be abused without consequences for the admin.
+Executioner can be passed to tell who removed the player. By default, this happens when someone uses /arenakick and /forceend, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
