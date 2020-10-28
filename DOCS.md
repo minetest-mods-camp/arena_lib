@@ -196,7 +196,6 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
 * `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
-* `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt#L4414)
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
@@ -208,6 +207,8 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 * `load_time`: the time between the loading state and the start of the match. Default is 3
 * `celebration_time`: the time between the celebration state and the end of the match. Default is 3
+* `in_game_physics`: an optional table containing a physical override to set to each player when they enter an arena
+* `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
 * `properties`: explained down below
 * `temp_properties`: same
 * `player_properties`: same

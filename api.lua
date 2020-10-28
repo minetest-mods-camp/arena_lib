@@ -81,7 +81,6 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
-  mod_ref.disabled_damage_types = {}
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
@@ -90,6 +89,8 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    -- time in the celebration phase
+  mod_ref.in_game_physics = nil
+  mod_ref.disabled_damage_types = {}
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
@@ -131,10 +132,6 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.chat_all_color = def.chat_all_color
   end
 
-  if def.disabled_damage_types and type(def.disabled_damage_types) == "table" then
-    mod_ref.disabled_damage_types = def.disabled_damage_types
-  end
-
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
   end
@@ -165,6 +162,14 @@ function arena_lib.register_minigame(mod, def)
 
   if def.celebration_time then
     mod_ref.celebration_time = def.celebration_time
+  end
+
+  if def.in_game_physics and type(def.in_game_physics) == "table" then
+    mod_ref.in_game_physics = def.in_game_physics
+  end
+
+  if def.disabled_damage_types and type(def.disabled_damage_types) == "table" then
+    mod_ref.disabled_damage_types = def.disabled_damage_types
   end
 
   if def.properties then
@@ -915,11 +920,6 @@ function arena_lib.load_arena(mod, arena_ID)
     -- chiudo eventuali formspec
     minetest.close_formspec(pl_name, "")
 
-    -- li blocco sul posto
-    player:set_physics_override({
-              speed = 0,
-              })
-
     -- cambio eventuale colore texture (richiede i team)
     if arena.teams_enabled and mod_ref.teams_color_overlay then
      player:set_properties({
@@ -934,6 +934,11 @@ function arena_lib.load_arena(mod, arena_ID)
       else
         arena.players[pl_name][k] = v
       end
+    end
+
+    -- imposto eventuale fisica personalizzata
+    if mod_ref.in_game_physics then
+      player:set_physics_override(mod_ref.in_game_physics)
     end
 
     -- teletrasporto i giocatori
@@ -977,15 +982,6 @@ function arena_lib.start_arena(mod_ref, arena)
 
   arena.in_loading = false
   arena_lib.update_sign(arena)
-
-  for pl_name, stats in pairs(arena.players) do
-
-    minetest.get_player_by_name(pl_name):set_physics_override({
-            speed = 1,
-            jump = 1,
-            gravity = 1,
-            })
-  end
 
   -- parte l'eventuale tempo
   if mod_ref.time_mode > 0 then
@@ -1041,6 +1037,11 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     else
       arena.players[p_name][k] = v
     end
+  end
+
+  -- imposto eventuale fisica personalizzata
+  if mod_ref.in_game_physics then
+    player:set_physics_override(mod_ref.in_game_physics)
   end
 
   -- riempio HP, teletrasporto e aggiungo
@@ -1131,6 +1132,16 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     if minetest.get_modpath("hub_manager") then
       hub_manager.set_items(player)
       hub_manager.set_hub_physics(player)
+    else
+      -- TODO 4.2: parametro personalizzato tramite /arenasettings
+      player:set_physics_override({
+        speed = 1,
+        jump = 1,
+        gravity = 1,
+        sneak = true,
+        sneak_glitch = false,
+        new_move = true
+      })
     end
 
     -- riattivo la minimappa eventualmente disattivata
@@ -1336,6 +1347,16 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     if minetest.get_modpath("hub_manager") then
       hub_manager.set_items(minetest.get_player_by_name(p_name))
       hub_manager.set_hub_physics(player)
+    else
+      -- TODO 4.2: parametro personalizzato tramite /arenasettings
+      player:set_physics_override({
+        speed = 1,
+        jump = 1,
+        gravity = 1,
+        sneak = true,
+        sneak_glitch = false,
+        new_move = true
+      })
     end
 
     -- resetto la minimappa eventualmente disattivata
