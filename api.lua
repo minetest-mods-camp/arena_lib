@@ -17,6 +17,7 @@ local function copy_table() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
 local function assign_team_spawner() end
+local function operations_before_entering_arena() end
 local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -916,67 +917,10 @@ function arena_lib.load_arena(mod, arena_ID)
 
     local player = minetest.get_player_by_name(pl_name)
 
-    -- nascondo i nomi se l'opzione è abilitata
-    if not mod_ref.show_nametags then
-      player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    end
+    operations_before_entering_arena(mod_ref, arena, player)
 
-    -- disattivo eventualmente la minimappa
-    if not mod_ref.show_minimap then
-      player:hud_set_flags({minimap = false})
-    end
-
-    -- chiudo eventuali formspec
-    minetest.close_formspec(pl_name, "")
-
-    -- cambio eventuale colore texture (richiede i team)
-    if arena.teams_enabled and mod_ref.teams_color_overlay then
-     player:set_properties({
-       textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[pl_name].teamID] .. ":85"}
-     })
-    end
-
-    -- cambio l'eventuale hotbar
-    if mod_ref.hotbar then
-
-      players_temp_storage[pl_name] = {}
-      local hotbar = mod_ref.hotbar
-
-      if hotbar.slots then
-        players_temp_storage[pl_name].slots = player:hud_get_hotbar_itemcount()
-        player:hud_set_hotbar_itemcount(hotbar.slots)
-      end
-
-      if hotbar.background_image then
-        players_temp_storage[pl_name].background_image = player:hud_get_hotbar_image()
-        player:hud_set_hotbar_image(hotbar.background_image)
-      end
-
-      if hotbar.selected_image then
-        players_temp_storage[pl_name].selected_image = player:hud_get_hotbar_selected_image()
-        player:hud_set_hotbar_selected_image(hotbar.selected_image)
-      end
-    end
-
-    -- assegno eventuali proprietà giocatori
-    for k, v in pairs(mod_ref.player_properties) do
-      if type(v) == "table" then
-        arena.players[pl_name][k] = copy_table(v)
-      else
-        arena.players[pl_name][k] = v
-      end
-    end
-
-    -- imposto eventuale fisica personalizzata
-    if mod_ref.in_game_physics then
-      player:set_physics_override(mod_ref.in_game_physics)
-    end
-
-    -- svuoto eventualmente l'inventario
-    if not mod_ref.keep_inventory then
-      player:get_inventory():set_list("main",{})
-      player:get_inventory():set_list("craft",{})
-    end
+    -- li curo
+    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
     -- teletrasporto i giocatori
     if not arena.teams_enabled then
@@ -984,9 +928,6 @@ function arena_lib.load_arena(mod, arena_ID)
     else
       team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
     end
-
-    -- li curo
-    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
     -- registro giocatori nella tabella apposita
     players_in_queue[pl_name] = nil
@@ -1038,64 +979,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
 
-  -- nascondo i nomi se l'opzione è abilitata
-  if not mod_ref.show_nametags then
-    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-  end
-
-  -- disattivo eventualmente la minimappa
-  if not mod_ref.show_minimap then
-    player:hud_set_flags({minimap = false})
-  end
-
-  -- cambio eventuale colore texture (richiede i team)
-  if arena.teams_enabled and mod_ref.teams_color_overlay then
-    player:set_properties({
-      textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
-    })
-  end
-
-  -- cambio l'eventuale hotbar
-  if mod_ref.hotbar then
-
-    players_temp_storage[p_name] = {}
-    local hotbar = mod_ref.hotbar
-
-    if hotbar.slots then
-      players_temp_storage[p_name].slots = player:hud_get_hotbar_itemcount()
-      player:set_hotbar_itemcount(hotbar.slots)
-    end
-
-    if hotbar.background_image then
-      players_temp_storage[p_name].background_image = player:hud_get_hotbar_image()
-      player:hud_set_hotbar_image(hotbar.background_image)
-    end
-
-    if hotbar.selected_image then
-      players_temp_storage[p_name].selected_image = player:hud_get_hotbar_selected_image()
-      player:hud_set_hotbar_selected_image(hotbar.selected_image)
-    end
-  end
-
-  -- assegno eventuali proprietà giocatore
-  for k, v in pairs(mod_ref.player_properties) do
-    if type(v) == "table" then
-      arena.players[p_name][k] = copy_table(v)
-    else
-      arena.players[p_name][k] = v
-    end
-  end
-
-  -- imposto eventuale fisica personalizzata
-  if mod_ref.in_game_physics then
-    player:set_physics_override(mod_ref.in_game_physics)
-  end
-
-  -- svuoto eventualmente l'inventario
-  if not mod_ref.keep_inventory then
-    player:get_inventory():set_list("main",{})
-    player:get_inventory():set_list("craft",{})
-  end
+  operations_before_entering_arena(mod_ref, arena, player)
 
   -- riempio HP, teletrasporto e aggiungo
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
@@ -2008,6 +1892,75 @@ function assign_team_spawner(spawn_points, ID, p_name, p_team_ID)
       minetest.get_player_by_name(p_name):set_pos(spawn_points[i].pos)
       return i+1
     end
+  end
+end
+
+
+
+function operations_before_entering_arena(mod_ref, arena, player)
+
+  -- nascondo i nomi se l'opzione è abilitata
+  if not mod_ref.show_nametags then
+    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+  end
+
+  -- disattivo eventualmente la minimappa
+  if not mod_ref.show_minimap then
+    player:hud_set_flags({minimap = false})
+  end
+
+  local p_name = player:get_player_name()
+
+  -- cambio eventuale colore texture (richiede i team)
+  if arena.teams_enabled and mod_ref.teams_color_overlay then
+   player:set_properties({
+     textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
+   })
+  end
+
+  -- cambio l'eventuale hotbar
+  if mod_ref.hotbar then
+
+    players_temp_storage[p_name] = {}
+    local hotbar = mod_ref.hotbar
+
+    if hotbar.slots then
+      players_temp_storage[p_name].slots = player:hud_get_hotbar_itemcount()
+      player:hud_set_hotbar_itemcount(hotbar.slots)
+    end
+
+    if hotbar.background_image then
+      players_temp_storage[p_name].background_image = player:hud_get_hotbar_image()
+      player:hud_set_hotbar_image(hotbar.background_image)
+    end
+
+    if hotbar.selected_image then
+      players_temp_storage[p_name].selected_image = player:hud_get_hotbar_selected_image()
+      player:hud_set_hotbar_selected_image(hotbar.selected_image)
+    end
+  end
+
+  -- assegno eventuali proprietà giocatori
+  for k, v in pairs(mod_ref.player_properties) do
+    if type(v) == "table" then
+      arena.players[p_name][k] = copy_table(v)
+    else
+      arena.players[p_name][k] = v
+    end
+  end
+
+  -- imposto eventuale fisica personalizzata
+  if mod_ref.in_game_physics then
+    player:set_physics_override(mod_ref.in_game_physics)
+  end
+
+  -- chiudo eventuali formspec
+  minetest.close_formspec(p_name, "")
+
+  -- svuoto eventualmente l'inventario
+  if not mod_ref.keep_inventory then
+    player:get_inventory():set_list("main",{})
+    player:get_inventory():set_list("craft",{})
   end
 end
 
