@@ -19,8 +19,9 @@ local function is_arena_name_allowed() end
 local function assign_team_spawner() end
 local function time_start() end
 
-local players_in_game = {}    -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_in_queue = {}   -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar slots, (string) hotbar bg img, (string) hotbar sel img}
 
 local arena_default = {
   name = "",
@@ -81,6 +82,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
+  mod_ref.hotbar = nil
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
@@ -130,6 +132,13 @@ function arena_lib.register_minigame(mod, def)
 
   if def.chat_all_color then
     mod_ref.chat_all_color = def.chat_all_color
+  end
+
+  if def.hotbar and type(def.hotbar) == "table" then
+    mod_ref.hotbar = {}
+    mod_ref.hotbar.slots = def.hotbar.slots
+    mod_ref.hotbar.background_image = def.hotbar.background_image
+    mod_ref.hotbar.selected_image = def.hotbar.selected_image
   end
 
   if def.join_while_in_progress == true then
@@ -927,6 +936,28 @@ function arena_lib.load_arena(mod, arena_ID)
      })
     end
 
+    -- cambio l'eventuale hotbar
+    if mod_ref.hotbar then
+
+      players_temp_storage[pl_name] = {}
+      local hotbar = mod_ref.hotbar
+
+      if hotbar.slots then
+        players_temp_storage[pl_name].slots = player:hud_get_hotbar_itemcount()
+        player:hud_set_hotbar_itemcount(hotbar.slots)
+      end
+
+      if hotbar.background_image then
+        players_temp_storage[pl_name].background_image = player:hud_get_hotbar_image()
+        player:hud_set_hotbar_image(hotbar.background_image)
+      end
+
+      if hotbar.selected_image then
+        players_temp_storage[pl_name].selected_image = player:hud_get_hotbar_selected_image()
+        player:hud_set_hotbar_selected_image(hotbar.selected_image)
+      end
+    end
+
     -- assegno eventuali proprietà giocatori
     for k, v in pairs(mod_ref.player_properties) do
       if type(v) == "table" then
@@ -941,6 +972,12 @@ function arena_lib.load_arena(mod, arena_ID)
       player:set_physics_override(mod_ref.in_game_physics)
     end
 
+    -- svuoto eventualmente l'inventario
+    if not mod_ref.keep_inventory then
+      player:get_inventory():set_list("main",{})
+      player:get_inventory():set_list("craft",{})
+    end
+
     -- teletrasporto i giocatori
     if not arena.teams_enabled then
       player:set_pos(shuffled_spawners[count].pos)
@@ -950,12 +987,6 @@ function arena_lib.load_arena(mod, arena_ID)
 
     -- li curo
     player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-
-    -- svuoto eventualmente l'inventario
-    if not mod_ref.keep_inventory then
-      player:get_inventory():set_list("main",{})
-      player:get_inventory():set_list("craft",{})
-    end
 
     -- registro giocatori nella tabella apposita
     players_in_queue[pl_name] = nil
@@ -1017,17 +1048,33 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
     player:hud_set_flags({minimap = false})
   end
 
-  -- svuoto eventualmente l'inventario
-  if not mod_ref.keep_inventory then
-    player:get_inventory():set_list("main",{})
-    player:get_inventory():set_list("craft",{})
-  end
-
   -- cambio eventuale colore texture (richiede i team)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
     player:set_properties({
       textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
     })
+  end
+
+  -- cambio l'eventuale hotbar
+  if mod_ref.hotbar then
+
+    players_temp_storage[p_name] = {}
+    local hotbar = mod_ref.hotbar
+
+    if hotbar.slots then
+      players_temp_storage[p_name].slots = player:hud_get_hotbar_itemcount()
+      player:set_hotbar_itemcount(hotbar.slots)
+    end
+
+    if hotbar.background_image then
+      players_temp_storage[p_name].background_image = player:hud_get_hotbar_image()
+      player:hud_set_hotbar_image(hotbar.background_image)
+    end
+
+    if hotbar.selected_image then
+      players_temp_storage[p_name].selected_image = player:hud_get_hotbar_selected_image()
+      player:hud_set_hotbar_selected_image(hotbar.selected_image)
+    end
   end
 
   -- assegno eventuali proprietà giocatore
@@ -1042,6 +1089,12 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   -- imposto eventuale fisica personalizzata
   if mod_ref.in_game_physics then
     player:set_physics_override(mod_ref.in_game_physics)
+  end
+
+  -- svuoto eventualmente l'inventario
+  if not mod_ref.keep_inventory then
+    player:get_inventory():set_list("main",{})
+    player:get_inventory():set_list("craft",{})
   end
 
   -- riempio HP, teletrasporto e aggiungo
@@ -1125,6 +1178,21 @@ function arena_lib.end_arena(mod_ref, mod, arena)
       })
     end
 
+    -- reimposto eventuale hotbar
+    if mod_ref.hotbar then
+      local hotbar = mod_ref.hotbar
+
+      if hotbar.slots then
+        player:hud_set_hotbar_itemcount(players_temp_storage[pl_name].slots)
+      end
+      if hotbar.background_image then
+        player:hud_set_hotbar_image(players_temp_storage[pl_name].background_image)
+      end
+      if hotbar.selected_image then
+        player:hud_set_hotbar_image(players_temp_storage[pl_name].selected_image)
+      end
+    end
+
     -- teletrasporto nella lobby
     player:set_pos(mod_ref.hub_spawn_point)
 
@@ -1146,6 +1214,9 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
     -- riattivo la minimappa eventualmente disattivata
     player:hud_set_flags({minimap = true})
+
+    -- svuoto lo storaggio temporaneo
+    players_temp_storage[pl_name] = nil
   end
 
 
@@ -1338,6 +1409,21 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       })
     end
 
+    -- reimposto eventuale hotbar
+    if mod_ref.hotbar then
+      local hotbar = mod_ref.hotbar
+
+      if hotbar.slots then
+        player:hud_set_hotbar_itemcount(players_temp_storage[p_name].slots)
+      end
+      if hotbar.background_image then
+        player:hud_set_hotbar_image(players_temp_storage[p_name].background_image)
+      end
+      if hotbar.selected_image then
+        player:hud_set_hotbar_image(players_temp_storage[p_name].selected_image)
+      end
+    end
+
     -- resetto gli HP, teletrasporto fuori dall'arena e ripristino nome
     player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
     player:set_pos(mod_ref.hub_spawn_point)
@@ -1409,6 +1495,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- lo rimuovo
   players_in_game[p_name] = nil
   players_in_queue[p_name] = nil
+  players_temp_storage[p_name] = nil
   arena.players_amount = arena.players_amount - 1
   if arena.teams_enabled then
     local p_team_ID = arena.players[p_name].teamID

@@ -196,6 +196,11 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
 * `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
+* `mod_ref.hotbar`: a table to override the server hotbar while inside an arena. Its fields are:
+  * `slots =`: (int) the number of slots
+  * `background_image =`: (string) the background image
+  * `selected_image =`: (string) the image to show when a slot is selected
+  If a field is not declared, it'll keep the server default
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
