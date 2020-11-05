@@ -199,8 +199,8 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `mod_ref.hotbar`: a table to override the server hotbar while inside an arena. Its fields are:
   * `slots =`: (int) the number of slots
   * `background_image =`: (string) the background image
-  * `selected_image =`: (string) the image to show when a slot is selected
-  If a field is not declared, it'll keep the server default
+  * `selected_image =`: (string) the image to show when a slot is selected  
+  If a field is not declared, it'll keep the server defaults
 * `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
 * `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
 * `show_nametags`: whether to show the players nametags while in game. Default is false
@@ -237,7 +237,7 @@ A couple more are available for players having the `arenalib_admin` privilege:
 * `/arenakick player_name`: kicks a player out of an ongoing game
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 
-Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/minetest-quake/-/blob/master/commands.lua) is what I came up with in my Quake minigame, which relies on arena_lib. As you can see, I declared a `local mod = "quake"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 2.3 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
