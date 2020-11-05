@@ -18,6 +18,7 @@ local function next_available_ID() end
 local function is_arena_name_allowed() end
 local function assign_team_spawner() end
 local function operations_before_entering_arena() end
+local function operations_before_leaving_arena() end
 local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -915,23 +916,14 @@ function arena_lib.load_arena(mod, arena_ID)
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
 
-    local player = minetest.get_player_by_name(pl_name)
-
-    operations_before_entering_arena(mod_ref, arena, player)
-
-    -- li curo
-    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+    operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
 
     -- teletrasporto i giocatori
     if not arena.teams_enabled then
-      player:set_pos(shuffled_spawners[count].pos)
+      minetest.get_player_by_name(pl_name):set_pos(shuffled_spawners[count].pos)
     else
       team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
     end
-
-    -- registro giocatori nella tabella apposita
-    players_in_queue[pl_name] = nil
-    players_in_game[pl_name] = {minigame = mod, arenaID = arena_ID}
 
     count = count +1
   end
@@ -979,12 +971,10 @@ function arena_lib.join_arena(mod, p_name, arena_ID)
   local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
 
-  operations_before_entering_arena(mod_ref, arena, player)
+  operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
-  -- riempio HP, teletrasporto e aggiungo
-  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+  -- teletrasporto
   player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
-  players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
@@ -1006,7 +996,6 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   for pl_name, stats in pairs(arena.players) do
     local player = minetest.get_player_by_name(pl_name)
 
-    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 
@@ -1047,57 +1036,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     arena.players[pl_name] = nil
     players_in_game[pl_name] = nil
 
-    local player = minetest.get_player_by_name(pl_name)
-
-    -- svuoto eventualmente l'inventario
-    if not mod_ref.keep_inventory then
-      player:get_inventory():set_list("main", {})
-      player:get_inventory():set_list("craft",{})
-    end
-
-    -- resetto eventuali texture
-    if arena.teams_enabled and mod_ref.teams_color_overlay then
-      player:set_properties({
-        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
-      })
-    end
-
-    -- reimposto eventuale hotbar
-    if mod_ref.hotbar then
-      local hotbar = mod_ref.hotbar
-
-      if hotbar.slots then
-        player:hud_set_hotbar_itemcount(players_temp_storage[pl_name].slots)
-      end
-      if hotbar.background_image then
-        player:hud_set_hotbar_image(players_temp_storage[pl_name].background_image)
-      end
-      if hotbar.selected_image then
-        player:hud_set_hotbar_image(players_temp_storage[pl_name].selected_image)
-      end
-    end
-
-    -- teletrasporto nella lobby
-    player:set_pos(mod_ref.hub_spawn_point)
-
-    -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
-    if minetest.get_modpath("hub_manager") then
-      hub_manager.set_items(player)
-      hub_manager.set_hub_physics(player)
-    else
-      -- TODO 4.2: parametro personalizzato tramite /arenasettings
-      player:set_physics_override({
-        speed = 1,
-        jump = 1,
-        gravity = 1,
-        sneak = true,
-        sneak_glitch = false,
-        new_move = true
-      })
-    end
-
-    -- riattivo la minimappa eventualmente disattivata
-    player:hud_set_flags({minimap = true})
+    operations_before_leaving_arena(mod_ref, arena, pl_name)
 
     -- svuoto lo storaggio temporaneo
     players_temp_storage[pl_name] = nil
@@ -1278,59 +1217,10 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- se una ragione è specificata
   if reason ~= 0 then
 
-    local player = minetest.get_player_by_name(p_name)
+    operations_before_leaving_arena(mod_ref, arena, p_name)
 
-    -- svuoto eventualmente l'inventario
-    if not mod_ref.keep_inventory then
-      player:get_inventory():set_list("main",{})
-      player:get_inventory():set_list("craft",{})
-    end
-
-    -- resetto eventuali texture
-    if arena.teams_enabled and mod_ref.teams_color_overlay then
-      player:set_properties({
-        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
-      })
-    end
-
-    -- reimposto eventuale hotbar
-    if mod_ref.hotbar then
-      local hotbar = mod_ref.hotbar
-
-      if hotbar.slots then
-        player:hud_set_hotbar_itemcount(players_temp_storage[p_name].slots)
-      end
-      if hotbar.background_image then
-        player:hud_set_hotbar_image(players_temp_storage[p_name].background_image)
-      end
-      if hotbar.selected_image then
-        player:hud_set_hotbar_image(players_temp_storage[p_name].selected_image)
-      end
-    end
-
-    -- resetto gli HP, teletrasporto fuori dall'arena e ripristino nome
-    player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-    player:set_pos(mod_ref.hub_spawn_point)
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-
-    -- se ho hub_manager, restituisco gli oggetti e imposto la fisica della lobby
-    if minetest.get_modpath("hub_manager") then
-      hub_manager.set_items(minetest.get_player_by_name(p_name))
-      hub_manager.set_hub_physics(player)
-    else
-      -- TODO 4.2: parametro personalizzato tramite /arenasettings
-      player:set_physics_override({
-        speed = 1,
-        jump = 1,
-        gravity = 1,
-        sneak = true,
-        sneak_glitch = false,
-        new_move = true
-      })
-    end
-
-    -- resetto la minimappa eventualmente disattivata
-    minetest.get_player_by_name(p_name):hud_set_flags({minimap = true})
+    -- ripristino nomi
+    minetest.get_player_by_name(p_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
     if reason == 1 then
       if executioner then
@@ -1897,7 +1787,9 @@ end
 
 
 
-function operations_before_entering_arena(mod_ref, arena, player)
+function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
+
+  local player = minetest.get_player_by_name(p_name)
 
   -- nascondo i nomi se l'opzione è abilitata
   if not mod_ref.show_nametags then
@@ -1908,8 +1800,6 @@ function operations_before_entering_arena(mod_ref, arena, player)
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
   end
-
-  local p_name = player:get_player_name()
 
   -- cambio eventuale colore texture (richiede i team)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
@@ -1962,6 +1852,71 @@ function operations_before_entering_arena(mod_ref, arena, player)
     player:get_inventory():set_list("main",{})
     player:get_inventory():set_list("craft",{})
   end
+
+  -- li curo
+  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+
+  -- registro giocatori nella tabella apposita
+  players_in_queue[p_name] = nil
+  players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
+end
+
+
+
+function operations_before_leaving_arena(mod_ref, arena, p_name)
+
+  local player = minetest.get_player_by_name(p_name)
+
+  -- svuoto eventualmente l'inventario
+  if not mod_ref.keep_inventory then
+    player:get_inventory():set_list("main", {})
+    player:get_inventory():set_list("craft",{})
+  end
+
+  -- resetto eventuali texture
+  if arena.teams_enabled and mod_ref.teams_color_overlay then
+    player:set_properties({
+      textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
+    })
+  end
+
+  -- reimposto eventuale hotbar
+  if mod_ref.hotbar then
+    local hotbar = mod_ref.hotbar
+
+    if hotbar.slots then
+      player:hud_set_hotbar_itemcount(players_temp_storage[p_name].slots)
+    end
+    if hotbar.background_image then
+      player:hud_set_hotbar_image(players_temp_storage[p_name].background_image)
+    end
+    if hotbar.selected_image then
+      player:hud_set_hotbar_image(players_temp_storage[p_name].selected_image)
+    end
+  end
+
+  -- resetto gli HP e teletrasporto fuori dall'arena e
+  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+  player:set_pos(mod_ref.hub_spawn_point)
+
+  -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
+  if minetest.get_modpath("hub_manager") then
+    hub_manager.set_items(player)
+    hub_manager.set_hub_physics(player)
+  else
+    -- TODO 4.2: parametro personalizzato tramite /arenasettings
+    player:set_physics_override({
+      speed = 1,
+      jump = 1,
+      gravity = 1,
+      sneak = true,
+      sneak_glitch = false,
+      new_move = true
+    })
+  end
+
+  -- riattivo la minimappa eventualmente disattivata
+  player:hud_set_flags({minimap = true})
 end
 
 
