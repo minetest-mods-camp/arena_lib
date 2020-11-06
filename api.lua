@@ -1280,6 +1280,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
   if reason == 4 then return end
 
+
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue then
 
@@ -1296,7 +1297,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     end
 
   -- se invece è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  elseif arena.in_game and arena.teams_enabled and arena.players_amount < arena.min_players * #arena.teams then
+  elseif arena.in_game and arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
 
     local team_to_compare
 
