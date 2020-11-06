@@ -1310,12 +1310,14 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     for _, pl_stats in pairs(arena.players) do
       if pl_stats.teamID ~= team_to_compare then
-        return
+        goto enemy_found
       end
     end
 
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
     arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
+
+    ::enemy_found::
 
   -- se invece è in partita ed erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.in_game and arena.players_amount == 1 then
@@ -1332,7 +1334,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   end
 
   arena_lib.update_sign(arena)
-
 end
 
 
