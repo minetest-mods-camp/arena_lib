@@ -138,6 +138,8 @@ function arena_lib.HUD_hide(HUD_type, player_or_arena)
     local player = minetest.get_player_by_name(player_or_arena)
     local p_HUD = player_huds[player_or_arena]
 
+    if not player then return end
+
     if HUD_type == "broadcast" then
       player:hud_change(p_HUD[1], "text", "")
       player:hud_change(p_HUD[2], "text", "")

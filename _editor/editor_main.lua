@@ -118,19 +118,16 @@ function arena_lib.quit_editor(player)
   player:get_meta():set_int("arena_lib_editor.team_ID", 0)
 
   arena_lib.remove_waypoints(p_name)
-
-  -- se si è disconnesso, mi fermo qua
-  if not minetest.get_player_by_name(p_name) then return end
+  arena_lib.HUD_hide("hotbar", p_name)
 
   -- teletrasporto
   player:set_pos(pos)
 
   -- restituisco l'inventario
   minetest.after(0, function()
+    if not minetest.get_player_by_name(p_name) then return end
     player:get_inventory():set_list("main", inv)
   end)
-
-  arena_lib.HUD_hide("hotbar", p_name)
 
 end
 
