@@ -273,12 +273,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   -- GUI per rinominare arena
   elseif formname == "arena_lib:settings_rename" then
 
-    if fields.rename_confirm or fields.key_enter then
-      if arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then
-        player:get_meta():set_string("arena_lib_editor.arena", fields.rename)
-        minetest.close_formspec(p_name, formname)
-      end
-    end
+    if not fields.rename_confirm and not fields.key_enter then return end
+    if not arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then return end
+
+    local p_meta = player:get_meta()
+
+    arena_lib.update_arena_in_edit_mode_name(p_meta:get_string("arena_lib_editor.arena"), fields.rename)
+    p_meta:set_string("arena_lib_editor.arena", fields.rename)
+    minetest.close_formspec(p_name, formname)
 
   -- GUI per modificare proprietà
   elseif formname == "arena_lib:settings_properties" then

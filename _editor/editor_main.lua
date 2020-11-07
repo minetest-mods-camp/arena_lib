@@ -154,6 +154,13 @@ end
 
 
 
+function arena_lib.update_arena_in_edit_mode_name(old_name, new_name)
+  arenas_in_edit_mode[new_name] = arenas_in_edit_mode[old_name]
+  arenas_in_edit_mode[old_name] = nil
+end
+
+
+
 function arena_lib.is_arena_in_edit_mode(arena_name)
   return arenas_in_edit_mode[arena_name] ~= nil
 end
