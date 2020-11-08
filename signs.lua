@@ -237,6 +237,7 @@ signs_lib.register_sign("arena_lib:sign", {
       if sign_arena.in_game then
         arena_lib.join_arena(mod, pl_name, arenaID)
         arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. pl_name))
+        arena_lib.update_sign(sign_arena)
         return
       else
         arena_lib.add_to_queue(pl_name, mod, arenaID)
