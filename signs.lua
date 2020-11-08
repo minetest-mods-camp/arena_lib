@@ -123,26 +123,14 @@ signs_lib.register_sign("arena_lib:sign", {
 
           local party_members = parties.get_party_members(p_name)
 
-          sign_arena.players_amount = sign_arena.players_amount - #party_members
-          if sign_arena.teams_enabled then
-            sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] - #party_members
-          end
-
           for _, pl_name in pairs(party_members) do
             arena_lib.HUD_hide("all", pl_name)
-            arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. pl_name))
             arena_lib.remove_from_queue(pl_name)
           end
 
         -- sennò rimuovo il singolo utente
         else
-          sign_arena.players_amount = sign_arena.players_amount - 1
-          if sign_arena.teams_enabled then
-            sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] -1
-          end
-
           arena_lib.HUD_hide("all", p_name)
-          arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#d69298", sign_arena.name .. " < " .. p_name))
           arena_lib.remove_from_queue(p_name)
         end
 
@@ -179,27 +167,14 @@ signs_lib.register_sign("arena_lib:sign", {
         -- se è un party
         if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
 
-          local party_members = parties.get_party_members(p_name)
-
-          old_arena.players_amount = old_arena.players_amount - #party_members
-          if old_arena.teams_enabled then
-            old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] - #party_members
-          end
-
           for _, pl_name in pairs(party_members) do
             arena_lib.HUD_hide("broadcast", pl_name)
-            arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. pl_name))
             arena_lib.remove_from_queue(pl_name)
           end
+
         -- sennò è singolo utente
         else
-          old_arena.players_amount = old_arena.players_amount -1
-          if #old_arena.teams > 1 then
-            old_arena.players_amount_per_team[old_p_team_ID] = old_arena.players_amount_per_team[old_p_team_ID] -1
-          end
-
           arena_lib.HUD_hide("broadcast", p_name)
-          arena_lib.send_message_players_in_arena(old_arena, minetest.colorize("#d69298", old_arena.name .. " < " .. p_name))
           arena_lib.remove_from_queue(p_name)
         end
 

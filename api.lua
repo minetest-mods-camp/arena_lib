@@ -1087,20 +1087,6 @@ end
 
 
 
-function arena_lib.add_to_queue(p_name, mod, arena_ID)
-  players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
-end
-
-
-
-function arena_lib.remove_from_queue(p_name)
-
-  local arena = arena_lib.get_arena_by_player(p_name)
-
-  players_in_queue[p_name] = nil
-  arena.players[p_name] = nil
-end
-
 
 
 ----------------------------------------------
@@ -1200,6 +1186,51 @@ end
 
 
 
+function arena_lib.add_to_queue(p_name, mod, arena_ID)
+  players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
+end
+
+
+
+function arena_lib.remove_from_queue(p_name)
+
+  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
+  local arena = arena_lib.get_arena_by_player(p_name)
+
+  if not arena then return end
+
+  arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", arena.name .. " < " .. p_name))
+
+  players_in_queue[p_name] = nil
+  arena.players_amount = arena.players_amount - 1
+  if arena.teams_enabled then
+    local p_team_ID = arena.players[p_name].teamID
+    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
+  end
+  arena.players[p_name] = nil
+
+  local arena_min_players = arena.min_players * #arena.teams
+
+  -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
+  if arena.in_queue and arena.players_amount < arena_min_players then
+
+    local arena_max_players = arena.max_players * #arena.teams
+    local timer = minetest.get_node_timer(arena.sign)
+
+    timer:stop()
+    arena.in_queue = false
+
+    arena_lib.HUD_hide("broadcast", arena)
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players .. " | " ..
+      S("Waiting for more players...") .. " (" .. arena_min_players - arena.players_amount .. ")")
+    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+  end
+
+  arena_lib.update_sign(arena)
+end
+
+
+
 function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- reason 0 = has disconnected
   -- reason 1 = has been eliminated
@@ -1268,7 +1299,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
   -- lo rimuovo
   players_in_game[p_name] = nil
-  players_in_queue[p_name] = nil
   players_temp_storage[p_name] = nil
   arena.players_amount = arena.players_amount - 1
   if arena.teams_enabled then
@@ -1280,24 +1310,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
   if reason == 4 then return end
 
-
-  -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
-  if arena.in_queue then
-
-    local timer = minetest.get_node_timer(arena.sign)
-    local arena_min_players = arena.min_players * #arena.teams
-    local arena_max_players = arena.max_players * #arena.teams
-
-    if arena.players_amount < arena_min_players then
-      timer:stop()
-      arena.in_queue = false
-      arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players .. " | " ..
-        S("Waiting for more players...") .. " (" .. arena_min_players - arena.players_amount .. ")")
-      arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-    end
-
-  -- se invece è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  elseif arena.in_game and arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
+  -- se l'arena è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
+  if arena.in_game and arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
 
     local team_to_compare
 

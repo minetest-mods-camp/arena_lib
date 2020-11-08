@@ -90,6 +90,7 @@ end
 
 
 function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound)
+
   for pl_name, _ in pairs(arena.players) do
 
     local pl = minetest.get_player_by_name(pl_name)
@@ -172,7 +173,13 @@ function arena_lib.HUD_hide(HUD_type, player_or_arena)
         pl:hud_change(pl_HUD[3], "text", "")
         pl:hud_change(pl_HUD[4], "text", "")
       end
+
     end
   end
+end
 
+
+
+function arena_lib.HUD_remove(p_name)
+  player_huds[p_name] = nil
 end
