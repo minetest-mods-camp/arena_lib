@@ -179,9 +179,9 @@ Overriding these functions is **not** recommended. Instead, there are 4 respecti
 
 > Still a TL;DR? Check out the [example file](mod-init.lua.example)
 
-First of all download the mod and put it in your mods folder.
+First of all download the mod and put it in your mods folder. Then, be sure you have [LuaJIT](https://luajit.org/) installed on your machine.
 
-Then, you need to register your minigame in arena_lib, possibly inside the init.lua, via:
+Now you need to register your minigame in arena_lib, possibly inside the init.lua, via:
 ```
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```

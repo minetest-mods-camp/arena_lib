@@ -9,7 +9,9 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 
 1) Install it as any other mod
 
-2) For an in-depth understanding of what you can do with the library, have a look at the [full documentation](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/DOCS.md).  
+2) Be sure you have [LuaJIT](https://luajit.org/) installed on your machine
+
+3) For an in-depth understanding of what you can do with the library, have a look at the [full documentation](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/DOCS.md).  
 
 ### Dependencies
 Default  
