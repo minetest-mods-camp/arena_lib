@@ -1037,9 +1037,6 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     players_in_game[pl_name] = nil
 
     operations_before_leaving_arena(mod_ref, arena, pl_name)
-
-    -- svuoto lo storaggio temporaneo
-    players_temp_storage[pl_name] = nil
   end
 
 
@@ -1237,6 +1234,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- reason 2 = has been kicked
   -- reason 3 = has quit the arena
   -- reason 4 = has been forced to quit the arena
+  assert(reason, "[ARENA_LIB] 'remove_player_from_arena': A reason must be specified!")
 
   -- se il giocatore non è in partita, annullo
   if not arena_lib.is_player_in_arena(p_name) then return end
@@ -1244,6 +1242,15 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   local mod = arena_lib.get_mod_by_player(p_name)
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
+
+  -- lo rimuovo
+  players_in_game[p_name] = nil
+  arena.players_amount = arena.players_amount - 1
+  if arena.teams_enabled then
+    local p_team_ID = arena.players[p_name].teamID
+    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
+  end
+  arena.players[p_name] = nil
 
   -- se una ragione è specificata
   if reason ~= 0 then
@@ -1296,16 +1303,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       mod_ref.on_disconnect(arena, p_name)
     end
   end
-
-  -- lo rimuovo
-  players_in_game[p_name] = nil
-  players_temp_storage[p_name] = nil
-  arena.players_amount = arena.players_amount - 1
-  if arena.teams_enabled then
-    local p_team_ID = arena.players[p_name].teamID
-    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
-  end
-  arena.players[p_name] = nil
 
   -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
   if reason == 4 then return end
@@ -1933,6 +1930,9 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   -- riattivo la minimappa eventualmente disattivata
   player:hud_set_flags({minimap = true})
+
+  -- svuoto lo storage temporaneo
+  players_temp_storage[p_name] = nil
 end
 
 

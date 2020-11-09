@@ -1,4 +1,4 @@
-local version = "4.1.0"
+local version = "4.2.0-dev"
 
 dofile(minetest.get_modpath("arena_lib") .. "/api.lua")
 dofile(minetest.get_modpath("arena_lib") .. "/callbacks.lua")
