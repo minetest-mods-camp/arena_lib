@@ -42,7 +42,7 @@ It all starts with a table called `arena_lib.mods = {}`. This table allows `aren
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
 * `sign`: (pos) the position of the sign associated with the arena.
-* `players`: (table) where to store players
+* `players`: (table) where to store players information, such as `player_properties` (explained in [2.4.2](#242-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
 * `teams`: (table) where to store teams. If there are none, it's {-1}
 * `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
@@ -312,7 +312,7 @@ arena_lib.register_minigame("mymod", {
 }
 ```
 
-Now you can easily access the `killstreak` parameter by retrieving the player inside an arena. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
+Now you can easily access the killstreak parameter by retrieving the player inside an arena via `ourarena.players[p_name].killlstreak`. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
 ```
 arena_lib.on_death("mymod", function(arena, p_name, reason)
   arena.players[p_name].killstreak = 0
