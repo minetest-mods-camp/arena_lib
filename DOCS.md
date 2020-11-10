@@ -367,14 +367,14 @@ Executioner can be passed to tell who removed the player. By default, this happe
 
 ### 2.8 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
-* `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
-* `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
 * `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing in
 * `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
+* `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
+* `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
 ### 2.9 Things you don't want to do with a light heart

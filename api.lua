@@ -1414,30 +1414,6 @@ end
 
 
 
-function arena_lib.get_players_in_game()
-  return players_in_game
-end
-
-
-
--- ritorna tabella di nomi giocatori, o di giocatori se to_players == true
-function arena_lib.get_players_in_team(arena, team_ID, to_players)
-  local players = {}
-  for pl_name, pl_stats in pairs(arena.players) do
-    if pl_stats.teamID == team_ID then
-      if to_players then
-        table.insert(players, minetest.get_player_by_name(pl_name))
-      else
-        table.insert(players, pl_name)
-      end
-    end
-  end
-
-  return players
-end
-
-
-
 function arena_lib.get_mod_by_player(p_name)
   if arena_lib.is_player_in_arena(p_name) then
     return players_in_game[p_name].minigame
@@ -1507,6 +1483,30 @@ function arena_lib.get_random_spawner(arena, team_ID)
   else
     return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))].pos
   end
+end
+
+
+
+function arena_lib.get_players_in_game()
+  return players_in_game
+end
+
+
+
+-- ritorna tabella di nomi giocatori, o di giocatori se to_players == true
+function arena_lib.get_players_in_team(arena, team_ID, to_players)
+  local players = {}
+  for pl_name, pl_stats in pairs(arena.players) do
+    if pl_stats.teamID == team_ID then
+      if to_players then
+        table.insert(players, minetest.get_player_by_name(pl_name))
+      else
+        table.insert(players, pl_name)
+      end
+    end
+  end
+
+  return players
 end
 
 
