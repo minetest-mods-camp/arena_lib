@@ -41,20 +41,24 @@
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
-* `sign`: (pos) the position of the sign associated with the arena.
-* `players`: (table) where to store players information, such as `player_properties` (explained in [2.4.2](#242-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
-* `teams`: (table) where to store teams. If there are none, it's {-1}
+* `sign`: (pos) the position of the sign associated with the arena
+* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties` (explained in [2.4.2](#242-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
+* `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
 * `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
+* `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`
+* `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `initial_time`: (int) in seconds. It's nil when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's nil
+* `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
 * `in_celebration`: (bool)
 * `enabled`: (bool) by default an arena is disabled, to avoid any unwanted damage
+
+> **BEWARE**: don't edit these parameters manually! Each one of them can be set through some arena_lib function, which runs the required checks in order to avoid any collateral damage
 
 
 Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
@@ -67,7 +71,7 @@ The second is via code by the functions:
 * `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
 * `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so, the table)
 
-> Beware: this is an API. It means all the functions illustrated here must be connected to your mod BY YOU. Nonetheless, I've created both an in-game editor to let you skip most of these steps and linked a configuration file example (that uses commands) close to the end. In short: I got you :)
+> **BEWARE**: this is an API. It means all the functions illustrated here must be connected to your mod BY YOU. Nonetheless, I've created both an in-game editor to let you skip most of these steps and linked a configuration file example (that uses commands) close to the end. In short: I got you :)
 
 ### 1.1 Creating and removing arenas
 There are two functions for it and they all need to be connected to some command in your mod. These functions are
@@ -219,7 +223,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `player_properties`: same
 * `team_properties`: same (it won't work if `teams` hasn't been declared)
 
-> Beware: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
+> **BEWARE**: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
 
 ### 2.1 Privileges
 * `arenalib_admin`: allows to use the `/arenakick` command
@@ -257,7 +261,7 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful ie. to ask confirmation first, or simply impede a player to quit
 * `arena_lib.on_disconnect(mod, function(arena, p_name))`: called when a player disconnects while in a match
 
-> Beware: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
+> **BEWARE**: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
 So for instance, if we want to add an object in the first slot when a player joins the pre-match, we can simply do:
 
@@ -289,7 +293,7 @@ arena_lib.register_minigame("mymod", {
 ```
 in doing so, we can easily access the `kill_leader` field whenever we want from every arena we have, via `ourarena.kill_leader`. E.g. when creating a function calculating the arena kill leader
 
-> Beware: you DO need to initialise your properties (whatever type) or it'll return an error
+> **BEWARE**: you DO need to initialise your properties (whatever type) or it'll return an error
 
 ##### 2.4.1.1 Updating non temporary properties via code
 Let's say you want to change a property from your mod. A naive approach would be doing `yourarena.property = something`. This, though, won't update it in the storage, so when you restart the server it'll still have the old value.  
