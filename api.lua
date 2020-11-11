@@ -23,7 +23,7 @@ local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar slots, (string) hotbar bg img, (string) hotbar sel img}
+local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image}
 
 local arena_default = {
   name = "",
@@ -1828,17 +1828,17 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     local hotbar = mod_ref.hotbar
 
     if hotbar.slots then
-      players_temp_storage[p_name].slots = player:hud_get_hotbar_itemcount()
+      players_temp_storage[p_name].hotbar_slots = player:hud_get_hotbar_itemcount()
       player:hud_set_hotbar_itemcount(hotbar.slots)
     end
 
     if hotbar.background_image then
-      players_temp_storage[p_name].background_image = player:hud_get_hotbar_image()
+      players_temp_storage[p_name].hotbar_background_image = player:hud_get_hotbar_image()
       player:hud_set_hotbar_image(hotbar.background_image)
     end
 
     if hotbar.selected_image then
-      players_temp_storage[p_name].selected_image = player:hud_get_hotbar_selected_image()
+      players_temp_storage[p_name].hotbar_selected_image = player:hud_get_hotbar_selected_image()
       player:hud_set_hotbar_selected_image(hotbar.selected_image)
     end
   end
@@ -1898,13 +1898,13 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     local hotbar = mod_ref.hotbar
 
     if hotbar.slots then
-      player:hud_set_hotbar_itemcount(players_temp_storage[p_name].slots)
+      player:hud_set_hotbar_itemcount(players_temp_storage[p_name].hotbar_slots)
     end
     if hotbar.background_image then
-      player:hud_set_hotbar_image(players_temp_storage[p_name].background_image)
+      player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_background_image)
     end
     if hotbar.selected_image then
-      player:hud_set_hotbar_image(players_temp_storage[p_name].selected_image)
+      player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_selected_image)
     end
   end
 
