@@ -26,8 +26,8 @@ Default
 * `SkinsDB` or any other mod applying a 3D model onto the player, if `teams_color_overlay` is used
 
 #### Mods relying on arena_lib
+[Block League](https://gitlab.com/zughy-friends-minetest/block_league)  
 [Murder](https://gitlab.com/giov4/minetest-murder-mod)  
-[Quake](https://gitlab.com/zughy-friends-minetest/minetest-quake)  
 [Skywars](https://gitlab.com/zughy-friends-minetest/skywars)
 
 ### Want to help?
