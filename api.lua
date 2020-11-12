@@ -1307,8 +1307,12 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
   if reason == 4 then return end
 
-  -- se l'arena è in partita, ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  if arena.in_game and arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
+  -- se l'ultimo rimasto abbandona con alt+f4, evito il crash
+  if arena.players_amount == 0 then
+    arena_lib.end_arena(mod_ref, mod, arena)
+
+  -- se l'arena ha i team e sono rimasti solo i giocatori di un team, il loro team vince
+  elseif arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
 
     local team_to_compare
 
@@ -1330,8 +1334,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     ::enemy_found::
 
-  -- se invece è in partita ed erano rimasti solo 2 giocatori in partita, l'altro vince
-  elseif arena.in_game and arena.players_amount == 1 then
+  -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
+  elseif arena.players_amount == 1 then
 
     if reason == 1 then
       arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
