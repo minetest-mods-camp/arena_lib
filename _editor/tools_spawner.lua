@@ -9,6 +9,7 @@ local spawners_tools_team = {
   "",
   "arena_lib:spawner_deleteall",
   "arena_lib:spawner_team_deleteall",
+  "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
 }
@@ -18,6 +19,7 @@ local spawners_tools_noteam = {
   "",
   "",
   "arena_lib:spawner_deleteall",
+  "",
   "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",

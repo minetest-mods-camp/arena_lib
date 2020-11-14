@@ -6,6 +6,7 @@ local spawners_tools = {
   "arena_lib:sign",
   "",
   "",
+  "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
 }

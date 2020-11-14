@@ -1,11 +1,12 @@
 local S = minetest.get_translator("arena_lib")
 local arenas_in_edit_mode = {}      -- KEY: arena name; VALUE: name of the player inside the editor
-local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv (player old inventory), pos (player old position)}
+local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv, pos, hotbar_slots, hotbar_bg }  (it stores the listed player properties to restore them when they leave the editor)
 local editor_tools = {
   "arena_lib:editor_players",
   "arena_lib:editor_spawners",
   "arena_lib:editor_signs",
   "arena_lib:editor_settings",
+  "",
   "",
   "arena_lib:editor_info",
   "arena_lib:editor_enable",
@@ -82,7 +83,15 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   -- metto l'arena in edit mode e salvo l'inventario
   arenas_in_edit_mode[arena_name] = sender
-  players_in_edit_mode[sender] = { inv = player:get_inventory():get_list("main"), pos = player:get_pos()}
+  players_in_edit_mode[sender] = {
+    inv           = player:get_inventory():get_list("main"),
+    pos           = player:get_pos(),
+    hotbar_slots  = player:hud_get_hotbar_itemcount(),
+    hotbar_bg     = player:hud_get_hotbar_image()
+  }
+
+  player:hud_set_hotbar_itemcount(9)
+  player:hud_set_hotbar_image("arenalib_gui_hotbar.png")
 
   -- se c'è almeno uno spawner, teletrasporto
   if next(arena.spawn_points) then
@@ -107,6 +116,8 @@ function arena_lib.quit_editor(player)
   local p_name = player:get_player_name()
   local inv = players_in_edit_mode[p_name].inv
   local pos = players_in_edit_mode[p_name].pos
+  local hotbar_slots = players_in_edit_mode[p_name].hotbar_slots
+  local hotbar_bg = players_in_edit_mode[p_name].hotbar_bg
 
   arenas_in_edit_mode[arena_name] = nil
   players_in_edit_mode[p_name] = nil
@@ -119,6 +130,9 @@ function arena_lib.quit_editor(player)
 
   arena_lib.remove_waypoints(p_name)
   arena_lib.HUD_hide("hotbar", p_name)
+
+  player:hud_set_hotbar_itemcount(hotbar_slots)
+  player:hud_set_hotbar_image(hotbar_bg)
 
   -- teletrasporto
   player:set_pos(pos)
