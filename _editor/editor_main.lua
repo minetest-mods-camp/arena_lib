@@ -1,4 +1,5 @@
 local S = minetest.get_translator("arena_lib")
+
 local arenas_in_edit_mode = {}      -- KEY: arena name; VALUE: name of the player inside the editor
 local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv, pos, hotbar_slots, hotbar_bg }  (it stores the listed player properties to restore them when they leave the editor)
 local editor_tools = {
@@ -77,18 +78,31 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   local player = minetest.get_player_by_name(sender)
 
+  -- se era già in un altro editor, lo rimuovo dal vecchio
+  if players_in_edit_mode[sender] then
+    arena_lib.remove_waypoints(sender)
+
+    for a_name, pl_name in pairs(arenas_in_edit_mode) do
+      if pl_name == sender then
+        arenas_in_edit_mode[a_name] = nil
+      end
+    end
+  -- sennò salvo le info
+  else
+    players_in_edit_mode[sender] = {
+      inv           = player:get_inventory():get_list("main"),
+      pos           = player:get_pos(),
+      hotbar_slots  = player:hud_get_hotbar_itemcount(),
+      hotbar_bg     = player:hud_get_hotbar_image()
+    }
+  end
+
+  -- metto l'arena in modalità edit, associandoci il giocatore
+  arenas_in_edit_mode[arena_name] = sender
+
   -- imposto i metadati che porto a spasso per l'editor
   player:get_meta():set_string("arena_lib_editor.mod", mod)
   player:get_meta():set_string("arena_lib_editor.arena", arena_name)
-
-  -- metto l'arena in edit mode e salvo l'inventario
-  arenas_in_edit_mode[arena_name] = sender
-  players_in_edit_mode[sender] = {
-    inv           = player:get_inventory():get_list("main"),
-    pos           = player:get_pos(),
-    hotbar_slots  = player:hud_get_hotbar_itemcount(),
-    hotbar_bg     = player:hud_get_hotbar_image()
-  }
 
   player:hud_set_hotbar_itemcount(9)
   player:hud_set_hotbar_image("arenalib_gui_hotbar.png")
