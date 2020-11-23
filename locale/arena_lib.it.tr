@@ -69,18 +69,20 @@ Wooosh!=Wooosh!
 
 # commands.lua
 player=giocatore
-Kick a player from an ongoing game=Caccia un giocatore da una partita in corso
+Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
 [!] This player is not online!=[!] Questo giocatore non è online!
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
 [!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
+Player successfully kicked=Giocatore cacciato con successo
 minigame=minigioco
+Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 arena name=nome arena
 Forcibly ends an ongoing game=Forza la conclusione di una partita in corso
-Quit an ongoing game=Abbandona una partita in corso
+Quits an ongoing game=Abbandona una partita in corso
 [!] You can't perform this action if you're the only one left!=[!] Non puoi eseguire quest'azione se sei l'unico giocatore rimasto!
 message=messaggio
-Write a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
-Write a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
+Writes a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
+Writes a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
 
 # debug_utilities.lua
 name: =nome: 

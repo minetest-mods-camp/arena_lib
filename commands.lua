@@ -9,7 +9,7 @@ local S = minetest.get_translator("arena_lib")
 minetest.register_chatcommand("arenakick", {
 
   params = "<" .. S("player") .. ">",
-  description = S("Kick a player from an ongoing game"),
+  description = S("Kicks a player from an ongoing game"),
   privs = {
         arenalib_admin = true,
     },
@@ -43,7 +43,7 @@ minetest.register_chatcommand("arenakick", {
 minetest.register_chatcommand("minigamesettings", {
 
   params = "<" ..S("minigame") .. ">",
-  description = S("TODO"),
+  description = S("Tweaks the minigame settings for the current server"),
   privs = {
     arenalib_admin = true,
   },
@@ -91,7 +91,7 @@ minetest.register_chatcommand("forceend", {
 
 minetest.register_chatcommand("quit", {
 
-  description = S("Quit an ongoing game"),
+  description = S("Quits an ongoing game"),
 
   func = function(name, param)
 
@@ -124,7 +124,7 @@ minetest.register_chatcommand("quit", {
 minetest.register_chatcommand("all", {
 
   params = "<" .. S("message") .. ">",
-  description = S("Write a message in the arena global chat while in a game"),
+  description = S("Writes a message in the arena global chat while in a game"),
 
   func = function(name, param)
 
@@ -146,7 +146,7 @@ minetest.register_chatcommand("all", {
 minetest.register_chatcommand("t", {
 
   params = "<" .. S("message") .. ">",
-  description = S("Write a message in the arena team chat while in a game (if teams are enabled)"),
+  description = S("Writes a message in the arena team chat while in a game (if teams are enabled)"),
 
   func = function(name, param)
 
