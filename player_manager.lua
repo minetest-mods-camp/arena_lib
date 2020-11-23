@@ -33,6 +33,8 @@ minetest.register_on_leaveplayer(function(player)
       arena_lib.remove_from_queue(p_name)
     elseif arena_lib.is_player_in_edit_mode(p_name) then
       arena_lib.quit_editor(player)
+    elseif arena_lib.is_player_in_settings(p_name) then
+      arena_lib.quit_minigame_settings(p_name)
     end
 
     arena_lib.HUD_remove(p_name)

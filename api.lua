@@ -10,6 +10,7 @@ local storage = minetest.get_mod_storage()
 ---------------DICHIARAZIONI------------------
 ----------------------------------------------
 
+local function load_settings() end
 local function init_storage() end
 local function update_storage() end
 local function check_for_properties() end
@@ -68,15 +69,27 @@ function arena_lib.register_minigame(mod, def)
   end
   --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
 
+  --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
+  if def.hub_spawn_point then
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") hub_spawn_point is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
+  end
+
+  if def.queue_waiting_time then
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") queue_waiting_time is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
+  end
+  --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
+
   arena_lib.mods[mod] = {}
   arena_lib.mods[mod].arenas = {}           -- KEY: (int) arenaID , VALUE: (table) arena properties
   arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
 
   local mod_ref = arena_lib.mods[mod]
 
+  -- /minigamesettings parameters
+  load_settings(mod)
+
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
-  mod_ref.hub_spawn_point = { x = 0, y = 20, z = 0}
   mod_ref.teams = {}
   mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
@@ -90,7 +103,6 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
   mod_ref.time_mode = 0
-  mod_ref.queue_waiting_time = 10
   mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
   mod_ref.celebration_time = 3    -- time in the celebration phase
   mod_ref.in_game_physics = nil
@@ -102,10 +114,6 @@ function arena_lib.register_minigame(mod, def)
 
   if def.prefix then
     mod_ref.prefix = def.prefix
-  end
-
-  if def.hub_spawn_point then
-    mod_ref.hub_spawn_point = def.hub_spawn_point
   end
 
   if def.teams and type(def.teams) == "table" then
@@ -163,10 +171,6 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.time_mode = def.time_mode
   end
 
-  if def.queue_waiting_time then
-    mod_ref.queue_waiting_time = def.queue_waiting_time
-  end
-
   if def.load_time then
     mod_ref.load_time = def.load_time
   end
@@ -200,6 +204,52 @@ function arena_lib.register_minigame(mod, def)
   end
 
   init_storage(mod, mod_ref)
+
+end
+
+
+
+function arena_lib.change_mod_settings(sender, mod, setting, new_value)
+
+  local mod_settings = arena_lib.mods[mod].settings
+
+  -- se la proprietà non esiste
+  if mod_settings[setting] == nil then
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Settings - Parameters don't seem right!") end
+    return end
+
+  ----- v inizio conversione stringa nel tipo corrispettivo v -----
+  local func, error_msg = loadstring("return (" .. new_value .. ")")
+
+  -- se non ritorna una sintassi corretta
+  if not func then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[SYNTAX!] " .. error_msg))
+    return end
+
+  setfenv(func, {})
+
+  local good, result = pcall(func)
+
+  -- se le operazioni della funzione causano errori
+  if not good then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[RUNTIME!] " .. result))
+    return end
+
+  new_value = result
+  ----- ^ fine conversione stringa nel tipo corrispettivo ^ -----
+
+  -- se il tipo è diverso dal precedente
+  if type(mod_settings[setting]) ~= type(new_value) then
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change type!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Minigame parameters - You can't change type!") end
+    return end
+
+  mod_settings[setting] = new_value
+  storage:set_string(mod .. ".SETTINGS", minetest.serialize(mod_settings))
+
+  if sender then minetest.chat_send_player(sender, S("Parameter @1 successfully overwritten", setting))
+  else minetest.log("action", "[ARENA_LIB] Parameter " .. setting .. " successfully overwritten") end
 
 end
 
@@ -369,15 +419,15 @@ function arena_lib.change_arena_property(sender, mod, arena_name, property, new_
 
   -- se il tipo è diverso dal precedente
   if type(arena[property]) ~= type(new_value) then
-    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change property type!")))
-    else minetest.log("warning", "[ARENA_LIB] [!] Properties - You can't change property type!") end
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change type!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Properties - You can't change type!") end
     return end
 
   arena[property] = new_value
   update_storage(false, mod, id, arena)
 
-  if sender then minetest.chat_send_player(sender, S("Property @1 successfully overwritten", property))
-  else minetest.log("action", "[ARENA_LIB] Property " .. property .. " successfully overwritten") end
+  if sender then minetest.chat_send_player(sender, S("Parameter @1 successfully overwritten", property))
+  else minetest.log("action", "[ARENA_LIB] Parameter " .. property .. " successfully overwritten") end
 end
 
 
@@ -1529,6 +1579,22 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
+function load_settings(mod)
+
+  -- primo avvio
+  if storage:get_string(mod .. ".SETTINGS") == "" then
+    local default_settings = {
+      hub_spawn_point = { x = 0, y = 20, z = 0},
+      queue_waiting_time = 10
+    }
+    arena_lib.mods[mod].settings = default_settings
+    storage:set_string(mod .. ".SETTINGS", minetest.serialize(default_settings))
+  else
+    arena_lib.mods[mod].settings = minetest.deserialize(storage:get_string(mod .. ".SETTINGS"))
+  end
+end
+
+
 
 function init_storage(mod, mod_ref)
 
@@ -1914,7 +1980,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   -- resetto gli HP e teletrasporto fuori dall'arena e
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-  player:set_pos(mod_ref.hub_spawn_point)
+  player:set_pos(mod_ref.settings.hub_spawn_point)
 
   -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
   if minetest.get_modpath("hub_manager") then

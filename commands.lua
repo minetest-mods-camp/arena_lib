@@ -40,6 +40,22 @@ minetest.register_chatcommand("arenakick", {
 
 
 
+minetest.register_chatcommand("minigamesettings", {
+
+  params = "<" ..S("minigame") .. ">",
+  description = S("TODO"),
+  privs = {
+    arenalib_admin = true,
+  },
+
+  func = function(sender, param)
+    local mod = param
+    arena_lib.enter_minigame_settings(sender, mod)
+  end
+})
+
+
+
 minetest.register_chatcommand("forceend", {
 
   params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",

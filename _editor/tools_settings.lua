@@ -5,7 +5,6 @@ local function get_rename_formspec() end
 local function get_properties_formspec() end
 local function get_timer_formspec() end
 local function get_delete_formspec() end
-local function value_to_string() end
 
 local settings_tools = {
   "arena_lib:settings_rename",
@@ -159,7 +158,7 @@ function get_properties_formspec(p_name, mod, arena, sel_idx)
 
   -- ottengo una stringa con tutte le proprietà
   for property, v in pairs(mod_ref.properties) do
-    properties = properties .. property .. " = " .. FS(value_to_string(arena[property])) .. ","
+    properties = properties .. property .. " = " .. FS(AL_value_to_string(arena[property])) .. ","
     properties_by_idx[i] = property
     i = i + 1
   end
@@ -173,7 +172,7 @@ function get_properties_formspec(p_name, mod, arena, sel_idx)
 
   -- e assegno il valore
   sel_property_attr[p_name] = {id = sel_idx, name = sel_property}
-  sel_property_value = FS(value_to_string(arena[sel_property]))
+  sel_property_value = FS(AL_value_to_string(arena[sel_property]))
 
   properties = properties:sub(1,-2)
 
@@ -226,26 +225,11 @@ end
 
 
 
-function value_to_string(property)
-
-	if type(property) == "string" then
-		return "\"" .. property .. "\""
-	elseif type(property) == "table" then
-		return tostring(dump(property)):gsub("\n", "")
-	else
-		return tostring(property)
-	end
-
-end
-
-
-
 
 
 ----------------------------------------------
 ---------------GESTIONE CAMPI-----------------
 ----------------------------------------------
-
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 

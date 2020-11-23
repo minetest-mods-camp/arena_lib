@@ -22,3 +22,17 @@ function ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, skip_enabled)
 
   return true
 end
+
+
+
+function AL_value_to_string(value)
+
+	if type(value) == "string" then
+		return "\"" .. value .. "\""
+	elseif type(value) == "table" then
+		return tostring(dump(value)):gsub("\n", "")
+	else
+		return tostring(value)
+	end
+
+end

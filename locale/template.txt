@@ -5,12 +5,12 @@
 
 # api.lua
 team=
+[!] You can't change type!=
+Parameter @1 successfully overwritten=
 [!] Parameters don't seem right!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
-[!] You can't change property type!=
-Property @1 successfully overwritten=
 Players amount successfully changed ( min @1 | max @2 )=
 [!] Teams are not enabled!=
 [!] Nothing to do here!=

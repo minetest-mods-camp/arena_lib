@@ -256,7 +256,7 @@ signs_lib.register_sign("arena_lib:sign", {
       -- ...e ci sono abbastanza giocatori, parte il timer d'attesa
       if players_required <= 0 then
         sign_arena.in_queue = true
-        timer:start(mod_ref.queue_waiting_time)
+        timer:start(mod_ref.settings.queue_waiting_time)
         HUD_countdown(sign_arena, timer)
 
       -- sennò aggiorno semplicemente la HUD
