@@ -98,6 +98,7 @@ waiting=
 Initial time: =
 current: =
 Name: =
+Author: =
 Teams: =
 Disabled damage types: =
 Players required: =
@@ -169,9 +170,11 @@ Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 
 # _editor/tools_settings.lua
-Rename arena=
+Arena name and author=
 Arena properties=
 Delete arena=
+Rename arena=
+Change author=
 Overwrite=
 Set timer=
 Cancel=

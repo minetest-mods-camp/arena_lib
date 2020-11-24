@@ -1,13 +1,13 @@
 local S = minetest.get_translator("arena_lib")
 local FS = minetest.formspec_escape
 
-local function get_rename_formspec() end
+local function get_rename_author_formspec() end
 local function get_properties_formspec() end
 local function get_timer_formspec() end
 local function get_delete_formspec() end
 
 local settings_tools = {
-  "arena_lib:settings_rename",
+  "arena_lib:settings_rename_author",
   "arena_lib:settings_properties",
   "",                                       -- timer_off/_on
   "",
@@ -52,17 +52,16 @@ minetest.register_craftitem("arena_lib:timer", {
 
 
 
+minetest.register_tool("arena_lib:settings_rename_author", {
 
-minetest.register_tool("arena_lib:settings_rename", {
-
-    description = S("Rename arena"),
-    inventory_image = "arenalib_tool_settings_rename.png",
+    description = S("Arena name and author"),
+    inventory_image = "arenalib_tool_settings_nameauthor.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename", get_rename_formspec())
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename_author", get_rename_author_formspec())
     end
 })
 
@@ -131,15 +130,19 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function get_rename_formspec()
+function get_rename_author_formspec()
 
   local formspec = {
-    "size[5.2,0.4]",
+    "formspec_version[4]",
+    "size[7,2.2]",
     "no_prepend[]",
     "bgcolor[;neither]",
-    "field[0.2,0.25;4,1;rename;;]",
-    "button[3.8,-0.05;1.7,1;rename_confirm;" .. S("Rename arena") .. "]",
-    "field_close_on_enter[rename;false]"
+    "field[0,0.1;3.7,0.7;rename;;]",
+    "button[3.8,0.1;2,0.7;rename_confirm;" .. S("Rename arena") .. "]",
+    "field[0,1;3.7,0.7;author;;]",
+    "button[3.8,1;2,0.7;author_confirm;" .. S("Change author") .. "]",
+    "field_close_on_enter[rename;false]",
+    "field_close_on_enter[author;false]"
   }
 
   return table.concat(formspec, "")
@@ -233,8 +236,9 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 
-  if formname ~= "arena_lib:settings_timer" and formname ~= "arena_lib:settings_rename"
-  and formname ~= "arena_lib:settings_properties" and formname ~= "arena_lib:settings_delete" then return end
+  if formname ~= "arena_lib:settings_timer" and formname ~= "arena_lib:settings_rename_author"
+  and formname ~= "arena_lib:settings_properties" and formname ~= "arena_lib:settings_delete" then
+  return end
 
   local p_name      =   player:get_player_name()
   local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
@@ -255,17 +259,32 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       minetest.close_formspec(p_name, formname)
     end
 
-  -- GUI per rinominare arena
-  elseif formname == "arena_lib:settings_rename" then
+  -- GUI per rinominare arena e cambiare autore
+  elseif formname == "arena_lib:settings_rename_author" then
 
-    if not fields.rename_confirm and not fields.key_enter then return end
-    if not arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then return end
+    if fields.key_enter then
+      if fields.key_enter_field == "rename" then
+        if not arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then return end
 
-    local p_meta = player:get_meta()
+        local p_meta = player:get_meta()
 
-    arena_lib.update_arena_in_edit_mode_name(p_meta:get_string("arena_lib_editor.arena"), fields.rename)
-    p_meta:set_string("arena_lib_editor.arena", fields.rename)
-    minetest.close_formspec(p_name, formname)
+        arena_lib.update_arena_in_edit_mode_name(p_meta:get_string("arena_lib_editor.arena"), fields.rename)
+        p_meta:set_string("arena_lib_editor.arena", fields.rename)
+      elseif fields.key_enter_field == "author" then
+        arena_lib.set_author(p_name, mod, arena_name, fields.author, true)
+      end
+
+    elseif fields.rename_confirm then
+      if not arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then return end
+
+      local p_meta = player:get_meta()
+
+      arena_lib.update_arena_in_edit_mode_name(p_meta:get_string("arena_lib_editor.arena"), fields.rename)
+      p_meta:set_string("arena_lib_editor.arena", fields.rename)
+
+    elseif fields.author_confirm then
+      arena_lib.set_author(p_name, mod, arena_name, fields.author, true)
+    end
 
   -- GUI per modificare proprietà
   elseif formname == "arena_lib:settings_properties" then

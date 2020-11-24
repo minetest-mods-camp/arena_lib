@@ -22,9 +22,10 @@ end
 
 function arena_lib.print_arena_info(sender, mod, arena_name)
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-  if arena == nil then
+
+  if not arena then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-  return end
+    return end
 
   local mod_ref = arena_lib.mods[mod]
   local arena_min_players = arena.min_players * #arena.teams
@@ -156,6 +157,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   minetest.chat_send_player(sender,
     minetest.colorize("#cfc6b8", "====================================") .. "\n" ..
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
+    minetest.colorize("#eea160", S("Author: ")) .. minetest.colorize("#cfc6b8", arena.author ) .. "\n" ..
     minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
     minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n" ..

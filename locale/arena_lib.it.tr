@@ -97,6 +97,7 @@ celebrating=in celebrazione
 waiting=in attesa
 Initial time: =Tempo iniziale: 
 current: =corrente: 
+Author: =Autore: 
 Name: =Nome: 
 Teams: =Squadre: 
 Disabled damage types: =Tipi di danno disabilitati: 
@@ -169,9 +170,11 @@ Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 
 # _editor/tools_settings.lua
-Rename arena=Rinomina arena
+Arena name and author=Nome arena e autore
 Arena properties=Proprietà arena
 Delete arena=Cancella arena
+Rename arena=Rinomina arena
+Change author=Cambia autore
 Overwrite=Sovrascrivi
 Set timer=Imposta timer
 Cancel=Annulla

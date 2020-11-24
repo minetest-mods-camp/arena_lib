@@ -21,4 +21,6 @@ dofile(modpath .. "/_editor/tools_spawner.lua")
 dofile(modpath .. "/_hud/hud_main.lua")
 dofile(modpath .. "/_hud/hud_waypoints.lua")
 
+dofile(modpath .. "/SETTINGS.lua")
+
 minetest.log("action", "[ARENA_LIB] Mod initialised, running version " .. version)

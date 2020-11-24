@@ -28,6 +28,7 @@ local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slot
 
 local arena_default = {
   name = "",
+  author = "",
   sign = {},
   players = {},               -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
   teams = {-1},
@@ -375,9 +376,23 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   update_storage(false, mod, id, arena)
 
-  minetest.chat_send_player(sender, S("Arena @1 successfully renamed in @2", old_name, new_name))
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Arena @1 successfully renamed in @2", old_name, new_name))
   return true
 
+end
+
+
+
+function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  arena.author = author
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed (@2)", arena.name, arena.author))
 end
 
 
@@ -976,6 +991,12 @@ function arena_lib.load_arena(mod, arena_ID)
     end
 
     count = count +1
+  end
+
+  -- mostro autore
+  if arena.author ~= "" then
+    local author_display_time = mod_ref.load_time < 3 and mod_ref.load_time or 3
+    arena_lib.HUD_send_msg_all("hotbar", arena, S("Author: " .. arena.author), author_display_time)
   end
 
   -- eventuale codice aggiuntivo
@@ -1629,6 +1650,13 @@ function init_storage(mod, mod_ref)
         to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
+
+      --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
+      if not arena.author then
+        arena.author = ""
+        to_update = true
+      end
+      --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
       -- gestione team
       if arena.teams_enabled and not next(mod_ref.teams) then                   -- se avevo abilitato i team e ora li ho rimossi
