@@ -1987,15 +1987,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     hub_manager.set_items(player)
     hub_manager.set_hub_physics(player)
   else
-    -- TODO 4.2: parametro personalizzato tramite /arenasettings
-    player:set_physics_override({
-      speed = 1,
-      jump = 1,
-      gravity = 1,
-      sneak = true,
-      sneak_glitch = false,
-      new_move = true
-    })
+    player:set_physics_override(arena_lib.server_physics)
   end
 
   -- riattivo la minimappa eventualmente disattivata
