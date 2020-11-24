@@ -42,6 +42,7 @@
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
+* `author`: (string) the name of the one who built/designed the map. If different from `""`, it'll appear in the loading phase. Default is `""`
 * `sign`: (pos) the position of the sign associated with the arena
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties` (explained in [2.5.2](#252-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
 * `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
@@ -213,8 +214,8 @@ The second field, on the contrary, is a table of parameters: they define the ver
   * `0`: no time tracking at all (default)
   * `1`: incremental time (0, 1, 2, ...)
   * `2`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
-* `load_time`: the time between the loading state and the start of the match. Default is 3
-* `celebration_time`: the time between the celebration state and the end of the match. Default is 3
+* `load_time`: the time between the loading state and the start of the match. Default is 5
+* `celebration_time`: the time between the celebration state and the end of the match. Default is 5
 * `in_game_physics`: an optional table containing a physical override to set to each player when they enter an arena
 * `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
 * `properties`: explained down below
