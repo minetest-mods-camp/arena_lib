@@ -104,8 +104,8 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
   mod_ref.time_mode = 0
-  mod_ref.load_time = 3           -- time in the loading phase (the pre-match)
-  mod_ref.celebration_time = 3    -- time in the celebration phase
+  mod_ref.load_time = 5           -- time in the loading phase (the pre-match)
+  mod_ref.celebration_time = 5    -- time in the celebration phase
   mod_ref.in_game_physics = nil
   mod_ref.disabled_damage_types = {}
   mod_ref.properties = {}
