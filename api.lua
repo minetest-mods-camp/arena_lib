@@ -993,12 +993,6 @@ function arena_lib.load_arena(mod, arena_ID)
     count = count +1
   end
 
-  -- mostro autore
-  if arena.author ~= "" then
-    local author_display_time = mod_ref.load_time < 3 and mod_ref.load_time or 3
-    arena_lib.HUD_send_msg_all("hotbar", arena, S("Author: " .. arena.author), author_display_time)
-  end
-
   -- eventuale codice aggiuntivo
   if mod_ref.on_load then
     mod_ref.on_load(arena)

@@ -42,7 +42,7 @@
 It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
-* `author`: (string) the name of the one who built/designed the map. If different from `""`, it'll appear in the loading phase. Default is `""`
+* `author`: (string) the name of the one who built/designed the map. Default is `""`. This is not practically implemented at the moment, but it'll be soon
 * `sign`: (pos) the position of the sign associated with the arena
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties` (explained in [2.5.2](#252-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
 * `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
