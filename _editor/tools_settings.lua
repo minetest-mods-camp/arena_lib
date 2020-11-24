@@ -22,36 +22,6 @@ local sel_property_attr = {}     --KEY: p_name; VALUE: {id = idx, name = propert
 
 
 
-minetest.register_craftitem("arena_lib:timer", {
-
-    description = S("Timer: on"),
-    inventory_image = "arenalib_tool_settings_timer.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
-    on_place = function() end,
-    on_drop = function() end,
-
-    on_use = function(itemstack, user, pointed_thing)
-      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec())
-    end,
-
-    on_secondary_use = function(itemstack, placer, pointed_thing)
-
-      local mod = placer:get_meta():get_string("arena_lib_editor.mod")
-      local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-      local inv = placer:get_inventory()
-
-      arena_lib.set_timer(placer:get_player_name(), mod, arena_name, -1, true)
-
-      minetest.after(0, function()
-        inv:set_stack("main", 1, "arena_lib:timer_off")
-      end)
-    end
-
-})
-
-
-
 minetest.register_tool("arena_lib:settings_rename_author", {
 
     description = S("Arena name and author"),
@@ -84,6 +54,36 @@ minetest.register_tool("arena_lib:settings_properties", {
 
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, 1))
     end
+})
+
+
+
+minetest.register_craftitem("arena_lib:timer", {
+
+    description = S("Timer: on"),
+    inventory_image = "arenalib_tool_settings_timer.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec())
+    end,
+
+    on_secondary_use = function(itemstack, placer, pointed_thing)
+
+      local mod = placer:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local inv = placer:get_inventory()
+
+      arena_lib.set_timer(placer:get_player_name(), mod, arena_name, -1, true)
+
+      minetest.after(0, function()
+        inv:set_stack("main", 1, "arena_lib:timer_off")
+      end)
+    end
+
 })
 
 
@@ -244,23 +244,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name  =   player:get_meta():get_string("arena_lib_editor.arena")
 
-  -- GUI per timer
-  if formname == "arena_lib:settings_timer" then
-
-    if fields.timer_confirm or fields.key_enter then
-
-      local timer = tonumber(fields.set_timer)
-
-      if timer == nil or timer < 1 then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-        return end
-
-      arena_lib.set_timer(p_name, mod, arena_name, timer, true)
-      minetest.close_formspec(p_name, formname)
-    end
 
   -- GUI per rinominare arena e cambiare autore
-  elseif formname == "arena_lib:settings_rename_author" then
+  if formname == "arena_lib:settings_rename_author" then
 
     if fields.key_enter then
       if fields.key_enter_field == "rename" then
@@ -304,6 +290,21 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     elseif fields.property_overwrite or fields.key_enter then
       arena_lib.change_arena_property(p_name, mod, arena_name, sel_property_attr[p_name].name, fields.sel_property_value, true)
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, sel_property_attr[p_name].id))
+    end
+
+  -- GUI per timer
+  elseif formname == "arena_lib:settings_timer" then
+
+    if fields.timer_confirm or fields.key_enter then
+
+      local timer = tonumber(fields.set_timer)
+
+      if timer == nil or timer < 1 then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+        return end
+
+      arena_lib.set_timer(p_name, mod, arena_name, timer, true)
+      minetest.close_formspec(p_name, formname)
     end
 
   -- GUI per cancellare arena
