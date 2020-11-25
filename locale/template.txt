@@ -122,6 +122,7 @@ You're immune!=
 Arena sign=
 [!] You must leave the editor first!=
 [!] Only the party leader can enter the queue!=
+[!] You must wait for all your party members to finish their ongoing games before entering a new one!=
 [!] There is no enough space for the whole party!=
 [!] There is no team with enough space for the whole party!=
 [!] The arena is not enabled!=

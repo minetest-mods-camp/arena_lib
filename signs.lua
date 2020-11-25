@@ -56,11 +56,18 @@ signs_lib.register_sign("arena_lib:sign", {
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can enter the queue!")))
         return end
 
-      local party_members_amount = #parties.get_party_members(p_name)
+      local party_members = parties.get_party_members(p_name)
+
+      for _, pl_name in pairs(party_members) do
+	    if arena_lib.is_player_in_arena(pl_name) then
+		  minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
+		  return
+	    end
+      end
 
       --se non c'è spazio (no team)
       if not sign_arena.teams_enabled then
-        if party_members_amount > sign_arena.max_players - sign_arena.players_amount then
+        if #party_members > sign_arena.max_players - sign_arena.players_amount then
           minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no enough space for the whole party!")))
           return end
       -- se non c'è spazio (team)
@@ -68,7 +75,7 @@ signs_lib.register_sign("arena_lib:sign", {
 
         local free_space = false
         for _, amount in pairs(sign_arena.players_amount_per_team) do
-          if party_members_amount <= sign_arena.max_players - amount then
+          if #party_members <= sign_arena.max_players - amount then
             free_space = true
             break
           end

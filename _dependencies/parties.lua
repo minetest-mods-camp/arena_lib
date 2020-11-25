@@ -39,26 +39,10 @@ parties.register_on_pre_party_join(function(party_leader, p_name)
 
   if not arena then return true end
 
-  -- se l'invitato è l'unico rimasto in partita ed è in celebrazione
-  if arena.players_amount == 1 and arena.in_celebration then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You can't perform this action if you're the only one left!")))
-    return false end
-
   -- se l'invitato è in coda, lo rimuovo
   if arena_lib.is_player_in_queue(p_name) then
     arena_lib.remove_from_queue(p_name)
   end
 
   return true
-end)
-
-
-
-parties.register_on_party_join(function(party_leader, p_name)
-
-  --se è in arena, lo rimuovo
-  if arena_lib.is_player_in_arena(p_name) then
-    arena_lib.remove_player_from_arena(p_name, 3)
-  end
-
 end)
