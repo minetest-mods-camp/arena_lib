@@ -1271,10 +1271,10 @@ function arena_lib.remove_from_queue(p_name)
   end
   arena.players[p_name] = nil
 
-  local arena_min_players = arena.min_players * #arena.teams
+  local players_required = arena_lib.get_players_to_start_queue(arena)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
-  if arena.in_queue and arena.players_amount < arena_min_players then
+  if arena.in_queue and players_required > 0 then
 
     local arena_max_players = arena.max_players * #arena.teams
     local timer = minetest.get_node_timer(arena.sign)
@@ -1283,9 +1283,17 @@ function arena_lib.remove_from_queue(p_name)
     arena.in_queue = false
 
     arena_lib.HUD_hide("broadcast", arena)
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players .. " | " ..
-      S("Waiting for more players...") .. " (" .. arena_min_players - arena.players_amount .. ")")
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+
+  -- se già non era in coda, aggiorno HUD
+  elseif players_required > 0 then
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
+
+  -- idem se è rimasta in coda
+  else
+    local seconds = math.floor(minetest.get_node_timer(arena.sign):get_timeout() + 0.5)
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("@1 seconds for the match to start", seconds)))
   end
 
   arena_lib.update_sign(arena)

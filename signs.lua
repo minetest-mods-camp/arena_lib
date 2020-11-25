@@ -1,10 +1,8 @@
 local S = minetest.get_translator("arena_lib")
 
-local function get_players_required() end
 local function assign_team() end
 local function in_game_txt(arena) end
 local function HUD_countdown(arena, seconds) end
-local function arena_display_format(arena, msg) end
 
 
 
@@ -105,103 +103,34 @@ signs_lib.register_sign("arena_lib:sign", {
     -- se è già in coda
     if arena_lib.is_player_in_queue(p_name) then
 
-      local queued_mod = arena_lib.get_mod_by_player(p_name)
+			local queued_mod = arena_lib.get_mod_by_player(p_name)
       local queued_ID = arena_lib.get_queueID_by_player(p_name)
 
-      -- se la coda è la stessa rimuovo il giocatore...
-      if queued_mod == mod and queued_ID == arenaID then
+			-- se è un party, rimuovo tutto il gruppo
+			if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
 
-        local p_team_ID = sign_arena.players[p_name].teamID
+				-- (se non è il capogruppo, annullo)
+				if not parties.is_player_party_leader(p_name) then
+					minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can leave the queue!")))
+					return end
 
-        -- se è un party, rimuovo tutto il gruppo
-        if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
+				local party_members = parties.get_party_members(p_name)
 
-					-- (se è il capogruppo, sennò annullo)
-					if not parties.is_player_party_leader(p_name) then
-						minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can leave the queue!")))
-					  return end
+				for _, pl_name in pairs(party_members) do
+					arena_lib.HUD_hide("all", pl_name)
+					arena_lib.remove_from_queue(pl_name)
+				end
 
-          local party_members = parties.get_party_members(p_name)
+			-- sennò rimuovo il singolo utente
+			else
+				arena_lib.HUD_hide("all", p_name)
+				arena_lib.remove_from_queue(p_name)
+			end
 
-          for _, pl_name in pairs(party_members) do
-            arena_lib.HUD_hide("all", pl_name)
-            arena_lib.remove_from_queue(pl_name)
-          end
-
-        -- sennò rimuovo il singolo utente
-        else
-          arena_lib.HUD_hide("all", p_name)
-          arena_lib.remove_from_queue(p_name)
-        end
-
-        local players_required = get_players_required(sign_arena)
-
-        -- ...e annullo la coda se non ci sono più abbastanza persone
-        if players_required > 0 and sign_arena.in_queue then
-          minetest.get_node_timer(pos):stop()
-          arena_lib.HUD_hide("broadcast", sign_arena)
-          arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
-            " (" .. players_required .. ")")
-          arena_lib.send_message_players_in_arena(sign_arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-          sign_arena.in_queue = false
-
-        -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
-        elseif players_required > 0 then
-          arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
-            " (" .. players_required .. ")")
-        else
-          local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
-          arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("@1 seconds for the match to start", seconds)))
-        end
-
-        arena_lib.update_sign(sign_arena)
-        return
-
-      else
-
-        local old_mod_ref = arena_lib.mods[queued_mod]
-        local old_arena = old_mod_ref.arenas[queued_ID]
-        local old_p_team_ID = old_arena.players[p_name].teamID
-
-        -- sennò lo rimuovo dalla precedente e continuo per aggiungerlo in questa...
-        -- se è un party
-        if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
-
-          for _, pl_name in pairs(party_members) do
-            arena_lib.HUD_hide("broadcast", pl_name)
-            arena_lib.remove_from_queue(pl_name)
-          end
-
-        -- sennò è singolo utente
-        else
-          arena_lib.HUD_hide("broadcast", p_name)
-          arena_lib.remove_from_queue(p_name)
-        end
-
-        local players_required = get_players_required(old_arena)
-
-        -- ...annullando la coda della precedente se non ci sono più abbastanza giocatori
-        if players_required > 0 and old_arena.in_queue then
-          minetest.get_node_timer(old_arena.sign):stop()
-          arena_lib.HUD_hide("broadcast", old_arena)
-          arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("Waiting for more players...")) ..
-            " (" .. players_required .. ")")
-          arena_lib.send_message_players_in_arena(old_arena, old_mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-          old_arena.in_queue = false
-
-        -- (se la situazione è rimasta invariata, devo comunque aggiornare il numero giocatori nella hotbar)
-        elseif players_required > 0 then
-          arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("Waiting for more players...")) ..
-            " (" .. players_required .. ")")
-        else
-          local seconds = math.floor(minetest.get_node_timer(pos):get_timeout() + 0.5)
-          arena_lib.HUD_send_msg_all("hotbar", old_arena, arena_display_format(old_arena, S("@1 seconds for the match to start", seconds)))
-        end
-
-        arena_lib.update_sign(old_arena)
-
-      end
-    end
+			-- se era in coda per la stessa arena, interrompo qua, sennò procedo per
+			-- aggiungerlo nella nuova
+			if queued_mod == mod and queued_ID == arenaID then return end
+		end
 
     local p_team_ID
 
@@ -251,7 +180,7 @@ signs_lib.register_sign("arena_lib:sign", {
     -- se la coda non è partita...
     if not sign_arena.in_queue and not sign_arena.in_game then
 
-      local players_required = get_players_required(sign_arena)
+      local players_required = arena_lib.get_players_to_start_queue(sign_arena)
 
       -- ...e ci sono abbastanza giocatori, parte il timer d'attesa
       if players_required <= 0 then
@@ -261,7 +190,7 @@ signs_lib.register_sign("arena_lib:sign", {
 
       -- sennò aggiorno semplicemente la HUD
       else
-        arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_display_format(sign_arena, S("Waiting for more players...")) ..
+        arena_lib.HUD_send_msg_all("hotbar", sign_arena, arena_lib.queue_format(sign_arena, S("Waiting for more players...")) ..
           " (" .. players_required .. ")")
       end
     end
@@ -340,15 +269,16 @@ end
 
 
 
+-- es. Foresta | 3/4 | Il match inizierà a breve
+function arena_lib.queue_format(arena, msg)
+  local arena_max_players = arena.max_players * #arena.teams
+  return arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players  .. " | " .. msg
+end
 
 
-----------------------------------------------
----------------FUNZIONI LOCALI----------------
-----------------------------------------------
 
-function get_players_required(arena)
+function arena_lib.get_players_to_start_queue(arena)
 
-  local players_in_arena = arena.players_amount
   local arena_min_players = arena.min_players * #arena.teams
   local players_required
 
@@ -362,13 +292,19 @@ function get_players_required(arena)
       end
     end
   else
-    players_required = arena_min_players - players_in_arena
+    players_required = arena_min_players - arena.players_amount
   end
 
   return players_required
 end
 
 
+
+
+
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
 
 function assign_team(mod_ref, arena, p_name)
 
@@ -404,21 +340,14 @@ function HUD_countdown(arena, timer)
   -- dai 5 secondi in giù il messaggio è stampato su broadcast e genero i team
   if seconds <= 5 then
     arena_lib.HUD_send_msg_all("broadcast", arena, S("The game begins in @1 seconds!", seconds), nil, "arenalib_countdown")
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena_display_format(arena, S("Get ready!")))
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Get ready!")))
   else
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena_display_format(arena, S("@1 seconds for the match to start", seconds)))
+    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("@1 seconds for the match to start", seconds)))
   end
 
   minetest.after(1, function()
     HUD_countdown(arena, timer)
   end)
-end
-
-
--- es. Foresta | 3/4 | Il match inizierà a breve
-function arena_display_format(arena, msg)
-  local arena_max_players = arena.max_players * #arena.teams
-  return arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players  .. " | " .. msg
 end
 
 
