@@ -123,7 +123,7 @@ Arena sign=Cartello dell'arena
 [!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 [!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
-[!] There is no enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
+[!] There is not enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
 [!] There is no team with enough space for the whole party!=[!] Non c'è un team con abbastanza spazio per tutto il gruppo!
 [!] Only the party leader can leave the queue!=[!] Solo il capo gruppo può abbandonare la coda!
 [!] The arena is not enabled!=[!] L'arena non è attiva!
@@ -197,4 +197,3 @@ Remove sign=Rimuovi cartello
 
 # _hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
-

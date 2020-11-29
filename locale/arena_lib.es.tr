@@ -1,0 +1,199 @@
+# version 4.2.0-dev
+# author(s): Joaquín Villalba (Dragonop)
+# reviewer(s):
+# textdomain: arena_lib
+
+# api.lua
+team=equipo
+[!] You can't change type!=[!] ¡No puedes cambiar de tipo!
+Parameter @1 successfully overwritten=Parámetro @1 sobrescrito con éxito
+[!] Parameters don't seem right!=[!] ¡Los parámetros no parecen ser correctos!
+Arena @1 successfully created=Arena @1 creada con éxito
+Arena @1 successfully removed=Arena @1 eliminada con éxito
+Arena @1 successfully renamed in @2=Arena @1 renombrada con éxito a @2
+Players amount successfully changed ( min @1 | max @2 )=Cantidad de jugadores modificada con éxito ( mínimo @1 | máximo @2)
+[!] Teams are not enabled!=[!] ¡Los equipos no están habilitados!
+[!] Nothing to do here!=[] ¡Nada que hacer aquí!
+Teams successfully enabled for the arena @1=Equipos habilitados con éxito para la arena @1
+Teams successfully disabled for the arena @1=Equipos deshabilitados con éxito para la arena @1
+[!] This team doesn't exist!=[!] ¡Este equipo no existe!
+[!] No spawner with that ID to overwrite!=[!] ¡No hay spawner con esa ID para sobrescribir!
+[!] No team must be specified for this function!=[!] ¡No se debe especificar ningún equipo para esta función!
+Spawn point #@1 successfully overwritten=Punto de spawn #@1 sobrescrito con éxito
+[!] No spawner with that ID to delete!=[!] ¡No hay spawner con esa ID para eliminar!
+All the spawn points belonging to team @1 have been removed=Se han eliminado todos los puntos de spawn que pertenecen al equipo @1
+All the spawn points have been removed=Se han eliminado todos los puntos de spawn
+Spawn point #@1 successfully deleted=Punto de spawn #@1 eliminado correctamente
+[!] Unknown parameter!=[!] ¡Parámetro desconocido!
+[!] There's already a spawn in this point!=[!] ¡Ya hay un spawn en este punto!
+[!] Spawn points can't exceed the maximum number of players!=[!] ¡Los puntos de spawn no pueden exceder el número máximo de jugadores!
+Spawn point #@1 successfully set=Punto de spawn #@1 establecido correctamente
+[!] That's not an arena_lib sign!=[!] ¡Este no es un cartel de arena_lib!
+Sign of arena @1 successfully removed=Cartel de la arena @1 eliminado correctamente
+[!] This sign doesn't belong to @1!=[!] ¡Este cartel no pertenece a @1!
+[!] There is already a sign for this arena!=[!] ¡Ya existe un cartel para este arena!
+[!] There is no sign to remove assigned to @1!=[!] ¡No hay un cartel para eliminar asignado a @1!
+Sign of arena @1 successfully set=Cartel de arena @1 establecido correctamente
+[!] Timers are not enabled in this mod!=[!] ¡Los temporizadores no están habilitados en este mod!
+Arena @1's timer is now @2 seconds=El temporizador de la arena @1 es ahora @2 segundos
+[!] Insufficient spawners, the arena can't be enabled!=[!] ¡Spawners insuficientes, la arena no puede ser habilitada!
+[!] Sign not set, the arena can't be enabled!=[!] ¡Cartel no establecido, la arena no puede ser habilitada!
+Arena @1 successfully enabled=Arena @1 habilitada con éxito
+[!] The arena is already disabled!=[!] ¡La arena ya está deshabilitada!
+[!] You can't disable an arena during an ongoing game!=[!] ¡No puedes deshabilitar una arena con una partida en curso!
+[!] The arena you were queueing for has been disabled... :(=[!] La arena por la que estabas en cola ha sido deshabilitada... :(
+Arena @1 successfully disabled=Arena @1 deshabilitada correctamente
+@1 wins the game=@1 gana la partida
+Team @1 wins the game=El equipo @1 gana la partida
+[!] This minigame doesn't exist!=[!] ¡Este minijuego no existe!
+[!] This arena doesn't exist!=[!] ¡Esta arena no existe!
+[!] No ongoing game!=[!] ¡No hay partida en curso!
+Game in arena @1 successfully terminated=La partida en la arena @1 se ha terminado con éxito
+@1 has been eliminated by @2=@1 ha sido eliminado por @2
+@1 has been eliminated=@1 ha sido eliminado
+@1 has been kicked by @2=@1 ha sido expulsado por @2
+@1 has been kicked=@1 ha sido expulsado
+The arena has been forcibly terminated by @1=La partida ha sido forzada a terminar por @1
+The arena has been forcibly terminated=La partida ha sido forzada a terminar
+@1 has quit the match=@1 ha abandonado la partida
+Waiting for more players...=Esperando más jugadores...
+The queue has been cancelled due to not enough players=La cola ha sido cancelada debido a que no hay suficientes jugadores
+There are no other teams left, you win!=No hay otros equipos restantes, ¡tú ganas!
+You're the last player standing: you win!=Eres el último jugador en pie: ¡tú ganas!
+You win the game due to not enough players=Ganas la partida porque no hay suficientes jugadores
+[!] This action can't be performed with no spawners set!=[!] ¡Esta accion no puede ser llevada a cabo si no hay spawners establecidos!
+Wooosh!=¡Wooosh!
+[!] An arena with that name exists already!=[!] ¡Ya existe una arena con ese nombre!
+[!] The name contains unsupported characters!=[!] ¡El nombre contiene caracteres no admitidos!
+[!] on_timeout callback must be declared to properly use a decreasing timer!=[!] ¡La devolución de llamada on_timeout debe declararse para poder utilizar correctamente un temporizador decreciente!
+
+# commands.lua
+player=jugador
+Kicks a player from an ongoing game=Expulsa un jugador de una partida en curso
+[!] This player is not online!=[!] ¡Este jugador no está conectado!
+[!] The player must be in a game to perform this action!=[!] ¡El jugador debe estar en una partida para realizar esta acción!
+[!] You must be in a game to perform this action!=[!] ¡Debes estar en una partida para realizar esta acción!
+Player successfully kicked=Jugador expulsado con éxito
+minigame=minijuego
+Tweaks the minigame settings for the current server=Cambia la configuración del minijuego para el server actual
+arena name=nombre de la arena
+Forcibly ends an ongoing game=Fuerza la finalización de una partida en curso
+Quits an ongoing game=Abandona una partida en curso
+[!] You can't perform this action if you're the only one left!=[!] ¡No puedes realizar esta acción si eres el único jugador restante!
+message=mensaje
+Writes a message in the arena global chat while in a game=Escribe un mensaje en el chat global de la arena mientras estás en una partida
+Writes a message in the arena team chat while in a game (if teams are enabled)=Escribe un mensaje en el chat de equipo de la arena mientras estás en una partida (si los equipos están habilitados)
+
+# debug_utilities.lua
+name: =nombre: 
+Total arenas: =Arenas totales: 
+Players required per team: =Jugadores requeridos por equipo: 
+Players supported per team: =Jugadores admitidos por equipo: 
+Players inside per team: =Jugadores dentro por equipo: 
+in queue=en cola
+loading=cargando
+in game=en partida
+celebrating=celebrando
+waiting=esperando
+Initial time: =Tiempo inicial: 
+current: =actual: 
+Author: =Autor: 
+Name: =Nombre: 
+Teams: =Equipos: 
+Disabled damage types: =Tipos de daño deshabilitados: 
+Players required: =Jugadores requeridos: 
+Players supported: =Jugadores admitidos: 
+Players inside: =Jugadores dentro: 
+Enabled: =Habilitado: 
+Status: =Estado: 
+Sign: =Cartel: 
+Spawn points: =Puntos de spawn: 
+Properties: =Propiedades: 
+Temp properties: =Propiedades temporales: 
+Team properties: =Propiedades del equipo: 
+Player: =Jugador: 
+, kills: =, asesinatos: 
+, deaths: =, muertes: 
+
+# items.lua
+You're immune!=¡Eres inmune!
+
+# signs.lua
+Arena sign=Cartel de la arena
+[!] You must leave the editor first!=[!] ¡Primero debes salir del editor!
+[!] Only the party leader can enter the queue!=[!] ¡Solo el líder del grupo puede entrar en la cola!
+[!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] ¡Debes esperar que todos los miembros de tu grupo finalicen sus partidas en curso antes de entrar a una nuevo!
+[!] There is not enough space for the whole party!=[!] ¡No hay suficiente espacio para todo tu grupo!
+[!] There is no team with enough space for the whole party!=[!] ¡No hay un equipo con suficiente espacio para todo tu grupo!
+[!] Only the party leader can leave the queue!=[!] ¡Solo el líder del grupo puede abandonar la cola!
+[!] The arena is not enabled!=[!] ¡Esta arena no está habilitada!
+[!] The arena is already full!=[!] ¡Esta arena ya está llena!
+[!] The arena is loading, try again in a few seconds!=[!] ¡La arena está cargando, intenta de nuevo en unos segundos!
+[!] This minigame doesn't allow to join while in progress!=[!] ¡Este minijuego no permite que ingreses a una partida en curso!
+Waiting for more players...=Esperando más jugadores...
+The queue has been cancelled due to not enough players=La cola ha sido cancelada debido a que no hay suficientes jugadores
+@1 seconds for the match to start=@1 segundos para que comience la partida
+You've joined team @1=Te has unido al equipo @1
+The game begins in @1 seconds!=¡La partida comenzará en @1 segundos!
+Get ready!=¡Prepárate!
+
+# utils.lua
+[!] You must disable the arena first!=[!] ¡Primero debes deshabilitar la arena!
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] ¡No debe haber nadie dentro del editor de la arena para ejecutar este comando! (ahora dentro: @1)
+
+# _dependencies/parties.lua
+[!] You can't perform this action while in queue!=[!] ¡No puedes realizar esta acción mientras estás en cola!
+[!] You can't perform this action while in game!=[!] ¡No puedes realizar esta acción mientras estas en partida!
+[!] The party leader must not be in queue to perform this action!=[!] ¡El líder del grupo no debe estar en cola para realizar esta acción!
+[!] The party leader must not be in game to perform this action!=[!] ¡El líder del grupo no debe estar en partida para realizar esta acción!
+
+# _editor/editor_main.lua
+Arena_lib editor | Now editing: @1=Editor de arena_lib | Ahora editando: @1
+
+# _editor/editor_icons.lua
+Players=Jugadores
+Players | num to set: @1 (left/right click slot #3 to change)=Jugadores | núm. a establecer: @1 (click izquierdo/derecho en el slot #3 para cambiar)
+Values are PER TEAM!=¡Los valores son POR EQUIPO!
+Spawners=Spawners
+Spawners | sel. ID: @1 (right click slot #2 to change)=Spawners | sel. ID: @1 (click izquierdo en el slot #2 para cambiar)
+Signs=Carteles
+One sign per arena=Un cartel por arena
+Settings=Configuraciones
+Arena settings=Configuraciones de la arena
+Info=Información
+Go back=Regresar
+Enable and leave=Habilitar y salir
+Leave the editor=Salir del editor
+
+# _editor/tools_players.lua
+Change the current number=Cambiar el número actual
+Teams: on (click to toggle off)=Equipos: activados (click para desactivar)
+Teams: off (click to toggle on)=Equipos: desactivados (click para activar)
+
+# _editor/tools_settings.lua
+Arena name and author=Nombre de la arena y autor
+Arena properties=Propiedades de la arena
+Delete arena=Eliminar arena
+Rename arena=Renombrar arena
+Change author=Cambiar autor
+Overwrite=Sobrescribir
+Set timer=Establecer temporizador
+Cancel=Cancelar
+Yes=Si
+
+# _editor/tools_spawner.lua
+Add spawner=Añadir spawner
+Remove spawner=Eliminar spawn
+Add team spawner=Añadir spawner de equipo
+Remove team spawner=Eliminar spawner de equipo
+Switch team=Cambiar equipo
+Selected team: @1=Equipo seleccionado: @1
+Delete all spawners=Eliminar todos los spawners
+Delete all spawners of a team=Eliminar todos los spawners de un equipo
+
+# _editor/tools_sign.lua
+Add sign=Añadir cartel
+Remove sign=Eliminar cartel
+
+# _hud/hud_waypoints.lua
+[!] Waypoints are not enabled!= [!] ¡Los waypoints no están habilitados!

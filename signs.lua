@@ -68,7 +68,7 @@ signs_lib.register_sign("arena_lib:sign", {
       --se non c'è spazio (no team)
       if not sign_arena.teams_enabled then
         if #party_members > sign_arena.max_players - sign_arena.players_amount then
-          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no enough space for the whole party!")))
+          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is not enough space for the whole party!")))
           return end
       -- se non c'è spazio (team)
       else
