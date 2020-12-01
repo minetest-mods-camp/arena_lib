@@ -1,4 +1,4 @@
-# version 4.2.0-dev
+# version 4.3.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -89,7 +89,7 @@ name: =nome:
 Total arenas: =Arene totali: 
 Players required per team: =Giocatori minimi per squadra: 
 Players supported per team: =Giocatori massimi per squadra: 
-Players inside per team: =Giocatori dentro per team: 
+Players inside per team: =Giocatori dentro per squadra: 
 in queue=in coda
 loading=in caricamento
 in game=in partita
@@ -153,7 +153,7 @@ Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 # _editor/editor_icons.lua
 Players=Giocatori
 Players | num to set: @1 (left/right click slot #3 to change)=Giocatori | num: @1 (click sx/dx su slot #3 per cambiare)
-Values are PER TEAM!=I valori sono PER TEAM!
+Values are PER TEAM!=I valori sono PER SQUADRA!
 Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
 Signs=Cartelli
