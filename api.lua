@@ -810,7 +810,7 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch, in_edi
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  if bgm == nil then
+  if track == nil then
     arena.bgm = nil
   else
     arena.bgm = {
