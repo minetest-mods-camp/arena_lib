@@ -1,4 +1,4 @@
-# version 4.2.0-dev
+# version 4.3.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -34,6 +34,7 @@ Sign of arena @1 successfully removed=
 [!] There is already a sign for this arena!=
 [!] There is no sign to remove assigned to @1!=
 Sign of arena @1 successfully set=
+Background music of arena @1 successfully overwritten=
 [!] Timers are not enabled in this mod!=
 Arena @1's timer is now @2 seconds=
 [!] Insufficient spawners, the arena can't be enabled!=
@@ -164,6 +165,12 @@ Info=
 Go back=
 Enable and leave=
 Leave the editor=
+
+# _editor/tools_bgm.lua
+Audio file=
+Volume=
+Pitch=
+[!] This audio track doesn't exist!=
 
 # _editor/tools_players.lua
 Change the current number=

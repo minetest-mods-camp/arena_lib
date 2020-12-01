@@ -78,6 +78,27 @@ minetest.register_tool("arena_lib:editor_signs", {
 
 
 
+minetest.register_tool("arena_lib:editor_bgm", {
+
+    description = S("BGM"),
+    inventory_image = "arenalib_editor_bgm.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Background music"))
+
+      minetest.after(0, function()
+        arena_lib.give_bgm_tools(user)
+      end)
+    end
+
+})
+
+
+
 minetest.register_tool("arena_lib:editor_settings", {
 
     description = S("Settings"),

@@ -1,6 +1,6 @@
-# version 4.2.0-dev
+# version 4.3.0-dev
 # author(s): Joaquín Villalba (Dragonop)
-# reviewer(s):
+# reviewer(s): Zughy
 # textdomain: arena_lib
 
 # api.lua
@@ -34,6 +34,7 @@ Sign of arena @1 successfully removed=Cartel de la arena @1 eliminado correctame
 [!] There is already a sign for this arena!=[!] ¡Ya existe un cartel para este arena!
 [!] There is no sign to remove assigned to @1!=[!] ¡No hay un cartel para eliminar asignado a @1!
 Sign of arena @1 successfully set=Cartel de arena @1 establecido correctamente
+Background music of arena @1 successfully overwritten=Música de fondo de arena @1 sobrescrita con éxito
 [!] Timers are not enabled in this mod!=[!] ¡Los temporizadores no están habilitados en este mod!
 Arena @1's timer is now @2 seconds=El temporizador de la arena @1 es ahora @2 segundos
 [!] Insufficient spawners, the arena can't be enabled!=[!] ¡Spawners insuficientes, la arena no puede ser habilitada!
@@ -164,6 +165,12 @@ Info=Información
 Go back=Regresar
 Enable and leave=Habilitar y salir
 Leave the editor=Salir del editor
+
+# _editor/tools_bgm.lua
+Audio file=Archivo de audio
+Volume=Volumen
+Pitch=Tono
+[!] This audio track doesn't exist!=[!] ¡Esta pista de audio no existe!
 
 # _editor/tools_players.lua
 Change the current number=Cambiar el número actual

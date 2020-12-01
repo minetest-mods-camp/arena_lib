@@ -24,7 +24,7 @@ local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image}
+local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle}
 
 local arena_default = {
   name = "",
@@ -38,6 +38,7 @@ local arena_default = {
   spawn_points = {},          -- KEY: ids, VALUE: {pos, teamID}
   max_players = 4,
   min_players = 2,
+  bgm = nil,
   initial_time = nil,
   current_time = nil,
   in_queue = false,
@@ -797,6 +798,30 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
 
+end
+
+
+
+function arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch, in_editor)
+
+  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if bgm == nil then
+    arena.bgm = nil
+  else
+    arena.bgm = {
+      track = track,
+      gain = volume,
+      pitch = pitch
+    }
+  end
+
+  update_storage(false, mod, arena_ID, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Background music of arena @1 successfully overwritten", arena.name))
 end
 
 
@@ -1902,6 +1927,18 @@ end
 
 function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
+  players_temp_storage[p_name] = {}
+
+  -- applico eventuale musica di sottofondo
+  if arena.bgm then
+    players_temp_storage[p_name].bgm_handle = minetest.sound_play(arena.bgm.track, {
+      gain = arena.bgm.gain,
+      pitch = arena.bgm.pitch,
+      to_player = p_name,
+      loop = true,
+    })
+  end
+
   local player = minetest.get_player_by_name(p_name)
 
   -- nascondo i nomi se l'opzione è abilitata
@@ -1924,7 +1961,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   -- cambio l'eventuale hotbar
   if mod_ref.hotbar then
 
-    players_temp_storage[p_name] = {}
     local hotbar = mod_ref.hotbar
 
     if hotbar.slots then
@@ -2022,6 +2058,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   -- riattivo la minimappa eventualmente disattivata
   player:hud_set_flags({minimap = true})
+
+  -- disattivo eventuale musica di sottofondo
+  if arena.bgm then
+    minetest.sound_stop(players_temp_storage[p_name].bgm_handle)
+  end
 
   -- svuoto lo storage temporaneo
   players_temp_storage[p_name] = nil

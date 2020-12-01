@@ -34,6 +34,7 @@ Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con success
 [!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
 [!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
 Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
+Background music of arena @1 successfully overwritten=Musica di sottofondo dell'arena @1 sovrascritta con successo
 [!] Timers are not enabled in this mod!=[!] I timer non sono abilitati in questa mod!
 Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
 [!] Insufficient spawners, the arena can't be enabled!=[!] Spawner insufficienti, l'arena non può essere abilitata!
@@ -164,6 +165,12 @@ Info=Info
 Go back=Torna indietro
 Enable and leave=Abilita ed esci
 Leave the editor=Esci dall'editor
+
+# _editor/tools_bgm.lua
+Audio file=File audio
+Volume=Volume
+Pitch=Tono
+[!] This audio track doesn't exist!=[!] Questa traccia audio non esiste!
 
 # _editor/tools_players.lua
 Change the current number=Cambia il numero attuale

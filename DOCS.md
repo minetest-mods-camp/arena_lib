@@ -14,6 +14,7 @@
             * [1.2.2.4 Arena properties](#1224-arena-properties)
             * [1.2.2.5 Spawners](#1225-spawners)
             * [1.2.2.6 Signs](#1226-signs)
+            * [1.2.2.7 Music](#1227-music)
         * [1.2.3 Enabling an arena](#123-enabling-an-arena)
     * [1.3 Arena phases](#13-arena-phases)
 * [2. Minigame configuration](#2-minigame-configuration)
@@ -54,6 +55,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
+* `bgm`: (table) contains the information about the audio track to play while in game
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -154,6 +156,9 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 
 ##### 1.2.2.6 Signs
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
+
+##### 1.2.2.7 Music
+`arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string
 
 #### 1.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  
