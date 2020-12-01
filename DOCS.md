@@ -55,7 +55,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
-* `bgm`: (table) contains the information about the audio track to play while in game
+* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
