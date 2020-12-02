@@ -890,8 +890,9 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
   arena.enabled = true
   arena_lib.update_sign(arena)
   update_storage(false, mod, arena_ID, arena)
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
 
+  minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
+  return true
 end
 
 
@@ -943,7 +944,9 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   arena.enabled = false
   arena_lib.update_sign(arena)
   update_storage(false, mod, arena_ID, arena)
+
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
+  return true
 end
 
 

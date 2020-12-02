@@ -71,9 +71,9 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)", arenas_in_edit_mode[arena_name])))
     return end
 
-  -- se l'arena è abilitata, la disabilito
+  -- se l'arena è abilitata, provo a disabilitiarla
   if arena.enabled then
-    arena_lib.disable_arena(sender, mod, arena_name)
+    if not arena_lib.disable_arena(sender, mod, arena_name) then return end
   end
 
   local player = minetest.get_player_by_name(sender)

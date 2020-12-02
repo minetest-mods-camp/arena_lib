@@ -163,13 +163,14 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 #### 1.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  
 `arena_lib.enable_arena(sender, mod, arena_name)` or by using the Enable and Leave button in the editor.
-If all the conditions are met, you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
+If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
 * all spawn points set
 * sign placed
+* potential custom checks through `arena_lib.on_enable` callback
   
 Arenas can be disabled too, via  
 `arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
-In order to do that, no game must be taking place in that specific arena.
+In order to do that, no game must be taking place in that specific arena. If successful, it'll return `true` and any potential player in queue will be removed. It acts like `enable_arena` (with `arena_lib.on_disable` as callback)
 
 ### 1.3 Arena phases
 An arena comes in 4 phases, each one of them linked to a specific function:
