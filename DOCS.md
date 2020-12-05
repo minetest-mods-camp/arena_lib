@@ -1,203 +1,51 @@
 # Arena_lib docs
 
 # Table of Contents
-* [1. Arenas](#1-arenas)
-    * [1.1 Creating and removing arenas](#11-creating-and-removing-arenas)
-        * [1.1.1 Storing arenas](#111-storing-arenas)
-        * [1.1.2 Renaming an arena](#112-renaming-an-arena)
-    * [1.2 Setting up an arena](#12-setting-up-an-arena)
-        * [1.2.1 Editor](#121-editor)
-        * [1.2.2 CLI](#122-cli)
-            * [1.2.2.1 Players management](#1221-players-management)
-            * [1.2.2.2 Enabling/Disabling teams](#1222-enablingdisabling-teams)
-            * [1.2.2.3 Timers](#1223-timers)
-            * [1.2.2.4 Arena properties](#1224-arena-properties)
-            * [1.2.2.5 Spawners](#1225-spawners)
-            * [1.2.2.6 Signs](#1226-signs)
-            * [1.2.2.7 Music](#1227-music)
-        * [1.2.3 Enabling an arena](#123-enabling-an-arena)
-    * [1.3 Arena phases](#13-arena-phases)
-* [2. Minigame configuration](#2-minigame-configuration)
-    * [2.1 Per server configuration](#21-per-server-configuration)
-    * [2.2 Privileges](#22-privileges)
-    * [2.3 Commands](#23-commands)
-        * [2.3.1 Admins only](#231-admins-only)
-    * [2.4 Callbacks](#24-callbacks)
-    * [2.5 Additional properties](#25-additional-properties)
-        * [2.5.1 Arena properties](#251-arena-properties)
-            * [2.5.1.1 Updating non temporary properties via code](#2511-updating-non-temporary-properties-via-code)
-            * [2.5.1.2 Updating properties for old arenas](#2512-updating-properties-for-old-arenas)
-        * [2.5.2 Player properties](#252-player-properties)
-        * [2.5.3 Team properties](#253-team-properties)
-    * [2.6 HUD](#26-hud)
-    * [2.7 Extendable editor](#27-extendable-editor)
-    * [2.8 Utils](#28-utils)
-    * [2.9 Getters](#29-getters)
-    * [2.10 Things you don't want to do with a light heart](#210-things-you-dont-want-to-do-with-a-light-heart)
+* [1. Minigame configuration](#1-minigame-configuration)
+    * [1.1 Per server configuration](#11-per-server-configuration)
+    * [1.2 Privileges](#12-privileges)
+    * [1.3 Commands](#13-commands)
+        * [1.3.1 Admins only](#131-admins-only)
+    * [1.4 Callbacks](#14-callbacks)
+    * [1.5 Additional properties](#15-additional-properties)
+        * [1.5.1 Arena properties](#151-arena-properties)
+            * [1.5.1.1 Updating non temporary properties via code](#1511-updating-non-temporary-properties-via-code)
+            * [1.5.1.2 Updating properties for old arenas](#1512-updating-properties-for-old-arenas)
+        * [1.5.2 Player properties](#152-player-properties)
+        * [1.5.3 Team properties](#153-team-properties)
+    * [1.6 HUD](#16-hud)
+    * [1.7 Extendable editor](#17-extendable-editor)
+    * [1.8 Utils](#18-utils)
+    * [1.9 Getters](#19-getters)
+    * [1.10 Things you don't want to do with a light heart](#110-things-you-dont-want-to-do-with-a-light-heart)
+    * [1.11 Example file](#111-example-file)
+* [2. Arenas](#2-arenas)
+    * [2.1 Creating and removing arenas](#21-creating-and-removing-arenas)
+        * [2.1.1 Storing arenas](#211-storing-arenas)
+        * [2.1.2 Renaming an arena](#212-renaming-an-arena)
+    * [2.2 Setting up an arena](#22-setting-up-an-arena)
+        * [2.2.1 Editor](#221-editor)
+        * [2.2.2 CLI](#222-cli)
+            * [2.2.2.1 Players management](#2221-players-management)
+            * [2.2.2.2 Enabling/Disabling teams](#2222-enablingdisabling-teams)
+            * [2.2.2.3 Timers](#2223-timers)
+            * [2.2.2.4 Arena properties](#2224-arena-properties)
+            * [2.2.2.5 Spawners](#2225-spawners)
+            * [2.2.2.6 Signs](#2226-signs)
+            * [2.2.2.7 Music](#2227-music)
+        * [2.2.3 Enabling an arena](#223-enabling-an-arena)
+    * [2.3 Arena phases](#23-arena-phases)
 * [3. About the author(s)](#3-about-the-authors)
 
-## 1. Arenas
-
-> Not the theory-kind of person? Skip it going to point [#2](#2-minigame-configuration) (but I highly suggest you at least the arena phases in 1.3)
-
-It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
-An arena is a table having as a key an ID and as a value its parameters. They are:
-* `name`: (string) the name of the arena, declared when creating it
-* `author`: (string) the name of the one who built/designed the map. Default is `""`. This is not practically implemented at the moment, but it'll be soon
-* `sign`: (pos) the position of the sign associated with the arena
-* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties` (explained in [2.5.2](#252-player-properties)). Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
-* `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
-* `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
-* `players_amount`: (int) separately stores how many players are inside the arena/queue
-* `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`
-* `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
-* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
-* `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
-* `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
-* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`
-* `in_queue`: (bool) about phases, look at "Arena phases" down below
-* `in_loading`: (bool)
-* `in_game`: (bool)
-* `in_celebration`: (bool)
-* `enabled`: (bool) by default an arena is disabled, to avoid any unwanted damage
-
-> **BEWARE**: don't edit these parameters manually! Each one of them can be set through some arena_lib function, which runs the required checks in order to avoid any collateral damage
-
-
-Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
-
-There are two ways to know an arena ID: the first is in-game via the two debug utilities:
-* `arena_lib.print_arenas(sender, mod)`: coincise
-* `arena_lib.print_arena_info(sender, mod, arena_name)`: extended with much more information (this one is implemented in the editor by default)
-
-The second is via code by the functions:
-* `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
-* `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so, the table)
-
-> **BEWARE**: this is an API. It means all the functions illustrated here must be connected to your mod BY YOU. Nonetheless, I've created both an in-game editor to let you skip most of these steps and linked a configuration file example (that uses commands) close to the end. In short: I got you :)
-
-### 1.1 Creating and removing arenas
-There are two functions for it and they all need to be connected to some command in your mod. These functions are
-* `arena_lib.create_arena(sender, mod, arena_name, <min_players>, <max_players>)`: `arena_name` must be unique. Sender is a string, fields between < > are optional
-* `arena_lib.remove_arena(mod, arena_name)`
-
-#### 1.1.1 Storing arenas
-Arenas and their settings are stored inside the mod storage. What is *not* stored are players, their stats and such.  
-Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
-
-#### 1.1.2 Renaming an arena
-Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
-`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
-In order to do so, it must be disabled.
-  
-### 1.2 Setting up an arena
-Two things are needed to have an arena up to go: spawners and signs. There are two functions for that:  
-* `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
-* `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
-
-#### 1.2.1 Editor
-Since 3.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
-In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
-The function calling the editor is  
-`arena_lib.enter_editor(sender, mod, arena_name)`
-
-#### 1.2.2 CLI
-If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I chose to odmit it (it's in `set_spawner` too).
-
-##### 1.2.2.1 Players management
-`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
-
-##### 1.2.2.2 Enabling/Disabling teams
-`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
-
-##### 1.2.2.3 Timers
-`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (explained further below).
-
-##### 1.2.2.4 Arena properties
-Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
-`arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
-
-##### 1.2.2.5 Spawners
-`arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
-* `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
-* `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
-* `ID` is the spawner ID, for `param`
-I suggest you using [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
-
-```
-
-local mod = "mymod" -- more about this later
-
-ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
-
-	-- for creating spawners without teams
-	cmd:sub("setspawn :arena", function(sender, arena)
-	  arena_lib.set_spawner(sender, mod, arena)
-	end)
-
-	-- for creating spawners with teams
-	cmd:sub("setspawn :arena :team:word", function(sender, arena, team)
-          arena_lib.set_spawner(sender, mod, arena, team)
-      	end)
-
-	-- for using 'param' (just pass a random number for deleteall as it won't matter)
-	cmd:sub("setspawn :arena :param:word :ID:int", function(sender, arena, param, ID)
-	  arena_lib.set_spawner(sender, mod, arena, nil, param, ID)
-	end)
-
-	-- for using 'param' with teams
-	cmd:sub("setspawn :arena :team:word :param:word :ID:int", function(sender, arena, team, param, ID)
-	  arena_lib.set_spawner(sender, mod, arena, team, param, ID)
-	end)
-
-   [etc.]
-```
-
-##### 1.2.2.6 Signs
-`arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
-
-##### 1.2.2.7 Music
-`arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
-
-#### 1.2.3 Enabling an arena
-When a sign has been set, it won't work. This because an arena must be enabled manually via  
-`arena_lib.enable_arena(sender, mod, arena_name)` or by using the Enable and Leave button in the editor.
-If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
-* all spawn points set
-* sign placed
-* potential custom checks through `arena_lib.on_enable` callback
-  
-Arenas can be disabled too, via  
-`arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
-In order to do that, no game must be taking place in that specific arena. If successful, it'll return `true` and any potential player in queue will be removed. It acts like `enable_arena` (with `arena_lib.on_disable` as callback)
-
-### 1.3 Arena phases
-An arena comes in 4 phases, each one of them linked to a specific function:
-* `waiting phase`: it's the queuing process. People hit a sign waiting for other players to play with 
-* `loading phase`: it's the pre-match. By default players get teleported in the arena not being able to do anything but jump
-* `fighting phase`: the actual game
-* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported
-
-The 4 functions, intertwined with the previously mentioned phases are:
-* `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
-* `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
-* `arena_lib.load_celebration(mod, arena, winner_name)`: between the fighting and the celebration phase. Called when the winning conditions are met. `winner_name` can be both a string and a table (in case of teams)
-* `arena_lib.end_arena(mod_ref, mod, arena)`: at the very end of the celebration phase. It teleports people outside the arena
-
-Overriding these functions is **not** recommended. Instead, there are 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`, and they are explained later in 2.4.
-
-## 2. Minigame configuration
-
-> Still a TL;DR? Check out the [example file](mod-init.lua.example)
+## 1. Minigame configuration
 
 First of all download the mod and put it in your mods folder. Then, be sure you have [LuaJIT](https://luajit.org/) installed on your machine.
 
-Now you need to register your minigame in arena_lib, possibly inside the init.lua, via:
+Now you need to register your minigame, possibly inside the init.lua of your mod, via:
 ```
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
-"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific mod (that's why almost every `arena_lib` function contains "mod" as a parameter).You'll need it when calling for commands or callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
+"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific minigame (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands and callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
 The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
 * `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
 * `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
@@ -229,33 +77,33 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `player_properties`: same
 * `team_properties`: same (it won't work if `teams` hasn't been declared)
 
-### 2.1 Per server configuration
+### 1.1 Per server configuration
 There are also a couple of settings that can only be set in game via `/minigamesettings`. This because different servers might need different parameters. They are:
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is 10
 
 > **BEWARE**: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
 
-### 2.2 Privileges
+### 1.2 Privileges
 * `arenalib_admin`: allows to use a few more commands
 
-### 2.3 Commands
+### 1.3 Commands
 A couple of general commands are already declared inside arena_lib, them being:
 
 * `/quit`: quits a game
 * `/all`: writes in the arena global chat
 * `/t`: writes in the arena team chat (if teams are enabled)
 
-#### 2.3.1 Admins only
+#### 1.3.1 Admins only
 A couple more are available for players having the `arenalib_admin` privilege:
 
 * `/minigamesettings mod`: change `mod` settings
-* `/arenakick player_name`: kicks a player out of an ongoing game
+* `/arenakick player_name`: kicks a player out of an ongoing game, no matter the mod
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 
-Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and again I suggest you the [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
-### 2.4 Callbacks
+### 1.4 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
 * `arena_lib.on_enable(mod, function(arena, p_name)`: use it to run more checks before enabling an arena. Must return true if all conditions are met
 * `arena_lib.on_disable(mod, function(arena, p_name)`: use it to run more checks before disabling an arena. Must return true if all conditions are met
@@ -289,11 +137,11 @@ arena_lib.on_load("mymod", function(arena)
 end)
 ```
 
-### 2.5 Additional properties
+### 1.5 Additional properties
 Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide specific parameters, as its role is to be generic. Instead, you can create your own kill leader parameter by using the four tables `properties`, `temp_properties`, `player_properties` and `team_properties`. The first two are for the arena, the third is for players and the fourth for teams.  
 No matter the type of property, they're all shared between arenas. Better said, their values can change, but there can't be an arena with more or less properties than another.
 
-#### 2.5.1 Arena properties
+#### 1.5.1 Arena properties
 The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
 ```
 arena_lib.register_minigame("mymod", {
@@ -307,14 +155,14 @@ in doing so, we can easily access the `kill_leader` field whenever we want from 
 
 > **BEWARE**: you DO need to initialise your properties (whatever type) or it'll return an error
 
-##### 2.5.1.1 Updating non temporary properties via code
+##### 1.5.1.1 Updating non temporary properties via code
 Let's say you want to change a property from your mod. A naive approach would be doing `yourarena.property = something`. This, though, won't update it in the storage, so when you restart the server it'll still have the old value.  
 Instead, the right way to permanently update a property for an arena is calling `arena_lib.change_arena_property(<sender>, mod, arena_name, property, new_value)`. If `sender` is nil, the output message will be printed in the log.
 
-##### 2.5.1.2 Updating properties for old arenas
+##### 1.5.1.2 Updating properties for old arenas
 This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena; so if you're not sure about what you're doing, do a backup first.
 
-#### 2.5.2 Player properties
+#### 1.5.2 Player properties
 These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
 ```
 arena_lib.register_minigame("mymod", {
@@ -336,18 +184,16 @@ end)
 
 ```
 
-#### 2.5.3 Team properties
+#### 1.5.3 Team properties
 Same as above, but for teams. For instance, you could count how many rounds of a single match has been won by a specific team, and then call a load_celebration when one of them reaches 3 wins.
 
-Check out [this example](mod-init.lua.example) for a full configuration file
-
-#### 2.6 HUD
+#### 1.6 HUD
 `arena_lib` also comes with a double practical HUD: `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following commands:
 * `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>)`: send a message to the specified player in the specified HUD type ("broadcast" or "hotbar"). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>)`: same as above, but for all the players inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
 
-#### 2.7 Extendable editor
+#### 1.7 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 5th slot. To do that, the function is
 ```
 arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
@@ -361,7 +207,7 @@ On the contrary of when an arena is registered, every parameter here is mandator
 When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/_editor/tools_players.lua)
 
 
-### 2.8 Utils
+### 1.8 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
@@ -381,7 +227,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
-### 2.9 Getters
+### 1.9 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
@@ -393,11 +239,161 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
-### 2.10 Things you don't want to do with a light heart
+### 1.10 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
-* Disabling timers (`time_mode = 2` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up.
+* Disabling timers (`time_mode = 2` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
+
+### 1.11 Example file
+Check [this](mod-init.lua.example) out for a full configuration file
+
+## 2. Arenas
+
+It all starts with a table called `arena_lib.mods = {}`. This table allows `arena_lib` to be subdivided per mod and it has different parameters, one being `arena_lib.mods[yourmod].arenas`. Here is where every new arena created gets put.  
+An arena is a table having as a key an ID and as a value its parameters. They are:
+* `name`: (string) the name of the arena, declared when creating it
+* `author`: (string) the name of the one who built/designed the map. Default is `""`. This is not practically implemented at the moment, but it'll be soon
+* `sign`: (pos) the position of the sign associated with the arena
+* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
+* `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
+* `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
+* `players_amount`: (int) separately stores how many players are inside the arena/queue
+* `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`
+* `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
+* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
+* `min_players`: (string) default is 2. When this value is reached, a queue starts
+* `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
+* `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
+* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`
+* `in_queue`: (bool) about phases, look at "Arena phases" down below
+* `in_loading`: (bool)
+* `in_game`: (bool)
+* `in_celebration`: (bool)
+* `enabled`: (bool) by default an arena is disabled, to avoid any unwanted damage
+
+> **BEWARE**: don't edit these parameters manually! Each one of them can be set through some arena_lib function, which runs the required checks in order to avoid any collateral damage
+
+
+Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
+
+There are two ways to know an arena ID: the first is in-game via the two debug utilities:
+* `arena_lib.print_arenas(sender, mod)`: coincise
+* `arena_lib.print_arena_info(sender, mod, arena_name)`: extended with much more information (this one is implemented in the editor by default)
+
+The second is via code by the functions:
+* `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
+* `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so, the table)
+
+### 2.1 Creating and removing arenas
+There are two functions for it and they all need to be connected to some command in your mod. These functions are
+* `arena_lib.create_arena(sender, mod, arena_name, <min_players>, <max_players>)`: `arena_name` must be unique. Sender is a string, fields between < > are optional
+* `arena_lib.remove_arena(mod, arena_name)`
+
+#### 2.1.1 Storing arenas
+Arenas and their settings are stored inside the mod storage. What is *not* stored are players, their stats and such.  
+Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
+
+#### 2.1.2 Renaming an arena
+Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
+`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
+In order to do so, it must be disabled.
+  
+### 2.2 Setting up an arena
+Two things are needed to have an arena up to go: spawners and signs. There are two functions for that:  
+* `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
+* `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
+
+#### 2.2.1 Editor
+Since 3.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
+In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
+The function calling the editor is  
+`arena_lib.enter_editor(sender, mod, arena_name)`
+
+#### 2.2.2 CLI
+If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I chose to odmit it (it's in `set_spawner` too).
+
+##### 2.2.2.1 Players management
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
+
+##### 2.2.2.2 Enabling/Disabling teams
+`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
+
+##### 2.2.2.3 Timers
+`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (explained further below).
+
+##### 2.2.2.4 Arena properties
+Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
+`arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
+
+##### 2.2.2.5 Spawners
+`arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
+* `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
+* `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
+* `ID` is the spawner ID, for `param`
+Again, I suggest you using [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
+
+```
+
+local mod = "mymod" -- more about this later
+
+ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
+
+	-- for creating spawners without teams
+	cmd:sub("setspawn :arena", function(sender, arena)
+	  arena_lib.set_spawner(sender, mod, arena)
+	end)
+
+	-- for creating spawners with teams
+	cmd:sub("setspawn :arena :team:word", function(sender, arena, team)
+          arena_lib.set_spawner(sender, mod, arena, team)
+      	end)
+
+	-- for using 'param' (just pass a random number for deleteall as it won't matter)
+	cmd:sub("setspawn :arena :param:word :ID:int", function(sender, arena, param, ID)
+	  arena_lib.set_spawner(sender, mod, arena, nil, param, ID)
+	end)
+
+	-- for using 'param' with teams
+	cmd:sub("setspawn :arena :team:word :param:word :ID:int", function(sender, arena, team, param, ID)
+	  arena_lib.set_spawner(sender, mod, arena, team, param, ID)
+	end)
+
+   [etc.]
+```
+
+##### 2.2.2.6 Signs
+`arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
+
+##### 2.2.2.7 Music
+`arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
+
+#### 2.2.3 Enabling an arena
+When a sign has been set, it won't work. This because an arena must be enabled manually via  
+`arena_lib.enable_arena(sender, mod, arena_name)` or by using the Enable and Leave button in the editor.
+If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
+* all spawn points set
+* sign placed
+* potential custom checks through `arena_lib.on_enable` callback
+  
+Arenas can be disabled too, via  
+`arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
+In order to do that, no game must be taking place in that specific arena. If successful, it'll return `true` and any potential player in queue will be removed. It acts like `enable_arena` (with `arena_lib.on_disable` as callback)
+
+### 2.3 Arena phases
+An arena comes in 4 phases, each one of them linked to a specific function:
+* `waiting phase`: it's the queuing process. People hit a sign waiting for other players to play with 
+* `loading phase`: it's the pre-match. By default players get teleported in the arena not being able to do anything but jump
+* `fighting phase`: the actual game
+* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported
+
+The 4 functions, intertwined with the previously mentioned phases are:
+* `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
+* `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
+* `arena_lib.load_celebration(mod, arena, winner_name)`: between the fighting and the celebration phase. Called when the winning conditions are met. `winner_name` can be both a string and a table (in case of teams)
+* `arena_lib.end_arena(mod_ref, mod, arena)`: at the very end of the celebration phase. It teleports people outside the arena
+
+Overriding these functions is **not** recommended. Instead, there are 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
