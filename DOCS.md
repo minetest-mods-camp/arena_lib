@@ -203,7 +203,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
 * `teams_color_overlay`: a table of [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires team. Default is none
 * `is_team_chat_default`: whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
-* `mod_ref.chat_all_prefix`: prefix for every message sent in arena, team chat aside. Default is none
+* `mod_ref.chat_all_prefix`: prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
 * `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
 * `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)

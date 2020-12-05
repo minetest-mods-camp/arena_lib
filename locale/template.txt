@@ -4,6 +4,7 @@
 # textdomain: arena_lib
 
 # api.lua
+arena=
 team=
 [!] You can't change type!=
 Parameter @1 successfully overwritten=

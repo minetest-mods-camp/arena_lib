@@ -95,7 +95,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.teams = {}
   mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
-  mod_ref.chat_all_prefix = ""
+  mod_ref.chat_all_prefix = "[" .. S("arena") .. "] "
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"

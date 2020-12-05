@@ -4,6 +4,7 @@
 # textdomain: arena_lib
 
 # api.lua
+arena=arena
 team=squadra
 [!] You can't change type!=[!] Non puoi cambiare tipo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
