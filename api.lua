@@ -1598,14 +1598,41 @@ end
 
 
 
+function arena_lib.get_players_in_minigame(mod, to_player)
+  local players_in_minigame = {}
+
+  if to_player then
+    for pl_name, info in pairs(players_in_game) do
+      if mod == info.minigame then
+        table.insert(players_in_minigame, minetest.get_player_by_name(pl_name))
+      end
+    end
+  else
+    for pl_name, info in pairs(players_in_game) do
+      if mod == info.minigame then
+        table.insert(players_in_minigame, pl_name)
+      end
+    end
+  end
+
+  return players_in_minigame
+end
+
+
+
 -- ritorna tabella di nomi giocatori, o di giocatori se to_players == true
-function arena_lib.get_players_in_team(arena, team_ID, to_players)
+function arena_lib.get_players_in_team(arena, team_ID, to_player)
   local players = {}
-  for pl_name, pl_stats in pairs(arena.players) do
-    if pl_stats.teamID == team_ID then
-      if to_players then
+
+  if to_player then
+    for pl_name, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID == team_ID then
         table.insert(players, minetest.get_player_by_name(pl_name))
-      else
+      end
+    end
+  else
+    for pl_name, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID == team_ID then
         table.insert(players, pl_name)
       end
     end

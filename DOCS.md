@@ -236,7 +236,8 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
-* `arena_lib.get_players_in_team(arena, team_ID, <to_players>)`: returns a table containing either the name of the players in the specified team or the players theirselves if to_player is true
+* `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as index either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
+* `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as index either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
 ### 1.10 Things you don't want to do with a light heart
