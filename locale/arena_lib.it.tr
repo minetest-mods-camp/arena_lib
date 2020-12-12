@@ -171,6 +171,7 @@ Leave the editor=Esci dall'editor
 Audio file=File audio
 Volume=Volume
 Pitch=Tono
+Apply=Applica
 [!] This audio track doesn't exist!=[!] Questa traccia audio non esiste!
 
 # _editor/tools_players.lua

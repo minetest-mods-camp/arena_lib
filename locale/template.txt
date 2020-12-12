@@ -171,6 +171,7 @@ Leave the editor=
 Audio file=
 Volume=
 Pitch=
+Apply=
 [!] This audio track doesn't exist!=
 
 # _editor/tools_players.lua

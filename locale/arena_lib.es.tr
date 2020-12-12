@@ -187,6 +187,7 @@ Change author=Cambiar autor
 Overwrite=Sobrescribir
 Set timer=Establecer temporizador
 Cancel=Cancelar
+Apply=Aplicar
 Yes=Si
 
 # _editor/tools_spawner.lua
