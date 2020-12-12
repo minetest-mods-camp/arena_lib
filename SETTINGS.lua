@@ -3,7 +3,7 @@
 -- ones featuring some minigames). If you're aiming for a full minigame server,
 -- ignore this parameter and let the mod hub_manager supersede it =>
 -- https://gitlab.com/zughy-friends-minetest/hub-manager
-arena_lib.server_physics = {
+arena_lib.SERVER_PHYSICS = {
   speed = 1,
   jump = 1,
   gravity = 1,

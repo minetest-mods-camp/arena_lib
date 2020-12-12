@@ -2083,7 +2083,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     hub_manager.set_items(player)
     hub_manager.set_hub_physics(player)
   else
-    player:set_physics_override(arena_lib.server_physics)
+    player:set_physics_override(arena_lib.SERVER_PHYSICS)
   end
 
   -- riattivo la minimappa eventualmente disattivata
