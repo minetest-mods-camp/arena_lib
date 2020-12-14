@@ -979,7 +979,11 @@ function arena_lib.load_arena(mod, arena_ID)
 
   -- aggiungo eventuali proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
-    arena[temp_property] = v
+    if type(v) == "table" then
+      arena[temp_property] = copy_table(v)
+    else
+      arena[temp_property] = v
+    end
   end
 
   -- randomizzo gli spawner se non è a team
