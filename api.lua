@@ -24,7 +24,8 @@ local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle}
+local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
+                                  --                           (int) bgm_handle, (table) camera_offset}
 
 local arena_default = {
   name = "",
@@ -99,6 +100,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
+  mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
   mod_ref.join_while_in_progress = false
   mod_ref.keep_inventory = false
@@ -144,6 +146,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.chat_all_color then
     mod_ref.chat_all_color = def.chat_all_color
+  end
+
+  if def.camera_offset and type(def.camera_offset) == "table" then
+    mod_ref.camera_offset = def.camera_offset
   end
 
   if def.hotbar and type(def.hotbar) == "table" then
@@ -1975,6 +1981,12 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
+  -- applico eventuale scostamento camera
+  if mod_ref.camera_offset then
+    players_temp_storage[p_name].camera_offset = player:get_eye_offset()
+    player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
+  end
+
   -- nascondo i nomi se l'opzione è abilitata
   if not mod_ref.show_nametags then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
@@ -2076,6 +2088,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     if hotbar.selected_image then
       player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_selected_image)
     end
+  end
+
+  -- resetto eventuale camera
+  if mod_ref.camera_offset then
+    player:set_eye_offset(players_temp_storage[p_name].camera_offset[1], players_temp_storage[p_name].camera_offset[2])
   end
 
   -- resetto gli HP e teletrasporto fuori dall'arena e

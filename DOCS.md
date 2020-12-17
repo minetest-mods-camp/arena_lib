@@ -55,6 +55,7 @@ The second field, on the contrary, is a table of parameters: they define the ver
 * `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
 * `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
+* `mod_ref.camera_offset`: change the offset of the camera for evey player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `mod_ref.hotbar`: a table to override the server hotbar while inside an arena. Its fields are:
   * `slots =`: (int) the number of slots
   * `background_image =`: (string) the background image
