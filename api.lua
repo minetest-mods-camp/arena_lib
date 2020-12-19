@@ -100,6 +100,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
+  mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
   mod_ref.join_while_in_progress = false
@@ -146,6 +147,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.chat_all_color then
     mod_ref.chat_all_color = def.chat_all_color
+  end
+
+  if def.fov then
+    mod_ref.fov = def.fov
   end
 
   if def.camera_offset and type(def.camera_offset) == "table" then
@@ -1981,6 +1986,12 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
+  -- applico eventuale fov
+  if mod_ref.fov then
+    players_temp_storage[p_name].fov = player:get_fov()
+    player:set_fov(mod_ref.fov)
+  end
+
   -- applico eventuale scostamento camera
   if mod_ref.camera_offset then
     players_temp_storage[p_name].camera_offset = player:get_eye_offset()
@@ -2088,6 +2099,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     if hotbar.selected_image then
       player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_selected_image)
     end
+  end
+
+  -- reimposto eventuale fov
+  if mod_ref.fov then
+    player:set_fov(players_temp_storage[p_name].fov)
   end
 
   -- resetto eventuale camera

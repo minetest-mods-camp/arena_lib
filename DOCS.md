@@ -46,33 +46,34 @@ Now you need to register your minigame, possibly inside the init.lua of your mod
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
 "yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific minigame (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands and callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
-The second field, on the contrary, is a table of parameters: they define the very features of your minigame. They are:
-* `prefix`: what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
-* `teams`: a table of strings containing teams. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
-* `teams_color_overlay`: a table of [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires team. Default is none
-* `is_team_chat_default`: whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
-* `mod_ref.chat_all_prefix`: prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
-* `mod_ref.chat_team_prefix`: prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
-* `mod_ref.chat_all_color`: color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
-* `mod_ref.chat_team_color`: color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
-* `mod_ref.camera_offset`: change the offset of the camera for evey player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
-* `mod_ref.hotbar`: a table to override the server hotbar while inside an arena. Its fields are:
+The second field, on the contrary, is a table of optional parameters: they define the very features of your minigame. They are:
+* `prefix`: (string) what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
+* `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
+* `teams_color_overlay`: (table) [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires `teams`. Default is `nil`
+* `is_team_chat_default`: (bool) whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
+* `chat_all_prefix`: (string) prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
+* `chat_team_prefix`: (string) prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
+* `chat_all_color`: (string) color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
+* `chat_team_color`: (string) color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
+* `fov`: (int) changes the fov of every player
+* `camera_offset`: (table) changes the offset of the camera for evey player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
+* `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
   * `slots =`: (int) the number of slots
   * `background_image =`: (string) the background image
   * `selected_image =`: (string) the image to show when a slot is selected  
   If a field is not declared, it'll keep the server defaults
-* `join_while_in_progress`: whether the minigame allows to join an ongoing match. Default is false
-* `keep_inventory`: whether to keep players inventories when joining an arena. Default is false
-* `show_nametags`: whether to show the players nametags while in game. Default is false
-* `show_minimap`: whether to allow players to use the builtin minimap function. Default is false
-* `time_mode`: whether arenas will keep track of the time or not.
+* `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
+* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`
+* `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
+* `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
+* `time_mode`: (int) whether arenas will keep track of the time or not.
   * `0`: no time tracking at all (default)
   * `1`: incremental time (0, 1, 2, ...)
   * `2`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
-* `load_time`: the time between the loading state and the start of the match. Default is 5
-* `celebration_time`: the time between the celebration state and the end of the match. Default is 5
-* `in_game_physics`: an optional table containing a physical override to set to each player when they enter an arena
-* `disabled_damage_types`: a table containing which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
+* `load_time`: (int) the time in seconds between the loading state and the start of the match. Default is `5`
+* `celebration_time`: (int) the time in seconds between the celebration state and the end of the match. Default is `5`
+* `in_game_physics`: (table) a physical override to set to each player when they enter an arena, following the Minetest `physics_override` parameters
+* `disabled_damage_types`: (table) contains which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
 * `properties`: explained down below
 * `temp_properties`: same
 * `player_properties`: same
