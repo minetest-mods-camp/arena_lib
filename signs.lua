@@ -346,7 +346,7 @@ function HUD_countdown(arena, timer)
 
   -- dai 5 secondi in giù il messaggio è stampato su broadcast e genero i team
   if seconds <= 5 then
-    arena_lib.HUD_send_msg_all("broadcast", arena, S("The game begins in @1 seconds!", seconds), nil, "arenalib_countdown")
+    arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", seconds), nil, "arenalib_countdown")
     arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Get ready!")))
   else
     arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("@1 seconds for the match to start", seconds)))

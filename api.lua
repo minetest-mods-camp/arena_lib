@@ -25,7 +25,7 @@ local function time_start() end
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                  --                           (int) bgm_handle, (table) camera_offset}
+                                  --                           (int) bgm_handle, (int) fov, (table) camera_offset}
 
 local arena_default = {
   name = "",

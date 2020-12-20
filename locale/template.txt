@@ -136,7 +136,7 @@ Waiting for more players...=
 The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=
 You've joined team @1=
-The game begins in @1 seconds!=
+Game begins in @1!=
 Get ready!=
 
 # utils.lua

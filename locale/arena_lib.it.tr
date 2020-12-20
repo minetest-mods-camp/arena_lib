@@ -136,7 +136,7 @@ Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 @1 seconds for the match to start=@1 secondi all'inizio
 You've joined team @1=Ti sei unito alla squadra @1
-The game begins in @1 seconds!=La partita inizierà tra @1 secondi!
+Game begins in @1!=La partita inizierà tra @1!
 Get ready!=Preparati!
 
 # utils.lua
