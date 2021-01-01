@@ -190,9 +190,9 @@ end)
 Same as above, but for teams. For instance, you could count how many rounds of a single match has been won by a specific team, and then call a load_celebration when one of them reaches 3 wins.
 
 #### 1.6 HUD
-`arena_lib` also comes with a double practical HUD: `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following commands:
-* `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>)`: send a message to the specified player in the specified HUD type ("broadcast" or "hotbar"). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD
-* `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>)`: same as above, but for all the players inside the arena
+`arena_lib` also comes with a triple practical HUD: `title`, `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following functions:
+* `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: send a message to the specified player in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
+* `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
 
 #### 1.7 Extendable editor
