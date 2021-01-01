@@ -18,6 +18,7 @@ function arena_lib.HUD_add(player)
     text      = "",
     size      = { x = 2},
     number    = 0xFFFFFF,
+    z_index   = 1100
   })
 
   local HUD_BROADCAST_IMG = player:hud_add({
@@ -26,6 +27,7 @@ function arena_lib.HUD_add(player)
     text      = "",
     scale     = { x = 25, y = 2},
     number    = 0xFFFFFF,
+    z_index   = 1100
   })
 
   local HUD_BROADCAST_TXT = player:hud_add({
@@ -34,6 +36,7 @@ function arena_lib.HUD_add(player)
     text      = "",
     size      = { x = 1, y = 1},
     number    = 0xFFFFFF,
+    z_index   = 1100
   })
 
   local HUD_HOTBAR_IMG = player:hud_add({
@@ -43,6 +46,7 @@ function arena_lib.HUD_add(player)
     text      = "",
     scale     = { x = 25, y = 1.5},
     number    = 0xFFFFFF,
+    z_index   = 1100
   })
 
   local HUD_HOTBAR_TXT = player:hud_add({
@@ -52,6 +56,7 @@ function arena_lib.HUD_add(player)
     text      = "",
     size      = { x = 1, y = 1},
     number    = 0xFFFFFF,
+    z_index   = 1100
   })
 
   player_huds[player:get_player_name()] = {HUD_TITLE_TXT, HUD_BROADCAST_IMG, HUD_BROADCAST_TXT, HUD_HOTBAR_IMG, HUD_HOTBAR_TXT}

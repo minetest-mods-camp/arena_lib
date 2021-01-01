@@ -1117,7 +1117,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
     winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
   end
 
-  arena_lib.send_message_players_in_arena(arena, mod_ref.prefix  .. winning_message)
+  arena_lib.HUD_send_msg_all("title", arena, winning_message, mod_ref.celebration_time)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_celebration then
