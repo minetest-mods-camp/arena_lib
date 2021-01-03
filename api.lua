@@ -1150,15 +1150,19 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
 
   -- effetto particellare
   if type(winner_name) == "string" then
-    local p_pos = minetest.get_player_by_name(winner_name):get_pos()
+    local winner = minetest.get_player_by_name(winner_name)
 
-    show_victory_particles(p_pos)
+    if winner then
+      show_victory_particles(winner:get_pos())
+    end
 
   elseif type(winner_name) == "table" then
     for _, pl_name in pairs(winner_name) do
-      local p_pos = minetest.get_player_by_name(pl_name):get_pos()
+      local winner = minetest.get_player_by_name(pl_name)
 
-      show_victory_particles(p_pos)
+      if winner then
+        show_victory_particles(winner:get_pos())
+      end
     end
   end
 
@@ -2120,14 +2124,20 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     player:set_fov(players_temp_storage[p_name].fov)
   end
 
-  -- resetto eventuale camera
+  -- ripristino eventuale camera
   if mod_ref.camera_offset then
     player:set_eye_offset(players_temp_storage[p_name].camera_offset[1], players_temp_storage[p_name].camera_offset[2])
   end
 
-  -- resetto gli HP e teletrasporto fuori dall'arena e
+  -- ripristino gli HP
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-  player:set_pos(mod_ref.settings.hub_spawn_point)
+
+  -- teletrasporto con un po' di rumore
+  local clean_pos = mod_ref.settings.hub_spawn_point
+  local noise_x = math.random(-1.5, 1.5)
+  local noise_z = math.random(-1.5, 1.5)
+  local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}
+  player:set_pos(noise_pos)
 
   -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
   if minetest.get_modpath("hub_manager") then
