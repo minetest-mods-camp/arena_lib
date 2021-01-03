@@ -20,6 +20,7 @@ local function is_arena_name_allowed() end
 local function assign_team_spawner() end
 local function operations_before_entering_arena() end
 local function operations_before_leaving_arena() end
+local function show_victory_particles() end
 local function time_start() end
 
 local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -1126,14 +1127,14 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
   -- l'arena finisce dopo tot secondi
   minetest.after(mod_ref.celebration_time, function()
-    arena_lib.end_arena(mod_ref, mod, arena)
+    arena_lib.end_arena(mod_ref, mod, arena, winner_name)
   end)
 
 end
 
 
 
-function arena_lib.end_arena(mod_ref, mod, arena)
+function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
 
   -- copia da passare a on_end
   local players = {}
@@ -1147,6 +1148,19 @@ function arena_lib.end_arena(mod_ref, mod, arena)
     operations_before_leaving_arena(mod_ref, arena, pl_name)
   end
 
+  -- effetto particellare
+  if type(winner_name) == "string" then
+    local p_pos = minetest.get_player_by_name(winner_name):get_pos()
+
+    show_victory_particles(p_pos)
+
+  elseif type(winner_name) == "table" then
+    for _, pl_name in pairs(winner_name) do
+      local p_pos = minetest.get_player_by_name(pl_name):get_pos()
+
+      show_victory_particles(p_pos)
+    end
+  end
 
   -- azzero il numero di giocatori
   arena.players_amount = 0
@@ -1175,7 +1189,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
-    mod_ref.on_end(arena, players)
+    mod_ref.on_end(arena, players, winner_name)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
@@ -1184,7 +1198,7 @@ function arena_lib.end_arena(mod_ref, mod, arena)
 
   local id = arena_lib.get_arena_by_name(mod, arena.name)
 
-  -- aggiorno storage per le properties e cartello
+  -- aggiorno storage per le proprietà e cartello
   update_storage(false, mod, id, arena)
   arena_lib.update_sign(arena)
 
@@ -2133,6 +2147,22 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   -- svuoto lo storage temporaneo
   players_temp_storage[p_name] = nil
+end
+
+
+
+function show_victory_particles(p_pos)
+  minetest.add_particlespawner({
+    amount = 50,
+    time = 0.6,
+    minpos = p_pos,
+    maxpos = p_pos,
+    minvel = {x=-2, y=-2, z=-2},
+    maxvel = {x=2, y=2, z=2},
+    minsize = 1,
+    maxsize = 3,
+    texture = "arenalib_winparticle.png"
+  })
 end
 
 
