@@ -3,6 +3,7 @@ local S = minetest.get_translator("arena_lib")
 local function assign_team() end
 local function in_game_txt(arena) end
 local function HUD_countdown(arena, seconds) end
+local function get_infobox_formspec() end
 
 
 
@@ -23,12 +24,23 @@ signs_lib.register_sign("arena_lib:sign", {
 	vert_scaling = 1.38,
 	number_of_lines = 5,
 
+	-- cartello indistruttibile se c'è un'arena assegnata
 	on_dig = function(pos, node, digger)
-      if minetest.get_meta(pos):get_int("arenaID") ~= 0 then
-        return end
+		if minetest.get_meta(pos):get_int("arenaID") ~= 0 then return end
 
-      minetest.node_dig(pos,node,digger)
-    end,
+		minetest.node_dig(pos,node,digger)
+  end,
+
+	-- click dx apre la finestra d'informazioni
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("arenaID") == 0 then return end
+
+		local mod = minetest.get_meta(pos):get_string("mod")
+		local arenaID = minetest.get_meta(pos):get_int("arenaID")
+		local arena = arena_lib.mods[mod].arenas[arenaID]
+
+		minetest.show_formspec(clicker:get_player_name(), "arena_lib:infobox", get_infobox_formspec(arena))
+	end,
 
 
   on_punch = function(pos, node, puncher, pointed_thing)
@@ -373,3 +385,54 @@ function in_game_txt(arena)
 
   return txt
 end
+
+
+
+function get_infobox_formspec(arena)
+
+	local bgm_info
+
+	if arena.bgm then
+		local title = arena.bgm.title or "???"
+		local author = arena.bgm.author or "???"
+		bgm_info = title .. " - " .. author
+	else
+		bgm_info = "---"
+	end
+
+	local formspec = {
+		"formspec_version[4]",
+		"size[7.1,5]",
+		"no_prepend[]",
+		"bgcolor[;neither]",
+		"style_type[image_button;border=false;bgimg=blank.png]",
+		"background[0,0;1,1;arenalib_infobox.png;true]",
+		"image_button[5.9,0.7;0.5,0.5;arenalib_infobox_quit.png;close;]",
+		-- immagini
+		"image[1,0.7;1,1;arenalib_tool_settings_rename.png]",
+		"image[1,1.7;1,1;arenalib_tool_settings_nameauthor.png]",
+		"image[1,3.1;1,1;arenalib_editor_bgm.png]",
+		-- scritte
+		"hypertext[2.4,1.1;4,1;name;<style size=20 font=mono color=#5a5353>" .. arena.name .. "</style>]",
+		"hypertext[2.4,2.15;4,1;name;<style size=20 font=mono color=#5a5353>" .. arena.author .. "</style>]",
+		"hypertext[2.4,3.15;4,1;name;<global valign=middle><style size=20 font=mono color=#5a5353>" .. bgm_info .. "</style>]",
+
+	}
+
+	return table.concat(formspec, "")
+end
+
+
+
+------------------------------------------------
+---------------GESTIONE CAMPI-----------------
+----------------------------------------------
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+
+	if formname ~= "arena_lib:infobox" then return end
+
+	if fields.close then
+		minetest.close_formspec(player:get_player_name(), formname)
+	end
+end)

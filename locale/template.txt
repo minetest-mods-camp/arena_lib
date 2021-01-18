@@ -1,4 +1,4 @@
-# version 4.4.0
+# version 4.5.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -169,6 +169,8 @@ Leave the editor=
 
 # _editor/tools_bgm.lua
 Audio file=
+Title=
+Author=
 Volume=
 Pitch=
 Apply=

@@ -1,4 +1,4 @@
-# version 4.4.0
+# version 4.5.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -169,6 +169,8 @@ Leave the editor=Esci dall'editor
 
 # _editor/tools_bgm.lua
 Audio file=File audio
+Title=Titolo
+Author=Autore
 Volume=Volume
 Pitch=Tono
 Apply=Applica

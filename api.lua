@@ -30,7 +30,7 @@ local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slot
 
 local arena_default = {
   name = "",
-  author = "",
+  author = "???",
   sign = {},
   players = {},               -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
   teams = {-1},
@@ -404,8 +404,16 @@ function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  arena.author = author
-  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed (@2)", arena.name, arena.author))
+  if type(author) ~= "string" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
+  elseif author == nil or not string.match(author, "[%w%p]+") then
+    arena.author = "???"
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully removed", arena.name))
+  else
+    arena.author = author
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed (@2)", arena.name, arena.author))
+  end
 end
 
 
@@ -1745,7 +1753,7 @@ function init_storage(mod, mod_ref)
 
       --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
       if not arena.author then
-        arena.author = ""
+        arena.author = "???"
         to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
