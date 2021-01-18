@@ -31,7 +31,12 @@ minetest.register_tool("arena_lib:settings_rename_author", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename_author", get_rename_author_formspec())
+
+      local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename_author", get_rename_author_formspec(arena))
     end
 })
 
@@ -130,16 +135,16 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function get_rename_author_formspec()
+function get_rename_author_formspec(arena)
 
   local formspec = {
     "formspec_version[4]",
     "size[7,2.2]",
     "no_prepend[]",
     "bgcolor[;neither]",
-    "field[0,0.1;3.7,0.7;rename;;]",
+    "field[0,0.1;3.7,0.7;rename;;" .. arena.name .. "]",
     "button[3.8,0.1;2,0.7;rename_confirm;" .. S("Rename arena") .. "]",
-    "field[0,1;3.7,0.7;author;;]",
+    "field[0,1;3.7,0.7;author;;" .. arena.author .. "]",
     "button[3.8,1;2,0.7;author_confirm;" .. S("Change author") .. "]",
     "field_close_on_enter[rename;false]",
     "field_close_on_enter[author;false]"
