@@ -177,8 +177,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       return
     -- sennò applico la traccia indicata
     else
-      local title = fields.title ~= "" and fields.title or nil
-      local author = fields.author ~= "" and fields.author or nil
+      local title = fields.title ~= "" and minetest.formspec_escape(fields.title) or nil
+      local author = fields.author ~= "" and minetest.formspec_escape(fields.author) or nil
       arena_lib.set_bgm(p_name, mod, arena_name, fields.bgm, title, author, calc_gain(fields.gain), calc_pitch(fields.pitch), true)
     end
 
