@@ -25,6 +25,11 @@ signs_lib.register_sign("arena_lib:sign", {
 	vert_scaling = 1.38,
 	number_of_lines = 5,
 
+	-- forza widefont
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_int("widefont", 1)
+	end,
+
 	-- cartello indistruttibile se c'è un'arena assegnata
 	on_dig = function(pos, node, digger)
 		if minetest.get_meta(pos):get_int("arenaID") ~= 0 then return end
