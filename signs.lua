@@ -1,4 +1,5 @@
 local S = minetest.get_translator("arena_lib")
+local FS = minetest.formspec_escape
 
 local function assign_team() end
 local function in_game_txt(arena) end
@@ -413,9 +414,9 @@ function get_infobox_formspec(arena)
 		"image[1,1.7;1,1;arenalib_tool_settings_nameauthor.png]",
 		"image[1,3.1;1,1;arenalib_editor_bgm.png]",
 		-- scritte
-		"hypertext[2.4,1.1;4,1;name;<style size=20 font=mono color=#5a5353>" .. arena.name .. "</style>]",
-		"hypertext[2.4,2.15;4,1;name;<style size=20 font=mono color=#5a5353>" .. arena.author .. "</style>]",
-		"hypertext[2.4,3.15;4,1;name;<global valign=middle><style size=20 font=mono color=#5a5353>" .. bgm_info .. "</style>]",
+		"hypertext[2.4,1.1;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.name) .. "</style>]",
+		"hypertext[2.4,2.15;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
+		"hypertext[2.4,3.15;4,1;name;<global valign=middle><style size=20 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
 
 	}
 
