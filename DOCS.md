@@ -268,7 +268,13 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
-* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`
+* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`.
+  In-depth fields, all empty by default, are:
+  * `track`: (string) the audio file, without `.ogg`. Mandatory. If no track is specified, all the other fields will be consequently empty
+  * `title`: (string) the title to display in the infobox (right-clicking a sign)
+  * `author`: (string) the author to display in the infobox (right-clicking a sign)
+  * `gain`: (int) the volume of the track
+  * `pitch`: (int) the pitch of the track
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
 * `in_loading`: (bool)
 * `in_game`: (bool)
@@ -369,7 +375,7 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
 
 ##### 2.2.2.7 Music
-`arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
+`arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
 
 #### 2.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  

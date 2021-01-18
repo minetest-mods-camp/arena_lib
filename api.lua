@@ -814,7 +814,7 @@ end
 
 
 
-function arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch, in_editor)
+function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch, in_editor)
 
   local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -826,9 +826,11 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, volume, pitch, in_edi
     arena.bgm = nil
   else
     arena.bgm = {
-      track = track,
-      gain = volume,
-      pitch = pitch
+      track  = track,
+      title  = title,
+      author = author,
+      gain   = volume,
+      pitch  = pitch
     }
   end
 
