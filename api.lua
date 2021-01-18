@@ -412,7 +412,7 @@ function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
     minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully removed", arena.name))
   else
     arena.author = author
-    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed (@2)", arena.name, arena.author))
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed to @2", arena.name, arena.author))
   end
 end
 
