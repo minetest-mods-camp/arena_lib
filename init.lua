@@ -1,4 +1,4 @@
-local version = "4.5.0-dev"
+local version = "4.5.0"
 local modpath = minetest.get_modpath("arena_lib")
 
 dofile(modpath .. "/api.lua")
