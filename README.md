@@ -30,7 +30,8 @@ Default
 #### Mods relying on arena_lib
 [Block League](https://gitlab.com/zughy-friends-minetest/block_league)  
 [Murder](https://gitlab.com/giov4/minetest-murder-mod)  
-[Skywars](https://gitlab.com/zughy-friends-minetest/skywars)
+[Skywars](https://gitlab.com/zughy-friends-minetest/skywars)  
+[Sumo](https://notabug.org/MisterE123/sumo)  
 
 ### Want to help?
 Feel free to:
