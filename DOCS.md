@@ -63,7 +63,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * `selected_image =`: (string) the image to show when a slot is selected  
   If a field is not declared, it'll keep the server defaults
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
-* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`
+* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. Check out also `STORE_INVENTORY_MODE` in `SETTINGS.lua`, to choose whether and how to store players' inventory
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
 * `time_mode`: (int) whether arenas will keep track of the time or not.

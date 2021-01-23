@@ -2,6 +2,10 @@ minetest.register_on_joinplayer(function(player)
 
   arena_lib.HUD_add(player)
 
+  if arena_lib.STORE_INVENTORY_MODE ~= "none" then
+    arena_lib.restore_inventory(player:get_player_name())
+  end
+
   -- nel caso qualcuno si fosse disconnesso da dentro all'editor o fosse crashato il server con qualcuno nell'editor
   if player:get_inventory():contains_item("main", "arena_lib:editor_quit") then
 

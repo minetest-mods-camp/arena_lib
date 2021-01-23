@@ -1106,8 +1106,6 @@ end
 -- winner_name può essere stringa (no team) o tabella di nomi (team)
 function arena_lib.load_celebration(mod, arena, winner_name)
 
-  local mod_ref = arena_lib.mods[mod]
-
   arena.in_celebration = true
   arena_lib.update_sign(arena)
 
@@ -1127,6 +1125,8 @@ function arena_lib.load_celebration(mod, arena, winner_name)
     local winner_team_ID = arena.players[winner_name[1]].teamID
     winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
   end
+
+  local mod_ref = arena_lib.mods[mod]
 
   arena_lib.HUD_send_msg_all("title", arena, winning_message, mod_ref.celebration_time)
 
@@ -1241,7 +1241,6 @@ function arena_lib.is_player_in_arena(p_name, mod)
     end
 
     return true
-
   end
 end
 
@@ -1261,7 +1260,6 @@ function arena_lib.is_player_in_queue(p_name, mod)
     end
 
     return true
-
   end
 end
 
@@ -1493,6 +1491,44 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   end
 
   arena_lib.update_sign(arena)
+end
+
+
+
+--WARNING: internal use only
+function arena_lib.restore_inventory(p_name)
+
+  if arena_lib.STORE_INVENTORY_MODE == "mod_db" and storage:get_string(p_name .. ".INVENTORY") ~= "" then
+
+    local stored_inv = minetest.deserialize(storage:get_string(p_name .. ".INVENTORY"))
+    local current_inv = minetest.get_player_by_name(p_name):get_inventory()
+
+    -- ripristino l'inventario
+    for listname, content in pairs(stored_inv) do
+      -- se una lista non esiste più (es. son cambiate le mod), la rimuovo
+      if not current_inv:get_list(listname) then
+        stored_inv[listname] = nil
+      else
+        for i_name, i_def in pairs(content) do
+          stored_inv[listname][i_name] = ItemStack(i_def)
+        end
+      end
+    end
+
+    -- quando una lista viene salvata, la sua grandezza equivarrà all'ultimo slot contenente
+    -- un oggetto. Per evitare quindi che reimpostando la lista, l'inventario si rimpicciolisca,
+    -- salvo prima la grandezza dell'inventario immacolato, applico la lista e poi reimposto la grandezza.
+    -- Questo mi evita di dover salvare nel database la grandezza di ogni lista.
+    for listname, _ in pairs (current_inv:get_lists()) do
+      local list_size = current_inv:get_size(listname)
+      current_inv:set_list(listname, stored_inv[listname])
+      current_inv:set_size(listname, list_size)
+    end
+
+    storage:set_string(p_name .. ".INVENTORY", "")
+  -- TODO: storaggio database esterno
+  --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
+  end
 end
 
 
@@ -2081,8 +2117,28 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   -- chiudo eventuali formspec
   minetest.close_formspec(p_name, "")
 
-  -- svuoto eventualmente l'inventario
+  -- svuoto eventualmente l'inventario, decidendo se e come salvarlo
   if not mod_ref.keep_inventory then
+    if arena_lib.STORE_INVENTORY_MODE == "mod_db" then
+
+      local p_inv = player:get_inventory()
+      local stored_inv = {}
+
+      -- itero ogni lista non vuota per convertire tutti gli itemstack in tabelle (sennò non li serializza)
+      for listname, content in pairs(p_inv:get_lists()) do
+        if not p_inv:is_empty(listname) then
+          stored_inv[listname] = {}
+          for i_name, i_def in pairs(content) do
+            stored_inv[listname][i_name] = i_def:to_table()
+          end
+        end
+      end
+
+      storage:set_string(p_name .. ".INVENTORY", minetest.serialize(stored_inv))
+    -- TODO: storaggio database esterno
+    --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
+    end
+
     player:get_inventory():set_list("main",{})
     player:get_inventory():set_list("craft",{})
   end
@@ -2101,10 +2157,14 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
-  -- svuoto eventualmente l'inventario
+  -- svuoto eventualmente l'inventario e ripristino gli oggetti
   if not mod_ref.keep_inventory then
     player:get_inventory():set_list("main", {})
     player:get_inventory():set_list("craft",{})
+
+    if arena_lib.STORE_INVENTORY_MODE ~= "none" then
+      arena_lib.restore_inventory(p_name)
+    end
   end
 
   -- resetto eventuali texture
