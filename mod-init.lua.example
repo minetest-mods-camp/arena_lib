@@ -1,6 +1,5 @@
 arena_lib.register_minigame("Call of Zughy", {
   prefix = "[CoZ] ",
-  hub_spawn_point = { x = 5, y = 10, z = 4 },
   teams = {
     "red",
     "blue"
