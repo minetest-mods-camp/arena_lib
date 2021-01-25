@@ -41,7 +41,7 @@ parties.register_on_pre_party_join(function(party_leader, p_name)
 
   -- se l'invitato è in coda, lo rimuovo
   if arena_lib.is_player_in_queue(p_name) then
-    arena_lib.remove_from_queue(p_name)
+    arena_lib.remove_player_from_queue(p_name)
   end
 
   return true

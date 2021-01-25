@@ -216,6 +216,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game.
+* `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any.
 * `arena_lib.remove_player_from_arena(p_name, reason, <executioner>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and it equals to...
   * `0`: player disconnected. Calls `on_disconnect`
   * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`

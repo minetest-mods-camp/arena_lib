@@ -143,13 +143,13 @@ signs_lib.register_sign("arena_lib:sign", {
 
 				for _, pl_name in pairs(party_members) do
 					arena_lib.HUD_hide("all", pl_name)
-					arena_lib.remove_from_queue(pl_name)
+					arena_lib.remove_player_from_queue(pl_name)
 				end
 
 			-- sennò rimuovo il singolo utente
 			else
 				arena_lib.HUD_hide("all", p_name)
-				arena_lib.remove_from_queue(p_name)
+				arena_lib.remove_player_from_queue(p_name)
 			end
 
 			-- se era in coda per la stessa arena, interrompo qua, sennò procedo per
