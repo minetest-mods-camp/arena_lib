@@ -1763,7 +1763,7 @@ function init_storage(mod, mod_ref)
         arena.players_amount_per_team = nil
         arena.teams = {-1}
         arena.teams_enabled = false
-      elseif mod_ref.teams > 1 and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
+      elseif #mod_ref.teams > 1 and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
         arena.players_amount_per_team = {}
         arena.teams = {}
 
