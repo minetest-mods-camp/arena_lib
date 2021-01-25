@@ -254,25 +254,6 @@ signs_lib.register_sign("arena_lib:sign", {
 
 
 
---v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
-minetest.override_item("default:sign_wall", {
-
-    on_punch = function(pos, node, puncher, pointed_thing)
-
-      local arenaID = minetest.get_meta(pos):get_int("arenaID")
-      if arenaID == 0 then return end
-
-			local lookdir = minetest.yaw_to_dir(puncher:get_look_horizontal())
-			minetest.swap_node(pos,{name = "arena_lib:sign", param2 = minetest.dir_to_wallmounted(lookdir)})
-			minetest.chat_send_player(puncher:get_player_name(), "Alakazam! We got a new sign here")
-
-    end,
-
-})
---^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
-
-
-
 function arena_lib.update_sign(arena)
 
   local p_count = 0

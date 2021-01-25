@@ -57,22 +57,6 @@ function arena_lib.register_minigame(mod, def)
 
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
-  --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
-  if def.is_timer_incrementing then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") is_timer_incrementing is deprecated. Use time_mode = 1 instead")
-    def.time_mode = 1
-  end
-
-  if def.timer then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") timer is deprecated. Use time_mode = 2 instead")
-    def.time_mode = 2
-  end
-
-  if def.immunity_time or def.immunity_slot then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") Immunity has been removed from arena_lib as a lot of minigames don't need it. It shall be implemented by modders in their own mods")
-  end
-  --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
-
   --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
   if def.hub_spawn_point then
     minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") hub_spawn_point is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
@@ -1766,26 +1750,6 @@ function init_storage(mod, mod_ref)
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
       local to_update = false
-
-      --v------------------ LEGACY UPDATE, to remove in 5.0 -------------------v
-      -- team per arena for 3.2.0 and lesser versions
-      if arena.teams_enabled == nil then
-        if #arena.teams > 1 then
-          arena.teams_enabled = true
-        else
-          arena.teams_enabled = false
-        end
-        minetest.log("action", "[ARENA_LIB] Added '.teams_enabled' property from 3.2.0")
-        to_update = true
-      end
-
-      -- refactoring arena.timer in arena.initial_time for 3.6.0 and lesser versions
-      if arena.timer then
-        arena.initial_time = arena.timer
-        arena.timer = nil
-        to_update = true
-      end
-      --^------------------ LEGACY UPDATE, to remove in 5.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
       if not arena.author then
