@@ -140,7 +140,7 @@ function arena_lib.give_players_tools(inv, mod, arena)
   local mod_ref = arena_lib.mods[mod]
 
   -- se non ha le squadre, non do l'oggetto per attivarle/disattivarle
-  if not next(mod_ref.teams) then return end
+  if #mod_ref.teams == 1 then return end
 
   if arena.teams_enabled then
     inv:set_stack("main", 5, "arena_lib:players_teams_on")

@@ -94,7 +94,7 @@ function arena_lib.register_minigame(mod, def)
 
   --default parameters
   mod_ref.prefix = "[Arena_lib] "
-  mod_ref.teams = {}
+  mod_ref.teams = {-1}
   mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
   mod_ref.chat_all_prefix = "[" .. S("arena") .. "] "
@@ -1795,11 +1795,11 @@ function init_storage(mod, mod_ref)
       --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
       -- gestione team
-      if arena.teams_enabled and not next(mod_ref.teams) then                   -- se avevo abilitato i team e ora li ho rimossi
+      if arena.teams_enabled and not (#mod_ref.teams > 1) then                   -- se avevo abilitato i team e ora li ho rimossi
         arena.players_amount_per_team = nil
         arena.teams = {-1}
         arena.teams_enabled = false
-      elseif next(mod_ref.teams) and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
+      elseif mod_ref.teams > 1 and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
         arena.players_amount_per_team = {}
         arena.teams = {}
 
