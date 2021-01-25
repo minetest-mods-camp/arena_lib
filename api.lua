@@ -65,6 +65,19 @@ function arena_lib.register_minigame(mod, def)
   if def.queue_waiting_time then
     minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") queue_waiting_time is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
   end
+
+  if def.time_mode and type(def.time_mode) == "number" then
+    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") time_mode with numeric values is deprecated. Use `none`, `incremental` or `decremental` instead")
+    if def.time_mode == nil or def.time_mode == 0 then
+      def.time_mode = "none"
+    elseif def.time_mode == 1 then
+      def.time_mode = "incremental"
+    elseif def.time_mode == 2 then
+      def.time_mode = "decremental"
+    else
+      def.time_mode = "none"
+    end
+  end
   --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
   arena_lib.mods[mod] = {}
@@ -92,7 +105,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
-  mod_ref.time_mode = 0
+  mod_ref.time_mode = "none"
   mod_ref.load_time = 5           -- time in the loading phase (the pre-match)
   mod_ref.celebration_time = 5    -- time in the celebration phase
   mod_ref.in_game_physics = nil
@@ -299,9 +312,9 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   end
 
   -- eventuale tempo
-  if mod_ref.time_mode == 1 then
+  if mod_ref.time_mode == "incremental" then
     arena.initial_time = 0
-  elseif mod_ref.time_mode == 2 then
+  elseif mod_ref.time_mode == "decremental" then
     arena.initial_time = 300
   end
 
@@ -843,8 +856,8 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
   local mod_ref = arena_lib.mods[mod]
 
   -- se la mod non supporta i timer
-  if mod_ref.time_mode ~= 2 then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] [!] Timers are not enabled in this mod!") .. " (time_mode = 2)"))
+  if mod_ref.time_mode ~= "decremental" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] [!] Timers are not enabled in this mod!") .. " (time_mode = 'decremental')"))
     return end
 
   -- se è inferiore a 1
@@ -1051,7 +1064,7 @@ function arena_lib.start_arena(mod_ref, arena)
   arena_lib.update_sign(arena)
 
   -- parte l'eventuale tempo
-  if mod_ref.time_mode > 0 then
+  if mod_ref.time_mode ~= "none" then
     arena.current_time = arena.initial_time
     minetest.after(1, function()
       time_start(mod_ref, arena)
@@ -1759,11 +1772,11 @@ function init_storage(mod, mod_ref)
       --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
       -- gestione team
-      if arena.teams_enabled and not (#mod_ref.teams > 1) then                   -- se avevo abilitato i team e ora li ho rimossi
+      if arena.teams_enabled and not (#mod_ref.teams > 1) then                  -- se avevo abilitato i team e ora li ho rimossi
         arena.players_amount_per_team = nil
         arena.teams = {-1}
         arena.teams_enabled = false
-      elseif #mod_ref.teams > 1 and arena.teams_enabled then                   -- sennò li genero per tutte le arena con teams_enabled
+      elseif #mod_ref.teams > 1 and arena.teams_enabled then                    -- sennò li genero per tutte le arena con teams_enabled
         arena.players_amount_per_team = {}
         arena.teams = {}
 
@@ -1785,16 +1798,16 @@ function init_storage(mod, mod_ref)
       end
 
       -- gestione tempo
-      if mod_ref.time_mode == 0 and arena.initial_time then                     -- se avevo abilitato il tempo e ora l'ho rimosso, lo tolgo dalle arene
+      if mod_ref.time_mode == "none" and arena.initial_time then                     -- se avevo abilitato il tempo e ora l'ho rimosso, lo tolgo dalle arene
         arena.initial_time = nil
         to_update = true
-      elseif mod_ref.time_mode ~= 0 and not arena.initial_time then             -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
-        arena.initial_time = mod_ref.time_mode == 1 and 0 or 300
+      elseif mod_ref.time_mode ~= "none" and not arena.initial_time then             -- se li ho abilitati ora e le arene non ce li hanno, glieli aggiungo
+        arena.initial_time = mod_ref.time_mode == "incremental" and 0 or 300
         to_update = true
-      elseif mod_ref.time_mode == 1 and arena.initial_time > 0 then             -- se ho disabilitato i timer e le arene ce li avevano, porto il tempo a 0
+      elseif mod_ref.time_mode == "incremental" and arena.initial_time > 0 then      -- se ho disabilitato i timer e le arene ce li avevano, porto il tempo a 0
         arena.initial_time = 0
         to_update = true
-      elseif mod_ref.time_mode == 2 and arena.initial_time == 0 then            -- se ho abilitato i timer e le arene partivano da 0, imposto il timer a 5 minuti
+      elseif mod_ref.time_mode == "decremental" and arena.initial_time == 0 then     -- se ho abilitato i timer e le arene partivano da 0, imposto il timer a 5 minuti
         arena.initial_time = 300
         to_update = true
       end
@@ -2215,7 +2228,7 @@ function time_start(mod_ref, arena)
 
   if arena.on_celebration or not arena.in_game then return end
 
-  if mod_ref.time_mode == 1 then
+  if mod_ref.time_mode == "incremental" then
     arena.current_time = arena.current_time + 1
   else
     arena.current_time = arena.current_time - 1

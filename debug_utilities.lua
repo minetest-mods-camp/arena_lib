@@ -108,7 +108,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   -- calcolo eventuale tempo
   local time = ""
-  if mod_ref.time_mode ~= 0 then
+  if mod_ref.time_mode ~= "none" then
     local current_time = not arena.current_time and "---" or arena.current_time
     time = minetest.colorize("#eea160", S("Initial time: ")) .. minetest.colorize("#cfc6b8", arena.initial_time .. " (" .. S("current: ") .. current_time .. ")") .. "\n"
   end

@@ -122,7 +122,7 @@ function arena_lib.give_settings_tools(user)
 
   local mod_ref = arena_lib.mods[mod]
 
-  if mod_ref.time_mode == 2 then
+  if mod_ref.time_mode == "decremental" then
     inv:set_stack("main", 3, "arena_lib:timer")
   end
 end

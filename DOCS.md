@@ -66,10 +66,10 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. Check out also `STORE_INVENTORY_MODE` in `SETTINGS.lua`, to choose whether and how to store players' inventory
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
-* `time_mode`: (int) whether arenas will keep track of the time or not.
-  * `0`: no time tracking at all (default)
-  * `1`: incremental time (0, 1, 2, ...)
-  * `2`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
+* `time_mode`: (string) whether arenas will keep track of the time or not.
+  * `"none"`: no time tracking at all (default)
+  * `"incremental"`: incremental time (0, 1, 2, ...)
+  * `"decremental"`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
 * `load_time`: (int) the time in seconds between the loading state and the start of the match. Default is `5`
 * `celebration_time`: (int) the time in seconds between the celebration state and the end of the match. Default is `5`
 * `in_game_physics`: (table) a physical override to set to each player when they enter an arena, following the Minetest `physics_override` parameters
@@ -115,8 +115,8 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players, winner_name))`
 * `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
-* `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from 0
-* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = 2`), reaches 0. Not declaring it will make the server crash when time runs out
+* `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
+* `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from a match (same as above)
 * `arena_lib.on_quit(mod, function(arena, p_name, is_forced))`: called when a player quits from a match (same as above). `is_forced` is true when the match has been terminated via `force_arena_ending(...)`
@@ -247,7 +247,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
-* Disabling timers (`time_mode = 2` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
+* Disabling timers (`time_mode = "decremental"` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
 
 ### 1.11 Example file
 Check [this](mod-init.lua.example) out for a full configuration file
