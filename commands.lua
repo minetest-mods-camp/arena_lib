@@ -75,8 +75,10 @@ minetest.register_chatcommand("forceend", {
 
     local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-    arena_lib.force_arena_ending(mod, arena, sender)
-
+    -- se è andata a buon fine, avviso chi ha eseguito il comando
+    if arena_lib.force_arena_ending(mod, arena, sender) then
+      minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
+    end
   end
 
 })

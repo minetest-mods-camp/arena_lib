@@ -1309,7 +1309,7 @@ function arena_lib.force_arena_ending(mod, arena, sender)
   end
 
   arena_lib.end_arena(mod_ref, mod, arena)
-  minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
+  return true
 end
 
 
