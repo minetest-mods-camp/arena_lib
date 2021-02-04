@@ -1456,27 +1456,16 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     arena_lib.end_arena(mod_ref, mod, arena)
 
   -- se l'arena ha i team e sono rimasti solo i giocatori di un team, il loro team vince
-  elseif arena.teams_enabled and arena.players_amount <= arena.min_players * #arena.teams then
+  elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
 
-    local team_to_compare
-
-    for i = 1, #arena.players_amount_per_team do
-      if arena.players_amount_per_team[i] ~= 0 then
-        team_to_compare = i
-        break
-      end
-    end
-
+    local winners
     for _, pl_stats in pairs(arena.players) do
-      if pl_stats.teamID ~= team_to_compare then
-        goto enemy_found
-      end
+      winners = arena_lib.get_players_in_team(arena, pl_stats.teamID)
+      break
     end
 
     arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
-    arena_lib.load_celebration(mod, arena, arena_lib.get_players_in_team(arena, team_to_compare))
-
-    ::enemy_found::
+    arena_lib.load_celebration(mod, arena, winners)
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
@@ -1720,6 +1709,25 @@ function arena_lib.get_players_in_team(arena, team_ID, to_player)
   end
 
   return players
+end
+
+
+
+function arena_lib.get_active_teams(arena)
+
+  if #arena.teams == 1 then
+    minetest.log("warning", "Attempt to call get_active_teams in arena " .. arena.name .. " when teams are not enabled. Aborting...")
+    return end
+
+  local active_teams = {}
+
+  for ID, t_stats in pairs(arena.teams) do
+    if arena.players_amount_per_team[ID] > 0 then
+      active_teams[ID] = t_stats
+    end
+  end
+
+  return active_teams
 end
 
 
