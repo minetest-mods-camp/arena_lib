@@ -1103,6 +1103,11 @@ end
 -- winner_name può essere stringa (no team) o tabella di nomi (team)
 function arena_lib.load_celebration(mod, arena, winner_name)
 
+  -- se era già in celebrazione
+  if arena.in_celebration then
+    minetest.log("error", "[" .. mod .. "] There was an attempt to call the celebration phase while already in it. This shall not be done, interrupting...")
+    return end
+
   arena.in_celebration = true
   arena_lib.update_sign(arena)
 
@@ -1443,8 +1448,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     end
   end
 
-  -- se il termine dell'arena è stato forzato, non c'è bisogno di andare oltre
-  if reason == 4 then return end
+  -- se il termine dell'arena è stato forzato o è già in celebrazione, non c'è bisogno di andare oltre
+  if reason == 4 or arena.in_celebration then return end
 
   -- se l'ultimo rimasto abbandona con alt+f4, evito il crash
   if arena.players_amount == 0 then
