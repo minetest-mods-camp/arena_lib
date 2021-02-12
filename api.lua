@@ -1060,6 +1060,9 @@ end
 
 function arena_lib.start_arena(mod_ref, arena)
 
+  -- nel caso sia terminata durante la fase di caricamento
+  if arena.in_celebration or not arena.in_game then return end
+
   arena.in_loading = false
   arena_lib.update_sign(arena)
 
@@ -1105,7 +1108,7 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
   -- se era già in celebrazione
   if arena.in_celebration then
-    minetest.log("error", "[" .. mod .. "] There was an attempt to call the celebration phase while already in it. This shall not be done, interrupting...")
+    minetest.log("error", "[" .. mod .. "] There was an attempt to call the celebration phase while already in it. This shall not be done, aborting...")
     return end
 
   arena.in_celebration = true
