@@ -260,8 +260,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `name`: (string) the name of the arena, declared when creating it
 * `author`: (string) the name of the one who built/designed the map. Default is `"???"`. It appears in the signs infobox (right-click an arena sign)
 * `sign`: (pos) the position of the sign associated with the arena
-* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = stuff, [p_name2] = stuff, ...}`
-* `teams`: (table) where to store teams. If there are none, it's `{-1}`. If there are, format is `{[teamID] = name}`
+* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
+* `teams`: (table) where to store teams information, such as their name (`name`) and `team_properties`. If there are no teams, it's `{-1}`. If there are, format is `{[teamID] = {stuff}, [teamID2] = {stuff}, ...}`
 * `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
 * `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`
