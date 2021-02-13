@@ -186,14 +186,16 @@ signs_lib.register_sign("arena_lib:sign", {
       sign_arena.players_amount_per_team[p_team_ID] = sign_arena.players_amount_per_team[p_team_ID] + #players_to_add
     end
 
-    -- notifico i vari giocatori del nuovo player
-    for _, pl_name in pairs(players_to_add) do
-      if sign_arena.in_game then
+    -- notifico i vari giocatori del nuovo giocatore
+    if sign_arena.in_game then
+      for _, pl_name in pairs(players_to_add) do
         arena_lib.join_arena(mod, pl_name, arenaID)
         arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. pl_name))
         arena_lib.update_sign(sign_arena)
-        return
-      else
+      end
+      return
+    else
+      for _, pl_name in pairs(players_to_add) do
         arena_lib.add_to_queue(pl_name, mod, arenaID)
         arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c8d692", sign_arena.name .. " > " ..  pl_name))
       end
