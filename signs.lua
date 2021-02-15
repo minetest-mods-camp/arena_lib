@@ -43,9 +43,8 @@ signs_lib.register_sign("arena_lib:sign", {
 
 		local mod = minetest.get_meta(pos):get_string("mod")
 		local arenaID = minetest.get_meta(pos):get_int("arenaID")
-		local arena = arena_lib.mods[mod].arenas[arenaID]
 
-		minetest.show_formspec(clicker:get_player_name(), "arena_lib:infobox", get_infobox_formspec(arena))
+		minetest.show_formspec(clicker:get_player_name(), "arena_lib:infobox", get_infobox_formspec(mod, arenaID, clicker))
 	end,
 
 
@@ -142,13 +141,11 @@ signs_lib.register_sign("arena_lib:sign", {
 				local party_members = parties.get_party_members(p_name)
 
 				for _, pl_name in pairs(party_members) do
-					arena_lib.HUD_hide("all", pl_name)
 					arena_lib.remove_player_from_queue(pl_name)
 				end
 
 			-- sennò rimuovo il singolo utente
 			else
-				arena_lib.HUD_hide("all", p_name)
 				arena_lib.remove_player_from_queue(p_name)
 			end
 
@@ -178,6 +175,7 @@ signs_lib.register_sign("arena_lib:sign", {
     -- aggiungo il giocatore
     for _, pl_name in pairs(players_to_add) do
       sign_arena.players[pl_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
+      sign_arena.players_and_spectators[pl_name] = true
     end
 
     -- aumento il conteggio di giocatori in partita
@@ -190,14 +188,12 @@ signs_lib.register_sign("arena_lib:sign", {
     if sign_arena.in_game then
       for _, pl_name in pairs(players_to_add) do
         arena_lib.join_arena(mod, pl_name, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c6f154", " >>> " .. pl_name))
         arena_lib.update_sign(sign_arena)
       end
       return
     else
       for _, pl_name in pairs(players_to_add) do
         arena_lib.add_to_queue(pl_name, mod, arenaID)
-        arena_lib.send_message_players_in_arena(sign_arena, minetest.colorize("#c8d692", sign_arena.name .. " > " ..  pl_name))
       end
     end
 
@@ -377,8 +373,12 @@ end
 
 
 
-function get_infobox_formspec(arena)
+function get_infobox_formspec(mod, arenaID, player)
 
+	player:get_meta():set_string("arenalib_infobox_mod", mod)
+	player:get_meta():set_int("arenalib_infobox_arenaID", arenaID)
+
+	local arena = arena_lib.mods[mod].arenas[arenaID]
 	local bgm_info
 
 	if arena.bgm then
@@ -401,11 +401,11 @@ function get_infobox_formspec(arena)
 		"image[1,0.7;1,1;arenalib_tool_settings_rename.png]",
 		"image[1,1.7;1,1;arenalib_tool_settings_nameauthor.png]",
 		"image[1,3.1;1,1;arenalib_editor_bgm.png]",
+		"image_button[6.1,2;1,1;arenalib_infobox_spectate.png;spectate;]",
 		-- scritte
 		"hypertext[2.4,1.1;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.name) .. "</style>]",
 		"hypertext[2.4,2.15;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
 		"hypertext[2.4,3.15;4,1;name;<global valign=middle><style size=20 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
-
 	}
 
 	return table.concat(formspec, "")
@@ -423,5 +423,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 	if fields.close then
 		minetest.close_formspec(player:get_player_name(), formname)
+		player:get_meta():set_string("arenalib_infobox_mod", "")
+		player:get_meta():set_int("arenalib_infobox_arenaID", 0)
+
+	elseif fields.spectate then
+		local mod = player:get_meta():get_string("arenalib_infobox_mod")
+		local arenaID = player:get_meta():get_int("arenalib_infobox_arenaID")
+		local p_name = player:get_player_name()
+
+		if arena_lib.is_player_in_queue(p_name) then
+			arena_lib.remove_player_from_queue(p_name)
+		end
+
+		arena_lib.join_arena(mod, p_name, arenaID, true)
 	end
 end)

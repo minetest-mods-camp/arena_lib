@@ -1,4 +1,4 @@
-# version 4.6.0
+# version 5.0.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -6,6 +6,7 @@
 # api.lua
 arena=arena
 team=squadra
+spectator=spettatore
 [!] You can't change type!=[!] Non puoi cambiare tipo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
@@ -167,7 +168,7 @@ Arena settings=Impostazioni arena
 Info=Info
 Go back=Torna indietro
 Enable and leave=Abilita ed esci
-Leave the editor=Esci dall'editor
+Leave=Esci
 
 # _editor/tools_bgm.lua
 Audio file=File audio
@@ -210,3 +211,12 @@ Remove sign=Rimuovi cartello
 
 # _hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
+
+# _spectate/spectate_main.lua
+[!] Spectate mode not supported!=[!] Modalità spettatore non supportata!
+Currently spectating: @1=Stai seguendo: @1
+
+# _spectate/spectate_tools.lua
+Change player=Cambia giocatore
+Change team=Cambia squadra
+Enter the match=Entra in partita

@@ -165,7 +165,7 @@ Arena settings=Configuraciones de la arena
 Info=Información
 Go back=Regresar
 Enable and leave=Habilitar y salir
-Leave the editor=Salir del editor
+Leave=Salir
 
 # _editor/tools_bgm.lua
 Audio file=Archivo de audio

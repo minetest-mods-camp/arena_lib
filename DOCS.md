@@ -2,39 +2,40 @@
 
 # Table of Contents
 * [1. Minigame configuration](#1-minigame-configuration)
-    * [1.1 Per server configuration](#11-per-server-configuration)
-    * [1.2 Privileges](#12-privileges)
-    * [1.3 Commands](#13-commands)
-        * [1.3.1 Admins only](#131-admins-only)
-    * [1.4 Callbacks](#14-callbacks)
-    * [1.5 Additional properties](#15-additional-properties)
-        * [1.5.1 Arena properties](#151-arena-properties)
-            * [1.5.1.1 Updating non temporary properties via code](#1511-updating-non-temporary-properties-via-code)
-            * [1.5.1.2 Updating properties for old arenas](#1512-updating-properties-for-old-arenas)
-        * [1.5.2 Player properties](#152-player-properties)
-        * [1.5.3 Team properties](#153-team-properties)
-    * [1.6 HUD](#16-hud)
-    * [1.7 Extendable editor](#17-extendable-editor)
-    * [1.8 Utils](#18-utils)
-    * [1.9 Getters](#19-getters)
-    * [1.10 Things you don't want to do with a light heart](#110-things-you-dont-want-to-do-with-a-light-heart)
-    * [1.11 Example file](#111-example-file)
+	* [1.1 Per server configuration](#11-per-server-configuration)
+	* [1.2 Privileges](#12-privileges)
+	* [1.3 Commands](#13-commands)
+		* [1.3.1 Admins only](#131-admins-only)
+	* [1.4 Callbacks](#14-callbacks)
+	* [1.5 Additional properties](#15-additional-properties)
+		* [1.5.1 Arena properties](#151-arena-properties)
+			* [1.5.1.1 Updating non temporary properties via code](#1511-updating-non-temporary-properties-via-code)
+			* [1.5.1.2 Updating properties for old arenas](#1512-updating-properties-for-old-arenas)
+		* [1.5.2 Player properties](#152-player-properties)
+		* [1.5.3 Team properties](#153-team-properties)
+	* [1.6 HUD](#16-hud)
+	* [1.7 Extendable editor](#17-extendable-editor)
+	* [1.8 Utils](#18-utils)
+	* [1.9 Getters](#19-getters)
+	* [1.10 Things you don't want to do with a light heart](#110-things-you-dont-want-to-do-with-a-light-heart)
+	* [1.11 Example file](#111-example-file)
 * [2. Arenas](#2-arenas)
-    * [2.1 Creating and removing arenas](#21-creating-and-removing-arenas)
-        * [2.1.1 Storing arenas](#211-storing-arenas)
-        * [2.1.2 Renaming an arena](#212-renaming-an-arena)
-    * [2.2 Setting up an arena](#22-setting-up-an-arena)
-        * [2.2.1 Editor](#221-editor)
-        * [2.2.2 CLI](#222-cli)
-            * [2.2.2.1 Players management](#2221-players-management)
-            * [2.2.2.2 Enabling/Disabling teams](#2222-enablingdisabling-teams)
-            * [2.2.2.3 Timers](#2223-timers)
-            * [2.2.2.4 Arena properties](#2224-arena-properties)
-            * [2.2.2.5 Spawners](#2225-spawners)
-            * [2.2.2.6 Signs](#2226-signs)
-            * [2.2.2.7 Music](#2227-music)
-        * [2.2.3 Enabling an arena](#223-enabling-an-arena)
-    * [2.3 Arena phases](#23-arena-phases)
+	* [2.1 Creating and removing arenas](#21-creating-and-removing-arenas)
+		* [2.1.1 Storing arenas](#211-storing-arenas)
+		* [2.1.2 Renaming an arena](#212-renaming-an-arena)
+	* [2.2 Setting up an arena](#22-setting-up-an-arena)
+		* [2.2.1 Editor](#221-editor)
+		* [2.2.2 CLI](#222-cli)
+			* [2.2.2.1 Players management](#2221-players-management)
+			* [2.2.2.2 Enabling/Disabling teams](#2222-enablingdisabling-teams)
+			* [2.2.2.3 Timers](#2223-timers)
+			* [2.2.2.4 Arena properties](#2224-arena-properties)
+			* [2.2.2.5 Spawners](#2225-spawners)
+			* [2.2.2.6 Signs](#2226-signs)
+			* [2.2.2.7 Music](#2227-music)
+		* [2.2.3 Enabling an arena](#223-enabling-an-arena)
+	* [2.3 Arena phases](#23-arena-phases)
+	* [2.4 Spectate mode](#24-spectate-mode)
 * [3. About the author(s)](#3-about-the-authors)
 
 ## 1. Minigame configuration
@@ -53,8 +54,10 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `is_team_chat_default`: (bool) whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
 * `chat_all_prefix`: (string) prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
 * `chat_team_prefix`: (string) prefix for every message sent in the team chat. Default is `[team] ` (geolocalised)
+* `chat_spectate_prefix`: (string) prefix for every message sent in the spectate chat. Default is `[spectator]` (geolocalised)
 * `chat_all_color`: (string) color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `chat_team_color`: (string) color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
+* `chat_spectate_color`: color for every message sent in the spectate chat. Default is gray (`"#dddddd"`)
 * `fov`: (int) changes the fov of every player
 * `camera_offset`: (table) changes the offset of the camera for evey player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
@@ -63,6 +66,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * `selected_image =`: (string) the image to show when a slot is selected  
   If a field is not declared, it'll keep the server defaults
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
+* `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. Check out also `STORE_INVENTORY_MODE` in `SETTINGS.lua`, to choose whether and how to store players' inventory
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
@@ -102,6 +106,7 @@ A couple more are available for players having the `arenalib_admin` privilege:
 * `/minigamesettings mod`: change `mod` settings
 * `/arenakick player_name`: kicks a player out of an ongoing game, no matter the mod
 * `/forceend mod arena_name`: forcibly ends an ongoing game
+* `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
 Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
@@ -109,19 +114,19 @@ Those aside, you need to connect a few functions with your mod in order to use t
 To customise your mod even more, there are a few empty callbacks you can use. They are:
 * `arena_lib.on_enable(mod, function(arena, p_name)`: use it to run more checks before enabling an arena. Must return true if all conditions are met
 * `arena_lib.on_disable(mod, function(arena, p_name)`: use it to run more checks before disabling an arena. Must return true if all conditions are met
-* `arena_lib.on_load(mod, function(arena)` (we saw these 4 earlier)
-* `arena_lib.on_start(mod, function(arena))`
-* `arena_lib.on_celebration(mod, function(arena, winner_name)`
-* `arena_lib.on_end(mod, function(arena, players, winner_name))`
-* `arena_lib.on_join(mod, function(p_name, arena))`: called when a player joins an ongoing match
+* `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
+* `arena_lib.on_start(mod, function(arena))`: same as above
+* `arena_lib.on_celebration(mod, function(arena, winner_name)`: same as above
+* `arena_lib.on_end(mod, function(arena, players, winner_name, spectators))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy
+* `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
-* `arena_lib.on_kick(mod, function(arena, p_name))`: called when a player is kicked from a match (same as above)
-* `arena_lib.on_quit(mod, function(arena, p_name, is_forced))`: called when a player quits from a match (same as above). `is_forced` is true when the match has been terminated via `force_arena_ending(...)`
-* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful ie. to ask confirmation first, or simply impede a player to quit
-* `arena_lib.on_disconnect(mod, function(arena, p_name))`: called when a player disconnects while in a match
+* `arena_lib.on_kick(mod, function(arena, p_name, is_spectator))`: called when a player/spectator is kicked from a match (same as above)
+* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, is_forced))`: called when a player/spectator quits from a match (same as above). `is_forced` is `true` when the match has been forcibly terminated
+* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
+* `arena_lib.on_disconnect(mod, function(arena, p_name, is_spectator))`: called when a player/spectator disconnects while in a match
 
 > **BEWARE**: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
@@ -191,9 +196,9 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 
 #### 1.6 HUD
 `arena_lib` also comes with a triple practical HUD: `title`, `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following functions:
-* `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: send a message to the specified player in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
-* `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players inside the arena
-* `arena_lib.HUD_hide(HUD_type, player_or_arena)`: it makes the specified HUD disappear; it can take both a player than a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make both the HUDs disappear
+* `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: sends a message to the specified player/spectator in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
+* `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players and spectators inside the arena
+* `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both a player/spectator and a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make all the HUDs disappear
 
 #### 1.7 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 5th slot. To do that, the function is
@@ -225,8 +230,10 @@ There are also some other functions which might turn useful. They are:
   * `4`: forced by the mod. This should NOT be used but internally. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1).  
 Executioner can be passed to tell who removed the player. By default, this happens when someone uses /arenakick and /forceend, so that these commands can't be abused without consequences for the admin.
-* `arena_lib.send_message_players_in_arena(arena, msg, <teamID>, <except_teamID>)`: send a message to all the players in that specific arena. If a teamID is specified, it'll be only sent to the players inside that very team. On the contrary, if except_teamID is true, it'll be sent to every player BUT the ones in the specified team
-* `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleport the sender into the arena if at least one spawner has been set
+* `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
+* `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleports the sender into the arena if at least one spawner has been set
+* `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean
+* `arena_lib.is_player_spectated(p_name)`: returns whether a player is being spectated
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
@@ -261,10 +268,16 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `author`: (string) the name of the one who built/designed the map. Default is `"???"`. It appears in the signs infobox (right-click an arena sign)
 * `sign`: (pos) the position of the sign associated with the arena
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
+* `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
+* `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
+* `past_present_players`: (table) keeps track of every player who took part to the match, even if they are spectators now or they left. Contrary to `players` and `players_and_spectators`, this is created when the arena loads, so it doesn't consider people who joined and left during the queue. Format `{[ppp_name] = true}`
+* `past_present_players_inside`: (table) same as `past_present_players` but without keeping track of the ones who left
 * `teams`: (table) where to store teams information, such as their name (`name`) and `team_properties`. If there are no teams, it's `{-1}`. If there are, format is `{[teamID] = {stuff}, [teamID2] = {stuff}, ...}`
 * `teams_enabled`: (boolean) whether teams are enabled in the arena. Requires teams
 * `players_amount`: (int) separately stores how many players are inside the arena/queue
-* `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`
+* `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`. If teams are disabled, it's `nil`
+* `spectators_amount`: (int) separately stores how many spectators are inside the arena
+* `spectators_amount_per_team`: (table) like `players_amount_per_team`, but for spectators
 * `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
@@ -316,7 +329,7 @@ Two things are needed to have an arena up to go: spawners and signs. There are t
 * `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
 
 #### 2.2.1 Editor
-Since 3.0, arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
+arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
 In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
 The function calling the editor is  
 `arena_lib.enter_editor(sender, mod, arena_name)`
@@ -402,9 +415,12 @@ The 4 functions, intertwined with the previously mentioned phases are:
 * `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
 * `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
 * `arena_lib.load_celebration(mod, arena, winner_name)`: between the fighting and the celebration phase. Called when the winning conditions are met. `winner_name` can be both a string and a table (in case of teams)
-* `arena_lib.end_arena(mod_ref, mod, arena, winner_name)`: at the very end of the celebration phase. It teleports people outside the arena. `winner_name` is taken by `load_celebration(...)`
+* `arena_lib.end_arena(mod_ref, mod, arena, winner_name, as_spectator)`: at the very end of the celebration phase. It teleports people outside the arena. `winner_name` is taken by `load_celebration(...)`
 
-Overriding these functions is **not** recommended. Instead, there are 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
+Overriding these functions is **not** recommended. Instead, use the 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
+
+### 2.4 Spectate mode
+Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

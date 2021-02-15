@@ -21,6 +21,9 @@ dofile(modpath .. "/_editor/tools_sign.lua")
 dofile(modpath .. "/_editor/tools_spawner.lua")
 dofile(modpath .. "/_hud/hud_main.lua")
 dofile(modpath .. "/_hud/hud_waypoints.lua")
+dofile(modpath .. "/_spectate/spectate_main.lua")
+dofile(modpath .. "/_spectate/spectate_hand.lua")
+dofile(modpath .. "/_spectate/spectate_tools.lua")
 
 dofile(modpath .. "/SETTINGS.lua")
 

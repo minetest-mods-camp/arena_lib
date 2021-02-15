@@ -113,7 +113,7 @@ function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound, color
 
   color = color == nil and "0xFFFFFF" or color
 
-  for pl_name, _ in pairs(arena.players) do
+  for pl_name, _ in pairs(arena.players_and_spectators) do
 
     local pl = minetest.get_player_by_name(pl_name)
     local pl_HUD = player_huds[pl_name]
@@ -186,7 +186,7 @@ function arena_lib.HUD_hide(HUD_type, player_or_arena)
 
   elseif type(player_or_arena) == "table" then
 
-    for pl_name, _ in pairs(player_or_arena.players) do
+    for pl_name, _ in pairs(player_or_arena.players_and_spectators) do
 
       local pl = minetest.get_player_by_name(pl_name)
       local pl_HUD = player_huds[pl_name]

@@ -19,24 +19,32 @@ local function next_available_ID() end
 local function is_arena_name_allowed() end
 local function assign_team_spawner() end
 local function operations_before_entering_arena() end
+local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
+local function handle_leaving_callbacks() end
 local function show_victory_particles() end
 local function time_start() end
 
-local players_in_game = {}        -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_in_queue = {}       -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}   -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                  --                           (int) bgm_handle, (int) fov, (table) camera_offset}
+local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
+local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
+                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset}
 
 local arena_default = {
   name = "",
   author = "???",
   sign = {},
-  players = {},               -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
+  players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
+  spectators = {},                    -- KEY: player name, VALUE: true
+  players_and_spectators = {},        -- KEY: pl/sp name,  VALUE: true
+  past_present_players = {},          -- KEY: player_name, VALUE: true
+  past_present_players_inside = {},   -- KEY: player_name, VALUE: true
   teams = {-1},
   teams_enabled = false,
   players_amount = 0,
   players_amount_per_team = nil,
+  spectators_amount = 0,
+  spectators_amount_per_team = nil,
   spawn_points = {},          -- KEY: ids, VALUE: {pos, teamID}
   max_players = 4,
   min_players = 2,
@@ -96,12 +104,15 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.is_team_chat_default = false
   mod_ref.chat_all_prefix = "[" .. S("arena") .. "] "
   mod_ref.chat_team_prefix = "[" .. S("team") .. "] "
+  mod_ref.chat_spectate_prefix = "[" .. S("spectator") .. "] "
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
+  mod_ref.chat_spectate_color = "#dddddd"
   mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
   mod_ref.join_while_in_progress = false
+  mod_ref.spectate_mode = true
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
@@ -147,6 +158,14 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.chat_all_color = def.chat_all_color
   end
 
+  if def.chat_spectate_prefix then
+    mod_ref.chat_spectate_prefix = def.chat_spectate_prefix
+  end
+
+  if def.chat_spectate_color then
+    mod_ref.chat_spectate_color = def.chat_spectate_color
+  end
+
   if def.fov then
     mod_ref.fov = def.fov
   end
@@ -166,16 +185,20 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.join_while_in_progress = def.join_while_in_progress
   end
 
+  if def.spectate_mode == false then
+    mod_ref.spectate_mode = false
+  end
+
   if def.keep_inventory == true then
-    mod_ref.keep_inventory = def.keep_inventory
+    mod_ref.keep_inventory = true
   end
 
   if def.show_nametags == true then
-    mod_ref.show_nametags = def.show_nametags
+    mod_ref.show_nametags = true
   end
 
   if def.show_minimap == true then
-    mod_ref.show_minimap = def.show_minimap
+    mod_ref.show_minimap = true
   end
 
   if def.time_mode then
@@ -299,7 +322,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     arena.max_players = max_players
   end
 
-  -- eventuali team
+  -- eventuali squadre
   if #mod_ref.teams > 1 then
     arena.teams = {}
     arena.teams_enabled = true
@@ -308,6 +331,13 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     for k, t_name in pairs(mod_ref.teams) do
       arena.teams[k] = {name = t_name}
       arena.players_amount_per_team[k] = 0
+    end
+
+    if mod_ref.spectate_mode then
+      arena.spectators_amount_per_team = {}
+      for k, t_name in pairs(mod_ref.teams) do
+        arena.spectators_amount_per_team[k] = 0
+      end
     end
   end
 
@@ -1083,21 +1113,47 @@ end
 
 
 
--- per il player singolo a match iniziato
-function arena_lib.join_arena(mod, p_name, arena_ID)
+-- per il giocatore singolo a match iniziato
+function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
 
   local mod_ref = arena_lib.mods[mod]
-  local player = minetest.get_player_by_name(p_name)
   local arena = mod_ref.arenas[arena_ID]
 
-  operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
+  -- se prova a entrare come spettatore
+  if as_spectator then
+    -- aggiungo temporaneamente, sennò non trova l'arena quando va a cercare lo spettatore
+    players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
-  -- teletrasporto
-  player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+    -- se passa i controlli, lo inserisco e notifico i giocatori
+    if arena_lib.enter_spectate_mode(p_name, arena) then
+      operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
+      arena_lib.send_message_in_arena(arena, "players", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
+
+    -- sennò annullo
+    else
+      players_in_game[p_name] = nil
+      return
+    end
+
+  -- se entra come giocatore
+  else
+    if arena_lib.is_player_spectating(p_name) then                              -- se lo fa mentre è spettatore, controllo che ci sia spazio ecc.
+      if not arena_lib.leave_spectate_mode(p_name, true) then return end
+      operations_before_playing_arena(mod_ref, arena, p_name)
+    else
+      operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)   -- sennò entra normalmente
+    end
+
+    local player = minetest.get_player_by_name(p_name)
+
+    -- notifico e teletrasporto
+    arena_lib.send_message_in_arena(arena, "players", minetest.colorize("#c6f154", " >>> " .. p_name))
+    player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+  end
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
-    mod_ref.on_join(p_name, arena)
+    mod_ref.on_join(p_name, arena, as_spectator)
   end
 end
 
@@ -1151,9 +1207,28 @@ end
 
 function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
 
-  -- copia da passare a on_end
+  -- copie da passare a on_end
+  local spectators = {}
   local players = {}
 
+  -- rimozione spettatori
+  for sp_name, sp_stats in pairs(arena.spectators) do
+
+    spectators[sp_name] = sp_stats
+    arena_lib.leave_spectate_mode(sp_name)
+    players_in_game[sp_name] = nil
+
+    operations_before_leaving_arena(mod_ref, arena, sp_name)
+
+    -- TEMP: 5.4, senza after non teletrasporta dove dovrebbe. Si veda https://github.com/minetest/minetest/pull/10235
+    minetest.after(0.1, function()
+      local spectator = minetest.get_player_by_name(sp_name)
+      spectator:set_pos(mod_ref.settings.hub_spawn_point)
+    end)
+    --^-----------------------------------------------------^
+  end
+
+  -- rimozione giocatori
   for pl_name, stats in pairs(arena.players) do
 
     players[pl_name] = stats
@@ -1163,29 +1238,18 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
     operations_before_leaving_arena(mod_ref, arena, pl_name)
   end
 
-  -- effetto particellare
-  if type(winner_name) == "string" then
-    local winner = minetest.get_player_by_name(winner_name)
+  -- azzerramento giocatori e spettatori
+  arena.past_present_players = {}
+  arena.players_and_spectators = {}
+  arena.past_present_players_inside = {}
 
-    if winner then
-      show_victory_particles(winner:get_pos())
-    end
-
-  elseif type(winner_name) == "table" then
-    for _, pl_name in pairs(winner_name) do
-      local winner = minetest.get_player_by_name(pl_name)
-
-      if winner then
-        show_victory_particles(winner:get_pos())
-      end
-    end
-  end
-
-  -- azzero il numero di giocatori
   arena.players_amount = 0
   if arena.teams_enabled then
     for i = 1, #arena.teams do
       arena.players_amount_per_team[i] = 0
+      if mod_ref.spectate_mode then
+        arena.spectators_amount_per_team[i] = 0
+      end
     end
   end
 
@@ -1206,9 +1270,27 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
     end
   end
 
+  -- effetto particellare
+  if type(winner_name) == "string" then
+    local winner = minetest.get_player_by_name(winner_name)
+
+    if winner then
+      show_victory_particles(winner:get_pos())
+    end
+
+  elseif type(winner_name) == "table" then
+    for _, pl_name in pairs(winner_name) do
+      local winner = minetest.get_player_by_name(pl_name)
+
+      if winner then
+        show_victory_particles(winner:get_pos())
+      end
+    end
+  end
+
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
-    mod_ref.on_end(arena, players, winner_name)
+    mod_ref.on_end(arena, players, winner_name, spectators)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
@@ -1311,9 +1393,9 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
     return end
 
-  -- caccio tutti i giocatori
-  for pl_name, _ in pairs(arena.players) do
-    arena_lib.remove_player_from_arena(pl_name, 4, sender)
+  -- caccio tutti i giocatori e spettatori
+  for psp_name, _ in pairs(arena.players_and_spectators) do
+    arena_lib.remove_player_from_arena(psp_name, 4, sender)
   end
 
   arena_lib.end_arena(mod_ref, mod, arena)
@@ -1323,6 +1405,9 @@ end
 
 
 function arena_lib.add_to_queue(p_name, mod, arena_ID)
+  local arena = arena_lib.mods[mod].arenas[arena_ID]
+  arena_lib.send_message_players_in_arena(arena, minetest.colorize("#c8d692", arena.name .. " > " ..  p_name))
+
   players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
 end
 
@@ -1344,6 +1429,9 @@ function arena_lib.remove_player_from_queue(p_name)
     arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
   end
   arena.players[p_name] = nil
+  arena.players_and_spectators[p_name] = nil
+
+  arena_lib.HUD_hide("all", p_name)
 
   local players_required = arena_lib.get_players_to_start_queue(arena)
 
@@ -1390,65 +1478,83 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
 
-  -- lo rimuovo
-  players_in_game[p_name] = nil
-  arena.players_amount = arena.players_amount - 1
-  if arena.teams_enabled then
-    local p_team_ID = arena.players[p_name].teamID
-    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
-  end
-  arena.players[p_name] = nil
+  -- se il giocatore era in spettatore
+  if mod_ref.spectate_mode and arena_lib.is_player_spectating(p_name) then
 
-  -- se una ragione è specificata
-  if reason ~= 0 then
+    arena_lib.leave_spectate_mode(p_name)
 
-    operations_before_leaving_arena(mod_ref, arena, p_name)
+    -- TEMP: 5.4, senza after non teletrasporta dove dovrebbe. Si veda https://github.com/minetest/minetest/pull/10235
+    -- Quando sistemato, basta eseguire solo operations_before_leaving_arena
+    if reason ~= 0 then
+      minetest.after(0.1, function()
+        operations_before_leaving_arena(mod_ref, arena, p_name)
+        arena.past_present_players_inside[p_name] = nil
+      end)
+    else
+      arena.past_present_players_inside[p_name] = nil
+    end
 
-    -- ripristino nomi
-    minetest.get_player_by_name(p_name):set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+    handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
 
+    players_in_game[p_name] = nil
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", "<<< " .. S("@1 has quit the match", p_name) .. " (" .. S("spectator") .. ")"))
+
+  -- sennò...
+  else
+
+    -- rimuovo
+    arena.players_amount = arena.players_amount - 1
+    if arena.teams_enabled then
+      local p_team_ID = arena.players[p_name].teamID
+      arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
+    end
+    arena.players[p_name] = nil
+
+    -- se ha abbandonato mentre aveva degli spettatori, li riassegno
+    if arena_lib.is_player_spectated(p_name) then
+      for sp_name, _ in pairs(arena_lib.get_player_spectators(p_name)) do
+        arena_lib.find_and_spectate_player(sp_name)
+      end
+    end
+
+    -- se è stato eliminato, tratto il callback a parte perché è l'unico dove potrebbe venire mandato eventualmente in spettatore
     if reason == 1 then
+
+      -- manda eventualmente in spettatore
+      if mod_ref.spectate_mode and arena.players_amount > 0 then
+        arena_lib.enter_spectate_mode(p_name, arena)
+      else
+        operations_before_leaving_arena(mod_ref, arena, p_name)
+        arena.players_and_spectators[p_name] = nil
+        arena.past_present_players_inside[p_name] = nil
+        players_in_game[p_name] = nil
+      end
+
       if executioner then
         arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
       else
         arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
       end
+
       if mod_ref.on_eliminate then
         mod_ref.on_eliminate(arena, p_name)
       elseif mod_ref.on_quit then
         mod_ref.on_quit(arena, p_name)
       end
-    elseif reason == 2 then
-      if executioner then
-        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked by @2", p_name, executioner)))
-      else
-        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been kicked", p_name)))
+
+    -- sennò procedo a rimuoverlo normalmente
+    else
+      if reason ~= 0 then       -- non c'è bisogno di reimpostare i vari parametri se si è disconnesso
+        operations_before_leaving_arena(mod_ref, arena, p_name)
       end
-      if mod_ref.on_kick then
-        mod_ref.on_kick(arena, p_name)
-      elseif mod_ref.on_quit then
-        mod_ref.on_quit(arena, p_name)
-      end
-    elseif reason == 3 then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", "<<< " .. S("@1 has quit the match", p_name)))
-      if mod_ref.on_quit then
-        mod_ref.on_quit(arena, p_name)
-      end
-    elseif reason == 4 then
-      if executioner then
-        minetest.chat_send_player(p_name, minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", executioner)))
-      else
-        minetest.chat_send_player(p_name, minetest.colorize("#d69298", S("The arena has been forcibly terminated")))
-      end
-      if mod_ref.on_quit then
-        mod_ref.on_quit(arena, p_name, true)
-      end
+
+      arena.players_and_spectators[p_name] = nil
+      arena.past_present_players_inside[p_name] = nil
+      players_in_game[p_name] = nil
     end
-  else
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. p_name ))
-    if mod_ref.on_disconnect then
-      mod_ref.on_disconnect(arena, p_name)
-    end
+
+    handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
+
   end
 
   -- se il termine dell'arena è stato forzato o è già in celebrazione, non c'è bisogno di andare oltre
@@ -1489,7 +1595,6 @@ end
 
 
 
---WARNING: internal use only
 function arena_lib.restore_inventory(p_name)
 
   if arena_lib.STORE_INVENTORY_MODE == "mod_db" and storage:get_string(p_name .. ".INVENTORY") ~= "" then
@@ -1527,25 +1632,33 @@ end
 
 
 
-function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_teamID)
+-- channel: "players", "spectators", "both"
+function arena_lib.send_message_in_arena(arena, channel, msg, teamID, except_teamID)
 
-  if teamID then
-    if except_teamID then
-      for pl_name, pl_stats in pairs(arena.players) do
-        if pl_stats.teamID ~= teamID then
-          minetest.chat_send_player(pl_name, msg)
+  if channel == "players" then
+    if teamID then
+      if except_teamID then
+        for pl_name, pl_stats in pairs(arena.players) do
+          if pl_stats.teamID ~= teamID then
+            minetest.chat_send_player(pl_name, msg)
+          end
+        end
+      else
+        for pl_name, pl_stats in pairs(arena.players) do
+          if pl_stats.teamID == teamID then
+            minetest.chat_send_player(pl_name, msg)
+          end
         end
       end
     else
-      for pl_name, pl_stats in pairs(arena.players) do
-        if pl_stats.teamID == teamID then
-          minetest.chat_send_player(pl_name, msg)
-        end
+      for pl_name, _ in pairs(arena.players) do
+        minetest.chat_send_player(pl_name, msg)
       end
     end
-  else
-    for pl_name, _ in pairs(arena.players) do
-      minetest.chat_send_player(pl_name, msg)
+
+  elseif channel == "spectators" then
+    for sp_name, _ in pairs(arena.spectators) do
+      minetest.chat_send_player(sp_name, msg)
     end
   end
 end
@@ -1787,19 +1900,34 @@ function init_storage(mod, mod_ref)
       end
       --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
-      -- gestione team
-      if arena.teams_enabled and not (#mod_ref.teams > 1) then                  -- se avevo abilitato i team e ora li ho rimossi
+      --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
+      if not arena.spectators then
+        arena.spectators = {}
+        arena.spectators_amount = 0
+        arena.players_and_spectators = {}
+        arena.past_present_players = {}
+        arena.past_present_players_inside = {}
+        to_update = true
+      end
+      --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
+
+      -- gestione squadre
+      if arena.teams_enabled and not (#mod_ref.teams > 1) then                  -- se avevo abilitato le squadre e ora le ho rimosse
         arena.players_amount_per_team = nil
         arena.teams = {-1}
         arena.teams_enabled = false
-      elseif #mod_ref.teams > 1 and arena.teams_enabled then                    -- sennò li genero per tutte le arena con teams_enabled
+        arena.spectators_amount_per_team = nil
+      elseif #mod_ref.teams > 1 and arena.teams_enabled then                    -- sennò le genero per tutte le arene con teams_enabled
         arena.players_amount_per_team = {}
+        arena.spectators_amount_per_team = {}
         arena.teams = {}
 
         for k, t_name in pairs(mod_ref.teams) do
           arena.players_amount_per_team[k] = 0
+          arena.spectators_amount_per_team[k] = 0
           arena.teams[k] = {name = t_name}
         end
+
       end
 
       local arena_max_players = arena.max_players * #arena.teams
@@ -2043,18 +2171,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
-  -- applico eventuale fov
-  if mod_ref.fov then
-    players_temp_storage[p_name].fov = player:get_fov()
-    player:set_fov(mod_ref.fov)
-  end
-
-  -- applico eventuale scostamento camera
-  if mod_ref.camera_offset then
-    players_temp_storage[p_name].camera_offset = player:get_eye_offset()
-    player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
-  end
-
   -- nascondo i nomi se l'opzione è abilitata
   if not mod_ref.show_nametags then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
@@ -2063,48 +2179,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   -- disattivo eventualmente la minimappa
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
-  end
-
-  -- cambio eventuale colore texture (richiede i team)
-  if arena.teams_enabled and mod_ref.teams_color_overlay then
-   player:set_properties({
-     textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
-   })
-  end
-
-  -- cambio l'eventuale hotbar
-  if mod_ref.hotbar then
-
-    local hotbar = mod_ref.hotbar
-
-    if hotbar.slots then
-      players_temp_storage[p_name].hotbar_slots = player:hud_get_hotbar_itemcount()
-      player:hud_set_hotbar_itemcount(hotbar.slots)
-    end
-
-    if hotbar.background_image then
-      players_temp_storage[p_name].hotbar_background_image = player:hud_get_hotbar_image()
-      player:hud_set_hotbar_image(hotbar.background_image)
-    end
-
-    if hotbar.selected_image then
-      players_temp_storage[p_name].hotbar_selected_image = player:hud_get_hotbar_selected_image()
-      player:hud_set_hotbar_selected_image(hotbar.selected_image)
-    end
-  end
-
-  -- assegno eventuali proprietà giocatori
-  for k, v in pairs(mod_ref.player_properties) do
-    if type(v) == "table" then
-      arena.players[p_name][k] = copy_table(v)
-    else
-      arena.players[p_name][k] = v
-    end
-  end
-
-  -- imposto eventuale fisica personalizzata
-  if mod_ref.in_game_physics then
-    player:set_physics_override(mod_ref.in_game_physics)
   end
 
   -- chiudo eventuali formspec
@@ -2139,9 +2213,81 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   -- li curo
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
+  -- salvo la hotbar se c'è la spettatore o la hotbar personalizzata
+  if mod_ref.spectate_mode or mod_ref.hotbar then
+    players_temp_storage[p_name].hotbar_slots = player:hud_get_hotbar_itemcount()
+    players_temp_storage[p_name].hotbar_background_image = player:hud_get_hotbar_image()
+    players_temp_storage[p_name].hotbar_selected_image = player:hud_get_hotbar_selected_image()
+  end
+
+  if not arena_lib.is_player_spectating(p_name) then
+    operations_before_playing_arena(mod_ref, arena, p_name)
+  end
+
   -- registro giocatori nella tabella apposita
   players_in_queue[p_name] = nil
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
+end
+
+
+
+function operations_before_playing_arena(mod_ref, arena, p_name)
+
+  arena.past_present_players[p_name] = true
+  arena.past_present_players_inside[p_name] = true
+
+  local player = minetest.get_player_by_name(p_name)
+
+  -- applico eventuale fov
+  if mod_ref.fov then
+    players_temp_storage[p_name].fov = player:get_fov()
+    player:set_fov(mod_ref.fov)
+  end
+
+  -- applico eventuale scostamento camera
+  if mod_ref.camera_offset then
+    players_temp_storage[p_name].camera_offset = player:get_eye_offset()
+    player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
+  end
+
+  -- cambio eventuale colore texture (richiede i team)
+  if arena.teams_enabled and mod_ref.teams_color_overlay then
+   player:set_properties({
+     textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
+   })
+  end
+
+  -- cambio l'eventuale hotbar
+  if mod_ref.hotbar then
+
+    local hotbar = mod_ref.hotbar
+
+    if hotbar.slots then
+      player:hud_set_hotbar_itemcount(hotbar.slots)
+    end
+
+    if hotbar.background_image then
+      player:hud_set_hotbar_image(hotbar.background_image)
+    end
+
+    if hotbar.selected_image then
+      player:hud_set_hotbar_selected_image(hotbar.selected_image)
+    end
+  end
+
+  -- imposto eventuale fisica personalizzata
+  if mod_ref.in_game_physics then
+    player:set_physics_override(mod_ref.in_game_physics)
+  end
+
+  -- assegno eventuali proprietà giocatori
+  for k, v in pairs(mod_ref.player_properties) do
+    if type(v) == "table" then
+      arena.players[p_name][k] = copy_table(v)
+    else
+      arena.players[p_name][k] = v
+    end
+  end
 end
 
 
@@ -2160,36 +2306,32 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     end
   end
 
-  -- resetto eventuali texture
-  if arena.teams_enabled and mod_ref.teams_color_overlay then
-    player:set_properties({
-      textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
-    })
+  -- se c'è la spettatore o l'hotbar personalizzata, la ripristino
+  if mod_ref.spectate_mode or mod_ref.hotbar then
+    player:hud_set_hotbar_itemcount(players_temp_storage[p_name].hotbar_slots)
+    player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_background_image)
+    player:hud_set_hotbar_selected_image(players_temp_storage[p_name].hotbar_selected_image)
   end
 
-  -- reimposto eventuale hotbar
-  if mod_ref.hotbar then
-    local hotbar = mod_ref.hotbar
+  -- se ha partecipato come giocatore
+  if arena.past_present_players_inside[p_name] then
 
-    if hotbar.slots then
-      player:hud_set_hotbar_itemcount(players_temp_storage[p_name].hotbar_slots)
+    -- resetto eventuali texture
+    if arena.teams_enabled and mod_ref.teams_color_overlay then
+      player:set_properties({
+        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
+      })
     end
-    if hotbar.background_image then
-      player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_background_image)
-    end
-    if hotbar.selected_image then
-      player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_selected_image)
-    end
-  end
 
-  -- reimposto eventuale fov
-  if mod_ref.fov then
-    player:set_fov(players_temp_storage[p_name].fov)
-  end
+    -- reimposto eventuale fov
+    if mod_ref.fov then
+      player:set_fov(players_temp_storage[p_name].fov)
+    end
 
-  -- ripristino eventuale camera
-  if mod_ref.camera_offset then
-    player:set_eye_offset(players_temp_storage[p_name].camera_offset[1], players_temp_storage[p_name].camera_offset[2])
+    -- ripristino eventuale camera
+    if mod_ref.camera_offset then
+      player:set_eye_offset(players_temp_storage[p_name].camera_offset[1], players_temp_storage[p_name].camera_offset[2])
+    end
   end
 
   -- ripristino gli HP
@@ -2213,6 +2355,9 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
   -- riattivo la minimappa eventualmente disattivata
   player:hud_set_flags({minimap = true})
 
+  -- ripristino nomi
+  player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+
   -- disattivo eventuale musica di sottofondo
   if arena.bgm then
     minetest.sound_stop(players_temp_storage[p_name].bgm_handle)
@@ -2220,6 +2365,62 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
 
   -- svuoto lo storage temporaneo
   players_temp_storage[p_name] = nil
+end
+
+
+
+function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, is_spectator)
+
+  local msg_color = reason < 3 and "#f16a54" or "#d69298"
+  local spect_str = ""
+
+  if is_spectator then
+    msg_color = "#cfc6b8"
+    spect_str = " (" .. S("spectator") .. ")"
+  end
+
+  -- se si è disconnesso
+  if reason == 0 then
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
+
+    if mod_ref.on_disconnect then
+      mod_ref.on_disconnect(arena, p_name, is_spectator)
+    end
+
+  -- se è stato cacciato
+  elseif reason == 2 then
+    if executioner then
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked by @2", p_name, executioner) .. spect_str))
+    else
+      arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
+    end
+
+    if mod_ref.on_kick then
+      mod_ref.on_kick(arena, p_name, is_spectator)
+    elseif mod_ref.on_quit then
+      mod_ref.on_quit(arena, p_name, is_spectator)
+    end
+
+  -- se ha abbandonato
+  elseif reason == 3 then
+    arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
+
+    if mod_ref.on_quit then
+      mod_ref.on_quit(arena, p_name, is_spectator)
+    end
+
+  -- se la fine è stata forzata
+  elseif reason == 4 then
+    if executioner then
+      minetest.chat_send_player(p_name, minetest.colorize(msg_color, S("The arena has been forcibly terminated by @1", executioner) .. spect_str))
+    else
+      minetest.chat_send_player(p_name, minetest.colorize(msg_color, S("The arena has been forcibly terminated") .. spect_str))
+    end
+
+    if mod_ref.on_quit then
+      mod_ref.on_quit(arena, p_name, is_spectator, true)
+    end
+  end
 end
 
 
@@ -2271,8 +2472,13 @@ end
 ------------------DEPRECATED------------------
 ----------------------------------------------
 
--- to remove in 6.0
+-- to remove in 7.0
 function arena_lib.remove_from_queue(p_name)
   minetest.log("warning", "[ARENA_LIB] remove_from_queue is deprecated. Please use remove_player_from_queue instead")
   arena_lib.remove_player_from_queue(p_name)
+end
+
+function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_teamID)
+  minetest.log("warning", "[ARENA_LIB] send_message_players_in_arena is deprecated. Please use send_message_in_arena instead")
+  arena_lib.send_message_in_arena(arena, "players", msg, teamID, except_teamID)
 end

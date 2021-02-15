@@ -34,6 +34,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local min_players_per_team = ""
   local max_players_per_team = ""
   local players_inside_per_team = ""
+  local spectators_inside_per_team = ""
 
   -- concateno eventuali team
   if arena.teams_enabled then
@@ -42,8 +43,14 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     for i = 1, #arena.teams do
       teams = teams .. "'" .. arena.teams[i].name .. "' "
       players_inside_per_team = players_inside_per_team .. "'" .. arena.teams[i].name .. "' : " .. arena.players_amount_per_team[i] .. " "
+      if mod_ref.spectate_mode then
+        spectators_inside_per_team = spectators_inside_per_team .. "'" .. arena.teams[i].name .. "' : " .. arena.spectators_amount_per_team[i] .. " "
+      end
     end
     players_inside_per_team = minetest.colorize("#eea160", S("Players inside per team: ")) .. minetest.colorize("#cfc6b8", players_inside_per_team) .. "\n"
+    if mod_ref.spectate_mode then
+      spectators_inside_per_team = minetest.colorize("#eea160", S("Spectators inside per team: ")) .. minetest.colorize("#cfc6b8", spectators_inside_per_team) .. "\n"
+    end
   else
     teams = "---"
   end
@@ -59,9 +66,39 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   end
 
   -- concateno nomi giocatori
-  local names = ""
+  local p_names = ""
   for pl, stats in pairs(arena.players) do
-    names = names .. " " .. pl
+    p_names = p_names .. " " .. pl
+  end
+
+  -- concateno nomi spettatori
+  local sp_names = ""
+  for sp_name, stats in pairs(arena.spectators) do
+    sp_names = sp_names .. " " .. sp_name
+  end
+
+  -- concateno giocatori e spettatori (per verificare che campo sia giusto)
+  local psp_names = ""
+  local psp_amount = 0
+  for psp_name, _ in pairs(arena.players_and_spectators) do
+    psp_names = psp_names .. " " .. psp_name
+    psp_amount = psp_amount + 1
+  end
+
+  -- concateno giocatori presenti e passati
+  local ppp_names = ""
+  local ppp_names_amount = 0
+  for ppp_name, _ in pairs(arena.past_present_players) do
+    ppp_names = ppp_names .. " " .. ppp_name
+    ppp_names_amount = ppp_names_amount + 1
+  end
+
+  -- concateno giocatori presenti e passati
+  local ppp_names_inside = ""
+  local ppp_names_inside_amount = 0
+  for ppp_name_inside, _ in pairs(arena.past_present_players_inside) do
+    ppp_names_inside = ppp_names_inside .. " " .. ppp_name_inside
+    ppp_names_inside_amount = ppp_names_inside_amount + 1
   end
 
   -- calcolo stato arena
@@ -165,8 +202,13 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     max_players_per_team ..
     minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..
     minetest.colorize("#eea160", S("Players supported: ")) .. minetest.colorize("#cfc6b8", arena_max_players) .. "\n" ..
-    minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. names .. " )") .. "\n" ..
+    minetest.colorize("#eea160", S("Players inside: ")) .. minetest.colorize("#cfc6b8", arena.players_amount .. " ( ".. p_names .. " )") .. "\n" ..
     players_inside_per_team ..
+    minetest.colorize("#eea160", S("Spectators inside: ")) .. minetest.colorize("#cfc6b8", arena.spectators_amount .. " ( ".. sp_names .. " )") .. "\n" ..
+    spectators_inside_per_team ..
+    minetest.colorize("#eea160", S("Players and spectators inside: ")) .. minetest.colorize("#cfc6b8", psp_amount .. " ( ".. psp_names .. " )") .. "\n" ..
+    minetest.colorize("#eea160", S("Past and present players: ")) .. minetest.colorize("#cfc6b8", ppp_names_amount .. " ( " .. ppp_names .. " )") .."\n" ..
+    minetest.colorize("#eea160", S("Past and present players inside: ")) .. minetest.colorize("#cfc6b8", ppp_names_inside_amount .. " ( " .. ppp_names_inside .. " )") .."\n" ..
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
@@ -208,6 +250,36 @@ function arena_lib.print_arena_stats(sender, mod, arena_name)
       p_properties)
   end
 
+end
+
+
+
+function arena_lib.flush_arena(mod, arena, sender)
+
+  if arena.in_queue or arena.in_game then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't perform this action during an ongoing game!")))
+    return end
+
+  arena.players = {}
+  arena.spectators = {}
+  arena.players_and_spectators = {}
+  arena.past_present_players = {}
+  arena.past_present_players_inside = {}
+  arena.players_amount = 0
+
+  if arena.teams_enabled then
+    local mod_ref = arena_lib.mods[mod]
+    for i = 1, #arena.teams do
+      arena.players_amount_per_team[i] = 0
+      if mod_ref.spectate_mode then
+        arena.spectators_amount_per_team[i] = 0
+      end
+    end
+  end
+
+  arena.current_time = nil
+
+  minetest.chat_send_player(sender, "Sluuush!")
 end
 
 
