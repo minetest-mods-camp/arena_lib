@@ -241,7 +241,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
 * `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as index either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as index either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
-* `arena_lib.get_active_teams(arena)`: returns a table like `arena.teams`, but containing only non empty ones
+* `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
 
 ### 1.10 Things you don't want to do with a light heart

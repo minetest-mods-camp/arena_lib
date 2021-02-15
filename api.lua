@@ -1724,9 +1724,9 @@ function arena_lib.get_active_teams(arena)
 
   local active_teams = {}
 
-  for ID, t_stats in pairs(arena.teams) do
+  for ID, _ in pairs(arena.teams) do
     if arena.players_amount_per_team[ID] > 0 then
-      active_teams[ID] = t_stats
+      active_teams[#active_teams + 1] = ID
     end
   end
 
