@@ -163,7 +163,7 @@ minetest.register_chatcommand("all", {
     local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(name)]
     local arena = arena_lib.get_arena_by_player(name)
 
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_all_color, mod_ref.chat_all_prefix .. minetest.format_chat_message(name, msg)))
+    arena_lib.send_message_in_arena(arena, "players", minetest.colorize(mod_ref.chat_all_color, mod_ref.chat_all_prefix .. minetest.format_chat_message(name, msg)))
     return true
   end
 })
@@ -190,7 +190,7 @@ minetest.register_chatcommand("t", {
       minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] Teams are not enabled!")))
       return false end
 
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(name, msg)), teamID)
+    arena_lib.send_message_in_arena(arena, "players", minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(name, msg)), teamID)
     return true
   end
 })

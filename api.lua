@@ -1406,7 +1406,7 @@ end
 
 function arena_lib.add_to_queue(p_name, mod, arena_ID)
   local arena = arena_lib.mods[mod].arenas[arena_ID]
-  arena_lib.send_message_players_in_arena(arena, minetest.colorize("#c8d692", arena.name .. " > " ..  p_name))
+  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena.name .. " > " ..  p_name))
 
   players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
 end
@@ -1420,7 +1420,7 @@ function arena_lib.remove_player_from_queue(p_name)
 
   if not arena then return end
 
-  arena_lib.send_message_players_in_arena(arena, minetest.colorize("#d69298", arena.name .. " < " .. p_name))
+  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena.name .. " < " .. p_name))
 
   players_in_queue[p_name] = nil
   arena.players_amount = arena.players_amount - 1
@@ -1446,7 +1446,7 @@ function arena_lib.remove_player_from_queue(p_name)
 
     arena_lib.HUD_hide("broadcast", arena)
     arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
+    arena_lib.send_message_in_arena(arena, "both", mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
 
   -- se già non era in coda, aggiorno HUD
   elseif players_required > 0 then
@@ -1495,9 +1495,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     end
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
-
     players_in_game[p_name] = nil
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", "<<< " .. S("@1 has quit the match", p_name) .. " (" .. S("spectator") .. ")"))
 
   -- sennò...
   else
@@ -1531,9 +1529,9 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       end
 
       if executioner then
-        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
+        arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
       else
-        arena_lib.send_message_players_in_arena(arena, minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+        arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
       end
 
       if mod_ref.on_eliminate then
@@ -1573,16 +1571,16 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       break
     end
 
-    arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("There are no other teams left, you win!"))
+    arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
     arena_lib.load_celebration(mod, arena, winners)
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
 
     if reason == 1 then
-      arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You're the last player standing: you win!"))
+      arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You're the last player standing: you win!"))
     else
-      arena_lib.send_message_players_in_arena(arena, mod_ref.prefix .. S("You win the game due to not enough players"))
+      arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You win the game due to not enough players"))
     end
 
     for pl_name, stats in pairs(arena.players) do
@@ -1659,6 +1657,11 @@ function arena_lib.send_message_in_arena(arena, channel, msg, teamID, except_tea
   elseif channel == "spectators" then
     for sp_name, _ in pairs(arena.spectators) do
       minetest.chat_send_player(sp_name, msg)
+    end
+
+  elseif channel == "both" then
+    for psp_name, _ in pairs(arena.players_and_spectators) do
+      minetest.chat_send_player(psp_name, msg)
     end
   end
 end
@@ -2381,7 +2384,7 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
   -- se si è disconnesso
   if reason == 0 then
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
 
     if mod_ref.on_disconnect then
       mod_ref.on_disconnect(arena, p_name, is_spectator)
@@ -2390,9 +2393,9 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
   -- se è stato cacciato
   elseif reason == 2 then
     if executioner then
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked by @2", p_name, executioner) .. spect_str))
+      arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked by @2", p_name, executioner) .. spect_str))
     else
-      arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
+      arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
     end
 
     if mod_ref.on_kick then
@@ -2403,7 +2406,7 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
   -- se ha abbandonato
   elseif reason == 3 then
-    arena_lib.send_message_players_in_arena(arena, minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
 
     if mod_ref.on_quit then
       mod_ref.on_quit(arena, p_name, is_spectator)
