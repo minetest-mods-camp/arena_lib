@@ -122,6 +122,8 @@ minetest.register_on_respawnplayer(function(player)
 
     local arena = arena_lib.get_arena_by_player(p_name)
 
-    player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+    if not arena_lib.is_player_spectating(p_name) then
+      player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+    end
     return true
   end)
