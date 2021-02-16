@@ -1205,7 +1205,7 @@ end
 
 
 
-function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
+function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
 
   -- copie da passare a on_end
   local spectators = {}
@@ -1290,7 +1290,7 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
-    mod_ref.on_end(arena, players, winner_name, spectators)
+    mod_ref.on_end(arena, players, winner_name, spectators, is_forced)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
@@ -1401,7 +1401,7 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     end
   end
 
-  arena_lib.end_arena(mod_ref, mod, arena)
+  arena_lib.end_arena(mod_ref, mod, arena, _, true)
   return true
 end
 

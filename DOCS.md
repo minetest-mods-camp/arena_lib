@@ -117,14 +117,14 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
 * `arena_lib.on_start(mod, function(arena))`: same as above
 * `arena_lib.on_celebration(mod, function(arena, winner_name)`: same as above
-* `arena_lib.on_end(mod, function(arena, players, winner_name, spectators))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy
+* `arena_lib.on_end(mod, function(arena, players, winner_name, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
 * `arena_lib.on_kick(mod, function(arena, p_name, is_spectator))`: called when a player/spectator is kicked from a match (same as above)
-* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, is_forced))`: called when a player/spectator quits from a match (same as above). `is_forced` is `true` when the match has been forcibly terminated
+* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator))`: called when a player/spectator quits from a match (same as above)
 * `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
 * `arena_lib.on_disconnect(mod, function(arena, p_name, is_spectator))`: called when a player/spectator disconnects while in a match
 
