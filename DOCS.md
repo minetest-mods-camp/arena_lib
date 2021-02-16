@@ -227,9 +227,8 @@ There are also some other functions which might turn useful. They are:
   * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`
   * `2`: player kicked. Calls `on_kick` if declared. Otherwise calls `on_quit`
   * `3`: player quit. Calls `on_quit`
-  * `4`: forced by the mod. This should NOT be used but internally. Calls `on_quit`
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1).  
-Executioner can be passed to tell who removed the player. By default, this happens when someone uses /arenakick and /forceend, so that these commands can't be abused without consequences for the admin.
+Executioner can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
 * `arena_lib.teleport_in_arena(sender, mod, arena_name)`: teleports the sender into the arena if at least one spawner has been set
 * `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean

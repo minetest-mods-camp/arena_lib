@@ -1393,9 +1393,12 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
     return end
 
-  -- caccio tutti i giocatori e spettatori
-  for psp_name, _ in pairs(arena.players_and_spectators) do
-    arena_lib.remove_player_from_arena(psp_name, 4, sender)
+  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
+
+  if mod_ref.on_quit then
+    for psp_name, _ in pairs(arena.players_and_spectators) do
+      mod_ref.on_quit(arena, p_name, is_spectator, true)
+    end
   end
 
   arena_lib.end_arena(mod_ref, mod, arena)
@@ -1468,7 +1471,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- reason 1 = has been eliminated
   -- reason 2 = has been kicked
   -- reason 3 = has quit the arena
-  -- reason 4 = has been forced to quit the arena
   assert(reason, "[ARENA_LIB] 'remove_player_from_arena': A reason must be specified!")
 
   -- se il giocatore non è in partita, annullo
@@ -1555,8 +1557,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
   end
 
-  -- se il termine dell'arena è stato forzato o è già in celebrazione, non c'è bisogno di andare oltre
-  if reason == 4 or arena.in_celebration then return end
+  -- se è già in celebrazione, non c'è bisogno di andare oltre
+  if arena.in_celebration then return end
 
   -- se l'ultimo rimasto abbandona con alt+f4, evito il crash
   if arena.players_amount == 0 then
@@ -2410,18 +2412,6 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
     if mod_ref.on_quit then
       mod_ref.on_quit(arena, p_name, is_spectator)
-    end
-
-  -- se la fine è stata forzata
-  elseif reason == 4 then
-    if executioner then
-      minetest.chat_send_player(p_name, minetest.colorize(msg_color, S("The arena has been forcibly terminated by @1", executioner) .. spect_str))
-    else
-      minetest.chat_send_player(p_name, minetest.colorize(msg_color, S("The arena has been forcibly terminated") .. spect_str))
-    end
-
-    if mod_ref.on_quit then
-      mod_ref.on_quit(arena, p_name, is_spectator, true)
     end
   end
 end
