@@ -305,6 +305,7 @@ function override_hotbar(player, mod, arena)
   end
 
   minetest.after(0, function()
+    player:hud_set_hotbar_image("arenalib_gui_hotbar" .. #tools .. ".png")
     player:hud_set_hotbar_itemcount(#tools)
     player:get_inventory():set_list("main", tools)
   end)

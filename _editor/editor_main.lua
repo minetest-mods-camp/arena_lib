@@ -105,7 +105,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   player:get_meta():set_string("arena_lib_editor.arena", arena_name)
 
   player:hud_set_hotbar_itemcount(9)
-  player:hud_set_hotbar_image("arenalib_gui_hotbar.png")
+  player:hud_set_hotbar_image("arenalib_gui_hotbar9.png")
 
   -- se c'è almeno uno spawner, teletrasporto
   if next(arena.spawn_points) then
