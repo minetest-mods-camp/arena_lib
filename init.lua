@@ -2,7 +2,10 @@ local version = "5.0.0-dev"
 local modpath = minetest.get_modpath("arena_lib")
 local srcpath = modpath .. "/src"
 
-dofile(srcpath .. "/api.lua")
+dofile(srcpath .. "/api/core.lua")
+dofile(srcpath .. "/api/in_game.lua")
+dofile(srcpath .. "/api/misc.lua")
+dofile(srcpath .. "/api/teams.lua")
 dofile(srcpath .. "/callbacks.lua")
 dofile(srcpath .. "/chat.lua")
 dofile(srcpath .. "/commands.lua")

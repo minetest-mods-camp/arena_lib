@@ -109,7 +109,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   -- se c'è almeno uno spawner, teletrasporto
   if next(arena.spawn_points) then
-    arena_lib.teleport_in_arena(sender, mod, arena_name)
+    player:set_pos(arena.spawn_points[next(arena.spawn_points)].pos)
+    minetest.chat_send_player(sender, S("Wooosh!"))
   end
 
   arena_lib.show_waypoints(sender, arena)

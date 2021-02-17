@@ -1,0 +1,67 @@
+function arena_lib.is_player_in_same_team(arena, p_name, t_name)
+  if arena.players[p_name].teamID == arena.players[t_name].teamID then return true
+  else return false
+  end
+end
+
+
+
+function arena_lib.is_team_declared(mod_ref, team_name)
+
+  if not mod_ref.teams then return false end
+
+  for _, t_name in pairs(mod_ref.teams) do
+    if team_name == t_name then
+      return true
+    end
+  end
+  return false
+end
+
+
+
+
+
+----------------------------------------------
+-----------------GETTERS----------------------
+----------------------------------------------
+
+-- ritorna tabella di nomi giocatori, o di giocatori se to_players == true
+function arena_lib.get_players_in_team(arena, team_ID, to_player)
+  local players = {}
+
+  if to_player then
+    for pl_name, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID == team_ID then
+        table.insert(players, minetest.get_player_by_name(pl_name))
+      end
+    end
+  else
+    for pl_name, pl_stats in pairs(arena.players) do
+      if pl_stats.teamID == team_ID then
+        table.insert(players, pl_name)
+      end
+    end
+  end
+
+  return players
+end
+
+
+
+function arena_lib.get_active_teams(arena)
+
+  if #arena.teams == 1 then
+    minetest.log("warning", "Attempt to call get_active_teams in arena " .. arena.name .. " when teams are not enabled. Aborting...")
+    return end
+
+  local active_teams = {}
+
+  for ID, _ in pairs(arena.teams) do
+    if arena.players_amount_per_team[ID] > 0 then
+      active_teams[#active_teams + 1] = ID
+    end
+  end
+
+  return active_teams
+end
