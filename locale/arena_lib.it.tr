@@ -146,16 +146,16 @@ Get ready!=Preparati!
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 
-# _dependencies/parties.lua
+# dependencies/parties.lua
 [!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
 [!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
 [!] The party leader must not be in queue to perform this action!=[!] Il capo gruppo non deve essere in coda per eseguire quest'azione!
 [!] The party leader must not be in game to perform this action!=[!] Il capo gruppo non deve essere in partita per eseguire quest'azione!
 
-# _editor/editor_main.lua
+# editor/editor_main.lua
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
-# _editor/editor_icons.lua
+# editor/editor_icons.lua
 Players=Giocatori
 Players | num to set: @1 (left/right click slot #3 to change)=Giocatori | num: @1 (click sx/dx su slot #3 per cambiare)
 Values are PER TEAM!=I valori sono PER SQUADRA!
@@ -170,7 +170,7 @@ Go back=Torna indietro
 Enable and leave=Abilita ed esci
 Leave=Esci
 
-# _editor/tools_bgm.lua
+# editor/tools_bgm.lua
 Audio file=File audio
 Title=Titolo
 Author=Autore
@@ -179,12 +179,12 @@ Pitch=Tono
 Apply=Applica
 [!] This audio track doesn't exist!=[!] Questa traccia audio non esiste!
 
-# _editor/tools_players.lua
+# editor/tools_players.lua
 Change the current number=Cambia il numero attuale
 Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 
-# _editor/tools_settings.lua
+# editor/tools_settings.lua
 Arena name and author=Nome arena e autore
 Arena properties=Proprietà arena
 Delete arena=Cancella arena
@@ -195,7 +195,7 @@ Set timer=Imposta timer
 Cancel=Annulla
 Yes=Sì
 
-# _editor/tools_spawner.lua
+# editor/tools_spawner.lua
 Add spawner=Aggiungi spawner
 Remove spawner=Rimuovi spawner
 Add team spawner=Aggiungi spawner squadra
@@ -205,18 +205,18 @@ Selected team: @1=Squadra selezionata: @1
 Delete all spawners=Cancella tutti gli spawner
 Delete all spawners of a team=Cancella tutti gli spawner della squadra
 
-# _editor/tools_sign.lua
+# editor/tools_sign.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
 
-# _hud/hud_waypoints.lua
+# hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
 
-# _spectate/spectate_main.lua
+# spectate/spectate_main.lua
 [!] Spectate mode not supported!=[!] Modalità spettatore non supportata!
 Currently spectating: @1=Stai seguendo: @1
 
-# _spectate/spectate_tools.lua
+# spectate/spectate_tools.lua
 Change player=Cambia giocatore
 Change team=Cambia squadra
 Enter the match=Entra in partita

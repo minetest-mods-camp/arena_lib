@@ -146,16 +146,16 @@ Get ready!=
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
-# _dependencies/parties.lua
+# dependencies/parties.lua
 [!] You can't perform this action while in queue!=
 [!] You can't perform this action while in game!=
 [!] The party leader must not be in queue to perform this action!=
 [!] The party leader must not be in game to perform this action!=
 
-# _editor/editor_main.lua
+# editor/editor_main.lua
 Arena_lib editor | Now editing: @1=
 
-# _editor/editor_icons.lua
+# editor/editor_icons.lua
 Players=
 Players | num to set: @1 (left/right click slot #3 to change)=
 Values are PER TEAM!=
@@ -170,7 +170,7 @@ Go back=
 Enable and leave=
 Leave=
 
-# _editor/tools_bgm.lua
+# editor/tools_bgm.lua
 Audio file=
 Title=
 Author=
@@ -179,12 +179,12 @@ Pitch=
 Apply=
 [!] This audio track doesn't exist!=
 
-# _editor/tools_players.lua
+# editor/tools_players.lua
 Change the current number=
 Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 
-# _editor/tools_settings.lua
+# editor/tools_settings.lua
 Arena name and author=
 Arena properties=
 Delete arena=
@@ -195,7 +195,7 @@ Set timer=
 Cancel=
 Yes=
 
-# _editor/tools_spawner.lua
+# editor/tools_spawner.lua
 Add spawner=
 Remove spawner=
 Add team spawner=
@@ -205,18 +205,18 @@ Selected team: @1=
 Delete all spawners=
 Delete all spawners of a team=
 
-# _editor/tools_sign.lua
+# editor/tools_sign.lua
 Add sign=
 Remove sign=
 
-# _hud/hud_waypoints.lua
+# hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=
 
-# _spectate/spectate_main.lua
+# spectate/spectate_main.lua
 [!] Spectate mode not supported!=
 Currently spectating: @1=
 
-# _spectate/spectate_tools.lua
+# spectate/spectate_tools.lua
 Change player=
 Change team=
 Enter the match=
