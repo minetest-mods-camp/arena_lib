@@ -1297,12 +1297,7 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
   arena.in_celebration = false
   arena.in_game = false
 
-  local id = arena_lib.get_arena_by_name(mod, arena.name)
-
-  -- aggiorno storage per le proprietà e cartello
-  update_storage(false, mod, id, arena)
   arena_lib.update_sign(arena)
-
 end
 
 
