@@ -181,12 +181,12 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     end
 
     -- eventuale cambio squadra sul quale eseguire il calcolo
-    if change_team and prev_spectated then
+    if change_team then
       arena.spectators_amount_per_team[team_ID] = arena.spectators_amount_per_team[team_ID] - 1
 
       local active_teams = arena_lib.get_active_teams(arena)
 
-      if team_ID >= #active_teams then
+      if team_ID >= active_teams[#active_teams] then
         team_ID = active_teams[1]
       else
         for i = team_ID + 1, #arena.teams do
