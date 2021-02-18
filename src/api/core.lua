@@ -960,24 +960,9 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   end
 
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione
-  if next(arena.players) then
-    for pl_name, stats in pairs(arena.players) do
-
-      arena_lib.HUD_hide("all", arena)
-      players_in_queue[pl_name] = nil
-      arena.players[pl_name] = nil
-      arena.in_queue = false
-      minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :(")))
-
-    end
-    -- svuoto l'arena
-    arena.players_amount = 0
-    if arena.teams_enabled then
-      for k, v in pairs(arena.players_amount_per_team) do
-        arena.players_amount_per_team[k] = 0
-      end
-    end
-
+  for pl_name, stats in pairs(arena.players) do
+    arena_lib.remove_player_from_queue(pl_name)
+    minetest.chat_send_player(pl_name, minetest.colorize("#e6482e", S("[!] The arena you were queueing for has been disabled... :(")))
   end
 
   -- disabilito

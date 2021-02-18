@@ -948,18 +948,3 @@ function time_start(mod_ref, arena)
     time_start(mod_ref, arena)
   end)
 end
-
-
-
-
-
-
-----------------------------------------------
-------------------DEPRECATED------------------
-----------------------------------------------
-
--- to remove in 7.0
-function arena_lib.remove_from_queue(p_name)
-  minetest.log("warning", "[ARENA_LIB] remove_from_queue is deprecated. Please use remove_player_from_queue instead")
-  arena_lib.remove_player_from_queue(p_name)
-end
