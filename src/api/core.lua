@@ -406,7 +406,6 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Arena @1 successfully renamed in @2", old_name, new_name))
   return true
-
 end
 
 
@@ -429,6 +428,8 @@ function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
     arena.author = author
     minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed to @2", arena.name, arena.author))
   end
+
+  update_storage(false, mod, id, arena)
 end
 
 
@@ -757,12 +758,12 @@ end
 -- la linea di comando usa sender, mod e arena_name. Prende dove guarda il giocatore e si accerta che è un cartello (non richiede quindi hotbar o inventari di alcun tipo)
 function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
 
-  local arena_ID = 0
+  local id = 0
   local arena = {}
 
   -- se uso la riga di comando, controllo se sto guardando un cartello
   if mod then
-    arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+    id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
@@ -794,7 +795,7 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
     local player = minetest.get_player_by_name(sender)
 
     mod = player:get_meta():get_string("arena_lib_editor.mod")
-    arena_ID, arena = arena_lib.get_arena_by_name(mod, player:get_meta():get_string("arena_lib_editor.arena"))
+    id, arena = arena_lib.get_arena_by_name(mod, player:get_meta():get_string("arena_lib_editor.arena"))
   end
 
   local mod_ref = arena_lib.mods[mod]
@@ -807,7 +808,7 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
         minetest.set_node(pos, {name = "air"})
         arena.sign = {}
         minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully removed", arena.name))
-        update_storage(false, mod, arena_ID, arena)
+        update_storage(false, mod, id, arena)
       else
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This sign doesn't belong to @1!", arena.name)))
       end
@@ -822,14 +823,14 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
 
   -- aggiungo il cartello ai cartelli dell'arena
   arena.sign = pos
-  update_storage(false, mod, arena_ID, arena)
+  update_storage(false, mod, id, arena)
 
   -- cambio la scritta
   arena_lib.update_sign(arena)
 
   -- salvo il nome della mod e l'ID come metadato nel cartello
   minetest.get_meta(pos):set_string("mod", mod)
-  minetest.get_meta(pos):set_int("arenaID", arena_ID)
+  minetest.get_meta(pos):set_int("arenaID", id)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
 
@@ -839,7 +840,7 @@ end
 
 function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch, in_editor)
 
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
@@ -857,7 +858,7 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume
     }
   end
 
-  update_storage(false, mod, arena_ID, arena)
+  update_storage(false, mod, id, arena)
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Background music of arena @1 successfully overwritten", arena.name))
 end
 
@@ -865,7 +866,7 @@ end
 
 function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
 
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
@@ -884,6 +885,8 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
     return end
 
   arena.initial_time = timer
+  update_storage(false, mod, id, arena)
+
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1's timer is now @2 seconds", arena_name, timer))
 end
 
@@ -891,7 +894,7 @@ end
 
 function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
@@ -926,7 +929,7 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
   -- abilito
   arena.enabled = true
   arena_lib.update_sign(arena)
-  update_storage(false, mod, arena_ID, arena)
+  update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
   return true
@@ -937,7 +940,7 @@ end
 function arena_lib.disable_arena(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
 
@@ -980,7 +983,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   -- disabilito
   arena.enabled = false
   arena_lib.update_sign(arena)
-  update_storage(false, mod, arena_ID, arena)
+  update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
   return true
