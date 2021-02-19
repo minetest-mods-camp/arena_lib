@@ -168,8 +168,8 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     arena_lib.remove_player_from_arena(sp_name, 3)
     return end
 
-  -- se già seguiva qualcuno e c'è rimasto solo quel qualcuno, annullo
-  if prev_spectated and arena.players_amount == 1 then return end
+  -- se c'è rimasto solo un giocatore e già lo si seguiva, annullo
+  if arena.players_amount == 1 and prev_spectated and arena.players[prev_spectated] then return end
 
   -- calcolo giocatori massimi tra cui ruotare
   -- squadre:
