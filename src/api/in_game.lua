@@ -564,13 +564,6 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     return end
 
   arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
-
-  if mod_ref.on_quit then
-    for psp_name, _ in pairs(arena.players_and_spectators) do
-      mod_ref.on_quit(arena, p_name, is_spectator, true)
-    end
-  end
-
   arena_lib.end_arena(mod_ref, mod, arena, _, true)
   return true
 end
