@@ -396,12 +396,12 @@ function get_infobox_formspec(mod, arenaID, player)
 		"bgcolor[;neither]",
 		"style_type[image_button;border=false;bgimg=blank.png]",
 		"background[0,0;1,1;arenalib_infobox.png;true]",
-		"image_button[5.9,0.7;0.5,0.5;arenalib_infobox_quit.png;close;]",
 		-- immagini
 		"image[1,0.7;1,1;arenalib_tool_settings_rename.png]",
 		"image[1,1.7;1,1;arenalib_tool_settings_nameauthor.png]",
 		"image[1,3.1;1,1;arenalib_editor_bgm.png]",
-		"image_button[6.1,2;1,1;arenalib_infobox_spectate.png;spectate;]",
+		"image_button[5.9,0.7;0.5,0.5;arenalib_infobox_quit.png;close;]",
+		"image_button[4.7,0.45;1,1;arenalib_infobox_spectate.png;spectate;]",
 		-- scritte
 		"hypertext[2.4,1.1;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.name) .. "</style>]",
 		"hypertext[2.4,2.15;4,1;name;<style size=20 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
