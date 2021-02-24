@@ -249,6 +249,14 @@ end
 
 
 
+function arena_lib.get_player_spectated(sp_name)
+  if arena_lib.is_player_spectating(sp_name) then
+    return players_in_spectate_mode[sp_name].spectating
+  end
+end
+
+
+
 
 
 ----------------------------------------------
