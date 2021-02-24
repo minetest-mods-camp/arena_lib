@@ -174,6 +174,8 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
   -- calcolo giocatori massimi tra cui ruotare
   -- squadre:
   if #arena.teams > 1 then
+    -- se è l'unico rimasto nella squadra e già lo si seguiva, annullo
+    if arena.players_amount_per_team[team_ID] == 1 and not change_team and prev_spectated and arena.players[prev_spectated] then return end
 
     -- se il giocatore seguito era l'ultimo membro della sua squadra, la imposto da cambiare
     if arena.players_amount_per_team[team_ID] == 0 then
