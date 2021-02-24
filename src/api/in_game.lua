@@ -137,7 +137,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
     -- se passa i controlli, lo inserisco e notifico i giocatori
     if arena_lib.enter_spectate_mode(p_name, arena) then
       operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
-      arena_lib.send_message_in_arena(arena, "players", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
+      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
 
     -- sennò annullo
     else
@@ -157,7 +157,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
     local player = minetest.get_player_by_name(p_name)
 
     -- notifico e teletrasporto
-    arena_lib.send_message_in_arena(arena, "players", minetest.colorize("#c6f154", " >>> " .. p_name))
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c6f154", " >>> " .. p_name))
     player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
   end
 
