@@ -123,6 +123,10 @@ Player: =
 # items.lua
 You're immune!=
 
+# minigame_settings.lua
+Minigame settings=
+Overwrite=
+
 # signs.lua
 Arena sign=
 [!] You must leave the editor first!=
@@ -171,6 +175,8 @@ Enable and leave=
 Leave=
 
 # editor/tools_bgm.lua
+Set BGM=
+leave empty to remove the current track=
 Audio file=
 Title=
 Author=
@@ -190,8 +196,8 @@ Arena properties=
 Delete arena=
 Rename arena=
 Change author=
-Overwrite=
 Set timer=
+Are you sure you want to delete arena @1?=
 Cancel=
 Yes=
 

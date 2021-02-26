@@ -123,6 +123,10 @@ Player: =Giocatore:
 # items.lua
 You're immune!=Sei immune!
 
+# minigame_settings.lua
+Minigame settings=Impostazioni minigioco
+Overwrite=Sovrascrivi
+
 # signs.lua
 Arena sign=Cartello dell'arena
 [!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
@@ -171,6 +175,8 @@ Enable and leave=Abilita ed esci
 Leave=Esci
 
 # editor/tools_bgm.lua
+Set BGM=Imposta BGM
+leave empty to remove the current track=lascia vuoto per rimuovere la traccia corrente
 Audio file=File audio
 Title=Titolo
 Author=Autore
@@ -190,8 +196,8 @@ Arena properties=Proprietà arena
 Delete arena=Cancella arena
 Rename arena=Rinomina arena
 Change author=Cambia autore
-Overwrite=Sovrascrivi
 Set timer=Imposta timer
+Are you sure you want to delete arena @1?=Sei sicuro/a di voler eliminare l'arena @1?
 Cancel=Annulla
 Yes=Sì
 

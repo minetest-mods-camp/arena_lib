@@ -87,8 +87,7 @@ function get_settings_formspec(p_name, sel_idx)
 
   local formspec = {
     "size[6.25,3.7]",
-    --"hypertext[0,0;6.25,1;settings_title;<global halign=center>" .. S("Minigame settings") .. "]",     -- 5.4.0
-    "hypertext[0,0;6.25,1;settings_title;<global halign=center>Minigame settings]",
+    "hypertext[0,0;6.25,1;settings_title;<global halign=center>" .. S("Minigame settings") .. "]",
     "textlist[0,0.5;6,2.5;minigame_settings;" .. settings .. ";" .. sel_idx .. ";false]",
     "field[0.3,3.3;4.7,1;sel_setting_value;;" .. sel_setting_value .. "]",
     "button[4.72,2.983;1.5,1;setting_overwrite;" .. S("Overwrite") .. "]",

@@ -77,8 +77,7 @@ function get_bgm_formspec(arena)
     "container[0.5,0.5]",
     "label[0,0;" .. S("Audio file") .. "]",
     "field[0,0.41;6,0.6;bgm;;" .. bgm .. "]",
-    --"hypertext[-0.05,0.12;6,0.3;audio_info;<style size=13 font=mono color=#b7aca3>S("(leave empty to remove the current track)")</style>]", --TODO: waiting for 5.4 translation fix on hypertext elems
-    "hypertext[-0.05,0.12;6,0.3;audio_info;<style size=13 font=mono color=#b7aca3>(leave empty to remove the current track)</style>]",
+    "hypertext[-0.05,0.13;6,0.3;audio_info;<style size=12 font=mono color=#b7aca3>(" .. S("leave empty to remove the current track") .. ")</style>]",
     "container[0,1.35]",
     "label[0,0;" .. S("Title") .. "]",
     "field[0,0.2;2.99,0.6;title;;" .. bgm_title .. "]",

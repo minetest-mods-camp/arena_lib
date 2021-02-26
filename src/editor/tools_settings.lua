@@ -186,8 +186,7 @@ function get_properties_formspec(p_name, mod, arena, sel_idx)
 
   local formspec = {
     "size[6.25,3.7]",
-    --"hypertext[0,0;6.25,1;properties_title;<global halign=center>" .. S("Arena properties") .. "]",     -- 5.4.0
-    "hypertext[0,0;6.25,1;properties_title;<global halign=center>Arena properties]",
+    "hypertext[0,0;6.25,1;properties_title;<global halign=center>" .. S("Arena properties") .. "]",
     "textlist[0,0.5;6,2.5;arena_properties;" .. properties .. ";" .. sel_idx .. ";false]",
     "field[0.3,3.3;4.7,1;sel_property_value;;" .. sel_property_value .. "]",
     "button[4.72,2.983;1.5,1;property_overwrite;" .. S("Overwrite") .. "]",
@@ -220,8 +219,7 @@ function get_delete_formspec(p_name, arena_name)
   local formspec = {
     "size[5,1]",
     "style[delete_confirm;bgcolor=red]",
-    --"hypertext[0.25,-0.1;5,1;delete_msg;<global halign=center>" .. S("Are you sure you want to delete arena @1?", arena_name) .. "]",       -- 5.4.0
-    "hypertext[0.25,-0.1;5,1;delete_msg;<global halign=center>Are you sure you want to delete arena " .. arena_name .. "?]",
+    "hypertext[0.25,-0.1;5,1;delete_msg;<global halign=center>" .. S("Are you sure you want to delete arena @1?", arena_name) .. "]",
     "button[3,0.5;1.5,0.5;delete_confirm;" .. S("Yes") .. "]",
     "button[0.5,0.5;1.5,0.5;delete_cancel;" .. S("Cancel") .. "]",
     "field_close_on_enter[;false]"
