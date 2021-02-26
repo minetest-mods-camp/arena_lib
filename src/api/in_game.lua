@@ -230,13 +230,6 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
     players_in_game[sp_name] = nil
 
     operations_before_leaving_arena(mod_ref, arena, sp_name)
-
-    -- TEMP: 5.4, senza after non teletrasporta dove dovrebbe. Si veda https://github.com/minetest/minetest/pull/10235
-    minetest.after(0.1, function()
-      local spectator = minetest.get_player_by_name(sp_name)
-      spectator:set_pos(mod_ref.settings.hub_spawn_point)
-    end)
-    --^-----------------------------------------------------^
   end
 
   -- rimozione giocatori
@@ -434,16 +427,11 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     arena_lib.leave_spectate_mode(p_name)
 
-    -- TEMP: 5.4, senza after non teletrasporta dove dovrebbe. Si veda https://github.com/minetest/minetest/pull/10235
-    -- Quando sistemato, basta eseguire solo operations_before_leaving_arena
     if reason ~= 0 then
-      minetest.after(0.1, function()
-        operations_before_leaving_arena(mod_ref, arena, p_name)
-        arena.past_present_players_inside[p_name] = nil
-      end)
-    else
-      arena.past_present_players_inside[p_name] = nil
+      operations_before_leaving_arena(mod_ref, arena, p_name)
     end
+
+    arena.past_present_players_inside[p_name] = nil
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
     players_in_game[p_name] = nil

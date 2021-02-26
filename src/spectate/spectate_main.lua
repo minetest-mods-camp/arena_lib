@@ -113,16 +113,8 @@ function arena_lib.leave_spectate_mode(p_name, to_join_match)
   end
 
   player:set_detach()
+  player:set_properties(players_in_spectate_mode[p_name].properties)
   player:get_meta():set_int("arenalib_watchID", 0)
-
-  -- mantengo l'intangibilità per 0.1 secondi a causa del teletrasporto in 0.1 secondi di ritardo. Si veda https://github.com/minetest/minetest/pull/10235
-  local properties = table.copy(players_in_spectate_mode[p_name].properties)
-
-  minetest.after(0.1, function()
-    if not player then return end
-    player:set_properties(properties)
-  end)
-  --^---------------------------------------------------------------------------------------------^
 
   arena_lib.HUD_hide("hotbar", p_name)
 
