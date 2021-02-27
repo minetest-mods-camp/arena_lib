@@ -424,13 +424,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
   -- se il giocatore era in spettatore
   if mod_ref.spectate_mode and arena_lib.is_player_spectating(p_name) then
-
     arena_lib.leave_spectate_mode(p_name)
-
-    if reason ~= 0 then
-      operations_before_leaving_arena(mod_ref, arena, p_name)
-    end
-
+    operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     arena.past_present_players_inside[p_name] = nil
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
@@ -481,10 +476,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     -- sennò procedo a rimuoverlo normalmente
     else
-      if reason ~= 0 then       -- non c'è bisogno di reimpostare i vari parametri se si è disconnesso
-        operations_before_leaving_arena(mod_ref, arena, p_name)
-      end
-
+      operations_before_leaving_arena(mod_ref, arena, p_name, reason)
       arena.players_and_spectators[p_name] = nil
       arena.past_present_players_inside[p_name] = nil
       players_in_game[p_name] = nil
@@ -770,7 +762,8 @@ end
 
 
 
-function operations_before_leaving_arena(mod_ref, arena, p_name)
+-- reason parametro opzionale che passo solo quando potrebbe essersi disconnesso
+function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
   local player = minetest.get_player_by_name(p_name)
 
@@ -784,11 +777,20 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     end
   end
 
-  -- se c'è la spettatore o l'hotbar personalizzata, la ripristino
-  if mod_ref.spectate_mode or mod_ref.hotbar then
-    player:hud_set_hotbar_itemcount(players_temp_storage[p_name].hotbar_slots)
-    player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_background_image)
-    player:hud_set_hotbar_selected_image(players_temp_storage[p_name].hotbar_selected_image)
+  -- ripristino gli HP
+  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+
+  -- teletrasporto con un po' di rumore
+  local clean_pos = mod_ref.settings.hub_spawn_point
+  local noise_x = math.random(-1.5, 1.5)
+  local noise_z = math.random(-1.5, 1.5)
+  local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}
+  player:set_pos(noise_pos)
+
+  -- se si è disconnesso, salta il resto
+  if reason == 0 then
+    players_temp_storage[p_name] = nil
+    return
   end
 
   -- se ha partecipato come giocatore
@@ -812,15 +814,12 @@ function operations_before_leaving_arena(mod_ref, arena, p_name)
     end
   end
 
-  -- ripristino gli HP
-  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-
-  -- teletrasporto con un po' di rumore
-  local clean_pos = mod_ref.settings.hub_spawn_point
-  local noise_x = math.random(-1.5, 1.5)
-  local noise_z = math.random(-1.5, 1.5)
-  local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}
-  player:set_pos(noise_pos)
+  -- se c'è la spettatore o l'hotbar personalizzata, la ripristino
+  if mod_ref.spectate_mode or mod_ref.hotbar then
+    player:hud_set_hotbar_itemcount(players_temp_storage[p_name].hotbar_slots)
+    player:hud_set_hotbar_image(players_temp_storage[p_name].hotbar_background_image)
+    player:hud_set_hotbar_selected_image(players_temp_storage[p_name].hotbar_selected_image)
+  end
 
   -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
   if minetest.get_modpath("hub_manager") then
