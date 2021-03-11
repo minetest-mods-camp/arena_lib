@@ -155,7 +155,13 @@ minetest.register_chatcommand("all", {
 
   func = function(name, param)
 
+    -- se non è in arena, annullo
     if not arena_lib.is_player_in_arena(name) then
+      minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game to perform this action!")))
+      return false end
+
+    -- se è spettatore, annullo
+    if arena_lib.is_player_spectating(name) then
       minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game to perform this action!")))
       return false end
 
@@ -177,7 +183,13 @@ minetest.register_chatcommand("t", {
 
   func = function(name, param)
 
+    -- se non è in arena, annullo
     if not arena_lib.is_player_in_arena(name) then
+      minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game to perform this action!")))
+      return false end
+
+    -- se è spettatore, annullo
+    if arena_lib.is_player_spectating(name) then
       minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game to perform this action!")))
       return false end
 
