@@ -430,6 +430,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
     players_in_game[p_name] = nil
+    return end
 
   -- sennò...
   else
