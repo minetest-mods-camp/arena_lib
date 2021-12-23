@@ -13,7 +13,6 @@ arena_lib.register_minigame("Call of Zughy", {
   disabled_damage_types = {
     "fall"
   },
-  queue_waiting_time = 20,
   show_minimap = true,
   time_mode = "incremental",
   properties = {
