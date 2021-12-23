@@ -15,7 +15,7 @@ arena_lib.register_minigame("Call of Zughy", {
   },
   queue_waiting_time = 20,
   show_minimap = true,
-  time_mode = 1,
+  time_mode = "incremental",
   properties = {
     planting_locations = {{x=30, y=20, z=40}, {x=5, y=20, z=80}}, -- you can override these parameters via your mod, of course
   },
