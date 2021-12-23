@@ -108,7 +108,7 @@ A couple more are available for players having the `arenalib_admin` privilege:
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 * `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
-Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 1.4 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
