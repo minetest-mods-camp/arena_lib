@@ -43,7 +43,7 @@
 First of all download the mod and put it in your mods folder. Then, be sure you have [LuaJIT](https://luajit.org/) installed on your machine.
 
 Now you need to register your minigame, possibly inside the init.lua of your mod, via:
-```
+```lua
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
 "yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific minigame (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands and callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
@@ -132,7 +132,7 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 
 So for instance, if we want to add an object in the first slot when a player joins the pre-match, we can simply do:
 
-```
+```lua
 arena_lib.on_load("mymod", function(arena)
 
   local item = ItemStack("default:dirt")
@@ -150,7 +150,7 @@ No matter the type of property, they're all shared between arenas. Better said, 
 
 #### 1.5.1 Arena properties
 The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
-```
+```lua
 arena_lib.register_minigame("mymod", {
   --whatever stuff we already have
   temp_properties = {
@@ -171,7 +171,7 @@ This is done automatically by arena_lib every time you change the properties dec
 
 #### 1.5.2 Player properties
 These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
-```
+```lua
 arena_lib.register_minigame("mymod", {
   --stuff
   temp_properties = {
@@ -184,7 +184,7 @@ arena_lib.register_minigame("mymod", {
 ```
 
 Now you can easily access the killstreak parameter by retrieving the player inside an arena via `ourarena.players[p_name].killlstreak`. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
-```
+```lua
 arena_lib.on_death("mymod", function(arena, p_name, reason)
   arena.players[p_name].killstreak = 0
 end)
@@ -202,7 +202,7 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 
 #### 1.7 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 5th slot. To do that, the function is
-```
+```lua
 arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
 ```
 On the contrary of when an arena is registered, every parameter here is mandatory. They are:
@@ -258,7 +258,8 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * Disabling timers (`time_mode = "decremental"` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
 
 ### 1.11 Example file
-Check [this](mod-init.lua.example) out for a full configuration file
+Check [this](mod-init.lua.example) out for a full configuration file  
+<br>  
 
 ## 2. Arenas
 
@@ -357,7 +358,7 @@ Properties are explained down below, but essentially they allow you to create ad
 * `ID` is the spawner ID, for `param`
 Again, I suggest you using [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
 
-```
+```lua
 
 local mod = "mymod" -- more about this later
 
@@ -420,7 +421,7 @@ The 4 functions, intertwined with the previously mentioned phases are:
 Overriding these functions is **not** recommended. Instead, use the 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
 
 ### 2.4 Spectate mode
-Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.
-
+Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
+<br>  
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
