@@ -1,4 +1,7 @@
 local S = minetest.get_translator("arena_lib")
+
+local function change_players_number() end
+
 local players_tools = {
   "",                                 -- arena_lib:players_min
   "",                                 -- arena_lib:players_max
