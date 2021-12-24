@@ -78,7 +78,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `celebration_time`: (int) the time in seconds between the celebration state and the end of the match. Default is `5`
 * `in_game_physics`: (table) a physical override to set to each player when they enter an arena, following the Minetest `physics_override` parameters
 * `disabled_damage_types`: (table) contains which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
-* `properties`: explained in [1.5 Additional properties](#15-additional-properties)
+* `properties`: see [1.5 Additional properties](#15-additional-properties)
 * `temp_properties`: ^
 * `player_properties`: ^
 * `team_properties`: ^ (it won't work if `teams` hasn't been declared)

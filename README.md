@@ -18,7 +18,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 ### Dependencies
 Default  
 [signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
-(soft) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
+(optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 #### Add-ons
 [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server
@@ -40,5 +40,5 @@ Feel free to:
 * contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
 
 ##### Credits
-Images by me. They're under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+Images by me. They're under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)  
 countdown sound by [BoxeDave92](https://freesound.org/people/BoxerDave92/sounds/338868/)
