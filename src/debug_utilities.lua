@@ -254,7 +254,11 @@ end
 
 
 
-function arena_lib.flush_arena(mod, arena, sender)
+function arena_lib.flush_arena(mod, arena_name, sender)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
   if arena.in_queue or arena.in_game then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't perform this action during an ongoing game!")))

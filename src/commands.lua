@@ -101,9 +101,7 @@ minetest.register_chatcommand("flusharena", {
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
 
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-    arena_lib.flush_arena(mod, arena, sender)
+    arena_lib.flush_arena(mod, arena_name, sender)
   end
 
 })
