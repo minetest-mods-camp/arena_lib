@@ -108,7 +108,7 @@ A couple more are available for players having the `arenalib_admin` privilege:
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 * `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
-Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 1.4 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
@@ -211,7 +211,7 @@ On the contrary of when an arena is registered, every parameter here is mandator
 * `hotbar_message`: the message that will appear in the hotbar HUD once the section has been opened
 * `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or nil if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly
 
-When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](https://gitlab.com/zughy-friends-minetest/arena_lib/-/blob/master/_editor/tools_players.lua)
+When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
 
 
 ### 1.8 Utils
@@ -356,7 +356,7 @@ Properties are explained down below, but essentially they allow you to create ad
 * `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
 * `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
 * `ID` is the spawner ID, for `param`
-Again, I suggest you using [ChatCmdBuilder](https://rubenwardy.com/minetest_modding_book/en/players/chat_complex.html) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
+Again, I suggest you using [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
 
 ```lua
 
@@ -424,4 +424,4 @@ Overriding these functions is **not** recommended. Instead, use the 4 respective
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
 <br>  
 ## 3. About the author(s)
-I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [LiberaPay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
+I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [Liberapay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
