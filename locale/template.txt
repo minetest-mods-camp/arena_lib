@@ -109,8 +109,9 @@ celebrating=
 waiting=
 Initial time: =
 current: =
-Author: =
 Name: =
+Author: =
+BGM: =
 Teams: =
 Disabled damage types: =
 Players required: =
@@ -174,6 +175,8 @@ Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=
 One sign per arena=
+BGM=
+Background music=
 Settings=
 Arena settings=
 Info=
@@ -209,6 +212,7 @@ Cancel=
 Yes=
 
 # editor/tools_sky.lua
+Celestial vault=
 Reset=
 Type=
 Day sky=

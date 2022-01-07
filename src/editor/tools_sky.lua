@@ -29,7 +29,7 @@ local sky_tools = {
 
 minetest.register_tool("arena_lib:editor_sky", {
 
-    description = S("Set sky"),
+    description = S("Celestial vault"),
     inventory_image = "arenalib_editor_sky.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
