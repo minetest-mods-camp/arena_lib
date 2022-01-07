@@ -167,7 +167,7 @@ function get_properties_formspec(p_name, mod, arena, sel_idx)
 
   -- ottengo una stringa con tutte le proprietà
   for property, v in pairs(mod_ref.properties) do
-    properties = properties .. property .. " = " .. FS(AL_value_to_string(arena[property])) .. ","
+    properties = properties .. property .. " = " .. FS(AL_property_to_string(arena[property])) .. ","
     properties_by_idx[i] = property
     i = i + 1
   end
@@ -181,7 +181,7 @@ function get_properties_formspec(p_name, mod, arena, sel_idx)
 
   -- e assegno il valore
   sel_property_attr[p_name] = {id = sel_idx, name = sel_property}
-  sel_property_value = FS(AL_value_to_string(arena[sel_property]))
+  sel_property_value = FS(AL_property_to_string(arena[sel_property]))
 
   properties = properties:sub(1,-2)
 

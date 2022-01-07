@@ -67,7 +67,7 @@ function get_settings_formspec(p_name, sel_idx)
 
   -- ottengo una stringa con tutte le impostazioni
   for setting, v in pairs(mod_ref.settings) do
-    settings = settings .. setting .. " = " .. FS(AL_value_to_string(mod_ref.settings[setting])) .. ","
+    settings = settings .. setting .. " = " .. FS(AL_property_to_string(mod_ref.settings[setting])) .. ","
     settings_by_idx[i] = setting
     i = i + 1
   end
@@ -81,7 +81,7 @@ function get_settings_formspec(p_name, sel_idx)
 
   -- e assegno il valore
   sel_setting_attr[p_name] = {id = sel_idx, name = sel_setting}
-  sel_setting_value = FS(AL_value_to_string(mod_ref.settings[sel_setting]))
+  sel_setting_value = FS(AL_property_to_string(mod_ref.settings[sel_setting]))
 
   settings = settings:sub(1,-2)
 

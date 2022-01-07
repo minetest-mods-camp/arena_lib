@@ -25,14 +25,14 @@ end
 
 
 
-function AL_value_to_string(value)
+function AL_property_to_string(property)
 
-	if type(value) == "string" then
-		return "\"" .. value .. "\""
-	elseif type(value) == "table" then
-		return tostring(dump(value)):gsub("\n", "")
+	if type(property) == "string" then
+		return "\"" .. property .. "\""
+	elseif type(property) == "table" then
+		return tostring(dump(property)):gsub("\n", "")
 	else
-		return tostring(value)
+		return tostring(property)
 	end
 
 end
