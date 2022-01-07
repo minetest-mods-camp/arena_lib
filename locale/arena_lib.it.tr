@@ -1,4 +1,4 @@
-# version 5.0.0
+# version 5.1.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -38,6 +38,13 @@ Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con success
 [!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
 [!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
 Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
+All=Tutto
+Sky=Cielo
+Sun=Sole
+Moon=Luna
+Stars=Stelle
+Clouds=Nuvole
+(@1) Celestial vault of arena @2 successfully overwritten=(@1) Volta celeste dell'arena @2 sovrascritta con successo
 Background music of arena @1 successfully overwritten=Musica di sottofondo dell'arena @1 sovrascritta con successo
 [!] Timers are not enabled in this mod!=[!] I timer non sono abilitati in questa mod!
 Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
@@ -200,6 +207,43 @@ Set timer=Imposta timer
 Are you sure you want to delete arena @1?=Sei sicuro/a di voler eliminare l'arena @1?
 Cancel=Annulla
 Yes=Sì
+
+# editor/tools_sky.lua
+Reset=Ripristina
+Type=Tipo
+Day sky=Cielo diurno
+Dawn sky=Cielo alba
+Night sky=Cielo notturno
+Day horizon=Orizz. diurno
+Dawn horizon=Orizz. alba
+Night horizon=Orizz. notturno
+Indoors=Al chiuso
+Custom fog tint=Personalizza tinta nebbia
+Fog sun tint=Tinta nebbia sole
+Fog moon tint=Tinta nebbia luna
+Base colour=Colore base
+Top=Sopra
+Bottom=Sotto
+West=Ovest
+East=Est
+North=Nord
+South=Sud
+Visible sun=Sole visibile
+Visible sunrise=Alba visibile
+Texture=Texture
+Tonemap=Mappa tonale
+Size=Dimensione
+Sunrise texture=Texture alba
+Visible moon=Luna visibile
+Visible stars=Stelle visibili
+Colour=Colore
+Count=Quantità
+Clouds must be enabled first to change their parameters=Vanno prima abilitate le nuvole per poterne cambiare i parametri
+Density=Densità
+Ambient=Ambiente
+Thickness=Spessore
+Height=Altezza
+Speed=Velocità
 
 # editor/tools_spawner.lua
 Add spawner=Aggiungi spawner

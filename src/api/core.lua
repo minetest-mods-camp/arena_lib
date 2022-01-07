@@ -33,9 +33,10 @@ local arena_default = {
   players_amount_per_team = nil,
   spectators_amount = 0,
   spectators_amount_per_team = nil,
-  spawn_points = {},          -- KEY: ids, VALUE: {pos, teamID}
+  spawn_points = {},                  -- KEY: ids, VALUE: {pos, teamID}
   max_players = 4,
   min_players = 2,
+  celestial_vault = {},               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
   bgm = nil,
   initial_time = nil,
   current_time = nil,
@@ -621,7 +622,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     -- se overwrite, sovrascrivo
     if param == "overwrite" then
 
-      -- è inutile specificare un team. Avviso per non confondere
+      -- è inutile specificare una squadra. Avviso per non confondere
       if team then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
         return end
@@ -835,6 +836,41 @@ function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
 
 end
+
+
+
+function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params, in_editor)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if params ~= nil and type(params) ~= "table" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  -- sovrascrivi tutti
+  if element == "all" then
+    arena.celestial_vault = params or {} -- se passano 'nil', evito che cancellino la proprietà
+
+  -- sovrascrivine uno specifico
+  elseif element == "sky" or element == "sun" or element == "moon" or element == "stars" or element == "clouds" then
+      arena.celestial_vault[element] = params
+
+  -- oppure type non è un parametro contemplato
+  else
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
+  end
+
+  element = element:gsub("^%l", string.upper) -- per non tradurre sia Sky che sky
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("(@1) Celestial vault of arena @2 successfully overwritten", S(element), arena.name))
+end
+
 
 
 
@@ -1100,6 +1136,11 @@ function init_storage(mod, mod_ref)
         arena.players_and_spectators = {}
         arena.past_present_players = {}
         arena.past_present_players_inside = {}
+        to_update = true
+      end
+
+      if not arena.celestial_vault then
+        arena.celestial_vault = {}
         to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^

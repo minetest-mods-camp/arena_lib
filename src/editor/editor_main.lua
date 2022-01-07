@@ -6,6 +6,7 @@ local editor_tools = {
   "arena_lib:editor_players",
   "arena_lib:editor_spawners",
   "arena_lib:editor_signs",
+  "arena_lib:editor_sky",
   "arena_lib:editor_bgm",
   "arena_lib:editor_settings",
   "",
@@ -89,9 +90,19 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     end
   -- sennò salvo le info
   else
+
+    local p_cvault = {}
+
+    p_cvault.sky = arena_lib.temp.get_sky(player)
+    p_cvault.sun = player:get_sun()
+    p_cvault.moon = player:get_moon()
+    p_cvault.stars = player:get_stars()
+    p_cvault.clouds = player:get_clouds()
+
     players_in_edit_mode[sender] = {
       inv           = player:get_inventory():get_list("main"),
       pos           = player:get_pos(),
+      celvault      = p_cvault,
       hotbar_slots  = player:hud_get_hotbar_itemcount(),
       hotbar_bg     = player:hud_get_hotbar_image()
     }
@@ -104,8 +115,18 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   player:get_meta():set_string("arena_lib_editor.mod", mod)
   player:get_meta():set_string("arena_lib_editor.arena", arena_name)
 
-  player:hud_set_hotbar_itemcount(9)
-  player:hud_set_hotbar_image("arenalib_gui_hotbar9.png")
+  player:hud_set_hotbar_itemcount(10)
+  player:hud_set_hotbar_image("arenalib_gui_hotbar10.png")
+
+  -- imposto volta celeste, controllando ogni elemento onde evitare un ripristino causa passaggio zero argomenti
+  if next(arena.celestial_vault) then
+    local celvault = arena.celestial_vault
+    if celvault.sky    then player:set_sky(celvault.sky)       end
+    if celvault.sun    then player:set_sun(celvault.sun)       end
+    if celvault.moon   then player:set_moon(celvault.moon)     end
+    if celvault.stars  then player:set_stars(celvault.stars)   end
+    if celvault.clouds then player:set_clouds(celvault.clouds) end
+  end
 
   -- se c'è almeno uno spawner, teletrasporto
   if next(arena.spawn_points) then
@@ -124,13 +145,16 @@ end
 
 function arena_lib.quit_editor(player)
 
+  local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if arena_name == "" then return end
 
   local p_name = player:get_player_name()
   local inv = players_in_edit_mode[p_name].inv
   local pos = players_in_edit_mode[p_name].pos
+  local celvault = table.copy(players_in_edit_mode[p_name].celvault)
   local hotbar_slots = players_in_edit_mode[p_name].hotbar_slots
   local hotbar_bg = players_in_edit_mode[p_name].hotbar_bg
 
@@ -151,6 +175,15 @@ function arena_lib.quit_editor(player)
 
   -- teletrasporto
   player:set_pos(pos)
+
+  -- ripristino volta celeste
+  if next(arena.celestial_vault) then
+    player:set_sky(celvault.sky)
+    player:set_sun(celvault.sun)
+    player:set_moon(celvault.moon)
+    player:set_stars(celvault.stars)
+    player:set_clouds(celvault.clouds)
+  end
 
   -- restituisco l'inventario
   minetest.after(0, function()

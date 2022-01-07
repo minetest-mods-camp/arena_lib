@@ -10,6 +10,7 @@ local players_tools = {
   "",                                 -- arena_lib:players_teams_on/off
   "",
   "",
+  "",
   "arena_lib:editor_return",
   "arena_lib:editor_quit",
 }

@@ -33,6 +33,7 @@
 			* [2.2.2.5 Spawners](#2225-spawners)
 			* [2.2.2.6 Signs](#2226-signs)
 			* [2.2.2.7 Music](#2227-music)
+			* [2.2.2.8 Celestial vault](#2228-celestial-vault)
 		* [2.2.3 Enabling an arena](#223-enabling-an-arena)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
@@ -336,7 +337,7 @@ The function calling the editor is
 `arena_lib.enter_editor(sender, mod, arena_name)`
 
 #### 2.2.2 CLI
-If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I chose to odmit it (it's in `set_spawner` too).
+If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I chose to omit it (it's in `set_spawner` too).
 
 ##### 2.2.2.1 Players management
 `arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
@@ -392,6 +393,21 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 
 ##### 2.2.2.7 Music
 `arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
+
+##### 2.2.2.8 Celestial vault
+By default, arenas celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  
+`arena_lib.set_celestial_vault(sender, mod, arena_name, element, params)` allows you to change parts of the vault, forcing it to players entering the arena. `element` is a string representing the part of the vault to be changed (`"sky"`, `"sun"`, `"moon"`, `"stars"`, `"clouds"`, or the explained later `"all"`), and `params` a table with the new values. This table is the same as the one used in the Minetest API `set_sky(...)`, `set_sun(...)` etc. functions, so for instance doing
+
+```lua
+	local sun_params = {
+		scale = 2.5,
+		sunrise_visible = false
+	}
+	arena_lib.set_celestial_vault(sender, mod, arena, "sun", sun_params)
+```
+will increase the size of the sun inside the arena and hide the sunrise texture. `params` can also be `nil`, and in that case will remove any custom setting previously set.  
+Last but not least, the special element `"all"` allows you to change everything, and it needs a table with the following optional parameters: `{sky={...}, sun={...}, moon={...}, stars={...}, clouds={...}}`. If `params` is nil, it'll reset the whole celestial vault.
+
 
 #### 2.2.3 Enabling an arena
 When a sign has been set, it won't work. This because an arena must be enabled manually via  

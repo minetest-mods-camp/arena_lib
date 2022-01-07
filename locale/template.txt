@@ -1,4 +1,4 @@
-# version 5.0.0
+# version 5.1.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -38,6 +38,13 @@ Sign of arena @1 successfully removed=
 [!] There is already a sign for this arena!=
 [!] There is no sign to remove assigned to @1!=
 Sign of arena @1 successfully set=
+All=
+Sky=
+Sun=
+Moon=
+Stars=
+Clouds=
+(@1) Celestial vault of arena @2 successfully overwritten=
 Background music of arena @1 successfully overwritten=
 [!] Timers are not enabled in this mod!=
 Arena @1's timer is now @2 seconds=
@@ -200,6 +207,43 @@ Set timer=
 Are you sure you want to delete arena @1?=
 Cancel=
 Yes=
+
+# editor/tools_sky.lua
+Reset=
+Type=
+Day sky=
+Dawn sky=
+Night sky=
+Day horizon=
+Dawn horizon=
+Night horizon=
+Indoors=
+Custom fog tint=
+Fog sun tint=
+Fog moon tint=
+Base colour=
+Top=
+Bottom=
+West=
+East=
+North=
+South=
+Visible sun=
+Visible sunrise=
+Texture=
+Tonemap=
+Size=
+Sunrise texture=
+Visible moon=
+Visible stars=
+Colour=
+Count=
+Clouds must be enabled first to change their parameters=
+Density=
+Ambient=
+Thickness=
+Height=
+Speed=
 
 # editor/tools_spawner.lua
 Add spawner=

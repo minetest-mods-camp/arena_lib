@@ -664,6 +664,36 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
+  -- cambio eventuale volta celeste
+  if next(arena.celestial_vault) then
+    local celvault = arena.celestial_vault
+
+    if celvault.sky then
+      players_temp_storage[p_name].celvault_sky = arena_lib.temp.get_sky(player)
+      player:set_sky(celvault.sky)
+    end
+
+    if celvault.sun then
+      players_temp_storage[p_name].celvault_sun = player:get_sun()
+      player:set_sun(celvault.sun)
+    end
+
+    if celvault.moon then
+      players_temp_storage[p_name].celvault_moon = player:get_moon()
+      player:set_moon(celvault.moon)
+    end
+
+    if celvault.stars then
+      players_temp_storage[p_name].celvault_stars = player:get_stars()
+      player:set_stars(celvault.stars)
+    end
+
+    if celvault.clouds then
+      players_temp_storage[p_name].celvault_clouds = player:get_clouds()
+      player:set_clouds(celvault.clouds)
+    end
+  end
+
   -- nascondo i nomi se l'opzione è abilitata
   if not mod_ref.show_nametags then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
@@ -767,6 +797,27 @@ end
 function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
   local player = minetest.get_player_by_name(p_name)
+
+  -- reimposto eventuale volta celeste
+  if next(arena.celestial_vault) then
+    local celvault = arena.celestial_vault
+
+    if celvault.sky then
+      player:set_sky(players_temp_storage[p_name].celvault_sky)
+    end
+    if celvault.sun then
+      player:set_sun(players_temp_storage[p_name].celvault_sun)
+    end
+    if celvault.moon then
+      player:set_moon(players_temp_storage[p_name].celvault_moon)
+    end
+    if celvault.stars then
+      player:set_stars(players_temp_storage[p_name].celvault_stars)
+    end
+    if celvault.clouds then
+      player:set_clouds(players_temp_storage[p_name].celvault_clouds)
+    end
+  end
 
   -- svuoto eventualmente l'inventario e ripristino gli oggetti
   if not mod_ref.keep_inventory then

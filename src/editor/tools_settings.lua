@@ -12,6 +12,7 @@ local settings_tools = {
   "",                                       -- timer_off/_on
   "",
   "",
+  "",
   "arena_lib:settings_delete",
   "",
   "arena_lib:editor_return",
