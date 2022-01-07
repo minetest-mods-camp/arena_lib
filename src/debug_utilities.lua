@@ -36,6 +36,11 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local players_inside_per_team = ""
   local spectators_inside_per_team = ""
 
+  local arena_bgm = "---"
+  if arena.bgm then
+    arena_bgm = arena.bgm.track .. ".ogg"
+  end
+
   -- concateno eventuali team
   if arena.teams_enabled then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
@@ -194,8 +199,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   minetest.chat_send_player(sender,
     minetest.colorize("#cfc6b8", "====================================") .. "\n" ..
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
-    minetest.colorize("#eea160", S("Author: ")) .. minetest.colorize("#cfc6b8", arena.author ) .. "\n" ..
     minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
+    minetest.colorize("#eea160", S("Author: ")) .. minetest.colorize("#cfc6b8", arena.author) .. "\n" ..
+    minetest.colorize("#eea160", S("BGM: ")) .. minetest.colorize("#cfc6b8", arena_bgm) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
     minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n" ..
     min_players_per_team ..
