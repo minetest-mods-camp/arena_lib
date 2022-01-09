@@ -12,25 +12,13 @@ local function get_palette_col_and_sorted_table() end
 local function compare_elem() end
 
 local temp_sky_settings = {}          -- KEY = p_name; VALUE = {all the sky settings}
-local sky_tools = {
-  "arena_lib:sky",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "arena_lib:editor_return",
-  "arena_lib:editor_quit",
-}
 
 
 
-minetest.register_tool("arena_lib:editor_sky", {
+minetest.register_tool("arena_lib:customise_sky", {
 
     description = S("Celestial vault"),
-    inventory_image = "arenalib_editor_sky.png",
+    inventory_image = "arenalib_customise_sky.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
     on_drop = function() end,
@@ -44,15 +32,11 @@ minetest.register_tool("arena_lib:editor_sky", {
 
       fill_tempsky(p_name, arena)
 
-      minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sky"))
+      minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sky"))
     end
 })
 
 
-
-function arena_lib.give_sky_tools(player)
-  player:get_inventory():set_list("main", sky_tools)
-end
 
 
 
@@ -412,7 +396,7 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 
-  if formname ~= "arena_lib:settings_sky" then return end
+  if formname ~= "arena_lib:celestial_vault" then return end
 
   local p_name = player:get_player_name()
   local temp_sky = temp_sky_settings[p_name].sky

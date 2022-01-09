@@ -6,8 +6,7 @@ local editor_tools = {
   "arena_lib:editor_players",
   "arena_lib:editor_spawners",
   "arena_lib:editor_signs",
-  "arena_lib:editor_sky",
-  "arena_lib:editor_bgm",
+  "arena_lib:editor_customise",
   "arena_lib:editor_settings",
   "",
   "arena_lib:editor_info",
@@ -115,8 +114,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   player:get_meta():set_string("arena_lib_editor.mod", mod)
   player:get_meta():set_string("arena_lib_editor.arena", arena_name)
 
-  player:hud_set_hotbar_itemcount(10)
-  player:hud_set_hotbar_image("arenalib_gui_hotbar10.png")
+  player:hud_set_hotbar_itemcount(9)
+  player:hud_set_hotbar_image("arenalib_gui_hotbar9.png")
 
   -- imposto volta celeste, controllando ogni elemento onde evitare un ripristino causa passaggio zero argomenti
   if next(arena.celestial_vault) then

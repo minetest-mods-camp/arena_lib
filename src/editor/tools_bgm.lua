@@ -8,10 +8,10 @@ local audio_currently_playing = {}     -- KEY p_name; VALUE sound handle
 
 
 
-minetest.register_tool("arena_lib:editor_bgm", {
+minetest.register_tool("arena_lib:customise_bgm", {
 
     description = S("Background music"),
-    inventory_image = "arenalib_editor_bgm.png",
+    inventory_image = "arenalib_customise_bgm.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,
     on_drop = function() end,
@@ -25,12 +25,6 @@ minetest.register_tool("arena_lib:editor_bgm", {
       minetest.show_formspec(user:get_player_name(), "arena_lib:bgm", get_bgm_formspec(arena))
     end
 })
-
-
-
-function arena_lib.give_bgm_tools(player)
-  player:get_inventory():set_list("main", bgm_tools)
-end
 
 
 
