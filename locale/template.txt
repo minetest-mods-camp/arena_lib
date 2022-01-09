@@ -175,8 +175,6 @@ Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
 Signs=
 One sign per arena=
-BGM=
-Background music=
 Settings=
 Arena settings=
 Info=
@@ -185,7 +183,7 @@ Enable and leave=
 Leave=
 
 # editor/tools_bgm.lua
-Set BGM=
+Background music=
 leave empty to remove the current track=
 Audio file=
 Title=

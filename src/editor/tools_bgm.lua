@@ -5,24 +5,12 @@ local function calc_gain() end
 local function calc_pitch() end
 
 local audio_currently_playing = {}     -- KEY p_name; VALUE sound handle
-local bgm_tools = {
-  "arena_lib:bgm_set",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "arena_lib:editor_return",
-  "arena_lib:editor_quit",
-}
 
 
 
-minetest.register_tool("arena_lib:bgm_set", {
+minetest.register_tool("arena_lib:editor_bgm", {
 
-    description = S("Set BGM"),
+    description = S("Background music"),
     inventory_image = "arenalib_editor_bgm.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
     on_place = function() end,

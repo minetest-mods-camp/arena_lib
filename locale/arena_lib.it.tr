@@ -175,8 +175,6 @@ Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
 Signs=Cartelli
 One sign per arena=Un cartello per arena
-BGM=Musica di sottofondo
-Background music=Musica di sottofondo
 Settings=Impostazioni
 Arena settings=Impostazioni arena
 Info=Info
@@ -185,7 +183,7 @@ Enable and leave=Abilita ed esci
 Leave=Esci
 
 # editor/tools_bgm.lua
-Set BGM=Imposta musica di sottofondo
+Background music=Musica di sottofondo
 leave empty to remove the current track=lascia vuoto per rimuovere la traccia corrente
 Audio file=File audio
 Title=Titolo
