@@ -355,7 +355,7 @@ function get_clouds_params(p_name)
       "label[4.15,2.75;X]",
       "field[4.45,2.45;1,0.6;clouds_speed_x;;" .. (temp_clouds.speed.x or 0) .. "]",
       "label[5.8,2.75;Z]",
-      "field[6.1,2.45;1,0.6;clouds_speed_z;;" .. (temp_clouds.speed.x or -2) .. "]",
+      "field[6.1,2.45;1,0.6;clouds_speed_z;;" .. (temp_clouds.speed.z or -2) .. "]",
       "container_end[]"
     }
   end
