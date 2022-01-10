@@ -54,18 +54,26 @@ end)
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
 
-    local target_name = player:get_player_name()
+    local t_name = player:get_player_name()
     local p_name = hitter:get_player_name()
-    local arena = arena_lib.get_arena_by_player(p_name)
+    local t_arena = arena_lib.get_arena_by_player(t_name)
+    local p_arena = arena_lib.get_arena_by_player(p_name)
 
-    if arena_lib.is_player_spectating(p_name) then
+    -- se nessuno dei due è perlomeno in coda, lascio spazio agli altri eventuali on_punchplayer
+    if not p_arena and not t_arena then
+      return
+    end
+
+    -- se uno è in partita e l'altro no, annullo
+    if ((p_arena and p_arena.in_game) and not (t_arena and t_arena.in_game)) or
+       ((t_arena and t_arena.in_game) and not (p_arena and p_arena.in_game)) then
       return true
     end
 
-    if arena and arena.in_game and arena.players[p_name].teamID and arena.players[p_name].teamID == arena.players[target_name].teamID then
+    -- se sono nella stessa partita e nella stessa squadra, annullo
+    if p_arena.players[t_name] and p_arena.players[p_name].teamID and p_arena.players[p_name].teamID == p_arena.players[t_name].teamID then
       return true
     end
-
 end)
 
 
