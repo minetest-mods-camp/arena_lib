@@ -397,9 +397,9 @@ function get_infobox_formspec(mod, arenaID, player)
 		"style_type[image_button;border=false;bgimg=blank.png]",
 		"background[0,0;1,1;arenalib_infobox.png;true]",
 		-- immagini
-		"image[1,0.7;1,1;arenalib_tool_settings_rename.png]",
+		"image[1,0.7;1,1;arenalib_infobox_name.png]",
 		"image[1,1.7;1,1;arenalib_tool_settings_nameauthor.png]",
-		"image[1,3.1;1,1;arenalib_editor_bgm.png]",
+		"image[1,3.1;1,1;arenalib_customise_bgm.png]",
 		"image_button[5.9,0.7;0.5,0.5;arenalib_infobox_quit.png;close;]",
 		"image_button[4.7,0.45;1,1;arenalib_infobox_spectate.png;spectate;]",
 		-- scritte
