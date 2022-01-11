@@ -328,7 +328,7 @@ In order to do so, it must be disabled.
 ### 2.2 Setting up an arena
 Two things are needed to have an arena up to go: spawners and signs. There are two functions for that:  
 * `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
-* `arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
+* `arena_lib.set_sign(sender, mod, arena_name, <pos, remove>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
 
 #### 2.2.1 Editor
 arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
@@ -389,7 +389,7 @@ ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 ```
 
 ##### 2.2.2.6 Signs
-`arena_lib.set_sign(sender, <pos, remove>, <mod, arena_name>)` via chat uses `sender`, `mod` and `arena_name`, while the editor `pos` and `remove` (hence the weird subdivision). When used via chat, it takes the block the player is pointing at in a 5 blocks radius. If the block is a sign, it then creates (or remove if already set) the "arena sign".
+`arena_lib.set_sign(sender, mod, arena_name, <pos, remove>)` allows to either set or remove the sign of that specific arena. `pos` is a table, and it must correspond to an arena_lib sign to be set. `remove` is a boolean, and if `true`, `pos` will be ignored, as it'll erase the current arena sign (if exists)
 
 ##### 2.2.2.7 Music
 `arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too

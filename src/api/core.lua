@@ -754,87 +754,74 @@ end
 
 
 
--- 2 approcci: da editor e da linea di comando (chat)
--- l'editor utilizza sender, pos e remove. Colpisce un cartello (pos) e fa una determinata azione (remove true/false)
--- la linea di comando usa sender, mod e arena_name. Prende dove guarda il giocatore e si accerta che è un cartello (non richiede quindi hotbar o inventari di alcun tipo)
-function arena_lib.set_sign(sender, pos, remove, mod, arena_name)
+function arena_lib.set_sign(sender, mod, arena_name, pos, remove, in_editor)
 
-  local id = 0
-  local arena = {}
+  -- remove in 7.0
+  if type(pos) == "string" and type(remove) == "string" then
+    warn_deprecated_set_sign(sender)
+    return
+  end
 
-  -- se uso la riga di comando, controllo se sto guardando un cartello
-  if mod then
-    id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
+  if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
-
-    local player = minetest.get_player_by_name(sender)
-    local p_pos = player:get_pos()
-    local p_eye_pos = { x = p_pos.x, y = p_pos.y + 1.475, z = p_pos.z }
-    local to = vector.add(p_eye_pos, vector.multiply(player:get_look_dir(), 5))
-    local ray = Raycast(p_eye_pos, to)
-
-    -- cerco un cartello
-    for hit in ray do
-      if hit.type == "node" then
-        local node = minetest.get_node(hit["under"])
-        if string.match(node.name, "arena_lib:sign") then
-          pos = hit["under"]
-          break
-        end
-      end
-    end
-
-    -- se non ha trovato niente, esco
-    if pos == nil then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
-    return end
-
-  -- se uso l'editor
-  else
-
-    local player = minetest.get_player_by_name(sender)
-
-    mod = player:get_meta():get_string("arena_lib_editor.mod")
-    id, arena = arena_lib.get_arena_by_name(mod, player:get_meta():get_string("arena_lib_editor.arena"))
   end
 
   local mod_ref = arena_lib.mods[mod]
 
-  -- se c'è già un cartello assegnato
-  if next(arena.sign) ~= nil then
-    -- dal linea di comando non fa distinzione (nil), sennò sto usando lo strumento per rimuovere da editor (remove == true)
-    if remove == nil or remove == true then
-      if minetest.serialize(pos) == minetest.serialize(arena.sign) then
-        minetest.set_node(pos, {name = "air"})
-        arena.sign = {}
-        minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully removed", arena.name))
-        update_storage(false, mod, id, arena)
-      else
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This sign doesn't belong to @1!", arena.name)))
-      end
-    elseif remove == false then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
+  -- se rimuovo
+  if remove then
+
+    -- se non ha cartelli da rimuovere, annullo
+    if not next(arena.sign) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no sign to remove assigned to @1!", arena.name)))
+      return end
+
+    minetest.load_area(arena.sign)
+
+    local sign_meta = minetest.get_meta(arena.sign)
+
+    -- se il cartello non è stato spostato lo rimuovo, sennò evito di far sparire il blocco che c'è ora
+    -- (può capitare se qualcuno sposta un'area con WorldEdit). Le altre condizioni assicurano poi che si stia
+    -- cancellando il cartello giusto, nel caso qualcuno con WorldEdit ne abbia spostato un altro appartenente
+    -- a un'arena diversa nella stessa posizione
+    if minetest.get_node(arena.sign).name == "arena_lib:sign" and sign_meta:get_string("mod") == mod and
+                                                                  sign_meta:get_int("arenaID") == id then
+      minetest.set_node(arena.sign, {name = "air"})
     end
-  return
-  elseif remove == true then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no sign to remove assigned to @1!", arena.name)))
-    return
+
+    arena.sign = {}
+    minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully removed", arena.name))
+
+  -- sennò aggiungo
+  else
+
+    if next(arena.sign) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
+      return end
+
+    if not pos or type(pos) ~= "table" then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return end
+
+    -- se non ha trovato niente, esco
+    if minetest.get_node(pos).name ~= "arena_lib:sign" then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
+      return end
+
+    -- aggiungo il cartello all'arena e cambio la scritta
+    arena.sign = pos
+    arena_lib.update_sign(arena)
+
+    -- salvo il nome della mod e l'ID come metadato nel cartello
+    minetest.get_meta(pos):set_string("mod", mod)
+    minetest.get_meta(pos):set_int("arenaID", id)
+
+    minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
   end
 
-  -- aggiungo il cartello ai cartelli dell'arena
-  arena.sign = pos
   update_storage(false, mod, id, arena)
-
-  -- cambio la scritta
-  arena_lib.update_sign(arena)
-
-  -- salvo il nome della mod e l'ID come metadato nel cartello
-  minetest.get_meta(pos):set_string("mod", mod)
-  minetest.get_meta(pos):set_int("arenaID", id)
-
-  minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
-
 end
 
 
@@ -1373,4 +1360,9 @@ end
 function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_teamID)
   minetest.log("warning", "[ARENA_LIB] send_message_players_in_arena is deprecated. Please use send_message_in_arena instead")
   arena_lib.send_message_in_arena(arena, "players", msg, teamID, except_teamID)
+end
+
+local function warn_deprecated_set_sign(sender)
+  minetest.log("warning", "[ARENA_LIB] set_sign(sender, <pos>, <remove>, mod, arena_name) is deprecated. Please use set_sign(sender, mod, arena_name, pos, <remove>) instead")
+  minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(sender, pos, remove, mod, arena_name) is deprecated and pos now mandatory. Watch the log, aborting...")
 end

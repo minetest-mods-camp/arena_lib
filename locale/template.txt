@@ -34,7 +34,6 @@ Spawn point #@1 successfully deleted=
 Spawn point #@1 successfully set=
 [!] That's not an arena_lib sign!=
 Sign of arena @1 successfully removed=
-[!] This sign doesn't belong to @1!=
 [!] There is already a sign for this arena!=
 [!] There is no sign to remove assigned to @1!=
 Sign of arena @1 successfully set=
@@ -138,6 +137,7 @@ Overwrite=
 # signs.lua
 Arena sign=
 [!] You must leave the editor first!=
+[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=
 [!] Only the party leader can enter the queue!=
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=
 [!] There is not enough space for the whole party!=
@@ -262,6 +262,7 @@ Delete all spawners of a team=
 # editor/tools_sign.lua
 Add sign=
 Remove sign=
+Are you sure you want to delete the sign from @1?=
 
 # hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=

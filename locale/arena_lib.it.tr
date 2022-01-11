@@ -34,7 +34,6 @@ Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
 Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
 [!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
 Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
-[!] This sign doesn't belong to @1!=[!] Questo cartello non appartiene a @1!
 [!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
 [!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
 Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
@@ -138,6 +137,7 @@ Overwrite=Sovrascrivi
 # signs.lua
 Arena sign=Cartello dell'arena
 [!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
+[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!==[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
 [!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
 [!] There is not enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
@@ -262,6 +262,7 @@ Delete all spawners of a team=Cancella tutti gli spawner della squadra
 # editor/tools_sign.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
+Are you sure you want to delete the sign from @1?=Sei sicuro/a di voler rimuovere il cartello di @1?
 
 # hud/hud_waypoints.lua
 [!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!

@@ -58,11 +58,22 @@ signs_lib.register_sign("arena_lib:sign", {
     local sign_arena = mod_ref.arenas[arenaID]
     local p_name = puncher:get_player_name()
 
-    if not sign_arena then return end -- nel caso qualche cartello dovesse buggarsi, si può rompere senza far crashare
+    if not sign_arena then return end -- nel caso qualche cartello dovesse impallarsi, si può rompere senza far crashare
 
     -- se si è nell'editor
     if arena_lib.is_player_in_edit_mode(p_name) then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
+      return end
+
+	-- se il cartello è stato spostato (tipo con WorldEdit), lo ripristino (e se c'è una partita in corso, la interrompo)
+    if minetest.serialize(sign_arena.sign) ~= minetest.serialize(pos) then
+      local arena_name = sign_arena.name
+      arena_lib.force_arena_ending(mod, sign_arena, "ARENA_LIB")
+      arena_lib.disable_arena("", mod, arena_name)
+      arena_lib.set_sign("", mod, arena_name, _, true)
+      arena_lib.set_sign("", mod, arena_name, pos)
+      arena_lib.enable_arena("", mod, arena_name)
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!")))
       return end
 
     -- se c'è parties e si è in gruppo...

@@ -31,7 +31,6 @@ Spawn point #@1 successfully deleted=Punto de spawn #@1 eliminado correctamente
 Spawn point #@1 successfully set=Punto de spawn #@1 establecido correctamente
 [!] That's not an arena_lib sign!=[!] ¡Este no es un cartel de arena_lib!
 Sign of arena @1 successfully removed=Cartel de la arena @1 eliminado correctamente
-[!] This sign doesn't belong to @1!=[!] ¡Este cartel no pertenece a @1!
 [!] There is already a sign for this arena!=[!] ¡Ya existe un cartel para este arena!
 [!] There is no sign to remove assigned to @1!=[!] ¡No hay un cartel para eliminar asignado a @1!
 Sign of arena @1 successfully set=Cartel de arena @1 establecido correctamente
