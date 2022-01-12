@@ -65,7 +65,7 @@ signs_lib.register_sign("arena_lib:sign", {
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
       return end
 
-	-- se il cartello è stato spostato (tipo con WorldEdit), lo ripristino (e se c'è una partita in corso, la interrompo)
+    -- se il cartello è stato spostato tipo con WorldEdit, lo aggiorno alla nuova posizione (e se c'è una partita in corso, la interrompo)
     if minetest.serialize(sign_arena.sign) ~= minetest.serialize(pos) then
       local arena_name = sign_arena.name
       arena_lib.force_arena_ending(mod, sign_arena, "ARENA_LIB")
@@ -86,11 +86,17 @@ signs_lib.register_sign("arena_lib:sign", {
 
       local party_members = parties.get_party_members(p_name)
 
+      -- per tutti i membri...
       for _, pl_name in pairs(party_members) do
-	    if arena_lib.is_player_in_arena(pl_name) then
-		  minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
-		  return
-	    end
+        -- se uno è in partita
+        if arena_lib.is_player_in_arena(pl_name) then
+          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
+          return end
+
+        -- se uno è attaccato a qualcosa
+        if minetest.get_player_by_name(pl_name):get_attach() then
+          minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)")))
+          return end
       end
 
       --se non c'è spazio (no team)
@@ -114,6 +120,11 @@ signs_lib.register_sign("arena_lib:sign", {
           return end
       end
     end
+
+    -- se si è attaccati a qualcosa
+    if puncher:get_attach() then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
+      return end
 
     -- se non è abilitata
     if not sign_arena.enabled then

@@ -140,9 +140,11 @@ Arena sign=Cartello dell'arena
 [!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!==[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
 [!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
+[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=[!] Non puoi entrare in partita se alcuni membri del gruppo sono attaccati a qualcosa! (es. navi, cavalli ecc.)
 [!] There is not enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
 [!] There is no team with enough space for the whole party!=[!] Non c'è un team con abbastanza spazio per tutto il gruppo!
 [!] Only the party leader can leave the queue!=[!] Solo il capo gruppo può abbandonare la coda!
+[!] You must detach yourself from the entity you're attached to before entering!=[!] Devi prima staccarti dall'entità alla quale sei agganciato/a se vuoi entrare!
 [!] The arena is not enabled!=[!] L'arena non è attiva!
 [!] The arena is already full!=[!] L'arena è già piena!
 [!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
