@@ -20,21 +20,21 @@
 	* [1.10 Things you don't want to do with a light heart](#110-things-you-dont-want-to-do-with-a-light-heart)
 	* [1.11 Example file](#111-example-file)
 * [2. Arenas](#2-arenas)
-	* [2.1 Creating and removing arenas](#21-creating-and-removing-arenas)
-		* [2.1.1 Storing arenas](#211-storing-arenas)
-		* [2.1.2 Renaming an arena](#212-renaming-an-arena)
+	* [2.1 Storing arenas](#21-storing-arenas)
 	* [2.2 Setting up an arena](#22-setting-up-an-arena)
 		* [2.2.1 Editor](#221-editor)
 		* [2.2.2 CLI](#222-cli)
-			* [2.2.2.1 Players management](#2221-players-management)
-			* [2.2.2.2 Enabling/Disabling teams](#2222-enablingdisabling-teams)
-			* [2.2.2.3 Timers](#2223-timers)
-			* [2.2.2.4 Arena properties](#2224-arena-properties)
+			* [2.2.2.1 Creating and removing arenas](#2221-creating-and-removing-arenas)
+			* [2.2.2.2 Renaming an arena](#2222-renaming-an-arena)
+			* [2.2.2.3 Players management](#2223-players-management)
+			* [2.2.2.4 Enabling/Disabling teams](#2224-enablingdisabling-teams)
 			* [2.2.2.5 Spawners](#2225-spawners)
 			* [2.2.2.6 Signs](#2226-signs)
-			* [2.2.2.7 Music](#2227-music)
-			* [2.2.2.8 Celestial vault](#2228-celestial-vault)
-		* [2.2.3 Enabling an arena](#223-enabling-an-arena)
+			* [2.2.2.7 Enabling/Disabling an arena](#2227-enablingdisabling-an-arena)
+			* [2.2.2.8 Arena properties](#2228-arena-properties)
+			* [2.2.2.9 Timers](#2229-timers)
+			* [2.2.2.10 Music](#22210-music)
+			* [2.2.2.11 Celestial vault](#22211-celestial-vault)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
 * [3. About the author(s)](#3-about-the-authors)
@@ -47,7 +47,7 @@ Now you need to register your minigame, possibly inside the init.lua of your mod
 ```lua
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```
-"yourmod" is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific minigame (that's why almost every `arena_lib` function contains "mod" as a parameter). You'll need it when calling for commands and callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
+`"yourmod"` is how arena_lib will store your mod inside its storage, and it's also what it needs in order to understand you're referring to that specific minigame (that's why almost every `arena_lib` function contains `"mod"` as a parameter). You'll need it when calling for commands and callbacks. **Use the same name you used in mod.conf or some features won't be available**.  
 The second field, on the contrary, is a table of optional parameters: they define the very features of your minigame. They are:
 * `prefix`: (string) what's going to appear in most of the lines printed by your mod. Default is `[Arena_lib] `
 * `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
@@ -151,6 +151,7 @@ No matter the type of property, they're all shared between arenas. Better said, 
 
 #### 1.5.1 Arena properties
 The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
+
 ```lua
 arena_lib.register_minigame("mymod", {
   --whatever stuff we already have
@@ -311,90 +312,121 @@ The second is via code by the functions:
 * `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
 * `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so, the table)
 
-### 2.1 Creating and removing arenas
-There are two functions for it and they all need to be connected to some command in your mod. These functions are
-* `arena_lib.create_arena(sender, mod, arena_name, <min_players>, <max_players>)`: `arena_name` must be unique. Sender is a string, fields between < > are optional
-* `arena_lib.remove_arena(mod, arena_name)`
-
-#### 2.1.1 Storing arenas
+### 2.1 Storing arenas
 Arenas and their settings are stored inside the mod storage. What is *not* stored are players, their stats and such.  
 Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
 
-#### 2.1.2 Renaming an arena
-Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
-`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
-In order to do so, it must be disabled.
-  
 ### 2.2 Setting up an arena
-Two things are needed to have an arena up to go: spawners and signs. There are two functions for that:  
-* `arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)`: spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
-* `arena_lib.set_sign(sender, mod, arena_name, <pos, remove>)`: there must be one and only one sign per arena. Signs are the bridge between the arena and the rest of the world
+In order for an arena to be playable, three conditions must be satisfied: the arena has to exist, spawners have to be set, and an arena sign must be placed (to allow players to enter the minigame).  
 
-#### 2.2.1 Editor
-arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands (if you still want to go full CLI/chat though, skip this paragraph).
-In order to use the editor, no other players must be editing the same arena. When entering it, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
-The function calling the editor is  
-`arena_lib.enter_editor(sender, mod, arena_name)`
-
-#### 2.2.2 CLI
-If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I chose to omit it (it's in `set_spawner` too).
-
-##### 2.2.2.1 Players management
-`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
-
-##### 2.2.2.2 Enabling/Disabling teams
-`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where 0 disables teams and 1 enables them.
-
-##### 2.2.2.3 Timers
-`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (explained further below).
-
-##### 2.2.2.4 Arena properties
-Properties are explained down below, but essentially they allow you to create additional attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
-`arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, this works for *arena* properties only. Not for temporary, players, nor team ones.
-
-##### 2.2.2.5 Spawners
-`arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be.  
-* `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
-* `param` is a string, specifically "overwrite", "delete" or "deleteall". "deleteall" aside, the other ones need an ID after them. Also, if a team is specified with deleteall, it will only delete the spawners belonging to that team
-* `ID` is the spawner ID, for `param`
-Again, I suggest you using [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) by rubenwardy and connect the `set_spawner` function to a few subcommands such as:
+If you love yourself, there is a built-in editor that allows you to easily make these things and many many more. Or, if you don't love yourself, you can connect every setup function to your custom CLI. Either way, both the approaches require you to connect at least the `arena_lib.create_arena` function inside your mod. It follows an example using [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/):  
 
 ```lua
-
-local mod = "mymod" -- more about this later
+local yourmod = "mymod"
 
 ChatCmdBuilder.new("NAMEOFYOURCOMMAND", function(cmd)
 
+	cmd:sub("create :arena", function(name, arena_name)
+		arena_lib.create_arena(name, yourmod, arena_name)
+	end)
+
+end, {})
+```
+Now do `/NAMEOFYOURCOMMAND create foo` and you'll have your first arena called "foo": 🎉 
+
+### 2.2.1 Editor
+arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands.  
+In order to use the editor, no other players shall be editing the same arena and there shall not be any ongoing game. When entering, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
+
+The function calling the editor is `arena_lib.enter_editor(sender, mod, arena_name)`, so we just need to add the following code into the previous snippet
+
+```lua
+	-- right after the first cmd:sub function
+
+	cmd:sub("edit :arena", function(sender, arena)
+		arena_lib.enter_editor(sender, yourmod, arena)
+	end)
+```
+
+To enter our "foo" arena, we can just simply do `/NAMEOFYOURCOMMAND edit foo`. Feel now free to skip to [2.3 Arena phases](#23-arena-phases).
+
+#### 2.2.2 CLI
+If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I've chosen to omit it.
+
+##### 2.2.2.1 Creating and removing arenas
+* `arena_lib.create_arena(sender, mod, arena_name, <min_players>, <max_players>)`: `arena_name` must be unique. Sender is a string, fields between < > are optional
+* `arena_lib.remove_arena(mod, arena_name)`
+
+##### 2.2.2.2 Renaming an arena
+Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
+`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
+In order to do so, it must be disabled.
+
+##### 2.2.2.3 Players management
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
+
+##### 2.2.2.4 Enabling/Disabling teams
+`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.
+
+##### 2.2.2.5 Spawners
+`arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. Spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
+* `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
+* `param` is a string, specifically `"overwrite"`, `"delete"` or `"deleteall"`. `"deleteall"` aside, the other ones need an ID after them. Also, if a team is specified with `"deleteall"`, it will only delete the spawners belonging to that team
+* `ID` is the spawner ID, for `param`
+
+Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/), here are few `set_spawner` examples:
+
+```lua
+
+	-- whatever previous subcommand
+
 	-- for creating spawners without teams
 	cmd:sub("setspawn :arena", function(sender, arena)
-	  arena_lib.set_spawner(sender, mod, arena)
+	  arena_lib.set_spawner(sender, yourmod, arena)
 	end)
 
 	-- for creating spawners with teams
 	cmd:sub("setspawn :arena :team:word", function(sender, arena, team)
-          arena_lib.set_spawner(sender, mod, arena, team)
+          arena_lib.set_spawner(sender, yourmod, arena, team)
       	end)
 
 	-- for using 'param' (just pass a random number for deleteall as it won't matter)
 	cmd:sub("setspawn :arena :param:word :ID:int", function(sender, arena, param, ID)
-	  arena_lib.set_spawner(sender, mod, arena, nil, param, ID)
+	  arena_lib.set_spawner(sender, yourmod, arena, nil, param, ID)
 	end)
 
 	-- for using 'param' with teams
 	cmd:sub("setspawn :arena :team:word :param:word :ID:int", function(sender, arena, team, param, ID)
-	  arena_lib.set_spawner(sender, mod, arena, team, param, ID)
+	  arena_lib.set_spawner(sender, yourmod, arena, team, param, ID)
 	end)
 
-   [etc.]
+   -- etc.
 ```
 
 ##### 2.2.2.6 Signs
 `arena_lib.set_sign(sender, mod, arena_name, <pos, remove>)` allows to either set or remove the sign of that specific arena. `pos` is a table, and it must correspond to an arena_lib sign to be set. `remove` is a boolean, and if `true`, `pos` will be ignored, as it'll erase the current arena sign (if exists)
 
-##### 2.2.2.7 Music
+##### 2.2.2.7 Enabling/Disabling an arena
+When a sign has been set, it won't work. This because an arena must be enabled manually via `arena_lib.enable_arena(sender, mod, arena_name)`.
+If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
+* all spawn points set
+* sign placed
+* potential custom checks through `arena_lib.on_enable` callback
+  
+Arenas can be disabled too, via `arena_lib.disable_arena(sender, mod, arena_name)`.  
+In order to do that, no game must be taking place in that specific arena. If successful, it'll return `true` and any potential player in queue will be removed. It acts like `enable_arena` (with `arena_lib.on_disable` as callback)
+
+##### 2.2.2.8 Arena properties
+[Arena properties](#151-arena-properties) allow you to create additional persistent attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
+`arena_lib.change_arena_property(sender, mod, arena_name, property, new_value)` changes the specified arena property with `new_value`. Keep in mind you can't change a property type (a number must remain a number, a string a string etc), and strings need quotes surrounding them - so `false` is a boolean, but `"false"` is a string. Also, as the title suggests, this works for *arena* properties only. Not for temporary, players, nor team ones.
+
+##### 2.2.2.9 Timers
+`arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (`time_mode = "decremental"`).
+
+##### 2.2.2.10 Music
 `arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
 
-##### 2.2.2.8 Celestial vault
+##### 2.2.2.11 Celestial vault
 By default, arenas celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  
 `arena_lib.set_celestial_vault(sender, mod, arena_name, element, params)` allows you to change parts of the vault, forcing it to players entering the arena. `element` is a string representing the part of the vault to be changed (`"sky"`, `"sun"`, `"moon"`, `"stars"`, `"clouds"`, or the explained later `"all"`), and `params` a table with the new values. This table is the same as the one used in the Minetest API `set_sky(...)`, `set_sun(...)` etc. functions, so for instance doing
 
@@ -408,18 +440,6 @@ By default, arenas celestial vault reflects the celestial vault of the player be
 will increase the size of the sun inside the arena and hide the sunrise texture. `params` can also be `nil`, and in that case will remove any custom setting previously set.  
 Last but not least, the special element `"all"` allows you to change everything, and it needs a table with the following optional parameters: `{sky={...}, sun={...}, moon={...}, stars={...}, clouds={...}}`. If `params` is nil, it'll reset the whole celestial vault.
 
-
-#### 2.2.3 Enabling an arena
-When a sign has been set, it won't work. This because an arena must be enabled manually via  
-`arena_lib.enable_arena(sender, mod, arena_name)` or by using the Enable and Leave button in the editor.
-If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
-* all spawn points set
-* sign placed
-* potential custom checks through `arena_lib.on_enable` callback
-  
-Arenas can be disabled too, via  
-`arena_lib.disable_arena(sender, mod, arena_name)` (or by entering the editor, as previously said).  
-In order to do that, no game must be taking place in that specific arena. If successful, it'll return `true` and any potential player in queue will be removed. It acts like `enable_arena` (with `arena_lib.on_disable` as callback)
 
 ### 2.3 Arena phases
 An arena comes in 4 phases, each one of them linked to a specific function:
@@ -439,5 +459,6 @@ Overriding these functions is **not** recommended. Instead, use the 4 respective
 ### 2.4 Spectate mode
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
 <br>  
+
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [Liberapay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
