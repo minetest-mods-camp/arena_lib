@@ -699,6 +699,9 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   end
 
+  -- li sgancio da eventuali entità
+  player:set_detach()
+
   -- disattivo eventualmente la minimappa
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
