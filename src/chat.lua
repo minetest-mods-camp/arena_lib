@@ -1,3 +1,8 @@
+-- nel caso arena_lib venisse registrata prima di altre mod che interferiscono
+-- con la chat (ponti IRC, chat di clan ecc.), i controlli che seguono verrebbero
+-- eseguiti prima delle mod sopracitate, annullandole a priori (perché i controlli
+-- vanno in ordine di registrazione). Evito ciò registrando i controlli della chat
+-- delle arene solo dopo che tutte le mod sono già state caricate (e quindi registrate)
 minetest.register_on_mods_loaded(function()
   minetest.register_on_chat_message(function(p_name, message)
 
