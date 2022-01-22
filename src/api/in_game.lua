@@ -45,13 +45,13 @@ function arena_lib.load_arena(mod, arena_ID)
     end
   end
 
-  -- randomizzo gli spawner se non è a team
+  -- randomizzo gli spawner se non è a squadre
   if not arena.teams_enabled then
     for i = #shuffled_spawners, 2, -1 do
       local j = math.random(i)
       shuffled_spawners[i], shuffled_spawners[j] = shuffled_spawners[j], shuffled_spawners[i]
     end
-  -- sennò ordino i giocatori per team
+  -- sennò ordino i giocatori per squadra
   else
     local j = 1
     for i = 1, #arena.teams do
@@ -62,7 +62,7 @@ function arena_lib.load_arena(mod, arena_ID)
         end
       end
 
-      -- e aggiungo eventuali proprietà per ogni team
+      -- e aggiungo eventuali proprietà per ogni squadra
       for k, v in pairs(mod_ref.team_properties) do
         arena.teams[i][k] = v
       end
@@ -265,7 +265,7 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
     arena[temp_property] = nil
   end
 
-  -- e quelle eventuali di team
+  -- e quelle eventuali di squadra
   if arena.teams_enabled then
     for i = 1, #arena.teams do
       for t_property, _ in pairs(mod_ref.team_properties) do
@@ -741,6 +741,11 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   arena.past_present_players[p_name] = true
   arena.past_present_players_inside[p_name] = true
 
+  -- inizializzo eventuale mod spettatore
+  if mod_ref.spectate_mode then
+    arena_lib.add_spectate_container(p_name)
+  end
+
   local player = minetest.get_player_by_name(p_name)
 
   -- applico eventuale fov
@@ -850,6 +855,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
   -- se ha partecipato come giocatore
   if arena.past_present_players_inside[p_name] then
+
+    -- rimuovo eventuale mod spettatore
+    if mod_ref.spectate_mode then
+      arena_lib.remove_spectate_container(p_name)
+    end
 
     -- resetto eventuali texture
     if arena.teams_enabled and mod_ref.teams_color_overlay then

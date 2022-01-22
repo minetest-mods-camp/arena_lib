@@ -9,6 +9,29 @@ local spectate_temp_storage = {}            -- KEY: player_name, VALUE: {(table)
 
 
 
+----------------------------------------------
+--------------INTERNAL USE ONLY---------------
+----------------------------------------------
+
+-- gestisco qui le tabelle che possono contenere i vari spettatori per ogni
+-- giocatore, onde evitare di fare dei controlli ogni volta che si cambia giocatore
+-- seguito (che rischierebbero di riempire/svuotare queste tabelle a ogni cambio)
+function arena_lib.add_spectate_container(p_name)
+  players_spectated[p_name] = {}
+end
+
+
+
+function arena_lib.remove_spectate_container(p_name)
+  players_spectated[p_name] = nil
+end
+
+
+
+----------------------------------------------
+---------------------CORE---------------------
+----------------------------------------------
+
 function arena_lib.enter_spectate_mode(p_name, arena)
 
   local mod = arena_lib.get_mod_by_player(p_name)
@@ -140,7 +163,7 @@ end
 
 
 function arena_lib.is_player_spectated(p_name)
-  return players_spectated[p_name] ~= nil
+  return next(players_spectated[p_name])
 end
 
 
@@ -264,14 +287,6 @@ function set_spectator(spectator, p_name, i, prev_spectated)
   -- se stava già seguendo qualcuno, lo rimuovo da questo
   if prev_spectated then
     players_spectated[prev_spectated][sp_name] = nil
-
-    if not next(players_spectated[prev_spectated]) then
-      players_spectated[prev_spectated] = nil
-    end
-  end
-
-  if not arena_lib.is_player_spectated(p_name) then
-    players_spectated[p_name] = {}
   end
 
   players_spectated[p_name][sp_name] = true
