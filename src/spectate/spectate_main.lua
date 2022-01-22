@@ -51,6 +51,13 @@ function arena_lib.enter_spectate_mode(p_name, arena)
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
     return end
 
+  local player = minetest.get_player_by_name(p_name)
+
+  -- se si è attaccati a qualcosa
+  if player:get_attach() then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
+    return end
+
   local arena_ID = arena_lib.get_arenaID_by_player(p_name)
   local team_ID = #arena.teams > 1 and 1 or nil
 
@@ -58,8 +65,6 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   arena.spectators[p_name] = true
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
-
-  local player = minetest.get_player_by_name(p_name)
 
   -- applico mano finta
   player:get_inventory():set_size("hand", 1)
