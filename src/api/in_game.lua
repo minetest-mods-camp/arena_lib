@@ -699,9 +699,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   end
 
-  -- li sgancio da eventuali entità
-  player:set_detach()
-
   -- disattivo eventualmente la minimappa
   if not mod_ref.show_minimap then
     player:hud_set_flags({minimap = false})
@@ -788,6 +785,10 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   if mod_ref.in_game_physics then
     player:set_physics_override(mod_ref.in_game_physics)
   end
+
+  -- li sgancio da eventuali entità (non lo faccio agli spettatori perché sono già
+  -- agganciati al giocatore, sennò cadono nel vuoto)
+  player:set_detach()
 
   -- assegno eventuali proprietà giocatori
   for k, v in pairs(mod_ref.player_properties) do
