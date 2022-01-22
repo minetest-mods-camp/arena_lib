@@ -68,7 +68,11 @@ function arena_lib.HUD_send_msg(HUD_type, p_name, msg, duration, sound, color)
 
   local player = minetest.get_player_by_name(p_name)
   local p_HUD = player_huds[p_name]
-  color = color == nil and "0xFFFFFF" or color
+  color = color or "0xFFFFFF"
+
+  if not player then
+    minetest.log("warning", debug.traceback("Player not found, can't send any arena_lib HUD"))
+    return end
 
   -- controllo il tipo di HUD
   if HUD_type == "title" then
