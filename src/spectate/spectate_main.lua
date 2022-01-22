@@ -59,9 +59,10 @@ function arena_lib.enter_spectate_mode(p_name, arena)
     return end
 
   local arena_ID = arena_lib.get_arenaID_by_player(p_name)
-  local team_ID = #arena.teams > 1 and 1 or nil
+  local team_ID  = #arena.teams > 1 and 1 or nil
+  local hand     = player:get_inventory():get_list("hand")
 
-  players_in_spectate_mode[p_name] = { minigame = mod, arenaID = arena_ID, teamID = team_ID}
+  players_in_spectate_mode[p_name] = { minigame = mod, arenaID = arena_ID, teamID = team_ID, hand = hand}
   arena.spectators[p_name] = true
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
@@ -128,9 +129,14 @@ function arena_lib.leave_spectate_mode(p_name, to_join_match)
   arena.spectators_amount = arena.spectators_amount -1
 
   local player = minetest.get_player_by_name(p_name)
+  local p_inv = player:get_inventory()
 
-  -- rimuovo mano finta
-  player:get_inventory():set_size("hand", 0)
+  -- rimuovo mano finta e reimposto eventuale mano precedente
+  p_inv:set_list("hand", players_in_spectate_mode[p_name].hand)
+
+  if not players_in_spectate_mode[p_name].hand then
+    p_inv:set_size("hand", 0)
+  end
 
   -- se il giocatore non è mai entrato in partita, riassegno le proprietà salvate qui
   if not arena.past_present_players_inside[p_name] then

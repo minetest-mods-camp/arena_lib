@@ -7,9 +7,10 @@ minetest.register_on_joinplayer(function(player)
   end
 
   local p_meta = player:get_meta()
+  local p_inv  = player:get_inventory()
 
   -- nel caso qualcuno si fosse disconnesso da dentro all'editor o fosse crashato il server con qualcuno nell'editor
-  if player:get_inventory():contains_item("main", "arena_lib:editor_quit") then
+  if p_inv:contains_item("main", "arena_lib:editor_quit") then
 
     p_meta:set_string("arena_lib_editor.mod", "")
     p_meta:set_string("arena_lib_editor.arena", "")
@@ -19,12 +20,13 @@ minetest.register_on_joinplayer(function(player)
 
     if minetest.get_modpath("hub_manager") then return end          -- se c'è hub_manager, ci pensa quest'ultimo allo svuotamento dell'inventario
 
-    player:get_inventory():set_list("main", {})
-    player:get_inventory():set_list("craft",{})
+    p_inv:set_list("main", {})
+    p_inv:set_list("craft", {})
 
   -- se invece era in spettatore
-  elseif player:get_inventory():get_list("hand") and player:get_inventory():contains_item("hand", "arena_lib:spectate_hand") then
-    player:get_inventory():set_size("hand", 0)
+elseif p_inv:get_list("hand") and p_inv:contains_item("hand", "arena_lib:spectate_hand") then
+    p_inv:set_stack("hand", 1, nil)
+    p_inv:set_size("hand", 0)
   end
 
   p_meta:set_string("arenalib_infobox_mod", "")
