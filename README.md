@@ -16,9 +16,9 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 4) (modders only) Dive into the [full documentation](DOCS.md) to understand how to create minigames  
 
 ### Dependencies
-Default  
-[signs_lib](https://gitlab.com/VanessaE/signs_lib) by Vanessa Dannenberg  
-(optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
+* Default  
+* [signs_lib](https://content.minetest.net/packages/VanessaE/signs_lib/) by Vanessa Dannenberg  
+* (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 #### Add-ons
 [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server
@@ -28,10 +28,10 @@ Default
 * `SkinsDB` or any other mod applying a 3D model onto the player, if `teams_color_overlay` is used
 
 #### Mods relying on arena_lib
-[Block League](https://gitlab.com/zughy-friends-minetest/block_league)  
-[Murder](https://gitlab.com/giov4/minetest-murder-mod)  
-[Skywars](https://gitlab.com/zughy-friends-minetest/skywars)  
-[Sumo](https://notabug.org/MisterE123/sumo)  
+* [Block League](https://gitlab.com/zughy-friends-minetest/block_league)
+* [Murder](https://gitlab.com/giov4/minetest-murder-mod)
+* [Skywars](https://gitlab.com/zughy-friends-minetest/skywars)
+* ...and many more! ([full list](https://content.minetest.net/metapackages/arena_lib/))
 
 ### Want to help?
 Feel free to:
