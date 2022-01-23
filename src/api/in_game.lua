@@ -5,8 +5,10 @@ local function operations_before_entering_arena() end
 local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
 local function handle_leaving_callbacks() end
+local function victory_particles() end
 local function show_victory_particles() end
 local function time_start() end
+local function deprecated_winning_team_celebration() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -170,8 +172,8 @@ end
 
 
 -- a partita finita.
--- winner_name può essere stringa (no team) o tabella di nomi (team)
-function arena_lib.load_celebration(mod, arena, winner_name)
+-- winners può essere stringa (giocatore singolo), intero (squadra) o tabella di uno di questi (più giocatori o squadre)
+function arena_lib.load_celebration(mod, arena, winners)
 
   -- se era già in celebrazione
   if arena.in_celebration then
@@ -191,11 +193,34 @@ function arena_lib.load_celebration(mod, arena, winner_name)
   local winning_message = ""
 
   -- determino il messaggio da inviare
-  if type(winner_name) == "string" then
-    winning_message = S("@1 wins the game", winner_name)
-  elseif type(winner_name) == "table" then
-    local winner_team_ID = arena.players[winner_name[1]].teamID
-    winning_message = S("Team @1 wins the game", arena.teams[winner_team_ID].name)
+  -- se è stringa, è giocatore singolo
+  if type(winners) == "string" then
+      winning_message = S("@1 wins the game", winners)
+
+  -- se è un ID è una squadra
+  elseif type(winners) == "number" then
+    winning_message = S("Team @1 wins the game", arena.teams[winners].name)
+
+  -- se è una tabella, può essere o più giocatori singoli, o più squadre
+  elseif type(winners) == "table" then
+
+    -- v DEPRECATED, da rimuovere in 6.0 ----- v
+    if arena.teams_enabled and type(winners[1]) == "string" then
+      winning_message = deprecated_winning_team_celebration(mod, arena, winners)
+    -- ^ -------------------------------------^
+
+    elseif type(winners[1]) == "string" then
+      for _, pl_name in pairs(winners) do
+        winning_message = winning_message .. pl_name .. ", "
+      end
+      winning_message = S("@1 win the game", winning_message:sub(1, -3))
+
+    else
+      for _, team_ID in pairs(winners) do
+        winning_message = winning_message .. arena.teams[team_ID].name .. ", "
+      end
+    winning_message = S("Teams @1 win the game", winning_message:sub(1, -3))
+    end
   end
 
   local mod_ref = arena_lib.mods[mod]
@@ -204,19 +229,19 @@ function arena_lib.load_celebration(mod, arena, winner_name)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_celebration then
-    mod_ref.on_celebration(arena, winner_name)
+    mod_ref.on_celebration(arena, winners)
   end
 
   -- l'arena finisce dopo tot secondi
   minetest.after(mod_ref.celebration_time, function()
-    arena_lib.end_arena(mod_ref, mod, arena, winner_name)
+    arena_lib.end_arena(mod_ref, mod, arena, winners)
   end)
 
 end
 
 
 
-function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
+function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
 
   -- copie da passare a on_end
   local spectators = {}
@@ -274,27 +299,11 @@ function arena_lib.end_arena(mod_ref, mod, arena, winner_name, is_forced)
     end
   end
 
-  -- effetto particellare
-  if type(winner_name) == "string" then
-    local winner = minetest.get_player_by_name(winner_name)
-
-    if winner then
-      show_victory_particles(winner:get_pos())
-    end
-
-  elseif type(winner_name) == "table" then
-    for _, pl_name in pairs(winner_name) do
-      local winner = minetest.get_player_by_name(pl_name)
-
-      if winner then
-        show_victory_particles(winner:get_pos())
-      end
-    end
-  end
+  victory_particles(arena, players, winners)
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
-    mod_ref.on_end(arena, players, winner_name, spectators, is_forced)
+    mod_ref.on_end(arena, players, winners, spectators, is_forced)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
@@ -494,17 +503,14 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   if arena.players_amount == 0 then
     arena_lib.end_arena(mod_ref, mod, arena)
 
-  -- se l'arena ha i team e sono rimasti solo i giocatori di un team, il loro team vince
+  -- se l'arena è a squadre e sono rimasti solo i giocatori di una squadra, la loro squadra vince
   elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
 
-    local winners
-    for _, pl_stats in pairs(arena.players) do
-      winners = arena_lib.get_players_in_team(arena, pl_stats.teamID)
-      break
-    end
+    local winning_team_id = arena_lib.get_active_teams(arena)[1]
 
     arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
-    arena_lib.load_celebration(mod, arena, winners)
+    arena_lib.load_celebration(mod, arena, winning_team_id)
+
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
@@ -956,6 +962,80 @@ end
 
 
 
+function victory_particles(arena, players, winners)
+  -- singolo giocatore
+  if type(winners) == "string" then
+    local winner = minetest.get_player_by_name(winners)
+
+    if winner then
+      show_victory_particles(winner:get_pos())
+    end
+
+  -- singola squadra
+  elseif type(winners) == "number" then
+    for pl_name, pl_stats in pairs(players) do
+      if pl_stats.teamID == winners then
+        local winner = minetest.get_player_by_name(pl_name)
+
+        if winner then
+          show_victory_particles(winner:get_pos())
+        end
+      end
+    end
+
+  -- più vincitori
+  elseif type(winners) == "table" then
+
+    -- v DEPRECATED, da rimuovere in 6.0 ----- v
+    if arena.teams_enabled and type(winners[1]) == "string" then
+      local teamID = 0
+      for pl_name, pl_stats in pairs(players) do
+        if pl_name == winners[1] then
+          teamID = pl_stats.teamID
+          break
+        end
+      end
+
+      for pl_name, pl_stats in pairs(players) do
+        if pl_stats.teamID == winners then
+          local winner = minetest.get_player_by_name(pl_name)
+
+          if winner then
+            show_victory_particles(winner:get_pos())
+          end
+        end
+      end
+    -- ^ -------------------------------------^
+    -- singoli giocatori
+    elseif type(winners[1]) == "string" then
+      for _, pl_name in pairs(winners) do
+        local winner = minetest.get_player_by_name(pl_name)
+
+        if winner then
+          show_victory_particles(winner:get_pos())
+        end
+      end
+
+    -- squadre
+    else
+      for _, team_ID in pairs(winners) do
+        local team = arena.teams[team_ID]
+        for pl_name, pl_stats in pairs(players) do
+          if pl_stats.teamID == team_ID then
+            local winner = minetest.get_player_by_name(pl_name)
+
+            if winner then
+              show_victory_particles(winner:get_pos())
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+
+
 function show_victory_particles(p_pos)
   minetest.add_particlespawner({
     amount = 50,
@@ -993,4 +1073,20 @@ function time_start(mod_ref, arena)
   minetest.after(1, function()
     time_start(mod_ref, arena)
   end)
+end
+
+
+
+
+
+----------------------------------------------
+------------------DEPRECATED------------------
+----------------------------------------------
+
+-- to remove in 6.0
+function deprecated_winning_team_celebration(mod, arena, winners)
+  minetest.log("warning", debug.traceback("[ARENA_LIB - " .. mod .. "] passing a single winning team as a table made of one of its players is deprecated, "
+    .. "please pass the (integer) team ID instead"))
+  local winner = arena.players[winners[1]].teamID
+  return S("Team @1 wins the game", arena.teams[winner].name)
 end

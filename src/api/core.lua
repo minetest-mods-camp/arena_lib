@@ -17,6 +17,7 @@ local function update_storage() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
+local function warn_deprecated_set_sign() end
 
 local arena_default = {
   name = "",
@@ -1362,7 +1363,7 @@ function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_team
   arena_lib.send_message_in_arena(arena, "players", msg, teamID, except_teamID)
 end
 
-local function warn_deprecated_set_sign(sender)
+function warn_deprecated_set_sign(sender)
   minetest.log("warning", "[ARENA_LIB] set_sign(sender, <pos>, <remove>, mod, arena_name) is deprecated. Please use set_sign(sender, mod, arena_name, pos, <remove>) instead")
   minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(sender, pos, remove, mod, arena_name) is deprecated and pos now mandatory. Watch the log, aborting...")
 end

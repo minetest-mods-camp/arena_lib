@@ -117,8 +117,8 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_disable(mod, function(arena, p_name)`: use it to run more checks before disabling an arena. Must return true if all conditions are met
 * `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
 * `arena_lib.on_start(mod, function(arena))`: same as above
-* `arena_lib.on_celebration(mod, function(arena, winner_name)`: same as above
-* `arena_lib.on_end(mod, function(arena, players, winner_name, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
+* `arena_lib.on_celebration(mod, function(arena, winners)`: same as above
+* `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
@@ -451,8 +451,9 @@ An arena comes in 4 phases, each one of them linked to a specific function:
 The 4 functions, intertwined with the previously mentioned phases are:
 * `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
 * `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
-* `arena_lib.load_celebration(mod, arena, winner_name)`: between the fighting and the celebration phase. Called when the winning conditions are met. `winner_name` can be both a string and a table (in case of teams)
-* `arena_lib.end_arena(mod_ref, mod, arena, winner_name, as_spectator)`: at the very end of the celebration phase. It teleports people outside the arena. `winner_name` is taken by `load_celebration(...)`
+* `arena_lib.load_celebration(mod, arena, winners)`: between the fighting and the celebration phase. Called when the winning conditions are met.
+  * `winners` can be a string (name of a player), an integer (ID of the winning team), a table of strings (more players) or a table of integers (more teams)
+* `arena_lib.end_arena(mod_ref, mod, arena, winners, as_spectator)`: at the very end of the celebration phase. It teleports people outside the arena. `winners` is taken by `load_celebration(...)`
 
 Overriding these functions is **not** recommended. Instead, use the 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
 
