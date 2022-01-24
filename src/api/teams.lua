@@ -1,7 +1,9 @@
 function arena_lib.is_player_in_same_team(arena, p_name, t_name)
-  if arena.players[p_name].teamID == arena.players[t_name].teamID then return true
-  else return false
+  if not arena or not arena.players[p_name] or not arena.players[t_name] then
+    return false
   end
+
+  return arena.players[p_name].teamID == arena.players[t_name].teamID
 end
 
 

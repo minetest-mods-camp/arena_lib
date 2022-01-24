@@ -66,14 +66,25 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
       return
     end
 
+    local is_p_queuing = arena_lib.is_player_in_queue(p_name)
+    local is_t_queuing = arena_lib.is_player_in_queue(t_name)
+    local is_p_playing = arena_lib.is_player_in_arena(p_name)
+    local is_t_playing = arena_lib.is_player_in_arena(t_name)
+
+    -- se nessuno dei due è in partita, ma solo al massimo in coda, lascio spazio agli altri eventuali on_punchplayer
+    if (is_p_queuing and not is_t_playing) or
+       (is_t_queuing and not is_p_playing) then
+      return
+    end
+
     -- se uno è in partita e l'altro no, annullo
-    if ((p_arena and p_arena.in_game) and not (t_arena and t_arena.in_game)) or
-       ((t_arena and t_arena.in_game) and not (p_arena and p_arena.in_game)) then
+    if (is_p_playing and not is_t_playing) or
+       (is_t_playing and not is_p_playing) then
       return true
     end
 
     -- se sono nella stessa partita e nella stessa squadra, annullo
-    if p_arena.players[t_name] and p_arena.players[p_name].teamID and p_arena.players[p_name].teamID == p_arena.players[t_name].teamID then
+    if p_arena.teams_enabled and arena_lib.is_player_in_same_team(p_arena, p_name, t_name) then
       return true
     end
 end)
