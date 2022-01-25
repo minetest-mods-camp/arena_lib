@@ -435,20 +435,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     -- TODO: there is some Minetest related bug that doesn't allow to instantly update dropdown fields.
     -- Too tired to backtrack for now and open an issue, maybe one day
-    minetest.close_formspec(p_name, "arena_lib:settings_sky")
+    minetest.close_formspec(p_name, "arena_lib:celestial_vault")
 
     -- riapro il formspec sul quale mi trovavo
     minetest.after(0.1, function()
       if fields.day_sky then
-        minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sky"))
+        minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sky"))
       elseif fields.sun_size then
-        minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sun"))
+        minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sun"))
       elseif fields.moon_size then
-        minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "moon"))
+        minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "moon"))
       elseif fields.stars_count then
-        minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "stars"))
+        minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "stars"))
       else
-        minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "clouds"))
+        minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "clouds"))
       end
     end)
     return
@@ -457,19 +457,19 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   -- se cambia sezione, non c'è bisogno di controllare il resto (dato che viene automatico cambiare
   -- e poi premere "Applica")
   if fields.sky_btn then
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sky"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sky"))
     return
   elseif fields.sun_btn then
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sun"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sun"))
     return
   elseif fields.moon_btn then
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "moon"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "moon"))
     return
   elseif fields.stars_btn then
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "stars"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "stars"))
     return
   elseif fields.clouds_btn then
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "clouds"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "clouds"))
     return
   end
 
@@ -609,27 +609,27 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   elseif fields.custom_fog_tint then
     temp_sky_col.fog_tint_type = fields.custom_fog_tint == "true" and "custom" or "default"
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sky"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sky"))
 
   elseif fields.sky_type then
     temp_sky.type = fields.sky_type
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sky"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sky"))
 
   elseif fields.sun_visible then
     temp_sun.visible = fields.sun_visible == "true" and true or false
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sun"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sun"))
 
   elseif fields.sunrise_visible then
     temp_sun.sunrise_visible = fields.sunrise_visible == "true" and true or false
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "sun"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "sun"))
 
   elseif fields.moon_visible then
     temp_moon.visible = fields.moon_visible == "true" and true or false
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "moon"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "moon"))
 
   elseif fields.stars_visible then
     temp_stars.visible = fields.stars_visible == "true" and true or false
-    minetest.show_formspec(p_name, "arena_lib:settings_sky", get_celvault_formspec(p_name, "stars"))
+    minetest.show_formspec(p_name, "arena_lib:celestial_vault", get_celvault_formspec(p_name, "stars"))
   end
 
 
