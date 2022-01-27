@@ -174,7 +174,7 @@ end
 
 
 function arena_lib.is_player_spectated(p_name)
-  return next(players_spectated[p_name])
+  return players_spectated[p_name] and next(players_spectated[p_name])
 end
 
 
