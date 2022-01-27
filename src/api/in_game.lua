@@ -718,9 +718,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     arena_lib.store_inventory(player)
   end
 
-  -- li curo
-  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
-
   -- salvo la hotbar se c'è la spettatore o la hotbar personalizzata
   if mod_ref.spectate_mode or mod_ref.hotbar then
     players_temp_storage[p_name].hotbar_slots = player:hud_get_hotbar_itemcount()
@@ -795,6 +792,9 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   -- li sgancio da eventuali entità (non lo faccio agli spettatori perché sono già
   -- agganciati al giocatore, sennò cadono nel vuoto)
   player:set_detach()
+
+  -- li curo
+  player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
   -- assegno eventuali proprietà giocatori
   for k, v in pairs(mod_ref.player_properties) do

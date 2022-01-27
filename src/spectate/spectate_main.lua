@@ -306,6 +306,7 @@ function set_spectator(spectator, p_name, i, prev_spectated)
   local target = minetest.get_player_by_name(p_name)
 
   spectator:set_attach(target, "", {x=0, y=-5, z=-20}, {x=0, y=0, z=0})
+  spectator:set_hp(target:get_hp() > 0 and target:get_hp() or 1)
   spectator:get_meta():set_int("arenalib_watchID", i)
 
   arena_lib.HUD_send_msg("hotbar", sp_name, S("Currently spectating: @1", p_name))
