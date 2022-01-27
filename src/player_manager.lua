@@ -94,10 +94,7 @@ end)
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
     local p_name = player:get_player_name()
-    local mod = arena_lib.get_mod_by_player(p_name)
-
-    -- se non è in partita, annullo
-    if not mod then return hp_change end
+    if not arena_lib.is_player_in_arena(p_name) then return hp_change end
 
     -- se è spettatore, annullo a meno che non abbia cambiato giocatore seguito
     -- o che il giocatore seguito non abbia subito un danno (che usano set_hp).
@@ -112,6 +109,8 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
       return reason.type == "set_hp" and hp_change or 0
     end
 
+    local mod = arena_lib.get_mod_by_player(p_name)
+
     -- se un tipo di danno è disabilitato, annullo
     for _, disabled_damage in pairs(arena_lib.mods[mod].disabled_damage_types) do
       if reason.type == disabled_damage then
@@ -123,20 +122,20 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
     if arena_lib.is_player_spectated(p_name) then
       for sp_name, _ in pairs(arena_lib.get_player_spectators(p_name)) do
         local spectator = minetest.get_player_by_name(sp_name)
-        -- TODO: capire se può essere sistemato a livello motore di gioco: al momento
-        -- devo ritardare di uno step o non aggiorna la vita fino al prossimo richiamo
-        minetest.after(0.1, function()
-          -- ..se lo spettatore non è stato ucciso per chissà quale arcano motivo
-          if spectator and spectator:get_hp() > 0 then
-            spectator:set_hp(player:get_hp() > 0 and player:get_hp() or 1)
+        -- ..se lo spettatore non è stato ucciso per chissà quale arcano motivo
+        if spectator:get_hp() > 0 then
+          if player:get_hp() > 0 then
+            spectator:set_hp(player:get_hp() + hp_change)
+          else
+            spectator:set_hp(1)
           end
-        end)
+        end
       end
     end
 
     return hp_change
 
-end, true)
+end, false)
 
 
 
