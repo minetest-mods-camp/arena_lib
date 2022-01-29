@@ -310,6 +310,17 @@ function set_spectator(spectator, p_name, i, prev_spectated)
   spectator:get_meta():set_int("arenalib_watchID", i)
 
   arena_lib.HUD_send_msg("hotbar", sp_name, S("Currently spectating: @1", p_name))
+
+  local mod_ref = arena_lib.mods[players_in_spectate_mode[sp_name].minigame]
+
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_change_spectated_target then
+    local arena = arena_lib.get_arena_by_player(sp_name)
+    --TODO: hardcoded for now, need to implement entities (ObjRef) and locations (table) focus first
+    target = p_name
+    local prev_target = prev_spectated
+    mod_ref.on_change_spectated_target(arena, sp_name, target, prev_target)
+  end
 end
 
 

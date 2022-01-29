@@ -121,6 +121,9 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
+* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, target, prev_target))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena.
+    * `target` can only be the player name for now, the same goes for `prev_target` (if any). Entities and locations will be hopefully added in the future
+    * Beware: as this gets called also when entering, keep in mind that it gets called before the `on_join` callback
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)

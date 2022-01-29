@@ -52,6 +52,12 @@ end
 
 
 
+function arena_lib.on_change_spectated_target(mod, func)
+  arena_lib.mods[mod].on_change_spectated_target = func
+end
+
+
+
 function arena_lib.on_time_tick(mod, func)
   arena_lib.mods[mod].on_time_tick = func
 end
