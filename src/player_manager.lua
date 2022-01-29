@@ -122,12 +122,16 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
     if arena_lib.is_player_spectated(p_name) then
       for sp_name, _ in pairs(arena_lib.get_player_spectators(p_name)) do
         local spectator = minetest.get_player_by_name(sp_name)
-        -- ..se lo spettatore è stato ucciso per chissà quale arcano motivo
+        -- ..se lo spettatore non è stato ucciso per chissà quale arcano motivo
         if spectator:get_hp() > 0 then
           if player:get_hp() > 0 then
             spectator:set_hp(math.max(player:get_hp() + hp_change, 1))
           else
-            spectator:set_hp(1)
+            if reason.type == "respawn" then
+              spectator:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
+            else
+              spectator:set_hp(1)
+            end
           end
         end
       end
