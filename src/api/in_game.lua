@@ -551,7 +551,7 @@ function arena_lib.force_arena_ending(mod, arena, sender)
     return end
 
   arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
-  arena_lib.end_arena(mod_ref, mod, arena, _, true)
+  arena_lib.end_arena(mod_ref, mod, arena, nil, true)
   return true
 end
 

@@ -70,7 +70,7 @@ signs_lib.register_sign("arena_lib:sign", {
       local arena_name = sign_arena.name
       arena_lib.force_arena_ending(mod, sign_arena, "ARENA_LIB")
       arena_lib.disable_arena("", mod, arena_name)
-      arena_lib.set_sign("", mod, arena_name, _, true)
+      arena_lib.set_sign("", mod, arena_name, nil, true)
       arena_lib.set_sign("", mod, arena_name, pos)
       arena_lib.enable_arena("", mod, arena_name)
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!")))

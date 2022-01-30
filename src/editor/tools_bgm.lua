@@ -152,7 +152,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     -- se il campo è vuoto, rimuovo la musica di sottofondo
     if fields.bgm == "" then
-      arena_lib.set_bgm(p_name, mod, arena_name, nil, _, _, _, _, true)
+      arena_lib.set_bgm(p_name, mod, arena_name, nil, nil, nil, nil, nil, true)
     -- se non esiste il file audio, annullo
     elseif not io.open(minetest.get_modpath(mod) .. "/sounds/" .. fields.bgm .. ".ogg", "r") then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This audio track doesn't exist!")))

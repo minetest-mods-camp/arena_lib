@@ -29,7 +29,7 @@ minetest.register_tool("arena_lib:sign_add", {
 
       if not pos then return end -- nel caso sia aria, sennò crasha
 
-      arena_lib.set_sign(p_name, mod, arena_name, pos, _, true)
+      arena_lib.set_sign(p_name, mod, arena_name, pos, nil, true)
     end
 })
 
@@ -96,7 +96,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
     local arena_name  =   player:get_meta():get_string("arena_lib_editor.arena")
 
-    arena_lib.set_sign(p_name, mod, arena_name, _, true, true)
+    arena_lib.set_sign(p_name, mod, arena_name, nil, true, true)
     minetest.close_formspec(p_name, formname)
 
   elseif fields.delete_cancel then
