@@ -420,7 +420,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       if celvault.stars  then player:set_stars(celvault.stars)   end
       if celvault.clouds then player:set_clouds(celvault.clouds) end
     else
-      arena_lib.temp.reset_celestial_vault(player)
+      -- TODO: this should be considered to make it shorter: https://github.com/minetest/minetest/issues/11917
+      player:set_sky()
+      player:set_sun()
+      player:set_moon()
+      player:set_stars()
+      player:set_clouds()
     end
 
     temp_sky_settings[p_name] = nil
@@ -430,7 +435,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   elseif fields.reset then
 
     arena_lib.set_celestial_vault(p_name, mod, arena_name, "all", nil, true)
-    arena_lib.temp.reset_celestial_vault(player)
+    player:set_sky()
+    player:set_sun()
+    player:set_moon()
+    player:set_stars()
+    player:set_clouds()
     fill_tempsky(p_name, arena)
 
     -- TODO: there is some Minetest related bug that doesn't allow to instantly update dropdown fields.
