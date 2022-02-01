@@ -74,7 +74,7 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   -- se il giocatore non è mai entrato in partita, lo salvo nello spazio di archiviazione temporaneo
   if not arena.past_present_players_inside[p_name] then
     spectate_temp_storage[p_name] = {}
-    spectate_temp_storage[p_name].camera_offset = player:get_eye_offset()
+    spectate_temp_storage[p_name].camera_offset = {player:get_eye_offset()}
   end
 
   -- applicazione parametri vari
