@@ -756,7 +756,7 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
 
   -- applico eventuale scostamento camera
   if mod_ref.camera_offset then
-    players_temp_storage[p_name].camera_offset = player:get_eye_offset()
+    players_temp_storage[p_name].camera_offset = {player:get_eye_offset()}
     player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
   end
 
