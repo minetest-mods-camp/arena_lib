@@ -41,9 +41,9 @@
 
 ## 1. Minigame configuration
 
-First of all download the mod and put it in your mods folder. Then, be sure you have [LuaJIT](https://luajit.org/) installed on your machine.
+First of all download the mod and put it in your mods folder.  
 
-Now you need to register your minigame, possibly inside the init.lua of your mod, via:
+Now you need to register your minigame, possibly inside the `init.lua` of your mod, via:
 ```lua
 arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 ```

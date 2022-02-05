@@ -9,11 +9,9 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 
 1) Install it as any other mod
 
-2) Be sure you have [LuaJIT](https://luajit.org/) installed on your machine
+2) Check [SETTINGS.lua](SETTINGS.lua)
 
-3) Check [SETTINGS.lua](SETTINGS.lua)
-
-4) (modders only) Dive into the [full documentation](DOCS.md) to understand how to create minigames  
+3) (modders only) Dive into the [full documentation](DOCS.md) to understand how to create minigames  
 
 ### Dependencies
 * Default  
