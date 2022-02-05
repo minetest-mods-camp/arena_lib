@@ -38,7 +38,6 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 Feel free to:
 * open an [issue](https://gitlab.com/zughy-friends-minetest/arena_lib/-/issues)
 * submit a merge request. In this case, PLEASE, do follow milestones and my [coding guidelines](https://cryptpad.fr/pad/#/2/pad/view/-l75iHl3x54py20u2Y5OSAX4iruQBdeQXcO7PGTtGew/embed/). I won't merge features for milestones that are different from the upcoming one (if it's declared), nor messy code
-* contact me on the [Minetest Forum](https://forum.minetest.net/memberlist.php?mode=viewprofile&u=26472)
 
 ##### Credits
 Images by me. They're under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)  
