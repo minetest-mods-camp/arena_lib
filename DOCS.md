@@ -60,7 +60,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `chat_team_color`: (string) color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
 * `chat_spectate_color`: color for every message sent in the spectate chat. Default is gray (`"#dddddd"`)
 * `fov`: (int) changes the fov of every player
-* `camera_offset`: (table) changes the offset of the camera for evey player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
+* `camera_offset`: (table) changes the offset of the camera for every player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
   * `slots =`: (int) the number of slots
   * `background_image =`: (string) the background image
@@ -87,7 +87,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 ### 1.1 Per server configuration
 There are also a couple of settings that can only be set in game via `/minigamesettings`. This because different servers might need different parameters. They are:
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
-* `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimium amount of players has been reached to start the queue. Default is `10`
+* `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimum amount of players has been reached to start the queue. Default is `10`
 
 > **BEWARE**: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
 
@@ -188,7 +188,7 @@ arena_lib.register_minigame("mymod", {
 }
 ```
 
-Now you can easily access the killstreak parameter by retrieving the player inside an arena via `ourarena.players[p_name].killlstreak`. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
+Now you can easily access the killstreak parameter by retrieving the player inside an arena via `ourarena.players[p_name].killstreak`. Also, don't forget to reset it when a player dies via the `on_death` callback we saw earlier:
 ```lua
 arena_lib.on_death("mymod", function(arena, p_name, reason)
   arena.players[p_name].killstreak = 0
@@ -232,7 +232,7 @@ There are also some other functions which might turn useful. They are:
   * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`
   * `2`: player kicked. Calls `on_kick` if declared. Otherwise calls `on_quit`
   * `3`: player quit. Calls `on_quit`
-Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (ie. in a murder minigame, so reason = 1).  
+Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (i.e. in a murder minigame, so reason = 1).  
 Executioner can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
 * `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean
@@ -308,7 +308,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
 
 There are two ways to know an arena ID: the first is in-game via the two debug utilities:
-* `arena_lib.print_arenas(sender, mod)`: coincise
+* `arena_lib.print_arenas(sender, mod)`: concise
 * `arena_lib.print_arena_info(sender, mod, arena_name)`: extended with much more information (this one is implemented in the editor by default)
 
 The second is via code by the functions:
@@ -430,7 +430,7 @@ In order to do that, no game must be taking place in that specific arena. If suc
 `arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
 
 ##### 2.2.2.11 Celestial vault
-By default, arenas celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  
+By default, the arena's celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  
 `arena_lib.set_celestial_vault(sender, mod, arena_name, element, params)` allows you to change parts of the vault, forcing it to players entering the arena. `element` is a string representing the part of the vault to be changed (`"sky"`, `"sun"`, `"moon"`, `"stars"`, `"clouds"`, or the explained later `"all"`), and `params` a table with the new values. This table is the same as the one used in the Minetest API `set_sky(...)`, `set_sun(...)` etc. functions, so for instance doing
 
 ```lua
