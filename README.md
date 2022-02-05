@@ -26,6 +26,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 ### Known conflicts
 * `Beds` or any other mod overriding the default respawn system
 * `SkinsDB` or any other mod applying a 3D model onto the player, if `teams_color_overlay` is used
+* `Weather` or any other mod changing players skybox at runtime (custom celestial vaults will be overridden) 
 
 #### Mods relying on arena_lib
 * [Block League](https://gitlab.com/zughy-friends-minetest/block_league)
