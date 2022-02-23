@@ -1,4 +1,4 @@
-# version 5.1.0
+# version 5.2.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -247,8 +247,9 @@ Visible stars=Stelle visibili
 Colour=Colore
 Count=Quantità
 Clouds must be enabled first to change their parameters=Vanno prima abilitate le nuvole per poterne cambiare i parametri
-Density=Densità
 Ambient=Ambiente
+Opacity=Opacità
+Density=Densità
 Thickness=Spessore
 Height=Altezza
 Speed=Velocità

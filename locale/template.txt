@@ -1,4 +1,4 @@
-# version 5.1.0
+# version 5.2.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -247,8 +247,9 @@ Visible stars=
 Colour=
 Count=
 Clouds must be enabled first to change their parameters=
-Density=
 Ambient=
+Opacity=
+Density=
 Thickness=
 Height=
 Speed=

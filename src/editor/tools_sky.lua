@@ -7,6 +7,8 @@ local function get_sun_params() end
 local function get_moon_params() end
 local function get_stars_params() end
 local function get_clouds_params() end
+local function get_clouds_col_alpha() end
+local function calc_clouds_col() end
 local function colstr() end
 local function get_palette_col_and_sorted_table() end
 local function compare_elem() end
@@ -320,31 +322,62 @@ function get_clouds_params(p_name)
 
   else
     local palette_str, palette_id = get_palette_col_and_sorted_table()
+    local col, alpha = get_clouds_col_alpha(temp_clouds.color)
     clouds = {
       "container[0,0.5]",
+      "scrollbaroptions[min=0;max=100;arrows=hide]",
+      -- colour
+      "container[0,0]",
+      "label[0,0;" .. S("Colour") .. "]",
+      "dropdown[0,0.2;3.75,0.6;clouds_color;" .. palette_str .. ";" .. (palette_id[col] or 1) .. "]",
+      "label[4.15,0;" .. S("Ambient") .. "]",
+      "dropdown[4.15,0.2;3.75,0.6;clouds_ambient;" .. palette_str .. ";" .. (palette_id[temp_clouds.ambient] or 1) .. "]",
+      "label[0,1.2;" .. S("Opacity") .. "]",
+      "label[0,1.7;0]",
+      "label[7.6,1.7;1]",
+      "scrollbar[0.3,1.55;7.15,0.3;horizontal;clouds_opacity;" .. alpha * 100 .. "]",
+      "container_end[]",
+      -- density etc
+      "container[0,2.3]",
       "label[0,0;" .. S("Density") .. "]",
       "label[0,0.5;0]",
       "label[7.6,0.5;1]",
-      "scrollbaroptions[min=0;max=100;arrows=hide]",
       "scrollbar[0.3,0.35;7.15,0.3;horizontal;clouds_density;" .. ((temp_clouds.density or 0.4) * 100) .. "]",
-      "label[0,1.2;" .. S("Colour") .. "]",
-      "dropdown[0,1.4;3.75,0.6;clouds_color;" .. palette_str .. ";" .. (palette_id[temp_clouds.color] or 1) .. "]",
-      "label[4.15,1.2;" .. S("Ambient") .. "]",
-      "dropdown[4.15,1.4;3.75,0.6;clouds_ambient;" .. palette_str .. ";" .. (palette_id[temp_clouds.ambient] or 1) .. "]",
-      "label[0,2.25;" .. S("Thickness") .. "]",
-      "field[0,2.45;1,0.6;clouds_thickness;;" .. (temp_clouds.thickness or 16) .. "]",
-      "label[1.7,2.25;" .. S("Height") .. "]",
-      "field[1.7,2.45;1,0.6;clouds_height;;" .. (temp_clouds.height or 120) .. "]",
-      "label[4.15,2.25;" .. S("Speed") .. "]",
-      "label[4.15,2.75;X]",
-      "field[4.45,2.45;1,0.6;clouds_speed_x;;" .. (temp_clouds.speed.x or 0) .. "]",
-      "label[5.8,2.75;Z]",
-      "field[6.1,2.45;1,0.6;clouds_speed_z;;" .. (temp_clouds.speed.z or -2) .. "]",
+      "label[0,1.05;" .. S("Thickness") .. "]",
+      "field[0,1.25;1,0.6;clouds_thickness;;" .. (temp_clouds.thickness or 16) .. "]",
+      "label[1.7,1.05;" .. S("Height") .. "]",
+      "field[1.7,1.25;1,0.6;clouds_height;;" .. (temp_clouds.height or 120) .. "]",
+      "label[4.15,1.05;" .. S("Speed") .. "]",
+      "label[4.15,1.55;X]",
+      "field[4.45,1.25;1,0.6;clouds_speed_x;;" .. (temp_clouds.speed.x or 0) .. "]",
+      "label[5.8,1.55;Z]",
+      "field[6.1,1.25;1,0.6;clouds_speed_z;;" .. (temp_clouds.speed.z or -2) .. "]",
+      "container_end[]",
       "container_end[]"
     }
   end
 
   return clouds
+end
+
+
+
+function get_clouds_col_alpha(colour)
+  if not colour then return "", 0.9 end
+
+  local col = string.sub(colour, 1, 7)
+  local alpha_hex = string.sub(colour, -2)
+  local alpha = tonumber(alpha_hex, 16) / 255
+  minetest.chat_send_all(colour .. " e alfa = " .. alpha)
+  return col, alpha
+end
+
+
+
+function calc_clouds_col(colour, alpha_val)
+  colour = colour == "" and "#FFF0F0" or colour
+  local alpha_hex = string.format("%x", alpha_val * 255)
+  return colour .. alpha_hex
 end
 
 
@@ -583,16 +616,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   end
 
   -- nuvole
-  if fields.clouds_density then
-    temp_clouds.density = minetest.explode_scrollbar_event(fields.clouds_density).value / 100
-  end
-
+  -- Minetest è stupido perché alcuni campi li aggiorna sempre e altri no, quindi
+  -- per farla breve, non controllo anche clouds_opacity per evitare un crash con
+  -- clouds_ambient che non rileverebbe clouds_color, esplodendo su calc_clouds_col
   if fields.clouds_color then
-    temp_clouds.color = palette[fields.clouds_color]
+    local alpha_value = minetest.explode_scrollbar_event(fields.clouds_opacity).value / 100
+    temp_clouds.color = calc_clouds_col(palette[fields.clouds_color], alpha_value)
   end
 
   if fields.clouds_ambient then
     temp_clouds.ambient = palette[fields.clouds_ambient]
+  end
+
+  if fields.clouds_density then
+    temp_clouds.density = minetest.explode_scrollbar_event(fields.clouds_density).value / 100
   end
 
   if fields.clouds_thickness then
