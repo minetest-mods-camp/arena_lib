@@ -368,7 +368,7 @@ function get_clouds_col_alpha(colour)
   local col = string.sub(colour, 1, 7)
   local alpha_hex = string.sub(colour, -2)
   local alpha = tonumber(alpha_hex, 16) / 255
-  minetest.chat_send_all(colour .. " e alfa = " .. alpha)
+
   return col, alpha
 end
 
