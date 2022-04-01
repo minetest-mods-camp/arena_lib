@@ -155,6 +155,12 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     time = minetest.colorize("#eea160", S("Initial time: ")) .. minetest.colorize("#cfc6b8", arena.initial_time .. " (" .. S("current: ") .. current_time .. ")") .. "\n"
   end
 
+  -- calcolo eventuale illuminazione personalizzata
+  local lighting = ""
+  if arena.lighting then
+    lighting = minetest.serialize(arena.lighting)
+  end
+
   --calcolo proprietà
   local properties = ""
   for property, _ in pairs(mod_ref.properties) do
@@ -221,6 +227,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n" ..
     time ..
     minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", minetest.serialize(arena.celestial_vault)) .. "\n" ..
+    minetest.colorize("#eea160", S("Custom lighting: ")) .. minetest.colorize("#cfc6b8", lighting) .. "\n" ..
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
     minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
     minetest.colorize("#eea160", S("Team properties: ")) .. minetest.colorize("#cfc6b8", team_properties)

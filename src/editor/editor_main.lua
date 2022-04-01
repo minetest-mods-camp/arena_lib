@@ -102,6 +102,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
       inv           = player:get_inventory():get_list("main"),
       pos           = player:get_pos(),
       celvault      = p_cvault,
+      lighting      = {light = player:get_day_night_ratio()},
       hotbar_slots  = player:hud_get_hotbar_itemcount(),
       hotbar_bg     = player:hud_get_hotbar_image()
     }
@@ -125,6 +126,11 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     if celvault.moon   then player:set_moon(celvault.moon)     end
     if celvault.stars  then player:set_stars(celvault.stars)   end
     if celvault.clouds then player:set_clouds(celvault.clouds) end
+  end
+
+  -- imposto luce
+  if arena.lighting then
+    player:override_day_night_ratio(arena.lighting.light)
   end
 
   -- se c'è almeno uno spawner, teletrasporto
@@ -154,6 +160,7 @@ function arena_lib.quit_editor(player)
   local inv = players_in_edit_mode[p_name].inv
   local pos = players_in_edit_mode[p_name].pos
   local celvault = table.copy(players_in_edit_mode[p_name].celvault)
+  local lighting = players_in_edit_mode[p_name].lighting
   local hotbar_slots = players_in_edit_mode[p_name].hotbar_slots
   local hotbar_bg = players_in_edit_mode[p_name].hotbar_bg
 
@@ -183,6 +190,8 @@ function arena_lib.quit_editor(player)
     player:set_stars(celvault.stars)
     player:set_clouds(celvault.clouds)
   end
+
+  player:override_day_night_ratio(lighting.light)
 
   -- restituisco l'inventario
   minetest.after(0, function()

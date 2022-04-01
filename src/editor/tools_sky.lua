@@ -649,7 +649,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   end
 
 
-  -- controlla i vari campi che aggiornano il formspec
+  -- controlla i vari campi che necessitano di ricaricare il formspec (le spunte)
   if fields.sky_clouds then
     temp_sky.clouds = fields.sky_clouds == "true" and true or false
 

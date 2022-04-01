@@ -670,6 +670,20 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
 
   local player = minetest.get_player_by_name(p_name)
 
+  -- cambio eventuale illuminazione
+  if arena.lighting then
+    players_temp_storage[p_name].lighting = {
+      light = player:get_day_night_ratio()
+    }
+
+    local lighting = arena.lighting
+    if lighting.light then
+      player:override_day_night_ratio(lighting.light)
+    end
+
+    --TODO MT 5.6: set_lighting (shadows)
+  end
+
   -- cambio eventuale volta celeste
   if next(arena.celestial_vault) then
     local celvault = arena.celestial_vault
@@ -811,7 +825,17 @@ end
 -- reason parametro opzionale che passo solo quando potrebbe essersi disconnesso
 function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
+  -- disattivo eventuale musica di sottofondo
+  if arena.bgm then
+    minetest.sound_stop(players_temp_storage[p_name].bgm_handle)
+  end
+
   local player = minetest.get_player_by_name(p_name)
+
+  -- reimposto eventuale illuminazione
+  if arena.lighting then
+    player:override_day_night_ratio(players_temp_storage[p_name].lighting.light)
+  end
 
   -- reimposto eventuale volta celeste
   if next(arena.celestial_vault) then
@@ -906,11 +930,6 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
   -- ripristino nomi
   player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-
-  -- disattivo eventuale musica di sottofondo
-  if arena.bgm then
-    minetest.sound_stop(players_temp_storage[p_name].bgm_handle)
-  end
 
   -- svuoto lo storage temporaneo
   players_temp_storage[p_name] = nil

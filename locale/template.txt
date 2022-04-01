@@ -37,6 +37,7 @@ Sign of arena @1 successfully removed=
 [!] There is already a sign for this arena!=
 [!] There is no sign to remove assigned to @1!=
 Sign of arena @1 successfully set=
+Lighting of arena @1 successfully overwritten=
 All=
 Sky=
 Sun=
@@ -198,6 +199,11 @@ Volume=
 Pitch=
 Apply=
 [!] This audio track doesn't exist!=
+
+# editor/tools_lighting.lua
+Lighting=
+Global light=
+Shadows=
 
 # editor/tools_players.lua
 Change the current number=

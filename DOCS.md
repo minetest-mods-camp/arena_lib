@@ -35,6 +35,7 @@
 			* [2.2.2.9 Timers](#2229-timers)
 			* [2.2.2.10 Music](#22210-music)
 			* [2.2.2.11 Celestial vault](#22211-celestial-vault)
+			* [2.2.2.12 Lighting](#22212-lighting)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
 * [3. About the author(s)](#3-about-the-authors)
@@ -443,6 +444,10 @@ By default, the arena's celestial vault reflects the celestial vault of the play
 will increase the size of the sun inside the arena and hide the sunrise texture. `params` can also be `nil`, and in that case will remove any custom setting previously set.  
 Last but not least, the special element `"all"` allows you to change everything, and it needs a table with the following optional parameters: `{sky={...}, sun={...}, moon={...}, stars={...}, clouds={...}}`. If `params` is nil, it'll reset the whole celestial vault.
 
+##### 2.2.2.12 Lighting
+NOTE: EXPERIMENTAL FEATURE. EXPECT BREAKAGE IN THE FUTURE (according to the direction Minetest will choose to go with lighting)
+By default, the arena's lighting settings reflect the lighting settings of the player before entering the match (meaning there are no default values inside arena_lib).  
+`arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. As for now, `light_table` only takes one field, `light`, a float between 0 and 1 that changes the intensity of the global lighting. If `light_table` is `nil`, it'll reset the whole lighting settings.  
 
 ### 2.3 Arena phases
 An arena comes in 4 phases, each one of them linked to a specific function:

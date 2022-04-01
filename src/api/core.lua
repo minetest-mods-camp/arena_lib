@@ -38,6 +38,7 @@ local arena_default = {
   max_players = 4,
   min_players = 2,
   celestial_vault = {},               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
+  lighting = nil,
   bgm = nil,
   initial_time = nil,
   current_time = nil,
@@ -823,6 +824,29 @@ function arena_lib.set_sign(sender, mod, arena_name, pos, remove, in_editor)
   end
 
   update_storage(false, mod, id, arena)
+end
+
+
+
+-- NOTE: è molto probabile che questa funzione verrà modificata con l'arrivo della 5.6,
+-- dacché l'ho segnata come sperimentale (per esempio, arriverà set_lighting()
+-- per modificare le ombre)
+function arena_lib.set_lighting(sender, mod, arena_name, light_table, in_editor)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if light_table ~= nil and type(light_table) ~= "table" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  arena.lighting = light_table
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Lighting of arena @1 successfully overwritten", arena.name))
 end
 
 
