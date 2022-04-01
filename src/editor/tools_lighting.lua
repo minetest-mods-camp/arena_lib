@@ -3,7 +3,7 @@ local S = minetest.get_translator("arena_lib")
 local function fill_templight() end
 local function get_lighting_formspec() end
 
-local temp_light_settings = {}          -- KEY = p_name; VALUE = {all the lighting settings}
+local temp_light_settings = {}          -- KEY = p_name; VALUE = {light = override_day_night_ratio}
 
 
 
@@ -44,7 +44,7 @@ end
 
 function get_lighting_formspec(p_name)
 
-  local light = temp_light_settings[p_name].light or 50
+  local light = (temp_light_settings[p_name].light or 0.5) * 100
   --TODO MT 5.6: local shadows  = 0
 
   local formspec = {
@@ -55,7 +55,7 @@ function get_lighting_formspec(p_name)
     "container[0.5,0.5]",
     "label[0,0;" .. S("Global light") .. "]",
     "label[0,0.41;0]",
-    "label[5.64,0.41;1]",
+    "label[5.8,0.41;1]",
     "scrollbaroptions[max=100;smallstep=1;largestep=10;arrows=hide]",
     "scrollbar[0.4,0.3;5.2,0.2;;light;" .. light .. "]",
     "label[0,1;" .. S("Shadows") .. "]",
