@@ -60,16 +60,12 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  -- (non uso ARENA_LIB_EDIT_PRECHECKS_PASSED perché sono più le eccezioni che altro)
-  -- se l'arena non esiste, annullo
-  if arena == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
+  -- se il giocatore sta già modificando un'arena
+  if arena_lib.is_player_in_edit_mode(sender) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
     return end
 
-  -- se c'è già qualcuno (sender incluso), annullo
-  if arena_lib.is_arena_in_edit_mode(arena.name) then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)", arenas_in_edit_mode[arena_name])))
-    return end
+  if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
 
   -- se l'arena è abilitata, provo a disabilitiarla
   if arena.enabled then
@@ -77,36 +73,23 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   end
 
   local player = minetest.get_player_by_name(sender)
+  local p_cvault = {}
 
-  -- se era già in un altro editor, lo rimuovo dal vecchio
-  if players_in_edit_mode[sender] then
-    arena_lib.remove_waypoints(sender)
+  -- salvo le info
+  p_cvault.sky = arena_lib.temp.get_sky(player)
+  p_cvault.sun = player:get_sun()
+  p_cvault.moon = player:get_moon()
+  p_cvault.stars = player:get_stars()
+  p_cvault.clouds = player:get_clouds()
 
-    for a_name, pl_name in pairs(arenas_in_edit_mode) do
-      if pl_name == sender then
-        arenas_in_edit_mode[a_name] = nil
-      end
-    end
-  -- sennò salvo le info
-  else
-
-    local p_cvault = {}
-
-    p_cvault.sky = arena_lib.temp.get_sky(player)
-    p_cvault.sun = player:get_sun()
-    p_cvault.moon = player:get_moon()
-    p_cvault.stars = player:get_stars()
-    p_cvault.clouds = player:get_clouds()
-
-    players_in_edit_mode[sender] = {
-      inv           = player:get_inventory():get_list("main"),
-      pos           = player:get_pos(),
-      celvault      = p_cvault,
-      lighting      = {light = player:get_day_night_ratio()},
-      hotbar_slots  = player:hud_get_hotbar_itemcount(),
-      hotbar_bg     = player:hud_get_hotbar_image()
-    }
-  end
+  players_in_edit_mode[sender] = {
+    inv           = player:get_inventory():get_list("main"),
+    pos           = player:get_pos(),
+    celvault      = p_cvault,
+    lighting      = {light = player:get_day_night_ratio()},
+    hotbar_slots  = player:hud_get_hotbar_itemcount(),
+    hotbar_bg     = player:hud_get_hotbar_image()
+  }
 
   -- metto l'arena in modalità edit, associandoci il giocatore
   arenas_in_edit_mode[arena_name] = sender

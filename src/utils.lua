@@ -45,7 +45,7 @@ end
 ----------------------------------------------
 arena_lib.temp = {}
 
--- proper get_sky() => https://github.com/minetest/minetest/issues/11890
+-- to remove in MT 5.6
 function arena_lib.temp.get_sky(player)
   local get_sky = {player:get_sky()}
   local p_sky = {}
