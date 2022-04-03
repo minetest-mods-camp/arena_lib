@@ -27,6 +27,12 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
     return end
 
+  -- calcolo eventuale musica sottofondo
+  local arena_bgm = "---"
+  if arena.bgm then
+    arena_bgm = arena.bgm.track .. ".ogg"
+  end
+
   local mod_ref = arena_lib.mods[mod]
   local arena_min_players = arena.min_players * #arena.teams
   local arena_max_players = arena.max_players * #arena.teams
@@ -36,12 +42,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local players_inside_per_team = ""
   local spectators_inside_per_team = ""
 
-  local arena_bgm = "---"
-  if arena.bgm then
-    arena_bgm = arena.bgm.track .. ".ogg"
-  end
-
-  -- concateno eventuali team
+  -- calcolo eventuali squadre
   if arena.teams_enabled then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
     max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
@@ -60,7 +61,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     teams = "---"
   end
 
-  -- concateno eventuali danni disabilitati
+  -- calcolo eventuali danni disabilitati
   local disabled_damage_types = ""
   if next(mod_ref.disabled_damage_types) then
     for _, dmg_type in pairs(mod_ref.disabled_damage_types) do
@@ -70,19 +71,19 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     disabled_damage_types = "---"
   end
 
-  -- concateno nomi giocatori
+  -- calcolo nomi giocatori
   local p_names = ""
   for pl, stats in pairs(arena.players) do
     p_names = p_names .. " " .. pl
   end
 
-  -- concateno nomi spettatori
+  -- calcolo nomi spettatori
   local sp_names = ""
   for sp_name, stats in pairs(arena.spectators) do
     sp_names = sp_names .. " " .. sp_name
   end
 
-  -- concateno giocatori e spettatori (per verificare che campo sia giusto)
+  -- calcolo giocatori e spettatori (per verificare che campo sia giusto)
   local psp_names = ""
   local psp_amount = 0
   for psp_name, _ in pairs(arena.players_and_spectators) do
@@ -90,7 +91,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     psp_amount = psp_amount + 1
   end
 
-  -- concateno giocatori presenti e passati
+  -- calcolo giocatori presenti e passati
   local ppp_names = ""
   local ppp_names_amount = 0
   for ppp_name, _ in pairs(arena.past_present_players) do
@@ -98,7 +99,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     ppp_names_amount = ppp_names_amount + 1
   end
 
-  -- concateno giocatori presenti e passati
+  -- calcolo giocatori presenti e passati
   local ppp_names_inside = ""
   local ppp_names_inside_amount = 0
   for ppp_name_inside, _ in pairs(arena.past_present_players_inside) do
@@ -128,7 +129,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     sign_pos = "---"
   end
 
-  -- calcolo coordinate spawn point
+  -- calcolo coordinate punto di spawn
   local spawners_pos = ""
   if arena.teams_enabled then
 
@@ -158,27 +159,39 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   -- calcolo eventuale illuminazione personalizzata
   local lighting = ""
   if arena.lighting then
-    lighting = minetest.serialize(arena.lighting)
+    for k, v in pairs(arena.lighting) do
+      lighting = lighting .. k .. " = " .. v .. "; "
+    end
+  else
+    lighting = "---"
   end
 
   --calcolo proprietà
   local properties = ""
-  for property, _ in pairs(mod_ref.properties) do
-    local value = value_to_string(arena[property])
-    properties = properties .. property .. " = " .. value .. "; "
+  if next(mod_ref.properties) then
+    for property, _ in pairs(mod_ref.properties) do
+      local value = value_to_string(arena[property])
+      properties = properties .. property .. " = " .. value .. "; "
+    end
+  else
+    properties = "---"
   end
 
   --calcolo proprietà temporanee
   local temp_properties = ""
-  if arena.in_game == true then
-    for temp_property, _ in pairs(mod_ref.temp_properties) do
-      local value = value_to_string(arena[temp_property])
-      temp_properties = temp_properties .. temp_property .. " = " .. value .. "; "
+  if next(mod_ref.temp_properties) then
+    if arena.in_game == true then
+      for temp_property, _ in pairs(mod_ref.temp_properties) do
+        local value = value_to_string(arena[temp_property])
+        temp_properties = temp_properties .. temp_property .. " = " .. value .. "; "
+      end
+    else
+      for temp_property, _ in pairs(mod_ref.temp_properties) do
+        temp_properties = temp_properties .. temp_property .. "; "
+      end
     end
   else
-    for temp_property, _ in pairs(mod_ref.temp_properties) do
-      temp_properties = temp_properties .. temp_property .. "; "
-    end
+    temp_properties = "---"
   end
 
   local team_properties = ""
