@@ -11,7 +11,7 @@ local function get_clouds_col_alpha() end
 local function calc_clouds_col() end
 local function colstr() end
 local function get_palette_col_and_sorted_table() end
-local function compare_elem() end
+local function same_table() end
 
 local temp_sky_settings = {}          -- KEY = p_name; VALUE = {all the sky settings}
 
@@ -47,7 +47,7 @@ minetest.register_tool("arena_lib:customise_sky", {
 ----------------------------------------------
 
 function fill_tempsky(p_name, arena)
-  temp_sky_settings[p_name] = table.copy(arena.celestial_vault)
+  temp_sky_settings[p_name] = not arena.celestial_vault and {} or table.copy(arena.celestial_vault)
 
   if not temp_sky_settings[p_name].sky then
     temp_sky_settings[p_name].sky = {sky_color = {}, textures = {}}
@@ -415,8 +415,8 @@ end
 
 
 
-function compare_elem(t1,t2)
-    return minetest.serialize(t1) == minetest.serialize(t2)
+function same_table(t1,t2)
+  return minetest.serialize(t1) == minetest.serialize(t2)
 end
 
 
@@ -446,7 +446,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   -- se abbandona...
   if fields.quit then
-    if next(celvault) then
+    if celvault then
       if celvault.sky    then player:set_sky(celvault.sky)       end
       if celvault.sun    then player:set_sun(celvault.sun)       end
       if celvault.moon   then player:set_moon(celvault.moon)     end
@@ -681,17 +681,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   -- applica
   if fields.apply then
-    local same_sky    = compare_elem(arena.celestial_vault.sky    or {textures={}, sky_color={}}, temp_sky_settings[p_name].sky)
-    local same_sun    = compare_elem(arena.celestial_vault.sun    or {}, temp_sky_settings[p_name].sun)
-    local same_moon   = compare_elem(arena.celestial_vault.moon   or {}, temp_sky_settings[p_name].moon)
-    local same_stars  = compare_elem(arena.celestial_vault.stars  or {}, temp_sky_settings[p_name].stars)
-    local same_clouds = compare_elem(arena.celestial_vault.clouds or {speed={}}, temp_sky_settings[p_name].clouds)
+    -- faccio una copia o va a condividere la tabella temporanea con quella dell'arena
+    -- finché non si chiude l'editor (non salvando le modifiche nel mezzo). La faccio qui
+    -- (e non sul set) perché sennò cambia non so come l'ordine degli elementi della tabella,
+    -- ritornando quindi same_table(...) sempre falso
+    local temp_copy = table.copy(temp_sky_settings[p_name])
+    local overwrite = not celvault or not same_table(celvault, temp_copy)
 
-    if not same_sky    then arena_lib.set_celestial_vault(p_name, mod, arena_name, "sky",    temp_sky_settings[p_name].sky, true)    end
-    if not same_sun    then arena_lib.set_celestial_vault(p_name, mod, arena_name, "sun",    temp_sky_settings[p_name].sun, true)    end
-    if not same_moon   then arena_lib.set_celestial_vault(p_name, mod, arena_name, "moon",   temp_sky_settings[p_name].moon, true)   end
-    if not same_stars  then arena_lib.set_celestial_vault(p_name, mod, arena_name, "stars",  temp_sky_settings[p_name].stars, true)  end
-    if not same_clouds then arena_lib.set_celestial_vault(p_name, mod, arena_name, "clouds", temp_sky_settings[p_name].clouds, true) end
+    if overwrite then
+      arena_lib.set_celestial_vault(p_name, mod, arena_name, "all", temp_copy, true)
+    end
   end
 
   player:set_sky(temp_sky)

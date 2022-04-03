@@ -685,7 +685,7 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   end
 
   -- cambio eventuale volta celeste
-  if next(arena.celestial_vault) then
+  if arena.celestial_vault then
     local celvault = arena.celestial_vault
 
     if celvault.sky then
@@ -838,7 +838,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   end
 
   -- reimposto eventuale volta celeste
-  if next(arena.celestial_vault) then
+  if arena.celestial_vault then
     local celvault = arena.celestial_vault
 
     if celvault.sky then

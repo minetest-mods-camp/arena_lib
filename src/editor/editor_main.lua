@@ -101,8 +101,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   player:hud_set_hotbar_itemcount(9)
   player:hud_set_hotbar_image("arenalib_gui_hotbar9.png")
 
-  -- imposto volta celeste, controllando ogni elemento onde evitare un ripristino causa passaggio zero argomenti
-  if next(arena.celestial_vault) then
+  -- imposto eventuale volta celeste, controllando ogni elemento onde evitare un ripristino causa passaggio zero argomenti
+  if arena.celestial_vault then
     local celvault = arena.celestial_vault
     if celvault.sky    then player:set_sky(celvault.sky)       end
     if celvault.sun    then player:set_sun(celvault.sun)       end
@@ -111,7 +111,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     if celvault.clouds then player:set_clouds(celvault.clouds) end
   end
 
-  -- imposto luce
+  -- imposto eventuale luce
   if arena.lighting then
     player:override_day_night_ratio(arena.lighting.light)
   end

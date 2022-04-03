@@ -37,8 +37,8 @@ local arena_default = {
   spawn_points = {},                  -- KEY: ids, VALUE: {pos, teamID}
   max_players = 4,
   min_players = 2,
-  celestial_vault = {},               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
-  lighting = nil,
+  celestial_vault = nil,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
+  lighting = nil,                      -- light = override_day_night_ratio
   bgm = nil,
   initial_time = nil,
   current_time = nil,
@@ -865,11 +865,14 @@ function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params,
 
   -- sovrascrivi tutti
   if element == "all" then
-    arena.celestial_vault = params or {} -- se passano 'nil', evito che cancellino la proprietà
+    arena.celestial_vault = params
 
   -- sovrascrivine uno specifico
   elseif element == "sky" or element == "sun" or element == "moon" or element == "stars" or element == "clouds" then
-      arena.celestial_vault[element] = params
+    if not arena.celestial_vault then
+      arena.celestial_vault = {}
+    end
+    arena.celestial_vault[element] = params
 
   -- oppure type non è un parametro contemplato
   else
@@ -1151,8 +1154,8 @@ function init_storage(mod, mod_ref)
         to_update = true
       end
 
-      if not arena.celestial_vault then
-        arena.celestial_vault = {}
+      if arena.celestial_vault and not next(arena.celestial_vault) then
+        arena.celestial_vault = nil
         to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
