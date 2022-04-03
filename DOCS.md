@@ -290,7 +290,9 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
-* `bgm`: (table) contains the information about the audio track to play while in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`.
+* `celestial_vault`: (table) if present, contains the information about the celestial vault to display to each player whilst in game, overriding the default one. Default is `nil`.
+* `lighting`: (table) if present, contains the information about the lighting settings of the arena, overriding players' default ones. Default is `nil`.
+* `bgm`: (table) if present, contains the information about the audio track to play whilst in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`.
   In-depth fields, all empty by default, are:
   * `track`: (string) the audio file, without `.ogg`. Mandatory. If no track is specified, all the other fields will be consequently empty
   * `title`: (string) the title to display in the infobox (right-clicking a sign)
