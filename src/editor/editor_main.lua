@@ -166,7 +166,7 @@ function arena_lib.quit_editor(player)
   player:set_pos(pos)
 
   -- ripristino volta celeste
-  if next(arena.celestial_vault) then
+  if arena.celestial_vault then
     player:set_sky(celvault.sky)
     player:set_sun(celvault.sun)
     player:set_moon(celvault.moon)
