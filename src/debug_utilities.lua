@@ -4,6 +4,7 @@
 local S = minetest.get_translator("arena_lib")
 
 local function value_to_string() end
+local function table_to_string() end
 
 
 function arena_lib.print_arenas(sender, mod)
@@ -156,12 +157,22 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     time = minetest.colorize("#eea160", S("Initial time: ")) .. minetest.colorize("#cfc6b8", arena.initial_time .. " (" .. S("current: ") .. current_time .. ")") .. "\n"
   end
 
+  -- calcolo eventuale volta celeste personalizzata
+  local celvault = ""
+  if arena.celestial_vault then
+    for elem, params in pairs(arena.celestial_vault) do
+      if next(params) then
+        celvault = celvault .. string.upper(elem) .. ": " .. table_to_string(params) .. "\n"
+      end
+    end
+  else
+    celvault = "---"
+  end
+
   -- calcolo eventuale illuminazione personalizzata
   local lighting = ""
   if arena.lighting then
-    for k, v in pairs(arena.lighting) do
-      lighting = lighting .. k .. " = " .. v .. "; "
-    end
+    lighting = table_to_string(arena.lighting)
   else
     lighting = "---"
   end
@@ -239,7 +250,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n" ..
     time ..
-    minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", minetest.serialize(arena.celestial_vault)) .. "\n" ..
+    minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", celvault) .. "\n" ..
     minetest.colorize("#eea160", S("Custom lighting: ")) .. minetest.colorize("#cfc6b8", lighting) .. "\n" ..
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
     minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
@@ -327,4 +338,27 @@ function value_to_string(value)
   else
     return tostring(value)
   end
+end
+
+
+
+function table_to_string(table)
+  local str = ""
+  for k, v in pairs(table) do
+    local val = ""
+
+    if type(v) == "table" then
+      if next(v) then
+        val = "{ " .. table_to_string(v) .. "}"
+      end
+    else
+      val = tostring(v)
+    end
+
+    if val ~= "" then
+      str = str .. k .. " = " .. val .. "; "
+    end
+  end
+
+  return str
 end
