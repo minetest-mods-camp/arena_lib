@@ -3,7 +3,7 @@
 ---
 local S = minetest.get_translator("arena_lib")
 
-local function value_to_string() end
+local function property_val_to_string() end
 local function table_to_string() end
 
 
@@ -181,7 +181,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local properties = ""
   if next(mod_ref.properties) then
     for property, _ in pairs(mod_ref.properties) do
-      local value = value_to_string(arena[property])
+      local value = property_val_to_string(arena[property])
       properties = properties .. property .. " = " .. value .. "; "
     end
   else
@@ -193,7 +193,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   if next(mod_ref.temp_properties) then
     if arena.in_game == true then
       for temp_property, _ in pairs(mod_ref.temp_properties) do
-        local value = value_to_string(arena[temp_property])
+        local value = property_val_to_string(arena[temp_property])
         temp_properties = temp_properties .. temp_property .. " = " .. value .. "; "
       end
     else
@@ -213,7 +213,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
       for i = 1, #arena.teams do
         team_properties = team_properties .. arena.teams[i].name .. ": "
         for team_property, _ in pairs(mod_ref.team_properties) do
-          local value = value_to_string(arena.teams[i][team_property])
+          local value = property_val_to_string(arena.teams[i][team_property])
           team_properties = team_properties .. " " .. team_property .. " = " .. value .. ";"
         end
         team_properties = team_properties .. "|"
@@ -332,7 +332,7 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function value_to_string(value)
+function property_val_to_string(value)
   if type(value) == "table" then
     return tostring(dump(value)):gsub("\n", "")
   else
