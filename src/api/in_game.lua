@@ -877,6 +877,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   local noise_z = math.random(-1.5, 1.5)
   local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}
   player:set_pos(noise_pos)
+  -- TEMP: waiting for https://github.com/minetest/minetest/issues/12092 to be fixed. Forcing the teleport twice on two different steps
+  minetest.after(0.1, function()
+    if not minetest.get_player_by_name(p_name) then return end
+    player:set_pos(noise_pos)
+  end)
 
   -- se si è disconnesso, salta il resto
   if reason == 0 then
