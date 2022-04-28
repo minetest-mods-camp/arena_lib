@@ -452,20 +452,12 @@ By default, the arena's lighting settings reflect the lighting settings of the p
 `arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. As for now, `light_table` only takes one field, `light`, a float between 0 and 1 that changes the intensity of the global lighting. If `light_table` is `nil`, it'll reset the whole lighting settings.  
 
 ### 2.3 Arena phases
-An arena comes in 4 phases, each one of them linked to a specific function:
-* `waiting phase`: it's the queuing process. People hit a sign waiting for other players to play with 
-* `loading phase`: it's the pre-match. By default players get teleported in the arena not being able to do anything but jump
-* `fighting phase`: the actual game
-* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported
+An arena comes in 4 phases:
+* `waiting phase`: the queuing process. People hit a sign waiting for other players to play with
+* `loading phase`: the pre-match. By default players get teleported in the arena, waiting for the game to start. Relevant callback: `on_load`
+* `fighting phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
+* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant callbacks: `on_celebration`, `on_end`
 
-The 4 functions, intertwined with the previously mentioned phases are:
-* `arena_lib.load_arena(mod, arena_ID)`: between the waiting and the loading phase. Called when the queue timer reaches 0, it teleports people inside.
-* `arena_lib.start_arena(mod_ref, arena)`: between the loading and the fighting phase. Called when the loading phase timer reaches 0.
-* `arena_lib.load_celebration(mod, arena, winners)`: between the fighting and the celebration phase. Called when the winning conditions are met.
-  * `winners` can be a string (name of a player), an integer (ID of the winning team), a table of strings (more players) or a table of integers (more teams)
-* `arena_lib.end_arena(mod_ref, mod, arena, winners, as_spectator)`: at the very end of the celebration phase. It teleports people outside the arena. `winners` is taken by `load_celebration(...)`
-
-Overriding these functions is **not** recommended. Instead, use the 4 respective callbacks made specifically to customise the behaviour of the formers, sharing (almost) the same variables. They are called *after* the function they're associated with and by default they are empty, so feel free to override them. They are `on_load`, `on_start`, `on_celebration` and `on_end`.
 
 ### 2.4 Spectate mode
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
