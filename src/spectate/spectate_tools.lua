@@ -11,13 +11,6 @@ minetest.register_tool("arena_lib:spectate_changeplayer", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
-      local p_name = user:get_player_name()
-      local arena = arena_lib.get_arena_by_player(p_name)
-
-      -- non far cambiare se c'è rimasto solo un giocatore da seguire
-      if arena.players_amount == 1 then return end
-
       arena_lib.find_and_spectate_player(user:get_player_name())
     end
 
@@ -41,7 +34,28 @@ minetest.register_tool("arena_lib:spectate_changeteam", {
       -- non far cambiare se c'è rimasto solo una squadra da seguire
       if arena_lib.get_active_teams(arena) == 1 then return end
 
-      arena_lib.find_and_spectate_player(user:get_player_name(), true)
+      arena_lib.find_and_spectate_player(p_name, true)
+    end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spectate_changeentity", {
+
+    description = S("Change entity"),
+    inventory_image = "arenalib_spectate_changeentity.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      local p_name = user:get_player_name()
+      local mod = arena_lib.get_mod_by_player(p_name)
+      local arena_name = arena_lib.get_arena_by_player(p_name).name
+
+      arena_lib.find_and_spectate_entity(mod, arena_name, p_name)
     end
 
 })

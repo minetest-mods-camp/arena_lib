@@ -236,8 +236,11 @@ There are also some other functions which might turn useful. They are:
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (i.e. in a murder minigame, so reason = 1).  
 Executioner can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
+* `arena_lib.add_spectable_target(mod, arena_name, t_type, t_name, target)`: adds to the current ongoing match a spectable target, allowing spectators to spectate more than just players. `t_type` indicates the target type, and for now can only be `"entity"`. `t_name` is the name that will appear in the spectator info hotbar, and `target` is the entity itself. When the entity is removed/unloaded, automatically calls `remove_spectable_target(...)`
+* `arena_lib.remove_spectable_target(mod, arena_name, t_type, t_name)`: removes a target from the spectable targets of an ongoing match
 * `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean
 * `arena_lib.is_player_spectated(p_name)`: returns whether a player is being spectated
+* `arena_lib.is_entity_spectated(mod, arena_name, e_name)`: returns whether an entity is being spectated
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
@@ -255,7 +258,9 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
 * `arena_lib.get_player_spectators(p_name)`: returns a list containing all the people currently spectating `p_name`. Format `{sp_name = true}`
 * `arena_lib.get_player_spectated(sp_name)`: returns the player `sp_name` is currently spectating, if any
-* `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if there is any
+* `arena_lib.get_spectable_entities(mod, arena_name)`: returns a table containing all the spectable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectable_target(...)`
+* `arena_lib.get_spectable_entities_amount(mod, arena_name)`: returns the amount of spectable entities currently present in `arena_name`, if any
+* `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if any
 
 ### 1.10 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
@@ -461,6 +466,7 @@ An arena comes in 4 phases:
 
 ### 2.4 Spectate mode
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
+By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and (not currently implemented) areas. To do that, have a look at `arena_lib.add_spectable_target(...)`
 <br>  
 
 ## 3. About the author(s)

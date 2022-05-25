@@ -86,12 +86,17 @@ function arena_lib.load_arena(mod, arena_ID)
     count = count +1
   end
 
+  -- se supporta la spettatore, inizializzo le varie tabelle
+  if mod_ref.spectate_mode then
+    arena_lib.init_spectate_containers(mod, arena.name)
+  end
+
   -- eventuale codice aggiuntivo
   if mod_ref.on_load then
     mod_ref.on_load(arena)
   end
 
-  -- inizio l'arena dopo tot secondi
+  -- avvio la partita dopo tot secondi
   minetest.after(mod_ref.load_time, function()
     arena_lib.start_arena(mod_ref, arena)
   end)
@@ -266,6 +271,8 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
 
     operations_before_leaving_arena(mod_ref, arena, pl_name)
   end
+
+  arena_lib.unload_spectate_containers(mod, arena.name)
 
   -- azzerramento giocatori e spettatori
   arena.past_present_players = {}
@@ -755,9 +762,9 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   arena.past_present_players[p_name] = true
   arena.past_present_players_inside[p_name] = true
 
-  -- inizializzo eventuale mod spettatore
+  -- aggiungo eventuale contenitore mod spettatore
   if mod_ref.spectate_mode then
-    arena_lib.add_spectate_container(p_name)
+    arena_lib.add_spectate_p_container(p_name)
   end
 
   local player = minetest.get_player_by_name(p_name)
@@ -892,19 +899,19 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   -- se ha partecipato come giocatore
   if arena.past_present_players_inside[p_name] then
 
-    -- rimuovo eventuale mod spettatore
+    -- rimuovo eventuale contenitore mod spettatore
     if mod_ref.spectate_mode then
-      arena_lib.remove_spectate_container(p_name)
+      arena_lib.remove_spectate_p_container(p_name)
     end
 
-    -- resetto eventuali texture
+    -- ripristino eventuali texture
     if arena.teams_enabled and mod_ref.teams_color_overlay then
       player:set_properties({
         textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
       })
     end
 
-    -- reimposto eventuale fov
+    -- ripristino eventuale fov
     if mod_ref.fov then
       player:set_fov(players_temp_storage[p_name].fov)
     end

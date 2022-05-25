@@ -285,4 +285,5 @@ Currently spectating: @1=
 # spectate/spectate_tools.lua
 Change player=
 Change team=
+Change entity=
 Enter the match=
