@@ -13,7 +13,7 @@ local function deprecated_winning_team_celebration() end
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset}
+                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups}
 
 
 
@@ -814,6 +814,16 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   -- agganciati al giocatore, sennò cadono nel vuoto)
   player:set_detach()
 
+  -- se il danno da caduta è disabilitato, disattivo il flash all'impatto
+  if table.indexof(mod_ref.disabled_damage_types, "fall") > 0 then
+    players_temp_storage[p_name].armor_groups = player:get_armor_groups()
+
+    local armor_groups = player:get_armor_groups()
+
+    armor_groups.fall_damage_add_percent = -100
+    player:set_armor_groups(armor_groups)
+  end
+
   -- li curo
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
@@ -873,6 +883,13 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     if arena_lib.STORE_INVENTORY_MODE ~= "none" then
       arena_lib.restore_inventory(p_name)
     end
+  end
+
+  local armor_groups = players_temp_storage[p_name].armor_groups
+
+  -- riassegno eventuali gruppi armatura  (per il flash da impatto caduta)
+  if armor_groups then
+    player:set_armor_groups(armor_groups)
   end
 
   -- ripristino gli HP
