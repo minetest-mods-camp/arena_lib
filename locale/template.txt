@@ -126,9 +126,6 @@ Spawn points: =
 Properties: =
 Temp properties: =
 Team properties: =
-Player: =
-, kills: =
-, deaths: =
 
 # items.lua
 You're immune!=

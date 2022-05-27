@@ -261,37 +261,6 @@ end
 
 
 
-function arena_lib.print_arena_stats(sender, mod, arena_name)
-
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-  if arena == nil then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
-    return end
-
-  if not arena.in_game and not arena.in_celebration then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
-    return end
-
-  for pl_name, stats in pairs(arena.players) do
-
-    -- calcolo proprietà del giocatore
-    local p_properties = ""
-    for k, v in pairs(arena_lib.mods[mod].player_properties) do
-      p_properties = p_properties .. ",  " .. k .. ": " .. tostring(stats[k])
-    end
-
-    minetest.chat_send_player(sender,
-      S("Player: ") .. pl_name ..
-      S(",  kills: ") .. stats.kills ..
-      S(",  deaths: ") .. stats.deaths ..
-      p_properties)
-  end
-
-end
-
-
-
 function arena_lib.flush_arena(mod, arena_name, sender)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)

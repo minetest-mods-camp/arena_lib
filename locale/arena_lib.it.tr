@@ -126,9 +126,6 @@ Spawn points: =Punti di spawn:
 Properties: =Proprietà: 
 Temp properties: =Proprietà temporanee: 
 Team properties: =Proprietà squadra: 
-Player: =Giocatore: 
-, kills: =, uccisioni: 
-, deaths: =, morti: 
 
 # items.lua
 You're immune!=Sei immune!
