@@ -6,9 +6,10 @@ local function set_spectator() end
 local players_in_spectate_mode = {}         -- KEY: player name, VALUE: {(string) minigame, (int) arenaID, (string) type, (string) spectating}
 local spectate_temp_storage = {}            -- KEY: player_name, VALUE: {(table) camera_offset}
 local players_spectated = {}                -- KEY: player name, VALUE: {(string) spectator(s) = true}
-local entities_spectated = {}               -- KEY: [mod][arena][entity name], VALUE: {(string) spectator(s) = true}
-local areas_spectated = {}
-local entities_storage = {}                 -- KEY: [mod][arena][entity_name], VALUE: entity
+local entities_spectated = {}               -- KEY: [mod][arena_name][entity name], VALUE: {(string) spectator(s) = true}
+local areas_spectated = {}                  -- KEY: [mod][arena_name][area_name], VALUE: {(string) spectator(s) = true}
+local entities_storage = {}                 -- KEY: [mod][arena_name][entity_name], VALUE: entity
+local areas_storage = {}                    -- KEY: [mod][arena_name][area_name], VALUE: dummy entity
 
 
 
@@ -31,18 +32,29 @@ function arena_lib.init_spectate_containers(mod, arena_name)
   if not entities_storage[mod] then
     entities_storage[mod] = {}
   end
+  if not areas_storage[mod] then
+    areas_storage[mod] = {}
+  end
 
   entities_spectated[mod][arena_name] = {}
   areas_spectated[mod][arena_name] = {}
   entities_storage[mod][arena_name] = {}
+  areas_storage[mod][arena_name] = {}
 end
 
 
 
 function arena_lib.unload_spectate_containers(mod, arena_name)
-  entities_spectated[mod][arena_name] = nil     -- non c'è bisogno di cancellare X[mod], al massimo rimangono vuote
+  -- rimuovo tutte le entità fantoccio delle aree
+  for _, dummy_entity in pairs(arena_lib.get_spectate_areas(mod, arena_name)) do
+    dummy_entity:remove()
+  end
+
+  -- non c'è bisogno di cancellare X[mod], al massimo rimangono vuote
+  entities_spectated[mod][arena_name] = nil
   areas_spectated[mod][arena_name] = nil
   entities_storage[mod][arena_name] = nil
+  areas_storage[mod][arena_name] = nil
 end
 
 
@@ -58,10 +70,9 @@ function arena_lib.remove_spectate_p_container(p_name)
 end
 
 
-
-----------------------------------------------
----------------------CORE---------------------
-----------------------------------------------
+----------------------------
+-- entering / leaving
+----------------------------
 
 function arena_lib.enter_spectate_mode(p_name, arena)
 
@@ -213,94 +224,9 @@ end
 
 
 
-function arena_lib.add_spectable_target(mod, arena_name, t_type, t_name, target)
-
-  local arena_ID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-  if not arena.in_game then return end
-
-  if t_type == "entity" then
-    local old_deact = target.on_deactivate
-
-    -- aggiungo sull'on_deactivate la funzione per rimuoverla dalla spettatore
-    target.on_deactivate = function(...)
-      local ret = old_deact and old_deact(...)
-
-      arena_lib.remove_spectable_target(mod, arena_name, t_type, t_name)
-
-      return ret
-    end
-
-    -- la aggiungo
-    entities_spectated[mod][arena_name][t_name] = {}
-    entities_storage[mod][arena_name][t_name] = target
-
-    -- se è l'unica entità registrata, aggiungo lo slot per seguire le entità
-    if arena_lib.get_spectable_entities_amount(mod, arena_name) == 1 then
-      for sp_name, _ in pairs(arena.spectators) do
-        override_hotbar(minetest.get_player_by_name(sp_name), mod, arena)
-      end
-    end
-
-  elseif t_type == "area" then
-    -- TODO registrare aree
-  end
-
-end
-
-
-
-function arena_lib.remove_spectable_target(mod, arena_name, t_type, t_name)
-
-  local arenaID, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-  -- se l'entità viene rimossa quando la partita è già finita, interrompi o crasha
-  if not arena.in_game then return end
-
-  if t_type == "entity" then
-    entities_storage[mod][arena_name][t_name] = nil
-
-    -- se non ci sono più entità, fai sparire l'icona
-    if not next(entities_storage[mod][arena_name]) then
-      for sp_name, _ in pairs(arena.spectators) do
-        local spectator = minetest.get_player_by_name(sp_name)
-        override_hotbar(spectator, mod, arena)
-      end
-    end
-
-    for sp_name, _ in pairs(entities_spectated[mod][arena_name][t_name]) do
-      arena_lib.find_and_spectate_entity(mod, arena_name, sp_name)
-    end
-  elseif t_type == "area" then
-    --TODO
-  end
-end
-
-
-
-
-
-----------------------------------------------
---------------------UTILS---------------------
-----------------------------------------------
-
-function arena_lib.is_player_spectating(sp_name)
-  return players_in_spectate_mode[sp_name] ~= nil
-end
-
-
-
-function arena_lib.is_player_spectated(p_name)
-  return players_spectated[p_name] and next(players_spectated[p_name])
-end
-
-
-
-function arena_lib.is_entity_spectated(mod, arena_name, e_name)
-  return entities_spectated[mod][arena_name][e_name] and next(entities_spectated[mod][arena_name][e_name])
-end
-
-
+----------------------------
+-- find next spectatatable target
+----------------------------
 
 function arena_lib.find_and_spectate_player(sp_name, change_team)
 
@@ -365,6 +291,7 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
 
   local watching_ID = spectator:get_meta():get_int("arenalib_watchID")
   local new_ID = players_amount <= watching_ID and 1 or watching_ID + 1
+  local mod = arena_lib.get_mod_by_player(sp_name)
 
   -- trovo il giocatore da seguire
   -- squadre:
@@ -373,7 +300,7 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     for i = 1, #players_team do
 
       if i == new_ID then
-        set_spectator(spectator, "player", players_team[i], i)
+        set_spectator(mod, arena_name, spectator, "player", players_team[i], i)
         return true
       end
     end
@@ -384,7 +311,7 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     for pl_name, _ in pairs(arena.players) do
 
       if i == new_ID then
-        set_spectator(spectator, "player", pl_name, i)
+        set_spectator(mod, arena.name, spectator, "player", pl_name, i)
         return true
       end
 
@@ -395,14 +322,16 @@ end
 
 
 
-function arena_lib.find_and_spectate_entity(mod, arena_name, sp_name)
+function arena_lib.find_and_spectate_entity(mod, arena, sp_name)
+
+  local e_amount = arena.spectate_entities_amount
 
   -- se non ci sono entità da seguire, segui un giocatore
-  if not next(entities_storage[mod][arena_name]) then
+  if e_amount == 0 then
     arena_lib.find_and_spectate_player(sp_name)
     return end
 
-  local e_amount = arena_lib.get_spectable_entities_amount(mod, arena_name)
+  local arena_name = arena.name
   local prev_spectated = players_in_spectate_mode[sp_name].spectating
 
   -- se è l'unica entità rimasta e la si stava già seguendo
@@ -419,15 +348,192 @@ function arena_lib.find_and_spectate_entity(mod, arena_name, sp_name)
   local new_ID = e_amount <= current_ID and 1 or current_ID + 1
   local i = 1
 
-  for en_name, _ in pairs(entities_spectated[mod][arena_name]) do
+  for en_name, _ in pairs(entities_storage[mod][arena_name]) do
 
     if i == new_ID then
-      set_spectator(spectator, "entity", en_name, i)
+      set_spectator(mod, arena_name, spectator, "entity", en_name, i)
       return true
     end
 
     i = i +1
   end
+end
+
+
+
+function arena_lib.find_and_spectate_area(mod, arena, sp_name)
+
+  local ar_amount = arena.spectate_areas_amount
+
+  -- se non ci sono aree da seguire, segui un giocatore
+  if ar_amount == 0 then
+    arena_lib.find_and_spectate_player(sp_name)
+    return end
+
+  local arena_name = arena.name
+  local prev_spectated = players_in_spectate_mode[sp_name].spectating
+
+  -- se è l'unica area rimasta e la si stava già seguendo
+  if ar_amount == 1 and prev_spectated and next(areas_spectated[mod][arena_name])[sp_name] then
+    return end
+
+  local spectator = minetest.get_player_by_name(sp_name)
+
+  if players_in_spectate_mode[sp_name].type ~= "area" then
+    spectator:get_meta():set_int("arenalib_watchID", 0)
+  end
+
+  local current_ID = spectator:get_meta():get_int("arenalib_watchID")
+  local new_ID = ar_amount <= current_ID and 1 or current_ID + 1
+  local i = 1
+
+  for pos_name, _ in pairs(areas_storage[mod][arena_name]) do
+
+    if i == new_ID then
+      set_spectator(mod, arena_name, spectator, "area", pos_name, i)
+      return true
+    end
+
+    i = i +1
+  end
+end
+
+
+
+
+
+----------------------------------------------
+---------------------CORE---------------------
+----------------------------------------------
+
+
+
+function arena_lib.add_spectate_entity(mod, arena, e_name, entity)
+
+  if not arena.in_game then return end
+
+  local arena_name = arena.name
+  local old_deact = entity.on_deactivate
+
+  -- aggiungo sull'on_deactivate la funzione per rimuoverla dalla spettatore
+  entity.on_deactivate = function(...)
+    local ret = old_deact and old_deact(...)
+
+    arena_lib.remove_spectate_entity(mod, arena, e_name)
+
+    return ret
+  end
+
+  -- la aggiungo
+  entities_spectated[mod][arena_name][e_name] = {}
+  entities_storage[mod][arena_name][e_name] = entity
+  arena.spectate_entities_amount = arena.spectate_entities_amount + 1
+
+  -- se è l'unica entità registrata, aggiungo lo slot per seguire le entità
+  if arena.spectate_entities_amount == 1 then
+    for sp_name, _ in pairs(arena.spectators) do
+      override_hotbar(minetest.get_player_by_name(sp_name), mod, arena)
+    end
+  end
+end
+
+
+
+function arena_lib.add_spectate_area(mod, arena, pos_name, pos)
+
+  if not arena.in_game then return end
+
+  minetest.forceload_block(pos, true)
+
+  local dummy_entity = minetest.add_entity(pos, "arena_lib:spectate_dummy")
+  local arena_name = arena.name
+
+  areas_spectated[mod][arena_name][pos_name] = {}
+  areas_storage[mod][arena_name][pos_name] = dummy_entity
+  arena.spectate_areas_amount = arena.spectate_areas_amount + 1
+
+  -- se è l'unica area registrata, aggiungo lo slot per seguire le aree
+  if arena.spectate_areas_amount == 1 then
+    for sp_name, _ in pairs(arena.spectators) do
+      override_hotbar(minetest.get_player_by_name(sp_name), mod, arena)
+    end
+  end
+
+end
+
+
+
+function arena_lib.remove_spectate_entity(mod, arena, e_name)
+
+  if not arena.in_game then return end          -- nel caso il minigioco si sia scordata di cancellarla, all'ucciderla fuori dalla partita non crasha
+  local arena_name = arena.name
+
+  entities_storage[mod][arena_name][e_name] = nil
+  arena.spectate_entities_amount = arena.spectate_entities_amount - 1
+
+  -- se non ci sono più entità, fai sparire l'icona
+  if arena.spectate_entities_amount == 0 then
+    for sp_name, _ in pairs(arena.spectators) do
+      local spectator = minetest.get_player_by_name(sp_name)
+      override_hotbar(spectator, mod, arena)
+    end
+  end
+
+  for sp_name, _ in pairs(entities_spectated[mod][arena_name][e_name]) do
+    arena_lib.find_and_spectate_entity(mod, arena, sp_name)
+  end
+end
+
+
+
+function arena_lib.remove_spectate_area(mod, arena, pos_name)
+
+  local arena_name = arena.name
+
+  areas_storage[mod][arena_name][pos_name]:remove()
+  areas_storage[mod][arena_name][pos_name] = nil
+  arena.spectate_areas_amount = arena.spectate_areas_amount - 1
+
+  -- se non ci sono più aree, fai sparire l'icona
+  if arena.spectate_areas_amount == 0 then
+    for sp_name, _ in pairs(arena.spectators) do
+      local spectator = minetest.get_player_by_name(sp_name)
+      override_hotbar(spectator, mod, arena)
+    end
+  end
+
+  for sp_name, _ in pairs(areas_spectated[mod][arena_name][pos_name]) do
+    arena_lib.find_and_spectate_area(mod, arena, sp_name)
+  end
+end
+
+
+
+
+----------------------------------------------
+--------------------UTILS---------------------
+----------------------------------------------
+
+function arena_lib.is_player_spectating(sp_name)
+  return players_in_spectate_mode[sp_name] ~= nil
+end
+
+
+
+function arena_lib.is_player_spectated(p_name)
+  return players_spectated[p_name] and next(players_spectated[p_name])
+end
+
+
+
+function arena_lib.is_entity_spectated(mod, arena_name, e_name)
+  return entities_spectated[mod][arena_name][e_name] and next(entities_spectated[mod][arena_name][e_name])
+end
+
+
+
+function arena_lib.is_area_spectated(mod, arena_name, pos_name)
+  return areas_spectated[mod][arena_name][pos_name] and next(areas_spectated[mod][arena_name][pos_name])
 end
 
 
@@ -452,18 +558,14 @@ end
 
 
 
-function arena_lib.get_spectable_entities(mod, arena_name)
+function arena_lib.get_spectate_entities(mod, arena_name)
   return entities_storage[mod][arena_name]
 end
 
 
 
-function arena_lib.get_spectable_entities_amount(mod, arena_name)
-  local i = 0
-  for k, v in pairs(entities_storage[mod][arena_name]) do
-    i = i + 1
-  end
-  return i
+function arena_lib.get_spectate_areas(mod, arena_name)
+  return areas_storage[mod][arena_name]
 end
 
 
@@ -474,16 +576,14 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function set_spectator(spectator, type, name, i)
+function set_spectator(mod, arena_name, spectator, type, name, i)
 
   local sp_name = spectator:get_player_name()
-  local mod = arena_lib.get_mod_by_player(sp_name)
-  local arena_name = arena_lib.get_arena_by_player(sp_name).name
   local prev_spectated = players_in_spectate_mode[sp_name].spectating
+  local prev_type = players_in_spectate_mode[sp_name].type
 
   -- se stava già seguendo qualcuno, lo rimuovo da questo
   if prev_spectated then
-    local prev_type = players_in_spectate_mode[sp_name].type
     if prev_type == "player" then
       players_spectated[prev_spectated][sp_name] = nil
     elseif prev_type == "entity" then
@@ -503,14 +603,18 @@ function set_spectator(spectator, type, name, i)
     spectator:set_hp(target:get_hp() > 0 and target:get_hp() or 1)
 
   elseif type == "entity" then
-
     entities_spectated[mod][arena_name][name][sp_name] = true
     target = entities_storage[mod][arena_name][name].object
 
     spectator:set_attach(target, "", {x=0, y=-5, z=-20}, {x=0, y=0, z=0})
     spectator:set_hp(target:get_hp() > 0 and target:get_hp() or 1)
+
   elseif type == "area" then
-    -- TODO
+    areas_spectated[mod][arena_name][name][sp_name] = true
+    target = areas_storage[mod][arena_name][name]
+
+    spectator:set_attach(target, "", {x=0, y=-5, z=-20}, {x=0, y=0, z=0})
+    spectator:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
   end
 
   players_in_spectate_mode[sp_name].spectating = name
@@ -524,9 +628,7 @@ function set_spectator(spectator, type, name, i)
   -- eventuale codice aggiuntivo
   if mod_ref.on_change_spectated_target then
     local arena = arena_lib.get_arena_by_player(sp_name)
-    target = name
-    local prev_target = prev_spectated
-    mod_ref.on_change_spectated_target(arena, sp_name, target, prev_target)
+    mod_ref.on_change_spectated_target(arena, sp_name, type, name, prev_type, prev_spectated)
   end
 end
 
@@ -547,8 +649,12 @@ function override_hotbar(player, mod, arena)
     table.insert(tools, 2, "arena_lib:spectate_changeteam")
   end
 
-  if next(arena_lib.get_spectable_entities(mod, arena.name)) then
+  if next(arena_lib.get_spectate_entities(mod, arena.name)) then
     table.insert(tools, #tools, "arena_lib:spectate_changeentity")
+  end
+
+  if next(arena_lib.get_spectate_areas(mod, arena.name)) then
+    table.insert(tools, #tools, "arena_lib:spectate_changearea")
   end
 
   if mod_ref.join_while_in_progress then

@@ -122,8 +122,10 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` deleted them already - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
-* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, target, prev_target))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena.
-    * `target` can only be the player name for now, the same goes for `prev_target` (if any). Entities and locations will be hopefully added in the future
+* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena.
+    * `t_type` represents the type of the target (either `"player"`, `"entity"` or `"area"`)
+    * `t_name` its name. If it's an entity or an area, it'll be the name used to register it through the `arena_lib.add_spectate...` functions
+    * if they were following someone/something else earlier, `prev_type` and `prev_spectated` follow the same logic of the aforementioned parameters
     * Beware: as this gets called also when entering, keep in mind that it gets called before the `on_join` callback
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
@@ -236,11 +238,14 @@ There are also some other functions which might turn useful. They are:
 Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (i.e. in a murder minigame, so reason = 1).  
 Executioner can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin.
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
-* `arena_lib.add_spectable_target(mod, arena_name, t_type, t_name, target)`: adds to the current ongoing match a spectable target, allowing spectators to spectate more than just players. `t_type` indicates the target type, and for now can only be `"entity"`. `t_name` is the name that will appear in the spectator info hotbar, and `target` is the entity itself. When the entity is removed/unloaded, automatically calls `remove_spectable_target(...)`
-* `arena_lib.remove_spectable_target(mod, arena_name, t_type, t_name)`: removes a target from the spectable targets of an ongoing match
+* `arena_lib.add_spectate_entity(mod, arena, e_name, entity)`: adds to the current ongoing match a spectatable entity, allowing spectators to spectate more than just players. `e_name` is the name that will appear in the spectator info hotbar, and `entity` the `luaentity` table. When the entity is removed/unloaded, automatically calls `remove_spectate_entity(...)`
+* `arena_lib.add_spectate_area(mod, arena, pos_name, pos)`: same as `add_spectate_entity`, but it adds an area instead. `pos` is a table containing the coordinates of the area to spectate
+* `arena_lib.remove_spectate_entity(mod, arena, e_name)`: removes an entity from the spectatable entities of an ongoing match
+* `arena_lib.remove_spectate_area(mod, arena, pos_name)`: removes an area from the spectatable areas of an ongoing match
 * `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean
 * `arena_lib.is_player_spectated(p_name)`: returns whether a player is being spectated
 * `arena_lib.is_entity_spectated(mod, arena_name, e_name)`: returns whether an entity is being spectated
+* `arena_lib.is_area_spectated(mod, arena_name, pos_name)`: returns whether an area is being spectated
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
@@ -258,8 +263,8 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
 * `arena_lib.get_player_spectators(p_name)`: returns a list containing all the people currently spectating `p_name`. Format `{sp_name = true}`
 * `arena_lib.get_player_spectated(sp_name)`: returns the player `sp_name` is currently spectating, if any
-* `arena_lib.get_spectable_entities(mod, arena_name)`: returns a table containing all the spectable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectable_target(...)`
-* `arena_lib.get_spectable_entities_amount(mod, arena_name)`: returns the amount of spectable entities currently present in `arena_name`, if any
+* `arena_lib.get_spectate_entities(mod, arena_name)`: returns a table containing all the spectatable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectate_entity(...)` and `entity` the `luaentity` table
+* `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(...)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if any
 
 ### 1.10 Things you don't want to do with a light heart
@@ -290,6 +295,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `players_amount_per_team`: (table) separately stores how many players currently are in a given team. Format `{[teamID] = amount}`. If teams are disabled, it's `nil`
 * `spectators_amount`: (int) separately stores how many spectators are inside the arena
 * `spectators_amount_per_team`: (table) like `players_amount_per_team`, but for spectators
+* `spectate_entities_amount`: (int) the amount of entities that can be currently spectated in an ongoing game. If spectate mode is disabled, it's `nil`. Outside of ongoing games is always `nil`
+* `spectate_areas_amount`: (int) like `spectate_entities_amount` but for areas
 * `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
 * `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
@@ -466,7 +473,7 @@ An arena comes in 4 phases:
 
 ### 2.4 Spectate mode
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
-By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and (not currently implemented) areas. To do that, have a look at `arena_lib.add_spectable_target(...)`
+By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(...)` and `arena_lib.add_spectate_area(...)`
 <br>  
 
 ## 3. About the author(s)

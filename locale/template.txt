@@ -286,4 +286,5 @@ Currently spectating: @1=
 Change player=
 Change team=
 Change entity=
+Change area=
 Enter the match=

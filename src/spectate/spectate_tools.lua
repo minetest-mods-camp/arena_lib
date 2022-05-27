@@ -53,9 +53,30 @@ minetest.register_tool("arena_lib:spectate_changeentity", {
 
       local p_name = user:get_player_name()
       local mod = arena_lib.get_mod_by_player(p_name)
-      local arena_name = arena_lib.get_arena_by_player(p_name).name
+      local arena = arena_lib.get_arena_by_player(p_name)
 
-      arena_lib.find_and_spectate_entity(mod, arena_name, p_name)
+      arena_lib.find_and_spectate_entity(mod, arena, p_name)
+    end
+
+})
+
+
+
+minetest.register_tool("arena_lib:spectate_changearea", {
+
+    description = S("Change area"),
+    inventory_image = "arenalib_spectate_changearea.png",
+    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+
+      local p_name = user:get_player_name()
+      local mod = arena_lib.get_mod_by_player(p_name)
+      local arena = arena_lib.get_arena_by_player(p_name)
+
+      arena_lib.find_and_spectate_area(mod, arena, p_name)
     end
 
 })

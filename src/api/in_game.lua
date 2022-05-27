@@ -88,6 +88,8 @@ function arena_lib.load_arena(mod, arena_ID)
 
   -- se supporta la spettatore, inizializzo le varie tabelle
   if mod_ref.spectate_mode then
+    arena.spectate_entities_amount = 0
+    arena.spectate_areas_amount = 0
     arena_lib.init_spectate_containers(mod, arena.name)
   end
 
@@ -272,7 +274,12 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
     operations_before_leaving_arena(mod_ref, arena, pl_name)
   end
 
-  arena_lib.unload_spectate_containers(mod, arena.name)
+  -- dealloca eventuale modalità spettatore
+  if mod_ref.spectate_mode then
+    arena.spectate_entities_amount = nil
+    arena.spectate_areas_amount = nil
+    arena_lib.unload_spectate_containers(mod, arena.name)
+  end
 
   -- azzerramento giocatori e spettatori
   arena.past_present_players = {}
