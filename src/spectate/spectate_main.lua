@@ -300,7 +300,7 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     for i = 1, #players_team do
 
       if i == new_ID then
-        set_spectator(mod, arena_name, spectator, "player", players_team[i], i)
+        set_spectator(mod, arena.name, spectator, "player", players_team[i], i)
         return true
       end
     end
@@ -649,11 +649,11 @@ function override_hotbar(player, mod, arena)
     table.insert(tools, 2, "arena_lib:spectate_changeteam")
   end
 
-  if next(arena_lib.get_spectate_entities(mod, arena.name)) then
+  if arena.spectate_entities_amount > 0 then
     table.insert(tools, #tools, "arena_lib:spectate_changeentity")
   end
 
-  if next(arena_lib.get_spectate_areas(mod, arena.name)) then
+  if arena.spectate_areas_amount > 0 then
     table.insert(tools, #tools, "arena_lib:spectate_changearea")
   end
 
