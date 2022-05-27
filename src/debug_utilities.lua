@@ -108,6 +108,30 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     ppp_names_inside_amount = ppp_names_inside_amount + 1
   end
 
+  -- calcolo eventuali entità/aree seguibili
+  local spectatable_entities = ""
+  local spectatable_areas = ""
+  if mod_ref.spectate_mode then
+    local entities = ""
+    local areas = ""
+    if arena.in_game then
+      for en_name, _ in pairs(arena_lib.get_spectate_entities(mod, arena_name)) do
+        entities = entities .. en_name .. ", "
+      end
+      for ar_name, _ in pairs(arena_lib.get_spectate_areas(mod, arena_name)) do
+        areas = areas .. ar_name .. ", "
+      end
+      entities = entities:sub(1, -3)
+      areas = areas:sub(1, -3)
+    else
+      entities = "---"
+      areas = "---"
+    end
+
+    spectatable_entities = minetest.colorize("#eea160", S("Current spectatable entities: ")) .. minetest.colorize("#cfc6b8", entities) .. "\n"
+    spectatable_areas = minetest.colorize("#eea160", S("Current spectatable areas: ")) .. minetest.colorize("#cfc6b8", areas) .. "\n\n"
+  end
+
   -- calcolo stato arena
   local status
   if arena.in_queue then
@@ -233,7 +257,8 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Author: ")) .. minetest.colorize("#cfc6b8", arena.author) .. "\n" ..
     minetest.colorize("#eea160", S("BGM: ")) .. minetest.colorize("#cfc6b8", arena_bgm) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
-    minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n" ..
+    minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n\n" ..
+    
     min_players_per_team ..
     max_players_per_team ..
     minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..
@@ -244,14 +269,20 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     spectators_inside_per_team ..
     minetest.colorize("#eea160", S("Players and spectators inside: ")) .. minetest.colorize("#cfc6b8", psp_amount .. " ( ".. psp_names .. " )") .. "\n" ..
     minetest.colorize("#eea160", S("Past and present players: ")) .. minetest.colorize("#cfc6b8", ppp_names_amount .. " ( " .. ppp_names .. " )") .."\n" ..
-    minetest.colorize("#eea160", S("Past and present players inside: ")) .. minetest.colorize("#cfc6b8", ppp_names_inside_amount .. " ( " .. ppp_names_inside .. " )") .."\n" ..
+    minetest.colorize("#eea160", S("Past and present players inside: ")) .. minetest.colorize("#cfc6b8", ppp_names_inside_amount .. " ( " .. ppp_names_inside .. " )") .."\n\n" ..
+
+    spectatable_entities ..
+    spectatable_areas ..
+
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
-    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n" ..
+    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
+
     time ..
     minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", celvault) .. "\n" ..
-    minetest.colorize("#eea160", S("Custom lighting: ")) .. minetest.colorize("#cfc6b8", lighting) .. "\n" ..
+    minetest.colorize("#eea160", S("Custom lighting: ")) .. minetest.colorize("#cfc6b8", lighting) .. "\n\n" ..
+
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..
     minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
     minetest.colorize("#eea160", S("Team properties: ")) .. minetest.colorize("#cfc6b8", team_properties)
