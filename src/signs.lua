@@ -17,7 +17,7 @@ signs_lib.register_sign("arena_lib:sign", {
 	inventory_image = "arenalib_sign_icon.png",
 	default_color = "8",
 	entity_info = "standard",
-	sounds = default.node_sound_wood_defaults(),
+	sounds = minetest.global_exists("default") and default.node_sound_wood_defaults() or nil,
 	groups = {cracky = 3, oddly_breakable_by_hand = 3},
 	allow_widefont = true,
 	chars_per_line = 40,
