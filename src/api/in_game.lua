@@ -178,13 +178,13 @@ end
 
 
 
--- a partita finita.
--- winners può essere stringa (giocatore singolo), intero (squadra) o tabella di uno di questi (più giocatori o squadre)
+-- a partita finita
+-- `winners` può essere stringa (giocatore singolo), intero (squadra) o tabella di uno di questi (più giocatori o squadre)
 function arena_lib.load_celebration(mod, arena, winners)
 
   -- se era già in celebrazione
   if arena.in_celebration then
-    minetest.log("error", debug.traceback("[" .. mod .. "] There was an attempt to call the celebration phase while already in it. This shall not be done, aborting..."))
+    minetest.log("error", debug.traceback("[" .. mod .. "] There has been an attempt to call the celebration phase whilst already in it. This shall not be done, aborting..."))
     return end
 
   arena.in_celebration = true
