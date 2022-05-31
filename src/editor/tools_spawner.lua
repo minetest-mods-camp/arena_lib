@@ -51,7 +51,6 @@ minetest.register_tool("arena_lib:spawner_remove", {
   description = S("Remove spawner"),
   inventory_image = "arenalib_tool_spawner_remove.png",
   groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
-  on_place = function() end,
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
@@ -63,11 +62,13 @@ minetest.register_tool("arena_lib:spawner_remove", {
     arena_lib.set_spawner(user:get_player_name(), mod, arena_name, nil, "delete", spawner_ID, true)
   end,
 
-
   on_secondary_use = function(itemstack, placer, pointed_thing)
     change_spawner_ID(placer)
-  end
+  end,
 
+  on_place = function(itemstack, user, pointed_thing)
+    change_spawner_ID(user)
+  end
 })
 
 

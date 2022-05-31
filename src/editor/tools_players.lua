@@ -73,7 +73,6 @@ minetest.register_tool("arena_lib:players_change", {
     description = S("Change the current number"),
     inventory_image = "arenalib_tool_players_change.png",
     groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
-    on_place = function() end,
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
@@ -82,6 +81,10 @@ minetest.register_tool("arena_lib:players_change", {
 
     on_secondary_use = function(itemstack, placer, pointed_thing)
       change_players_number(placer, false)
+    end,
+
+    on_place = function(itemstack, user, pointed_thing)
+      change_players_number(user, false)
     end
 })
 
