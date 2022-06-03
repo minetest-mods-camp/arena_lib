@@ -199,7 +199,7 @@ function arena_lib.show_main_editor(player)
 
   player:get_inventory():set_list("main", editor_tools)
   if minetest.registered_items[mod .. ":arenalib_editor_slot_custom"] then
-    player:get_inventory():set_stack("main", 5, mod .. ":arenalib_editor_slot_custom")
+    player:get_inventory():set_stack("main", 6, mod .. ":arenalib_editor_slot_custom")
   end
 
   arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Arena_lib editor | Now editing: @1", arena_name))
