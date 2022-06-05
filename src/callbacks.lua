@@ -12,6 +12,26 @@ end
 
 
 
+-- Queues
+
+function arena_lib.on_prejoin_queue(mod, func)
+  arena_lib.mods[mod].on_prejoin_queue = func
+end
+
+
+
+function arena_lib.on_join_queue(mod, func)
+  arena_lib.mods[mod].on_join_queue = func
+end
+
+
+
+function arena_lib.on_leave_queue(mod, func)
+  arena_lib.mods[mod].on_leave_queue = func
+end
+
+
+
 -- Arena phases
 
 function arena_lib.on_load(mod, func)

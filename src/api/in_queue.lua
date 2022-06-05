@@ -114,6 +114,11 @@ function arena_lib.join_queue(mod, arena, p_name)
     end
   end
 
+  -- controlli aggiuntivi
+  if mod_ref.on_prejoin_queue then
+    if not mod_ref.on_prejoin_queue(arena, p_name) then return end
+  end
+
   local p_team_ID
 
   -- determino eventuale squadra giocatore
@@ -185,6 +190,10 @@ function arena_lib.join_queue(mod, arena, p_name)
     if active_queues[mod][arena_name] > 5 then
       active_queues[mod][arena_name] = 5
     end
+  end
+
+  if mod_ref.on_join_queue then
+    mod_ref.on_join_queue(arena, p_name)
   end
 
   arena_lib.update_sign(arena)
@@ -259,6 +268,10 @@ function arena_lib.remove_player_from_queue(p_name)
   else
     local seconds = active_queues[mod][arena.name]
     arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", seconds)))
+  end
+
+  if mod_ref.on_leave_queue then
+    mod_ref.on_leave_queue(arena, p_name)
   end
 
   arena_lib.update_sign(arena)

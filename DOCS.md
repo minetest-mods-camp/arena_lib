@@ -114,8 +114,11 @@ Those aside, you need to connect a few functions with your mod in order to use t
 
 ### 1.4 Callbacks
 To customise your mod even more, there are a few empty callbacks you can use. They are:
-* `arena_lib.on_enable(mod, function(arena, p_name)`: use it to run more checks before enabling an arena. Must return true if all conditions are met
-* `arena_lib.on_disable(mod, function(arena, p_name)`: use it to run more checks before disabling an arena. Must return true if all conditions are met
+* `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
+* `arena_lib.on_disable(mod, function(arena, p_name)`: run more checks before disabling an arena. Must return `true` or the arena won't be disabled
+* `arena_lib.on_prejoin_queue(mod, function(arena, p_name)`: run more checks when entering a queue. Must return `true` or the player won't be added
+* `arena_lib.on_join_queue(mod, function(arena, p_name)`: additional actions to perform after a player has successfully joined a queue
+* `arena_lib.on_leave_queue(mod, function(arena, p_name)`: same as above, but for when they leave
 * `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
 * `arena_lib.on_start(mod, function(arena))`: same as above
 * `arena_lib.on_celebration(mod, function(arena, winners)`: same as above. `winners` can be either a string, an integer or a table of string/integers. If you want to have a single winner, return their name (string). If you want to have a whole team, return the team ID (integer). If you want to have more single winners, a table of strings, and more teams, a table of integers.
