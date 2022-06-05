@@ -3,107 +3,35 @@
 # reviewer(s):
 # textdomain: arena_lib
 
-# api.lua
-arena=
-team=
-spectator=
-[!] You can't change type!=
-Parameter @1 successfully overwritten=
-[!] Parameters don't seem right!=
-Arena @1 successfully created=
-Arena @1 successfully removed=
-Arena @1 successfully renamed in @2=
-@1's author succesfully removed=
-@1's author succesfully changed to @2=
-Players amount successfully changed ( min @1 | max @2 )=
-[!] Teams are not enabled!=
-[!] Nothing to do here!=
-Teams successfully enabled for the arena @1=
-Teams successfully disabled for the arena @1=
-[!] This team doesn't exist!=
-[!] No spawner with that ID to overwrite!=
-[!] No team must be specified for this function!=
-Spawn point #@1 successfully overwritten=
-[!] No spawner with that ID to delete!=
-All the spawn points belonging to team @1 have been removed=
-All the spawn points have been removed=
-Spawn point #@1 successfully deleted=
-[!] Unknown parameter!=
-[!] There's already a spawn in this point!=
-[!] Spawn points can't exceed the maximum number of players!=
-Spawn point #@1 successfully set=
-[!] That's not an arena_lib sign!=
-Sign of arena @1 successfully removed=
-[!] There is already a sign for this arena!=
-[!] There is no sign to remove assigned to @1!=
-Sign of arena @1 successfully set=
-Lighting of arena @1 successfully overwritten=
-All=
-Sky=
-Sun=
-Moon=
-Stars=
-Clouds=
-(@1) Celestial vault of arena @2 successfully overwritten=
-Background music of arena @1 successfully overwritten=
-[!] Timers are not enabled in this mod!=
-Arena @1's timer is now @2 seconds=
-[!] Insufficient spawners, the arena can't be enabled!=
-[!] Sign not set, the arena can't be enabled!=
-Arena @1 successfully enabled=
-[!] The arena is already disabled!=
-[!] You can't disable an arena during an ongoing game!=
-[!] The arena you were queueing for has been disabled... :(=
-Arena @1 successfully disabled=
-@1 wins the game=
-Team @1 wins the game=
-@1 win the game=
-Teams @1 win the game=
-[!] This minigame doesn't exist!=
-[!] This arena doesn't exist!=
-[!] No ongoing game!=
-Game in arena @1 successfully terminated=
-@1 has been eliminated by @2=
-@1 has been eliminated=
-@1 has been kicked by @2=
-@1 has been kicked=
-The arena has been forcibly terminated by @1=
-The arena has been forcibly terminated=
-@1 has quit the match=
-Waiting for more players...=
-The queue has been cancelled due to not enough players=
-There are no other teams left, you win!=
-You're the last player standing: you win!=
-You win the game due to not enough players=
-[!] This action can't be performed with no spawners set!=
-Wooosh!=
-[!] An arena with that name exists already!=
-[!] The name contains unsupported characters!=
-[!] on_timeout callback must be declared to properly use a decreasing timer!=
-
 # commands.lua
 player=
 Kicks a player from an ongoing game=
 [!] This player is not online!=
 [!] The player must be in a game to perform this action!=
-[!] You must be in a game to perform this action!=
 Player successfully kicked=
 minigame=
 Tweaks the minigame settings for the current server=
 arena name=
 Forcibly ends an ongoing game=
+[!] Parameters don't seem right!=
+Game in arena @1 successfully terminated=
+DEBUG ONLY: reset the properties of a bugged arena=
 Quits an ongoing game=
+[!] You must be in a game to perform this action!=
 [!] You can't perform this action if you're the only one left!=
 message=
 Writes a message in the arena global chat while in a game=
 Writes a message in the arena team chat while in a game (if teams are enabled)=
+[!] Teams are not enabled!=
 
 # debug_utilities.lua
 name: =
 Total arenas: =
+[!] This arena doesn't exist!=
 Players required per team: =
 Players supported per team: =
 Players inside per team: =
+Spectators inside per team: =
 Current spectatable entities: =
 Current spectatable areas: =
 in queue=
@@ -121,18 +49,25 @@ Disabled damage types: =
 Players required: =
 Players supported: =
 Players inside: =
+Spectators inside: =
+Players and spectators inside: =
+Past and present players: =
+Past and present players inside: =
 Enabled: =
 Status: =
 Sign: =
 Spawn points: =
+Custom sky: =
+Custom lighting: =
 Properties: =
 Temp properties: =
 Team properties: =
-
-# items.lua
-You're immune!=
+[!] You can't perform this action during an ongoing game!=
 
 # minigame_settings.lua
+[!] You can't perform this action while in queue!=
+[!] You can't perform this action while in game!=
+[!] This minigame doesn't exist!=
 Minigame settings=
 Overwrite=
 
@@ -143,6 +78,76 @@ Arena sign=
 # utils.lua
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
+
+# api/core.lua
+arena=
+team=
+spectator=
+[!] You can't change type!=
+Parameter @1 successfully overwritten=
+Arena @1 successfully created=
+Arena @1 successfully removed=
+Arena @1 successfully renamed in @2=
+@1's author successfully removed=
+@1's author successfully changed to @2=
+Players amount successfully changed ( min @1 | max @2 )=
+[!] Nothing to do here!=
+Teams successfully enabled for the arena @1=
+Teams successfully disabled for the arena @1=
+[!] This team doesn't exist!=
+[!] No team must be specified for this function!=
+[!] No spawner with that ID to overwrite!=
+Spawn point #@1 successfully overwritten=
+[!] No spawner with that ID to delete!=
+Spawn point #@1 successfully deleted=
+All the spawn points belonging to team @1 have been removed=
+All the spawn points have been removed=
+[!] Unknown parameter!=
+[!] There's already a spawn in this point!=
+[!] Spawn points can't exceed the maximum number of players!=
+Spawn point #@1 successfully set=
+[!] There is no sign to remove assigned to @1!=
+Sign of arena @1 successfully removed=
+[!] There is already a sign for this arena!=
+[!] That's not an arena_lib sign!=
+Sign of arena @1 successfully set=
+Lighting of arena @1 successfully overwritten=
+(@1) Celestial vault of arena @2 successfully overwritten=
+All=
+Sky=
+Sun=
+Moon=
+Stars=
+Clouds=
+Background music of arena @1 successfully overwritten=
+[!] Timers are not enabled in this mod!=
+Arena @1's timer is now @2 seconds=
+[!] Insufficient spawners, the arena can't be enabled!=
+[!] Sign not set, the arena can't be enabled!=
+Arena @1 successfully enabled=
+[!] The arena is already disabled!=
+[!] You can't disable an arena during an ongoing game!=
+[!] The arena you were queueing for has been disabled... :(=
+Arena @1 successfully disabled=
+[!] An arena with that name exists already!=
+[!] The name contains unsupported characters!=
+
+# api/in_game.lua
+@1 wins the game=
+Team @1 wins the game=
+@1 win the game=
+Teams @1 win the game=
+@1 has been eliminated by @2=
+@1 has been eliminated=
+There are no other teams left, you win!=
+You're the last player standing: you win!=
+You win the game due to not enough players=
+[!] No ongoing game!=
+The arena has been forcibly terminated by @1=
+@1 has been kicked by @2=
+@1 has been kicked=
+@1 has quit the match=
+[!] on_timeout callback must be declared to properly use a decreasing timer!=
 
 # api/in_queue.lua
 [!] You must leave the editor first!=
@@ -166,12 +171,11 @@ Game begins in @1!=
 Get ready!=
 
 # dependencies/parties.lua
-[!] You can't perform this action while in queue!=
-[!] You can't perform this action while in game!=
 [!] The party leader must not be in queue to perform this action!=
 [!] The party leader must not be in game to perform this action!=
 
 # editor/editor_main.lua
+Wooosh!=
 Arena_lib editor | Now editing: @1=
 
 # editor/editor_icons.lua

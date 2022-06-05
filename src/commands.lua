@@ -88,7 +88,7 @@ minetest.register_chatcommand("forceend", {
 minetest.register_chatcommand("flusharena", {
 
   params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",
-  description = S("(temp) DEBUG ONLY: reset the properties of a bugged arena"),
+  description = S("DEBUG ONLY: reset the properties of a bugged arena"),
   privs = {
         arenalib_admin = true,
     },

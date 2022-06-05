@@ -3,107 +3,35 @@
 # reviewer(s):
 # textdomain: arena_lib
 
-# api.lua
-arena=arena
-team=squadra
-spectator=spettatore
-[!] You can't change type!=[!] Non puoi cambiare tipo!
-Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
-[!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
-Arena @1 successfully created=Arena @1 creata con successo
-Arena @1 successfully removed=Arena @1 rimossa con successo
-Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
-@1's author succesfully removed=Autore dell'arena @1 rimosso con successo
-@1's author succesfully changed to @2=Autore dell'arena @1 cambiato con successo in @2
-Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
-[!] Teams are not enabled!=[!] Le squadre non sono abilitate!
-[!] Nothing to do here!=[!] È già tutto a posto qui!
-Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
-Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
-[!] This team doesn't exist!=[!] Questo team non esiste!
-[!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
-[!] No team must be specified for this function!=[!] Non va specificata nessuna squadra per questa funzione!
-Spawn point #@1 successfully overwritten=Punto di spawn #@1 sovrascritto con successo
-[!] No spawner with that ID to delete!=[!] Nessuno spawner con quell'ID da cancellare!
-All the spawn points belonging to team @1 have been removed=Tutti i punti di spawn appartenenti alla squadra @1 sono stati rimossi
-All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
-Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
-[!] Unknown parameter!=[!] Parametro non riconosciuto!
-[!] There's already a spawn in this point!=[!] C'è già uno spawn in questo punto!
-[!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
-Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
-[!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
-Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
-[!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
-[!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
-Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
-Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
-All=Tutto
-Sky=Cielo
-Sun=Sole
-Moon=Luna
-Stars=Stelle
-Clouds=Nuvole
-(@1) Celestial vault of arena @2 successfully overwritten=(@1) Volta celeste dell'arena @2 sovrascritta con successo
-Background music of arena @1 successfully overwritten=Musica di sottofondo dell'arena @1 sovrascritta con successo
-[!] Timers are not enabled in this mod!=[!] I timer non sono abilitati in questa mod!
-Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
-[!] Insufficient spawners, the arena can't be enabled!=[!] Spawner insufficienti, l'arena non può essere abilitata!
-[!] Sign not set, the arena can't be enabled!=[!] Cartello non impostato, l'arena non può essere abilitata!
-Arena @1 successfully enabled=Arena @1 abilitata con successo
-[!] The arena is already disabled=[!] L'arena è già disabilitata
-[!] You can't disable an arena during an ongoing game!=[!] Non puoi disabilitare un'arena mentre una partita è in corso!
-[!] The arena you were queueing for has been disabled... :(=[!] L'arena per la quale eri in coda è stata disabilitata... :(
-Arena @1 successfully disabled=Arena @1 disabilitata con successo
-@1 wins the game=@1 ha vinto la partita
-Team @1 wins the game=La squadra @1 ha vinto la partita
-@1 win the game=@1 hanno vinto la partita
-Teams @1 win the game=Le squadre @1 hanno vinto la partita
-[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
-[!] This arena doesn't exist!=[!] Quest'arena non esiste!
-[!] No ongoing game!=[!] Nessuna partita in corso!
-Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
-@1 has been eliminated by @2=@1 è stato eliminato da @2
-@1 has been eliminated=@1 è stato eliminato
-@1 has been kicked by @2=@1 è stato cacciato da @2
-@1 has been kicked=@1 è stato cacciato
-The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
-The arena has been forcibly terminated=La conclusione della partita è stata forzata
-@1 has quit the match=@1 ha abbandonato la partita
-Waiting for more players...=In attesa di più giocatori...
-The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
-There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
-You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
-You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
-[!] This action can't be performed with no spawners set!=[!] Quest'azione non può essere eseguita senza punti di spawn impostati!
-Wooosh!=Wooosh!
-[!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
-[!] The name contains unsupported characters!=[!] Il nome contiene caratteri non supportati!
-[!] on_timeout callback must be declared to properly use a decreasing timer!=[!] il callback on_timeout deve essere dichiarato per poter usare correttamente un timer decrescente!
-
 # commands.lua
 player=giocatore
 Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
 [!] This player is not online!=[!] Questo giocatore non è online!
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
-[!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
 Player successfully kicked=Giocatore cacciato con successo
 minigame=minigioco
 Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 arena name=nome arena
 Forcibly ends an ongoing game=Forza la conclusione di una partita in corso
+[!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
+Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
+DEBUG ONLY: reset the properties of a bugged arena=SOLO DEBUG: ripristina le proprietà di un'arena rotta
 Quits an ongoing game=Abbandona una partita in corso
+[!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
 [!] You can't perform this action if you're the only one left!=[!] Non puoi eseguire quest'azione se sei l'unico giocatore rimasto!
 message=messaggio
 Writes a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
 Writes a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
+[!] Teams are not enabled!=[!] Le squadre non sono abilitate!
 
 # debug_utilities.lua
 name: =nome: 
 Total arenas: =Arene totali: 
+[!] This arena doesn't exist!=[!] Quest'arena non esiste!
 Players required per team: =Giocatori minimi per squadra: 
 Players supported per team: =Giocatori massimi per squadra: 
 Players inside per team: =Giocatori dentro per squadra: 
+Spectators inside per team: =Spettatori dentro per squadra: 
 Current spectatable entities: =Entità attualmente seguibili: 
 Current spectatable areas: =Aree attualmente seguibili: 
 in queue=in coda
@@ -121,18 +49,25 @@ Disabled damage types: =Tipi di danno disabilitati:
 Players required: =Giocatori minimi: 
 Players supported: =Giocatori massimi: 
 Players inside: =Giocatori dentro: 
+Spectators inside: =Spettatori dentro: 
+Players and spectators inside: =Giocatori e spettatori dentro: 
+Past and present players: =Giocatori presenti e passati: 
+Past and present players inside: =Giocatori presenti e passati dentro: 
 Enabled: =Abilitata: 
 Status: =Stato: 
 Sign: =Cartello: 
 Spawn points: =Punti di spawn: 
+Custom sky: =Cielo personalizzato: 
+Custom lighting: =Illuminazione personalizzata: 
 Properties: =Proprietà: 
 Temp properties: =Proprietà temporanee: 
 Team properties: =Proprietà squadra: 
-
-# items.lua
-You're immune!=Sei immune!
+[!] You can't perform this action during an ongoing game!=[!] Non puoi eseguire quest'azione mentre c'è una partita in corso!
 
 # minigame_settings.lua
+[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
+[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
+[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 Minigame settings=Impostazioni minigioco
 Overwrite=Sovrascrivi
 
@@ -143,6 +78,77 @@ Arena sign=Cartello dell'arena
 # utils.lua
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
+
+# api/core.lua
+arena=arena
+team=squadra
+spectator=spettatore
+[!] You can't change type!=[!] Non puoi cambiare tipo!
+Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
+Arena @1 successfully created=Arena @1 creata con successo
+Arena @1 successfully removed=Arena @1 rimossa con successo
+Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
+@1's author successfully removed=Autore dell'arena @1 rimosso con successo
+@1's author successfully changed to @2=Autore dell'arena @1 cambiato con successo in @2
+Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
+[!] Nothing to do here!=[!] È già tutto a posto qui!
+Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
+Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
+[!] This team doesn't exist!=[!] Questo team non esiste!
+[!] No team must be specified for this function!=[!] Non va specificata nessuna squadra per questa funzione!
+[!] No spawner with that ID to overwrite!=[!] Nessuno spawner con quell'ID da sovrascrivere!
+Spawn point #@1 successfully overwritten=Punto di spawn #@1 sovrascritto con successo
+[!] No spawner with that ID to delete!=[!] Nessuno spawner con quell'ID da cancellare!
+Spawn point #@1 successfully deleted=Punto di spawn #@1 cancellato con successo
+All the spawn points belonging to team @1 have been removed=Tutti i punti di spawn appartenenti alla squadra @1 sono stati rimossi
+All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
+[!] Unknown parameter!=[!] Parametro non riconosciuto!
+[!] There's already a spawn in this point!=[!] C'è già uno spawn in questo punto!
+[!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
+Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
+[!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
+Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
+[!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
+[!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
+Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
+Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
+(@1) Celestial vault of arena @2 successfully overwritten=(@1) Volta celeste dell'arena @2 sovrascritta con successo
+All=Tutto
+Sky=Cielo
+Sun=Sole
+Moon=Luna
+Stars=Stelle
+Clouds=Nuvole
+Background music of arena @1 successfully overwritten=Musica di sottofondo dell'arena @1 sovrascritta con successo
+[!] Timers are not enabled in this mod!=[!] I timer non sono abilitati in questa mod!
+Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
+[!] Insufficient spawners, the arena can't be enabled!=[!] Spawner insufficienti, l'arena non può essere abilitata!
+[!] Sign not set, the arena can't be enabled!=[!] Cartello non impostato, l'arena non può essere abilitata!
+Arena @1 successfully enabled=Arena @1 abilitata con successo
+[!] The arena is already disabled=[!] L'arena è già disabilitata
+[!] You can't disable an arena during an ongoing game!=[!] Non puoi disabilitare un'arena mentre una partita è in corso!
+[!] The arena you were queueing for has been disabled... :(=[!] L'arena per la quale eri in coda è stata disabilitata... :(
+Arena @1 successfully disabled=Arena @1 disabilitata con successo
+[!] An arena with that name exists already!=[!] Esiste già un'arena con quel nome!
+[!] The name contains unsupported characters!=[!] Il nome contiene caratteri non supportati!
+
+# api/in_game.lua
+@1 wins the game=@1 ha vinto la partita
+Team @1 wins the game=La squadra @1 ha vinto la partita
+@1 win the game=@1 hanno vinto la partita
+Teams @1 win the game=Le squadre @1 hanno vinto la partita
+@1 has been eliminated by @2=@1 è stato eliminato da @2
+@1 has been eliminated=@1 è stato eliminato
+There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
+You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
+You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
+[!] No ongoing game!=[!] Nessuna partita in corso!
+Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
+The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
+@1 has been kicked by @2=@1 è stato cacciato da @2
+@1 has been kicked=@1 è stato cacciato
+@1 has quit the match=@1 ha abbandonato la partita
+[!] on_timeout callback must be declared to properly use a decreasing timer!=[!] il callback on_timeout deve essere dichiarato per poter usare correttamente un timer decrescente!
 
 # api/in_queue.lua
 [!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
@@ -166,12 +172,11 @@ Game begins in @1!=La partita inizierà tra @1!
 Get ready!=Preparati!
 
 # dependencies/parties.lua
-[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
-[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
 [!] The party leader must not be in queue to perform this action!=[!] Il capo gruppo non deve essere in coda per eseguire quest'azione!
 [!] The party leader must not be in game to perform this action!=[!] Il capo gruppo non deve essere in partita per eseguire quest'azione!
 
 # editor/editor_main.lua
+Wooosh!=Wooosh!
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
 # editor/editor_icons.lua

@@ -428,10 +428,10 @@ function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
     return
   elseif author == nil or not string.match(author, "[%w%p]+") then
     arena.author = "???"
-    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully removed", arena.name))
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author successfully removed", arena.name))
   else
     arena.author = author
-    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author succesfully changed to @2", arena.name, arena.author))
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's author successfully changed to @2", arena.name, arena.author))
   end
 
   update_storage(false, mod, id, arena)
@@ -642,7 +642,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     -- se delete, cancello
     elseif param == "delete" then
 
-      -- è inutile specificare un team. Avviso per non confondere
+      -- è inutile specificare una squadra. Avviso per non confondere
       if team then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
         return end
@@ -929,7 +929,7 @@ function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
 
   -- se la mod non supporta i timer
   if mod_ref.time_mode ~= "decremental" then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] [!] Timers are not enabled in this mod!") .. " (time_mode = 'decremental')"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Timers are not enabled in this mod!") .. " (time_mode = 'decremental')"))
     return end
 
   -- se è inferiore a 1
