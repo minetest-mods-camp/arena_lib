@@ -11,7 +11,6 @@ local function time_start() end
 local function deprecated_winning_team_celebration() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
                                       --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups}
 
@@ -335,23 +334,6 @@ end
 --------------------UTILS---------------------
 ----------------------------------------------
 
-function arena_lib.is_player_in_queue(p_name, mod)
-
-  if not players_in_queue[p_name] then
-    return false
-  else
-
-    -- se il campo mod è specificato, controllo che sia lo stesso
-    if mod then
-      if players_in_queue[p_name].minigame == mod then return true
-      else return false
-      end
-    end
-
-    return true
-  end
-end
-
 -- mod è opzionale
 function arena_lib.is_player_in_arena(p_name, mod)
 
@@ -368,65 +350,6 @@ function arena_lib.is_player_in_arena(p_name, mod)
 
     return true
   end
-end
-
-
-
-function arena_lib.add_to_queue(p_name, mod, arena_ID)
-  local arena = arena_lib.mods[mod].arenas[arena_ID]
-  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena.name .. " > " ..  p_name))
-
-  players_in_queue[p_name] = {minigame = mod, arenaID = arena_ID}
-end
-
-
-
-function arena_lib.remove_player_from_queue(p_name)
-
-  local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
-  local arena = arena_lib.get_arena_by_player(p_name)
-
-  if not arena then return end
-
-  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena.name .. " < " .. p_name))
-
-  players_in_queue[p_name] = nil
-  arena.players_amount = arena.players_amount - 1
-  if arena.teams_enabled then
-    local p_team_ID = arena.players[p_name].teamID
-    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] - 1
-  end
-  arena.players[p_name] = nil
-  arena.players_and_spectators[p_name] = nil
-
-  arena_lib.HUD_hide("all", p_name)
-
-  local players_required = arena_lib.get_players_to_start_queue(arena)
-
-  -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
-  if arena.in_queue and players_required > 0 then
-
-    local arena_max_players = arena.max_players * #arena.teams
-    local timer = minetest.get_node_timer(arena.sign)
-
-    timer:stop()
-    arena.in_queue = false
-
-    arena_lib.HUD_hide("broadcast", arena)
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
-    arena_lib.send_message_in_arena(arena, "both", mod_ref.prefix .. S("The queue has been cancelled due to not enough players"))
-
-  -- se già non era in coda, aggiorno HUD
-  elseif players_required > 0 then
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
-
-  -- idem se è rimasta in coda
-  else
-    local seconds = math.floor(minetest.get_node_timer(arena.sign):get_timeout() + 0.5)
-    arena_lib.HUD_send_msg_all("hotbar", arena, arena_lib.queue_format(arena, S("@1 seconds for the match to start", seconds)))
-  end
-
-  arena_lib.update_sign(arena)
 end
 
 
@@ -581,27 +504,21 @@ function arena_lib.get_mod_by_player(p_name)
   if arena_lib.is_player_in_arena(p_name) then
     return players_in_game[p_name].minigame
   elseif arena_lib.is_player_in_queue(p_name) then
-    return players_in_queue[p_name].minigame
-  else
-    return end
+    return arena_lib.get_mod_by_queuing_player(p_name)
+  end
 end
 
 
 
 function arena_lib.get_arena_by_player(p_name)
-
-  local mod, arenaID
-
   if arena_lib.is_player_in_arena(p_name) then      -- è in partita
-    mod = players_in_game[p_name].minigame
-    arenaID = players_in_game[p_name].arenaID
-  elseif arena_lib.is_player_in_queue(p_name) then   -- è in coda
-    mod = players_in_queue[p_name].minigame
-    arenaID = players_in_queue[p_name].arenaID
-  else
-    return end
+    local mod = players_in_game[p_name].minigame
+    local arenaID = players_in_game[p_name].arenaID
 
-  return arena_lib.mods[mod].arenas[arenaID]
+    return arena_lib.mods[mod].arenas[arenaID]
+  elseif arena_lib.is_player_in_queue(p_name) then   -- è in coda
+    return arena_lib.get_arena_by_queuing_player(p_name)
+  end
 end
 
 
@@ -609,14 +526,6 @@ end
 function arena_lib.get_arenaID_by_player(p_name)
   if players_in_game[p_name] then
     return players_in_game[p_name].arenaID
-  end
-end
-
-
-
-function arena_lib.get_queueID_by_player(p_name)
-  if players_in_queue[p_name] then
-    return players_in_queue[p_name].arenaID
   end
 end
 
@@ -758,7 +667,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
   end
 
   -- registro giocatori nella tabella apposita
-  players_in_queue[p_name] = nil
   players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 end
 

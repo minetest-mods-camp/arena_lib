@@ -229,7 +229,8 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
-* `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any
+* `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
+* `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any. Returns `true` if successful
 * `arena_lib.remove_player_from_arena(p_name, reason, <executioner>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and it equals to...
   * `0`: player disconnected. Calls `on_disconnect`
   * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`
@@ -257,6 +258,7 @@ Executioner can be passed to tell who removed the player. By default, this happe
 * `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
+* `arena_lib.get_players_amount_left_to_start_queue(arena)`: returns the amount of player still needed to make a queue start, or `nil` if the arena is already in game
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
 * `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as index either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as index either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves

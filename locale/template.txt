@@ -138,8 +138,14 @@ Overwrite=
 
 # signs.lua
 Arena sign=
-[!] You must leave the editor first!=
 [!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=
+
+# utils.lua
+[!] You must disable the arena first!=
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
+
+# api/in_queue.lua
+[!] You must leave the editor first!=
 [!] Only the party leader can enter the queue!=
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=
 [!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=
@@ -151,16 +157,13 @@ Arena sign=
 [!] The arena is already full!=
 [!] The arena is loading, try again in a few seconds!=
 [!] This minigame doesn't allow to join while in progress!=
+[!] You're already queuing for this arena!=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=
 You've joined team @1=
 Game begins in @1!=
 Get ready!=
-
-# utils.lua
-[!] You must disable the arena first!=
-[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
 # dependencies/parties.lua
 [!] You can't perform this action while in queue!=

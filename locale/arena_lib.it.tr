@@ -138,8 +138,14 @@ Overwrite=Sovrascrivi
 
 # signs.lua
 Arena sign=Cartello dell'arena
-[!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 [!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!==[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
+
+# utils.lua
+[!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
+
+# api/in_queue.lua
+[!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 [!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
 [!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
 [!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=[!] Non puoi entrare in partita se alcuni membri del gruppo sono attaccati a qualcosa! (es. navi, cavalli ecc.)
@@ -151,16 +157,13 @@ Arena sign=Cartello dell'arena
 [!] The arena is already full!=[!] L'arena è già piena!
 [!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
 [!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
+[!] You're already queuing for this arena!=[!] Sei già in coda per quest'arena!
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 @1 seconds for the match to start=@1 secondi all'inizio
 You've joined team @1=Ti sei unito alla squadra @1
 Game begins in @1!=La partita inizierà tra @1!
 Get ready!=Preparati!
-
-# utils.lua
-[!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
-[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 
 # dependencies/parties.lua
 [!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!

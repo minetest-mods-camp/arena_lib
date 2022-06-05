@@ -4,6 +4,7 @@ local srcpath = modpath .. "/src"
 
 dofile(srcpath .. "/api/core.lua")
 dofile(srcpath .. "/api/in_game.lua")
+dofile(srcpath .. "/api/in_queue.lua")
 dofile(srcpath .. "/api/misc.lua")
 dofile(srcpath .. "/api/teams.lua")
 dofile(srcpath .. "/callbacks.lua")
