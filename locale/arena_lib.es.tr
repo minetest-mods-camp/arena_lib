@@ -3,6 +3,8 @@
 # reviewer(s): Zughy
 # textdomain: arena_lib
 
+# NOTE FOR TRANSLATORS: at this point it's probably easier to just copy-paste template.txt in here and manually paste that 50% of sentences that have remained the same
+
 # api.lua
 arena=arena
 team=equipo

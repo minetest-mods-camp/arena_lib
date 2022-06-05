@@ -19,7 +19,7 @@ minetest.register_chatcommand("arenakick", {
 
     -- se non è specificato niente, annullo
     if not p_name then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return false end
 
     -- se il giocatore non è online, annullo

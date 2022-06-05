@@ -612,7 +612,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       team = teamID_or_name
     end
 
-    -- controllo team
+    -- controllo squadra
     if not arena_lib.is_team_declared(mod_ref, team) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
       return end
@@ -626,11 +626,6 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     -- se overwrite, sovrascrivo
     if param == "overwrite" then
 
-      -- è inutile specificare una squadra. Avviso per non confondere
-      if team then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
-        return end
-
       -- se lo spawner da sovrascrivere non esiste, annullo
       if arena.spawn_points[ID].pos == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
@@ -641,11 +636,6 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
     -- se delete, cancello
     elseif param == "delete" then
-
-      -- è inutile specificare una squadra. Avviso per non confondere
-      if team then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No team must be specified for this function!")))
-        return end
 
       if arena.spawn_points[ID] == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
@@ -681,7 +671,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       end
 
     else
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Unknown parameter!")))
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     end
 
   update_storage(false, mod, id, arena)
