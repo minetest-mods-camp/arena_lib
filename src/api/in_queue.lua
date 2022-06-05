@@ -153,8 +153,8 @@ function arena_lib.join_queue(mod, arena, p_name)
     return
   else
     for _, pl_name in pairs(players_to_add) do
-      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena_name .. " > " ..  p_name))
-      players_in_queue[p_name] = {minigame = mod, arenaID = arenaID}
+      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena_name .. " > " ..  pl_name))
+      players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
     end
   end
 
