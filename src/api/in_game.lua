@@ -4,6 +4,7 @@ local function assign_team_spawner() end
 local function operations_before_entering_arena() end
 local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
+local function eliminate_player() end
 local function handle_leaving_callbacks() end
 local function victory_particles() end
 local function show_victory_particles() end
@@ -396,30 +397,10 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       end
     end
 
-    -- se è stato eliminato, tratto il callback a parte perché è l'unico dove potrebbe venire mandato eventualmente in spettatore
-    if reason == 1 then
-
-      -- manda eventualmente in spettatore
-      if mod_ref.spectate_mode and arena.players_amount > 0 then
-        arena_lib.enter_spectate_mode(p_name, arena)
-      else
-        operations_before_leaving_arena(mod_ref, arena, p_name)
-        arena.players_and_spectators[p_name] = nil
-        arena.past_present_players_inside[p_name] = nil
-        players_in_game[p_name] = nil
-      end
-
-      if executioner then
-        arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
-      else
-        arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
-      end
-
-      if mod_ref.on_eliminate then
-        mod_ref.on_eliminate(arena, p_name)
-      elseif mod_ref.on_quit then
-        mod_ref.on_quit(arena, p_name)
-      end
+    -- se è stato eliminato e c'è la spettatore, non va rimosso, bensì solo spostato in spettatore
+    if reason == 1 and mod_ref.spectate_mode and arena.players_amount > 0 then
+      eliminate_player(mod_ref, arena, p_name, executioner)
+      arena_lib.enter_spectate_mode(p_name, arena)
 
     -- sennò procedo a rimuoverlo normalmente
     else
@@ -427,10 +408,9 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       arena.players_and_spectators[p_name] = nil
       arena.past_present_players_inside[p_name] = nil
       players_in_game[p_name] = nil
+
+      handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
     end
-
-    handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
-
   end
 
   -- se è già in celebrazione, non c'è bisogno di andare oltre
@@ -881,6 +861,19 @@ end
 
 
 
+function eliminate_player(mod_ref, arena, p_name, executioner)
+  if executioner then
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
+  else
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+  end
+
+  if mod_ref.on_eliminate then
+    mod_ref.on_eliminate(arena, p_name)
+  end
+end
+
+
 function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, is_spectator)
 
   local msg_color = reason < 3 and "#f16a54" or "#d69298"
@@ -895,9 +888,15 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
   if reason == 0 then
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
 
+    -- DEPRECATED: remove in 6.0
     if mod_ref.on_disconnect then
+      minetest.log("warning", "[ARENA_LIB] on_kick is deprecated. Please use on_quit with reason `0` instead")
       mod_ref.on_disconnect(arena, p_name, is_spectator)
     end
+
+  -- se è stato eliminato (no spettatore, quindi viene rimosso dall'arena)
+  elseif reason == 1 then
+    eliminate_player(mod_ref, arena, p_name, executioner)
 
   -- se è stato cacciato
   elseif reason == 2 then
@@ -907,19 +906,19 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
       arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
     end
 
+    -- DEPRECATED: remove in 6.0
     if mod_ref.on_kick then
+      minetest.log("warning", "[ARENA_LIB] on_kick is deprecated. Please use on_quit with reason `2` instead")
       mod_ref.on_kick(arena, p_name, is_spectator)
-    elseif mod_ref.on_quit then
-      mod_ref.on_quit(arena, p_name, is_spectator)
     end
 
   -- se ha abbandonato
   elseif reason == 3 then
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
+  end
 
-    if mod_ref.on_quit then
-      mod_ref.on_quit(arena, p_name, is_spectator)
-    end
+  if mod_ref.on_quit then
+    mod_ref.on_quit(arena, p_name, is_spectator, reason)
   end
 end
 

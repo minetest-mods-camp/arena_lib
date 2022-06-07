@@ -134,10 +134,8 @@ To customise your mod even more, there are a few empty callbacks you can use. Th
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
-* `arena_lib.on_kick(mod, function(arena, p_name, is_spectator))`: called when a player/spectator is kicked from a match (same as above)
-* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator))`: called when a player/spectator quits from a match (same as above)
-* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
-* `arena_lib.on_disconnect(mod, function(arena, p_name, is_spectator))`: called when a player/spectator disconnects while in a match
+* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from a match. See `arena_lib.remove_player_from_arena(...)` to learn about the `reason` parameter
+* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit with `/quit`. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
 
 > **BEWARE**: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 
@@ -235,13 +233,14 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
 * `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
 * `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any. Returns `true` if successful
-* `arena_lib.remove_player_from_arena(p_name, reason, <executioner>)`: removes the player from the arena and it brings back the player to the lobby if still online. Reason is an int, and it equals to...
-  * `0`: player disconnected. Calls `on_disconnect`
-  * `1`: player eliminated. Calls `on_eliminate` if declared. Otherwise calls `on_quit`
-  * `2`: player kicked. Calls `on_kick` if declared. Otherwise calls `on_quit`
-  * `3`: player quit. Calls `on_quit`
-Default is 0 and these are mostly hardcoded in arena_lib already, so it's advised to not touch it and to use callbacks. The only exception is in case of manual elimination (i.e. in a murder minigame, so reason = 1).  
-Executioner can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin.
+* `arena_lib.remove_player_from_arena(p_name, reason, <executioner>)`: removes the player from the arena and it brings back the player to the game world if still online. This is already extensively used within arena_lib, but modders can use it to customise their gameplay (e.g. to eliminate a player or to automatically kick a user who went AFK). This is *not* called when an arena is forcibly terminated
+	* `reason` is an integer, and it equals to...
+		* `0`: player disconnected. Default used when: players disconnect
+		* `1`: player eliminated. Default used when: ---
+		* `2`: player kicked. Default used when: players are kicked through `/arenakick`
+		* `3`: player quits. Default used when: players do `/quit` or when they leave the spectator mode
+		* All these reasons call `on_quit`, with the only exception of `1`, that calls `on_eliminate` if declared, and that only calls `on_quit` if there is no spectator mode
+	* `executioner` can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
 * `arena_lib.add_spectate_entity(mod, arena, e_name, entity)`: adds to the current ongoing match a spectatable entity, allowing spectators to spectate more than just players. `e_name` is the name that will appear in the spectator info hotbar, and `entity` the `luaentity` table. When the entity is removed/unloaded, automatically calls `remove_spectate_entity(...)`
 * `arena_lib.add_spectate_area(mod, arena, pos_name, pos)`: same as `add_spectate_entity`, but it adds an area instead. `pos` is a table containing the coordinates of the area to spectate
