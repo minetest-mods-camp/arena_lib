@@ -72,6 +72,12 @@ end
 
 
 
+function arena_lib.on_respawn(mod, func)
+  arena_lib.mods[mod].on_respawn = func
+end
+
+
+
 function arena_lib.on_change_spectated_target(mod, func)
   arena_lib.mods[mod].on_change_spectated_target = func
 end

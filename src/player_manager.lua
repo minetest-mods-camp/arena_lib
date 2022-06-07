@@ -167,12 +167,18 @@ minetest.register_on_respawnplayer(function(player)
 
     if not arena_lib.is_player_in_arena(p_name) then return end
 
-    local arena = arena_lib.get_arena_by_player(p_name)
-
-    if not arena_lib.is_player_spectating(p_name) then
-      player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
-    else
+    if arena_lib.is_player_spectating(p_name) then
       arena_lib.find_and_spectate_player(p_name)
+
+    else
+      local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
+      local arena = arena_lib.get_arena_by_player(p_name)
+
+      player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+
+      if mod_ref.on_respawn then
+        mod_ref.on_respawn(arena, p_name)
+      end
     end
 
     return true
