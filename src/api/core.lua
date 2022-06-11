@@ -91,7 +91,9 @@ function arena_lib.register_minigame(mod, def)
   load_settings(mod)
 
   --default parameters
-  mod_ref.prefix = "[Arena_lib] "
+  mod_ref.name = def.name or mod
+  mod_ref.prefix = "[" .. mod_ref.name .. "] "
+  mod_ref.icon = def.icon
   mod_ref.teams = {-1}
   mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
