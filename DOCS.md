@@ -52,7 +52,7 @@ arena_lib.register_minigame("yourmod", {parameter1, parameter2 etc})
 The second field, on the contrary, is a table of optional parameters: they define the very features of your minigame. They are:
 * `name`: (string) the name of your minigame. If not specified, it takes the name used to register the minigame
 * `prefix`: (string) what's going to appear in most of the lines printed by your mod. Default is `[<mg name>] `, where `<mg name>` is the name of your minigame
-* `icon`: (string) optional icon to represent your minigame. Currently unused by default, it comes in handy for external mods
+* `icon`: (string) optional icon to represent your minigame. Currently unused by default (`nil`), it comes in handy for external mods
 * `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
 * `teams_color_overlay`: (table) [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires `teams`. Default is `nil`
 * `is_team_chat_default`: (bool) whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
