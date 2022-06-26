@@ -119,6 +119,10 @@ function arena_lib.join_queue(mod, arena, p_name)
     if not mod_ref.on_prejoin_queue(arena, p_name) then return end
   end
 
+  for _, callback in ipairs(arena_lib.registered_on_prejoin_queue) do
+    if not callback(mod_ref, arena, p_name) then return end
+  end
+
   local p_team_ID
 
   -- determino eventuale squadra giocatore
@@ -164,6 +168,7 @@ function arena_lib.join_queue(mod, arena, p_name)
   end
 
   local arena_max_players = arena.max_players * #arena.teams
+  local has_queue_status_changed = false      -- per il richiamo globale, o non hanno modo di saperlo (dato che viene chiamato all'ultimo)
 
   -- se la coda non è partita...
   if not arena.in_queue and not arena.in_game then
@@ -175,6 +180,7 @@ function arena_lib.join_queue(mod, arena, p_name)
       local timer = mod_ref.settings.queue_waiting_time
 
       arena.in_queue = true
+      has_queue_status_changed = true
       active_queues[mod][arena_name] = timer
       countdown(mod, arena)
 
@@ -192,8 +198,13 @@ function arena_lib.join_queue(mod, arena, p_name)
     end
   end
 
+  -- richiami eventuali
   if mod_ref.on_join_queue then
     mod_ref.on_join_queue(arena, p_name)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_join_queue) do
+    callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
   arena_lib.update_sign(arena)
@@ -233,6 +244,8 @@ function arena_lib.remove_player_from_queue(p_name)
     players_to_remove[p_name] = true
   end
 
+  local arena_name = arena.name
+
   for pl_name, _ in pairs(players_to_remove) do
     players_in_queue[pl_name] = nil
     arena.players_amount = arena.players_amount - 1
@@ -244,10 +257,11 @@ function arena_lib.remove_player_from_queue(p_name)
     arena.players_and_spectators[pl_name] = nil
 
     arena_lib.HUD_hide("all", pl_name)
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena.name .. " < " .. pl_name))
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena_name .. " < " .. pl_name))
   end
 
   local players_required = arena_lib.get_players_amount_left_to_start_queue(arena)
+  local has_queue_status_changed = false      -- per il richiamo globale, o non hanno modo di saperlo (dato che viene chiamato all'ultimo)
 
   -- se l'arena era in coda e ora ci son troppi pochi giocatori, annullo la coda
   if arena.in_queue and players_required > 0 then
@@ -255,6 +269,8 @@ function arena_lib.remove_player_from_queue(p_name)
     local arena_max_players = arena.max_players * #arena.teams
 
     arena.in_queue = false
+    has_queue_status_changed = true
+    active_queues[mod][arena_name] = nil
 
     arena_lib.HUD_hide("broadcast", arena)
     arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("Waiting for more players...")) .. " (" .. players_required .. ")")
@@ -266,12 +282,17 @@ function arena_lib.remove_player_from_queue(p_name)
 
   -- idem se è rimasta in coda
   else
-    local seconds = active_queues[mod][arena.name]
+    local seconds = active_queues[mod][arena_name]
     arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", seconds)))
   end
 
+  -- richiami eventuali
   if mod_ref.on_leave_queue then
     mod_ref.on_leave_queue(arena, p_name)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_leave_queue) do
+    callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
   arena_lib.update_sign(arena)

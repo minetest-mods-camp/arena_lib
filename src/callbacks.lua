@@ -1,3 +1,38 @@
+-- I had no idea how to do it, so this is how Minetest handles global callbacks :D
+local function make_registration()
+  local t = {}
+  local registerfunc = function(func)
+    t[#t+1] = func
+  end
+  return t, registerfunc
+end
+
+
+
+----------------------------------------------
+--------------------GLOBAL--------------------
+----------------------------------------------
+
+arena_lib.registered_on_enable, arena_lib.register_on_enable = make_registration()
+arena_lib.registered_on_disable, arena_lib.register_on_disable = make_registration()
+arena_lib.registered_on_prejoin_queue, arena_lib.register_on_prejoin_queue = make_registration()
+arena_lib.registered_on_join_queue, arena_lib.register_on_join_queue = make_registration()
+arena_lib.registered_on_leave_queue, arena_lib.register_on_leave_queue = make_registration()
+arena_lib.registered_on_load, arena_lib.register_on_load = make_registration()
+arena_lib.registered_on_start, arena_lib.register_on_start = make_registration()
+arena_lib.registered_on_celebration, arena_lib.register_on_celebration = make_registration()
+arena_lib.registered_on_end, arena_lib.register_on_end = make_registration()
+arena_lib.registered_on_join, arena_lib.register_on_join = make_registration()
+arena_lib.registered_on_quit, arena_lib.register_on_quit = make_registration()
+
+
+
+
+
+----------------------------------------------
+-----------------PER MINIGAME-----------------
+----------------------------------------------
+
 -- Arena management
 
 function arena_lib.on_enable(mod, func)
@@ -103,12 +138,6 @@ end
 
 
 
-function arena_lib.on_kick(mod, func)
-  arena_lib.mods[mod].on_kick = func
-end
-
-
-
 function arena_lib.on_prequit(mod, func)
   arena_lib.mods[mod].on_prequit = func
 end
@@ -117,6 +146,18 @@ end
 
 function arena_lib.on_quit(mod, func)
   arena_lib.mods[mod].on_quit = func
+end
+
+
+
+
+
+----------------------------------------------
+------------------DEPRECATED------------------
+----------------------------------------------
+
+function arena_lib.on_kick(mod, func)
+  arena_lib.mods[mod].on_kick = func
 end
 
 

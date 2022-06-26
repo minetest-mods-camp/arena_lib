@@ -98,6 +98,10 @@ function arena_lib.load_arena(mod, arena_ID)
     mod_ref.on_load(arena)
   end
 
+  for _, callback in ipairs(arena_lib.registered_on_load) do
+    callback(mod_ref, arena)
+  end
+
   -- avvio la partita dopo tot secondi
   minetest.after(mod_ref.load_time, function()
     arena_lib.start_arena(mod_ref, arena)
@@ -126,6 +130,10 @@ function arena_lib.start_arena(mod_ref, arena)
   -- eventuale codice aggiuntivo
   if mod_ref.on_start then
     mod_ref.on_start(arena)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_start) do
+    callback(mod_ref, arena)
   end
 
 end
@@ -173,6 +181,10 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
   -- eventuale codice aggiuntivo
   if mod_ref.on_join then
     mod_ref.on_join(p_name, arena, as_spectator)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_join) do
+    callback(mod_ref, arena, p_name, as_spectator)
   end
 end
 
@@ -237,6 +249,10 @@ function arena_lib.load_celebration(mod, arena, winners)
   -- eventuale codice aggiuntivo
   if mod_ref.on_celebration then
     mod_ref.on_celebration(arena, winners)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_celebration) do
+    callback(mod_ref, arena, winners)
   end
 
   -- l'arena finisce dopo tot secondi
@@ -318,6 +334,10 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
   -- eventuale codice aggiuntivo
   if mod_ref.on_end then
     mod_ref.on_end(arena, players, winners, spectators, is_forced)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_end) do
+    callback(mod_ref, arena, players, winners, spectators, is_forced)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
@@ -874,6 +894,7 @@ function eliminate_player(mod_ref, arena, p_name, executioner)
 end
 
 
+
 function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, is_spectator)
 
   local msg_color = reason < 3 and "#f16a54" or "#d69298"
@@ -919,6 +940,10 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
   if mod_ref.on_quit then
     mod_ref.on_quit(arena, p_name, is_spectator, reason)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_quit) do
+    callback(mod_ref, arena, p_name, is_spectator, reason)
   end
 end
 

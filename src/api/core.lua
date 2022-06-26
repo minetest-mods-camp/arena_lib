@@ -966,6 +966,11 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
     if not mod_ref.on_enable(arena, sender) then return end
   end
 
+  for _, callback in ipairs(arena_lib.registered_on_enable) do
+    if not callback(mod_ref, arena, sender) then return end
+  end
+
+
   -- se sono nell'editor, vengo buttato fuori
   if arena_lib.is_player_in_edit_mode(sender) then
     arena_lib.quit_editor(minetest.get_player_by_name(sender))
@@ -1002,6 +1007,10 @@ function arena_lib.disable_arena(sender, mod, arena_name)
   -- eventuali controlli personalizzati
   if mod_ref.on_disable then
     if not mod_ref.on_disable(arena, sender) then return end
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_disable) do
+    if not callback(mod_ref, arena, sender) then return end
   end
 
   -- se c'è gente rimasta è in coda: annullo la coda e li avviso della disabilitazione

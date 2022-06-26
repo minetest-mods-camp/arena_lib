@@ -7,6 +7,8 @@
 	* [1.3 Commands](#13-commands)
 		* [1.3.1 Admins only](#131-admins-only)
 	* [1.4 Callbacks](#14-callbacks)
+		* [1.4.1 Minigame callbacks](#141-minigame-callbacks)
+		* [1.4.2 Global callbacks](#142-global-callbacks)
 	* [1.5 Additional properties](#15-additional-properties)
 		* [1.5.1 Arena properties](#151-arena-properties)
 			* [1.5.1.1 Updating non temporary properties via code](#1511-updating-non-temporary-properties-via-code)
@@ -115,7 +117,9 @@ A couple more are available for players having the `arenalib_admin` privilege:
 Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 1.4 Callbacks
-To customise your mod even more, there are a few empty callbacks you can use. They are:
+Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
+
+#### 1.4.1 Minigame callbacks
 * `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
 * `arena_lib.on_disable(mod, function(arena, p_name)`: run more checks before disabling an arena. Must return `true` or the arena won't be disabled
 * `arena_lib.on_prejoin_queue(mod, function(arena, p_name)`: run more checks when entering a queue. Must return `true` or the player won't be added
@@ -152,6 +156,34 @@ arena_lib.on_load("mymod", function(arena)
     pl_name:get_inventory():set_stack("main", 1, item)
   end
 
+end)
+```
+
+#### 1.4.2 Global callbacks
+Global callbacks act in the same way of minigame callbacks with the same name. Keep in mind that not every minigame callback has a global counterpart.
+* `arena_lib.register_on_enable(function(mod_ref, arena, p_name))`
+* `arena_lib.register_on_disable(function(mod_ref, arena, p_name))`
+* `arena_lib.register_on_prejoin_queue(function(mod_ref, arena, p_name))`
+* `arena_lib.register_on_join_queue(function(mod_ref, arena, p_name, has_queue_status_changed))`: `has_queue_status_changed` is a boolean, returning true when the arena goes from in queue -> not in queue, and viceversa
+* `arena_lib.register_on_leave_queue(function(mod_ref, arena, p_name, has_queue_status_changed))`: check the previous callback for `has_queue_status_changed`
+* `arena_lib.register_on_load(function(mod_ref, arena))`
+* `arena_lib.register_on_start(function(mod_ref, arena))`
+* `arena_lib.register_on_join(function(mod_ref, arena, p_name, as_spectator))`
+* `arena_lib.register_on_celebration(function(mod_ref, arena, winners))`
+* `arena_lib.register_on_end(function(mod_ref, arena, players, winners, spectators, is_forced))`
+* `arena_lib.register_on_quit(function(mod_ref, arena, p_name, is_spectator, reason))`
+
+Let's say we want to stop people to enter minigames when there is an event on our server. We can simply do:
+
+```lua
+arena_lib.register_on_prejoin_queue(function(mod_ref, arena, p_name)
+
+  if myservermod.is_event_active() then
+	minetest.chat_send_player(p_name, "There is a special event in progress, minigames will be back once it ends!")
+	return
+  end
+  
+  return true
 end)
 ```
 
