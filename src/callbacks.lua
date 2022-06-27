@@ -23,6 +23,7 @@ arena_lib.registered_on_start, arena_lib.register_on_start = make_registration()
 arena_lib.registered_on_celebration, arena_lib.register_on_celebration = make_registration()
 arena_lib.registered_on_end, arena_lib.register_on_end = make_registration()
 arena_lib.registered_on_join, arena_lib.register_on_join = make_registration()
+arena_lib.registered_on_eliminate, arena_lib.register_on_eliminate = make_registration()
 arena_lib.registered_on_quit, arena_lib.register_on_quit = make_registration()
 
 

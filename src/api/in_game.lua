@@ -891,6 +891,10 @@ function eliminate_player(mod_ref, arena, p_name, executioner)
   if mod_ref.on_eliminate then
     mod_ref.on_eliminate(arena, p_name)
   end
+
+  for _, callback in ipairs(arena_lib.registered_on_eliminate) do
+    callback(mod_ref, arena, p_name)
+  end
 end
 
 

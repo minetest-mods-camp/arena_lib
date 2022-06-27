@@ -171,6 +171,7 @@ Global callbacks act in the same way of minigame callbacks with the same name. K
 * `arena_lib.register_on_join(function(mod_ref, arena, p_name, as_spectator))`
 * `arena_lib.register_on_celebration(function(mod_ref, arena, winners))`
 * `arena_lib.register_on_end(function(mod_ref, arena, players, winners, spectators, is_forced))`
+* `arena_lib.register_on_eliminate(function(mod_ref, arena, p_name))`
 * `arena_lib.register_on_quit(function(mod_ref, arena, p_name, is_spectator, reason))`
 
 Let's say we want to stop people to enter minigames when there is an event on our server. We can simply do:
