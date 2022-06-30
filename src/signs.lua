@@ -58,7 +58,7 @@ signs_lib.register_sign("arena_lib:sign", {
     if not arena then return end -- nel caso qualche cartello dovesse impallarsi, si può rompere senza far crashare
 
 		-- se il cartello è stato spostato tipo con WorldEdit, lo aggiorno alla nuova posizione (e se c'è una partita in corso, la interrompo)
-	  if minetest.serialize(arena.sign) ~= minetest.serialize(pos) then
+	  if not vector.equals(arena.sign, pos) then
 	    local arena_name = arena.name
 	    arena_lib.force_arena_ending(mod, arena, "ARENA_LIB")
 	    arena_lib.disable_arena("", mod, arena_name)
