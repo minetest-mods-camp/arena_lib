@@ -420,8 +420,6 @@ end
 
 
 function countdown(mod, arena)
-  if not arena.in_queue or not active_queues[mod][arena.name] then return end
-
   local seconds = active_queues[mod][arena.name]
 
   -- dai 5 secondi in giù il messaggio è stampato su broadcast e genero le squadre
@@ -435,6 +433,11 @@ function countdown(mod, arena)
   end
 
   minetest.after(1, function()
+    -- i secondi potrebbero esser stati alterati dall'esterno, tipo se la coda si è riempita
+    seconds = active_queues[mod][arena.name]
+
+    if not arena.in_queue or not seconds then return end
+
     active_queues[mod][arena.name] = seconds -1
     countdown(mod, arena)
   end)
