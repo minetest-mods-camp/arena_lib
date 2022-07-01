@@ -247,6 +247,9 @@ function arena_lib.remove_player_from_queue(p_name)
   local arena_name = arena.name
 
   for pl_name, _ in pairs(players_to_remove) do
+    arena_lib.HUD_hide("all", pl_name)
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena_name .. " < " .. pl_name))
+
     players_in_queue[pl_name] = nil
     arena.players_amount = arena.players_amount - 1
     if arena.teams_enabled then
@@ -255,9 +258,6 @@ function arena_lib.remove_player_from_queue(p_name)
     end
     arena.players[pl_name] = nil
     arena.players_and_spectators[pl_name] = nil
-
-    arena_lib.HUD_hide("all", pl_name)
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", arena_name .. " < " .. pl_name))
   end
 
   local players_required = arena_lib.get_players_amount_left_to_start_queue(arena)
