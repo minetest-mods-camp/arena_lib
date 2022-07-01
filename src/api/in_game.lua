@@ -915,7 +915,7 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
     -- DEPRECATED: remove in 6.0
     if mod_ref.on_disconnect then
-      minetest.log("warning", "[ARENA_LIB] on_kick is deprecated. Please use on_quit with reason `0` instead")
+      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_disconnect is deprecated. Please use on_quit with reason `0` instead")
       mod_ref.on_disconnect(arena, p_name, is_spectator)
     end
 
@@ -933,7 +933,7 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
     -- DEPRECATED: remove in 6.0
     if mod_ref.on_kick then
-      minetest.log("warning", "[ARENA_LIB] on_kick is deprecated. Please use on_quit with reason `2` instead")
+      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_kick is deprecated. Please use on_quit with reason `2` instead")
       mod_ref.on_kick(arena, p_name, is_spectator)
     end
 
