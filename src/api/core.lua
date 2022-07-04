@@ -684,7 +684,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   -- se c'è già uno spawner in quel punto, annullo
   for id, spawn in pairs(arena.spawn_points) do
-    if minetest.serialize(pos) == minetest.serialize(spawn.pos) then
+    if vector.equals(pos, spawn.pos) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
       return end
   end
