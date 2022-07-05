@@ -92,12 +92,10 @@ minetest.register_tool("arena_lib:spectate_join", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      minetest.after(0, function()                                              -- after sennò non rimuove quest'oggetto
-        local p_name = user:get_player_name()
-        local mod = arena_lib.get_mod_by_player(p_name)
-        local arena_ID = arena_lib.get_arenaID_by_player(p_name)
-        arena_lib.join_arena(mod, p_name, arena_ID)
-      end)
+      local p_name = user:get_player_name()
+      local mod = arena_lib.get_mod_by_player(p_name)
+      local arena_ID = arena_lib.get_arenaID_by_player(p_name)
+      arena_lib.join_arena(mod, p_name, arena_ID)
     end
 
 })
@@ -113,9 +111,7 @@ minetest.register_tool("arena_lib:spectate_quit", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      minetest.after(0, function()                                              -- after sennò non rimuove quest'oggetto
-        arena_lib.remove_player_from_arena(user:get_player_name(), 3)
-      end)
+      arena_lib.remove_player_from_arena(user:get_player_name(), 3)
     end
 
 })

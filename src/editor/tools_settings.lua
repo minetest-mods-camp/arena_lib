@@ -84,9 +84,7 @@ minetest.register_craftitem("arena_lib:timer", {
 
       arena_lib.set_timer(placer:get_player_name(), mod, arena_name, -1, true)
 
-      minetest.after(0, function()
-        inv:set_stack("main", 1, "arena_lib:timer_off")
-      end)
+      inv:set_stack("main", 1, "arena_lib:timer_off")
     end
 
 })

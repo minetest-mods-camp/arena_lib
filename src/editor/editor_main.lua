@@ -45,11 +45,9 @@ function arena_lib.register_editor_section(mod, def)
 
         local inv = user:get_inventory()
 
-        minetest.after(0, function()
-          inv:set_list("main", item_list)
-          inv:set_stack("main", 7, "arena_lib:editor_return")
-          inv:set_stack("main", 8, "arena_lib:editor_quit")
-        end)
+        inv:set_list("main", item_list)
+        inv:set_stack("main", 7, "arena_lib:editor_return")
+        inv:set_stack("main", 8, "arena_lib:editor_quit")
       end
   })
 end
@@ -177,11 +175,7 @@ function arena_lib.quit_editor(player)
   player:override_day_night_ratio(lighting.light)
 
   -- restituisco l'inventario
-  minetest.after(0, function()
-    if not minetest.get_player_by_name(p_name) then return end
-    player:get_inventory():set_list("main", inv)
-  end)
-
+  player:get_inventory():set_list("main", inv)
 end
 
 

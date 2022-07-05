@@ -23,12 +23,8 @@ minetest.register_tool("arena_lib:editor_players", {
       user:get_meta():set_int("arena_lib_editor.players_number", 2)
 
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #3 to change)", 2))
-
-      minetest.after(0, function()
-        arena_lib.give_players_tools(user:get_inventory(), mod, arena)
-      end)
+      arena_lib.give_players_tools(user:get_inventory(), mod, arena)
     end
-
 })
 
 
@@ -47,12 +43,8 @@ minetest.register_tool("arena_lib:editor_spawners", {
       user:get_meta():set_int("arena_lib_editor.team_ID", 1)
 
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Spawners | sel. ID: @1 (right click slot #2 to change)", 1))
-
-      minetest.after(0, function()
-        arena_lib.give_spawners_tools(user)
-      end)
+      arena_lib.give_spawners_tools(user)
     end
-
 })
 
 
@@ -66,14 +58,9 @@ minetest.register_tool("arena_lib:editor_signs", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("One sign per arena"))
-
-      minetest.after(0, function()
-        arena_lib.give_signs_tools(user)
-      end)
+      arena_lib.give_signs_tools(user)
     end
-
 })
 
 
@@ -87,14 +74,9 @@ minetest.register_tool("arena_lib:editor_customise", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Pimp my arena"))
-
-      minetest.after(0, function()
-        arena_lib.give_customise_tools(user)
-      end)
+      arena_lib.give_customise_tools(user)
     end
-
 })
 
 
@@ -111,9 +93,7 @@ minetest.register_tool("arena_lib:editor_settings", {
 
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Arena settings"))
 
-      minetest.after(0, function()
-        arena_lib.give_settings_tools(user)
-      end)
+      arena_lib.give_settings_tools(user)
     end
 
 })
@@ -149,9 +129,7 @@ minetest.register_tool("arena_lib:editor_return", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      minetest.after(0, function()
-        arena_lib.show_main_editor(user)
-      end)
+      arena_lib.show_main_editor(user)
     end
 
 })

@@ -33,10 +33,8 @@ minetest.register_node("arena_lib:players_min", {
 
       if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, players_amount, nil, true) then return end
 
-      -- aggiorno lo stack se il cambio è andato a buon fine
-      minetest.after(0, function()
-        user:set_wielded_item("arena_lib:players_min " .. players_amount)
-      end)
+      -- aggiorno la quantità se il cambio è andato a buon fine
+      user:set_wielded_item("arena_lib:players_min " .. players_amount)
     end
 })
 
@@ -59,10 +57,8 @@ minetest.register_node("arena_lib:players_max", {
 
       if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, players_amount, true) then return end
 
-      -- aggiorno lo stack se il cambio è andato a buon fine
-      minetest.after(0, function()
-        user:set_wielded_item("arena_lib:players_max " .. players_amount)
-      end)
+      -- aggiorno la quantità se il cambio è andato a buon fine
+      user:set_wielded_item("arena_lib:players_max " .. players_amount)
     end
 })
 
@@ -105,9 +101,7 @@ minetest.register_tool("arena_lib:players_teams_on", {
 
       arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 0, true)
 
-      minetest.after(0, function()
-        user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")
-      end)
+      user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_off")
     end
 })
 
@@ -128,9 +122,7 @@ minetest.register_tool("arena_lib:players_teams_off", {
 
       arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1, true)
 
-      minetest.after(0, function()
-        user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")
-      end)
+      user:get_inventory():set_stack("main", 5, "arena_lib:players_teams_on")
     end
 })
 
