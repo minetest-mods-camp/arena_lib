@@ -2,12 +2,11 @@ local S = minetest.get_translator("arena_lib")
 
 local function initialise_queue_container() end
 local function assign_team() end
-local function countdown() end
 local function go_to_arena() end
 local function queue_format() end
 
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local active_queues = {}              -- KEY: [mod] arena_name, VALUE: (int) current timer
+local active_queues = {}              -- KEY: [mod] arena_name, VALUE: {(table) arena, (int) time_left, (table) was_second_run}
 
 -- inizializzo il contenitore delle code una volta che tutti i minigiochi sono stati caricati
 minetest.after(0.1, function()
@@ -15,7 +14,43 @@ minetest.after(0.1, function()
 end)
 
 ----------------------------------------
+-- GESTIONE CONTO ALLA ROVESCIA SU GLOBALSTEP
+--
+-- se usassi un normale `after`, all'entrare e uscire ripetutamente da una coda
+-- i giocatori riuscirebbero a impallarle, eseguendone due o più per la stessa
+-- arena. Nonostante ciò non vada a fondere il server, dimezza comunque i tempi
+-- d'attesa e riproduce il doppio dei suoni. Da qui il globalstep
+minetest.register_globalstep(function(dtime)
+  for mod, ar_name in pairs(active_queues) do
+    for _, info in pairs(ar_name) do
+      info.time_left = info.time_left - dtime
 
+      local arena = info.arena
+      local time_left = math.ceil(info.time_left)
+
+      -- per eseguire queste chiamate solo una volta al secondo, utilizzo un booleano
+      if info.was_second_run[time_left] then return end
+
+      if time_left == 0 then
+        go_to_arena(mod, arena)
+      elseif time_left <= 5 then
+        arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", time_left), nil, "arenalib_countdown")
+        arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("Get ready!")))
+      else
+        arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", time_left)))
+      end
+
+      info.was_second_run[time_left] = true
+    end
+  end
+end)
+
+----------------------------------------
+
+
+----------------------------------------------
+--------------------CORPO---------------------
+----------------------------------------------
 
 function arena_lib.join_queue(mod, arena, p_name)
   -- se si è nell'editor
@@ -181,8 +216,7 @@ function arena_lib.join_queue(mod, arena, p_name)
 
       arena.in_queue = true
       has_queue_status_changed = true
-      active_queues[mod][arena_name] = timer
-      countdown(mod, arena)
+      active_queues[mod][arena_name] = { arena = arena, time_left = timer, was_second_run = {} }
 
     -- sennò aggiorno semplicemente la HUD
     else
@@ -193,8 +227,8 @@ function arena_lib.join_queue(mod, arena, p_name)
 
   -- se raggiungo i giocatori massimi e la partita non è iniziata, accorcio eventualmente la durata
   if arena.players_amount == arena_max_players and arena.in_queue then
-    if active_queues[mod][arena_name] > 5 then
-      active_queues[mod][arena_name] = 5
+    if active_queues[mod][arena_name].time_left > 5 then
+      active_queues[mod][arena_name].time_left = 5
     end
   end
 
@@ -415,32 +449,6 @@ function assign_team(mod_ref, arena, p_name)
   end
 
   return assigned_team_ID
-end
-
-
-
-function countdown(mod, arena)
-  local seconds = active_queues[mod][arena.name]
-
-  -- dai 5 secondi in giù il messaggio è stampato su broadcast e genero le squadre
-  if seconds == 0 then
-    go_to_arena(mod, arena)
-  elseif seconds <= 5 then
-    arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", seconds), nil, "arenalib_countdown")
-    arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("Get ready!")))
-  else
-    arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", seconds)))
-  end
-
-  minetest.after(1, function()
-    -- i secondi potrebbero esser stati alterati dall'esterno, tipo se la coda si è riempita
-    seconds = active_queues[mod][arena.name]
-
-    if not arena.in_queue or not seconds then return end
-
-    active_queues[mod][arena.name] = seconds -1
-    countdown(mod, arena)
-  end)
 end
 
 
