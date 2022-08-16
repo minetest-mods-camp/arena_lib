@@ -316,7 +316,7 @@ function arena_lib.remove_player_from_queue(p_name)
 
   -- idem se è rimasta in coda
   else
-    local seconds = active_queues[mod][arena_name]
+    local seconds = math.ceil(active_queues[mod][arena_name].time_left)
     arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", seconds)))
   end
 
