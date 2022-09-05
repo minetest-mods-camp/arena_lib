@@ -148,19 +148,30 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
 
   -- se prova a entrare come spettatore
   if as_spectator then
-    -- aggiungo temporaneamente, sennò non trova l'arena quando va a cercare lo spettatore
-    players_in_game[p_name] = {minigame = mod, arenaID = arena_ID}
 
-    -- se passa i controlli, lo inserisco e notifico i giocatori
-    if arena_lib.enter_spectate_mode(p_name, arena) then
-      operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
-      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
+    -- se non supporta la spettatore
+    if not arena_lib.mods[mod].spectate_mode then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Spectate mode not supported!")))
+      return end
 
-    -- sennò annullo
-    else
-      players_in_game[p_name] = nil
-      return
-    end
+    -- se l'arena non è abilitata
+    if not arena.enabled then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
+      return end
+
+    -- se non è in corso
+    if not arena.in_game then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
+      return end
+
+    -- se si è attaccati a qualcosa
+    if minetest.get_player_by_name(p_name):get_attach() then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
+      return end
+
+    operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
+    arena_lib.enter_spectate_mode(p_name, arena)
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
 
   -- se entra come giocatore
   else
@@ -171,11 +182,9 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)   -- sennò entra normalmente
     end
 
-    local player = minetest.get_player_by_name(p_name)
-
     -- notifico e teletrasporto
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c6f154", " >>> " .. p_name))
-    player:set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+    minetest.get_player_by_name(p_name):set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
   end
 
   -- eventuale codice aggiuntivo
@@ -577,7 +586,7 @@ end
 
 
 
-function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
+function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, as_spectator)
 
   players_temp_storage[p_name] = {}
 
@@ -603,8 +612,6 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     if lighting.light then
       player:override_day_night_ratio(lighting.light)
     end
-
-    --TODO MT 5.6: set_lighting (shadows)
   end
 
   -- cambio eventuale volta celeste
@@ -662,7 +669,7 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
     players_temp_storage[p_name].hotbar_selected_image = player:hud_get_hotbar_selected_image()
   end
 
-  if not arena_lib.is_player_spectating(p_name) then
+  if not as_spectator then
     operations_before_playing_arena(mod_ref, arena, p_name)
   end
 

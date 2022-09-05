@@ -76,32 +76,10 @@ end
 
 function arena_lib.enter_spectate_mode(p_name, arena)
 
-  local mod = arena_lib.get_mod_by_player(p_name)
-
-  -- se non supporta la spettatore
-  if not arena_lib.mods[mod].spectate_mode then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Spectate mode not supported!")))
-    return end
-
-  -- se l'arena non è abilitata
-  if not arena.enabled then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
-    return end
-
-  -- se non è in corso
-  if not arena.in_game then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
-    return end
-
-  local player = minetest.get_player_by_name(p_name)
-
-  -- se si è attaccati a qualcosa
-  if player:get_attach() then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
-    return end
-
-  local arena_ID = arena_lib.get_arenaID_by_player(p_name)
+  local mod      = arena_lib.get_mod_by_player(p_name)
+  local arena_ID = arena_lib.get_arenaID_by_player(p_name)      -- TODO 6.0: use arena.ID
   local team_ID  = #arena.teams > 1 and 1 or nil
+  local player   = minetest.get_player_by_name(p_name)
   local hand     = player:get_inventory():get_list("hand")
 
   players_in_spectate_mode[p_name] = { minigame = mod, arenaID = arena_ID, teamID = team_ID, hand = hand}
