@@ -507,7 +507,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   arena.max_players = max_players or arena.max_players
 
   -- se ha parametri assurdi, annullo
-  if arena.min_players > arena.max_players or arena.min_players == 0 or arena.max_players < 2 then
+  if arena.min_players > arena.max_players or arena.min_players <= 0 then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     arena.min_players = old_min_players
     arena.max_players = old_max_players
