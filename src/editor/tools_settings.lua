@@ -26,7 +26,7 @@ minetest.register_tool("arena_lib:settings_rename_author", {
 
     description = S("Arena name and author"),
     inventory_image = "arenalib_tool_settings_nameauthor.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -46,7 +46,7 @@ minetest.register_tool("arena_lib:settings_properties", {
 
     description = S("Arena properties"),
     inventory_image = "arenalib_tool_settings_properties.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -67,7 +67,7 @@ minetest.register_craftitem("arena_lib:timer", {
 
     description = S("Timer: on"),
     inventory_image = "arenalib_tool_settings_timer.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -95,7 +95,7 @@ minetest.register_tool("arena_lib:settings_delete", {
 
     description = S("Delete arena"),
     inventory_image = "arenalib_tool_settings_delete.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 

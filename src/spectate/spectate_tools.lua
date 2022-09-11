@@ -6,7 +6,7 @@ minetest.register_tool("arena_lib:spectate_changeplayer", {
 
     description = S("Change player"),
     inventory_image = "arenalib_spectate_changeplayer.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -22,7 +22,7 @@ minetest.register_tool("arena_lib:spectate_changeteam", {
 
     description = S("Change team"),
     inventory_image = "arenalib_spectate_changeteam.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -45,7 +45,7 @@ minetest.register_tool("arena_lib:spectate_changeentity", {
 
     description = S("Change entity"),
     inventory_image = "arenalib_spectate_changeentity.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -66,7 +66,7 @@ minetest.register_tool("arena_lib:spectate_changearea", {
 
     description = S("Change area"),
     inventory_image = "arenalib_spectate_changearea.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -87,7 +87,7 @@ minetest.register_tool("arena_lib:spectate_join", {
 
     description = S("Enter the match"),
     inventory_image = "arenalib_editor_return.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -106,7 +106,7 @@ minetest.register_tool("arena_lib:spectate_quit", {
 
     description = S("Leave"),
     inventory_image = "arenalib_editor_quit.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 

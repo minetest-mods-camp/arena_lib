@@ -30,7 +30,7 @@ minetest.register_tool("arena_lib:spawner_add", {
 
   description = S("Add spawner"),
   inventory_image = "arenalib_tool_spawner_add.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 
@@ -50,7 +50,7 @@ minetest.register_tool("arena_lib:spawner_remove", {
 
   description = S("Remove spawner"),
   inventory_image = "arenalib_tool_spawner_remove.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
@@ -77,7 +77,7 @@ minetest.register_tool("arena_lib:spawner_team_add", {
 
   description = S("Add team spawner"),
   inventory_image = "arenalib_tool_spawner_team_add.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 
@@ -98,7 +98,7 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
 
   description = S("Remove team spawner"),
   inventory_image = "arenalib_tool_spawner_team_remove.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 
@@ -125,7 +125,7 @@ minetest.register_tool("arena_lib:spawner_team_switch", {
 
   description = S("Switch team"),
   inventory_image = "arenalib_tool_spawner_team_switch.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 
@@ -158,7 +158,7 @@ minetest.register_tool("arena_lib:spawner_deleteall", {
 
   description = S("Delete all spawners"),
   inventory_image = "arenalib_tool_spawner_deleteall.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 
@@ -179,7 +179,7 @@ minetest.register_tool("arena_lib:spawner_team_deleteall", {
 
   description = S("Delete all spawners of the team"),
   inventory_image = "arenalib_tool_spawner_team_deleteall.png",
-  groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+  groups = {not_in_creative_inventory = 1},
   on_place = function() end,
   on_drop = function() end,
 

@@ -21,7 +21,7 @@ minetest.register_tool("arena_lib:customise_sky", {
 
     description = S("Celestial vault"),
     inventory_image = "arenalib_customise_sky.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 

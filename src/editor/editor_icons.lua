@@ -6,7 +6,7 @@ minetest.register_tool("arena_lib:editor_players", {
 
     description = S("Players"),
     inventory_image = "arenalib_editor_players.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -33,7 +33,7 @@ minetest.register_tool("arena_lib:editor_spawners", {
 
     description = S("Spawners"),
     inventory_image = "arenalib_editor_spawners.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -53,7 +53,7 @@ minetest.register_tool("arena_lib:editor_signs", {
 
     description = S("Signs"),
     inventory_image = "arenalib_editor_signs.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -69,7 +69,7 @@ minetest.register_tool("arena_lib:editor_customise", {
 
     description = S("Customise"),
     inventory_image = "arenalib_editor_customise.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -85,7 +85,7 @@ minetest.register_tool("arena_lib:editor_settings", {
 
     description = S("Settings"),
     inventory_image = "arenalib_editor_settings.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -104,7 +104,7 @@ minetest.register_tool("arena_lib:editor_info", {
 
     description = S("Info"),
     inventory_image = "arenalib_editor_info.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -124,7 +124,7 @@ minetest.register_tool("arena_lib:editor_return", {
 
     description = S("Go back"),
     inventory_image = "arenalib_editor_return.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -140,7 +140,7 @@ minetest.register_tool("arena_lib:editor_enable", {
 
     description = S("Enable and leave"),
     inventory_image = "arenalib_editor_enable.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -160,7 +160,7 @@ minetest.register_tool("arena_lib:editor_quit", {
 
     description = S("Leave"),
     inventory_image = "arenalib_editor_quit.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 

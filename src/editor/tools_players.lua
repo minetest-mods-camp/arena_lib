@@ -16,12 +16,12 @@ local players_tools = {
 
 
 
-minetest.register_node("arena_lib:players_min", {
+minetest.register_tool("arena_lib:players_min", {
 
     description = S("Players required: "),
     inventory_image = "arenalib_tool_players_min.png",
     wield_image = "arenalib_tool_players_min.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -40,12 +40,12 @@ minetest.register_node("arena_lib:players_min", {
 
 
 
-minetest.register_node("arena_lib:players_max", {
+minetest.register_tool("arena_lib:players_max", {
 
     description = S("Players supported: "),
     inventory_image = "arenalib_tool_players_max.png",
     wield_image = "arenalib_tool_players_max.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -68,7 +68,7 @@ minetest.register_tool("arena_lib:players_change", {
 
     description = S("Change the current number"),
     inventory_image = "arenalib_tool_players_change.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
@@ -90,7 +90,7 @@ minetest.register_tool("arena_lib:players_teams_on", {
 
     description = S("Teams: on (click to toggle off)"),
     inventory_image = "arenalib_tool_players_teams_on.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
@@ -111,7 +111,7 @@ minetest.register_tool("arena_lib:players_teams_off", {
 
     description = S("Teams: off (click to toggle on)"),
     inventory_image = "arenalib_tool_players_teams_off.png",
-    groups = {not_in_creative_inventory = 1, oddly_breakable_by_hand = "2"},
+    groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
 
