@@ -619,7 +619,7 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     local celvault = arena.celestial_vault
 
     if celvault.sky then
-      players_temp_storage[p_name].celvault_sky = arena_lib.temp.get_sky(player)
+      players_temp_storage[p_name].celvault_sky = player:get_sky(true)
       player:set_sky(celvault.sky)
     end
 

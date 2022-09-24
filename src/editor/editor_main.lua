@@ -74,7 +74,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   local p_cvault = {}
 
   -- salvo le info
-  p_cvault.sky = arena_lib.temp.get_sky(player)
+  p_cvault.sky = player:get_sky(true)
   p_cvault.sun = player:get_sun()
   p_cvault.moon = player:get_moon()
   p_cvault.stars = player:get_stars()

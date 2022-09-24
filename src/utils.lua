@@ -44,17 +44,3 @@ end
 -------------ASPETTANDO MINETEST--------------
 ----------------------------------------------
 arena_lib.temp = {}
-
--- to remove in MT 5.6
-function arena_lib.temp.get_sky(player)
-  local get_sky = {player:get_sky()}
-  local p_sky = {}
-
-  p_sky.base_color = (type(get_sky[1]) ~= "table") and get_sky[1] or table.copy(get_sky[1])
-  p_sky.type = get_sky[2]
-  p_sky.sky_color = table.copy(player:get_sky_color())
-  p_sky.textures = table.copy(get_sky[3])
-  p_sky.clouds = get_sky[4]
-
-  return p_sky
-end
