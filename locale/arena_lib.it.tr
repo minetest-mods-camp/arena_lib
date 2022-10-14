@@ -208,6 +208,7 @@ Apply=Applica
 # editor/tools_lighting.lua
 Lighting=Illuminazione
 Global light=Luce globale
+Shadows=Ombre
 
 # editor/tools_players.lua
 Change the current number=Cambia il numero attuale
