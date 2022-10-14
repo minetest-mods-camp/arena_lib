@@ -207,7 +207,6 @@ Apply=
 # editor/tools_lighting.lua
 Lighting=
 Global light=
-Shadows=
 
 # editor/tools_players.lua
 Change the current number=

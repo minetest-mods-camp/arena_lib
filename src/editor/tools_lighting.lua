@@ -45,11 +45,10 @@ end
 function get_lighting_formspec(p_name)
 
   local light = (temp_light_settings[p_name].light or 0.5) * 100
-  --TODO MT 5.6: local shadows  = 0
 
   local formspec = {
     "formspec_version[4]",
-    "size[7,4.5]",
+    "size[7,2.5]",
     "bgcolor[;neither]",
     -- parametri vari
     "container[0.5,0.5]",
@@ -58,14 +57,9 @@ function get_lighting_formspec(p_name)
     "label[5.8,0.41;1]",
     "scrollbaroptions[max=100;smallstep=1;largestep=10;arrows=hide]",
     "scrollbar[0.4,0.3;5.2,0.2;;light;" .. light .. "]",
-    "label[0,1;" .. S("Shadows") .. "]",
-    "hypertext[-0.05,1.3;6,0.3;audio_info;<style size=12 font=mono color=#b7aca3>(" .. S("coming with MT 5.6") .. ")</style>]",
-    --[["label[0,1.41;0]",
-    "label[5.9,1.41;1]",
-    "scrollbar[0.4,1.3;5.2,0.2;;shadows;" .. shadows .. "]",]]
     "container_end[]",
-    "button[1.95,3.7;1.5,0.5;reset;" .. S("Reset") .."]",
-    "button[3.55,3.7;1.5,0.5;apply;" .. S("Apply") .."]",
+    "button[1.95,1.7;1.5,0.5;reset;" .. S("Reset") .."]",
+    "button[3.55,1.7;1.5,0.5;apply;" .. S("Apply") .."]",
   }
 
   return table.concat(formspec, "")

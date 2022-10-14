@@ -822,9 +822,6 @@ end
 
 
 
--- NOTE: è molto probabile che questa funzione verrà modificata con l'arrivo della 5.6,
--- dacché l'ho segnata come sperimentale (per esempio, arriverà set_lighting()
--- per modificare le ombre)
 function arena_lib.set_lighting(sender, mod, arena_name, light_table, in_editor)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
