@@ -13,7 +13,7 @@ local function deprecated_winning_team_celebration() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups}
+                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
 
 
 
@@ -710,6 +710,12 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
    })
   end
 
+  -- disabilito eventualmente l'inventario
+  if mod_ref.disable_inventory then
+    players_temp_storage[p_name].inventory_fs = player:get_inventory_formspec()
+    player:set_inventory_formspec("")
+  end
+
   -- cambio l'eventuale hotbar
   if mod_ref.hotbar then
     local hotbar = mod_ref.hotbar
@@ -795,6 +801,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     if celvault.clouds then
       player:set_clouds(players_temp_storage[p_name].celvault_clouds)
     end
+  end
+
+  -- riabilito eventualmente l'inventario
+  if mod_ref.disable_inventory then
+    player:set_inventory_formspec(players_temp_storage[p_name].inventory_fs)
   end
 
   -- svuoto eventualmente l'inventario e ripristino gli oggetti

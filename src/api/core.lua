@@ -108,6 +108,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.hotbar = nil
   mod_ref.join_while_in_progress = false
   mod_ref.spectate_mode = true
+  mod_ref.disable_inventory = false
   mod_ref.keep_inventory = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
@@ -182,6 +183,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.spectate_mode == false then
     mod_ref.spectate_mode = false
+  end
+
+  if def.disable_inventory == true then
+    mod_ref.disable_inventory = true
   end
 
   if def.keep_inventory == true then
