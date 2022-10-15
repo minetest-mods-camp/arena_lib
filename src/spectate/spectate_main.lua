@@ -4,7 +4,7 @@ local function override_hotbar() end
 local function set_spectator() end
 
 local players_in_spectate_mode = {}         -- KEY: player name, VALUE: {(string) minigame, (int) arenaID, (string) type, (string) spectating}
-local spectate_temp_storage = {}            -- KEY: player_name, VALUE: {(table) camera_offset}
+local spectate_temp_storage = {}            -- KEY: player_name, VALUE: {(table) camera_offset, (string) inventory_fs}
 local players_spectated = {}                -- KEY: player name, VALUE: {(string) spectator(s) = true}
 local entities_spectated = {}               -- KEY: [mod][arena_name][entity name], VALUE: {(string) spectator(s) = true}
 local areas_spectated = {}                  -- KEY: [mod][arena_name][area_name], VALUE: {(string) spectator(s) = true}
@@ -95,6 +95,7 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   if not arena.past_present_players_inside[p_name] then
     spectate_temp_storage[p_name] = {}
     spectate_temp_storage[p_name].camera_offset = {player:get_eye_offset()}
+    spectate_temp_storage[p_name].inventory_fs = player:get_inventory_formspec()
   end
 
   -- applicazione parametri vari
@@ -110,6 +111,7 @@ function arena_lib.enter_spectate_mode(p_name, arena)
 
   player:set_eye_offset({x = 0, y = -2, z = -25}, {x=0, y=0, z=0})
   player:set_nametag_attributes({color = {a = 0}})
+  player:set_inventory_formspec("")
 
   -- assegno un ID al giocatore per ruotare chi/cosa sta seguendo, in quanto gli
   -- elementi seguibili non dispongono di un ID per orientarsi nella loro navigazione
@@ -168,9 +170,8 @@ function arena_lib.leave_spectate_mode(p_name, to_join_match)
   -- se il giocatore non è mai entrato in partita, riassegno le proprietà salvate qui
   if not arena.past_present_players_inside[p_name] then
     player:set_eye_offset(spectate_temp_storage[p_name].camera_offset[1], spectate_temp_storage[p_name].camera_offset[2])
+    player:set_inventory_formspec(spectate_temp_storage[p_name].inventory_fs)
     spectate_temp_storage[p_name] = nil
-  else
-    player:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
   end
 
   player:set_detach()
