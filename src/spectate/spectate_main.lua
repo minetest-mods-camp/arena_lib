@@ -172,7 +172,9 @@ function arena_lib.leave_spectate_mode(p_name, to_join_match)
     player:set_eye_offset(spectate_temp_storage[p_name].camera_offset[1], spectate_temp_storage[p_name].camera_offset[2])
     player:set_inventory_formspec(spectate_temp_storage[p_name].inventory_fs)
     spectate_temp_storage[p_name] = nil
-  end
+  else
+    player:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0}) -- TODO: not a proper implementation, just a patch (if the server has a different default offset, it breaks:
+  end                                                       -- I should modify the in_game.lua file so to check whether the server has some custom offset)
 
   player:set_detach()
   player:set_properties(players_in_spectate_mode[p_name].properties)
