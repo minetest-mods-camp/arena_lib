@@ -91,12 +91,12 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   player:get_inventory():set_size("hand", 1)
   player:get_inventory():add_item("hand", "arena_lib:spectate_hand")
 
-  -- se il giocatore non è mai entrato in partita, lo salvo nello spazio di archiviazione temporaneo
-  if not arena.past_present_players_inside[p_name] then
-    spectate_temp_storage[p_name] = {}
-    spectate_temp_storage[p_name].camera_offset = {player:get_eye_offset()}
-    spectate_temp_storage[p_name].inventory_fs = player:get_inventory_formspec()
-  end
+  -- che siano entrati anche come giocatori o meno, non importa, in quanto operations_before_entering_arena
+  -- viene eseguita prima dell'entrata nella spettatore, e quindi questi parametri
+  -- sono già stati eventualmente salvati nell'archiviazione di arena_lib
+  spectate_temp_storage[p_name] = {}
+  spectate_temp_storage[p_name].camera_offset = {player:get_eye_offset()}
+  spectate_temp_storage[p_name].inventory_fs = player:get_inventory_formspec()
 
   -- applicazione parametri vari
   local current_properties = table.copy(player:get_properties())
@@ -167,14 +167,12 @@ function arena_lib.leave_spectate_mode(p_name, to_join_match)
     p_inv:set_size("hand", 0)
   end
 
-  -- se il giocatore non è mai entrato in partita, riassegno le proprietà salvate qui
-  if not arena.past_present_players_inside[p_name] then
-    player:set_eye_offset(spectate_temp_storage[p_name].camera_offset[1], spectate_temp_storage[p_name].camera_offset[2])
-    player:set_inventory_formspec(spectate_temp_storage[p_name].inventory_fs)
-    spectate_temp_storage[p_name] = nil
-  else
-    player:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0}) -- TODO: not a proper implementation, just a patch (if the server has a different default offset, it breaks:
-  end                                                       -- I should modify the in_game.lua file so to check whether the server has some custom offset)
+  -- che siano entrati anche come giocatori o meno, non importa, in quanto operations_before_leaving_arena
+  -- viene eseguita dopo l'uscita dalla spettatore, e quindi questi parametri
+  -- verranno eventualmente poi sovrascritti da quelli nell'archiviazione di arena_lib
+  player:set_eye_offset(spectate_temp_storage[p_name].camera_offset[1], spectate_temp_storage[p_name].camera_offset[2])
+  player:set_inventory_formspec(spectate_temp_storage[p_name].inventory_fs)
+  spectate_temp_storage[p_name] = nil
 
   player:set_detach()
   player:set_properties(players_in_spectate_mode[p_name].properties)
