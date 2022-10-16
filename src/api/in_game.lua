@@ -803,11 +803,6 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     end
   end
 
-  -- riabilito eventualmente l'inventario
-  if mod_ref.disable_inventory then
-    player:set_inventory_formspec(players_temp_storage[p_name].inventory_fs)
-  end
-
   -- svuoto eventualmente l'inventario e ripristino gli oggetti
   if not mod_ref.keep_inventory then
     player:get_inventory():set_list("main", {})
@@ -864,6 +859,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     -- ripristino eventuale fov
     if mod_ref.fov then
       player:set_fov(players_temp_storage[p_name].fov)
+    end
+
+    -- riabilito eventualmente l'inventario
+    if mod_ref.disable_inventory then
+      player:set_inventory_formspec(players_temp_storage[p_name].inventory_fs)
     end
 
     -- ripristino eventuale camera
