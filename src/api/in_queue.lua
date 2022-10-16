@@ -62,7 +62,7 @@ function arena_lib.join_queue(mod, arena, p_name)
   local arenaID = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- se c'è `parties` e si è in gruppo...
-  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
+  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
 
     -- se non si è il capo gruppo
     if not parties.is_player_party_leader(p_name) then
