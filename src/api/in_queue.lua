@@ -29,18 +29,19 @@ minetest.register_globalstep(function(dtime)
       local time_left = math.ceil(info.time_left)
 
       -- per eseguire queste chiamate solo una volta al secondo, utilizzo un booleano
-      if info.was_second_run[time_left] then return end
+      if not info.was_second_run[time_left] then
 
-      if time_left == 0 then
-        go_to_arena(mod, arena)
-      elseif time_left <= 5 then
-        arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", time_left), nil, "arenalib_countdown")
-        arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("Get ready!")))
-      else
-        arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", time_left)))
+        if time_left == 0 then
+          go_to_arena(mod, arena)
+        elseif time_left <= 5 then
+          arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", time_left), nil, "arenalib_countdown")
+          arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("Get ready!")))
+        else
+          arena_lib.HUD_send_msg_all("hotbar", arena, queue_format(arena, S("@1 seconds for the match to start", time_left)))
+        end
+
+        info.was_second_run[time_left] = true
       end
-
-      info.was_second_run[time_left] = true
     end
   end
 end)
