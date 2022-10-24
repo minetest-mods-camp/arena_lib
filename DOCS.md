@@ -266,6 +266,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
+* `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing game, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team) or a table of strings/integers (more players/teams).
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing game. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
 * `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
 * `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any. Returns `true` if successful
@@ -509,7 +510,7 @@ An arena comes in 4 phases:
 * `waiting phase`: the queuing process. People hit a sign waiting for other players to play with
 * `loading phase`: the pre-match. By default players get teleported in the arena, waiting for the game to start. Relevant callback: `on_load`
 * `fighting phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
-* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant callbacks: `on_celebration`, `on_end`
+* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant function: `arena_lib.load_celebration(...)`. Relevant callbacks: `on_celebration`, `on_end`.
 
 
 ### 2.4 Spectate mode
