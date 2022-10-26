@@ -102,8 +102,9 @@ function arena_lib.load_arena(mod, arena_ID)
     callback(mod_ref, arena)
   end
 
-  -- avvio la partita dopo tot secondi
+  -- avvio la partita dopo tot secondi, se non è già stata avviata manualmente
   minetest.after(mod_ref.load_time, function()
+    if not arena.in_loading then return end
     arena_lib.start_arena(mod_ref, arena)
   end)
 
@@ -115,6 +116,11 @@ function arena_lib.start_arena(mod_ref, arena)
 
   -- nel caso sia terminata durante la fase di caricamento
   if arena.in_celebration or not arena.in_game then return end
+
+  -- se era già in corso
+  if not arena.in_loading then
+    minetest.log("error", debug.traceback("[" .. arena.name .. "] There has been an attempt to call the fighting phase whilst already in it. This shall not be done, aborting..."))
+    return end
 
   arena.in_loading = false
   arena_lib.update_sign(arena)
