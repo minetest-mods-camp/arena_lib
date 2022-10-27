@@ -1,6 +1,3 @@
----
---- Link these functions to your mod through some commands, ie. /yourmod info arena_name
----
 local S = minetest.get_translator("arena_lib")
 
 local function property_val_to_string() end
@@ -258,7 +255,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("BGM: ")) .. minetest.colorize("#cfc6b8", arena_bgm) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
     minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n\n" ..
-    
+
     min_players_per_team ..
     max_players_per_team ..
     minetest.colorize("#eea160", S("Players required: ")) .. minetest.colorize("#cfc6b8", arena_min_players) .. "\n" ..

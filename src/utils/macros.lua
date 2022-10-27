@@ -35,12 +35,3 @@ function AL_property_to_string(property)
 		return tostring(property)
 	end
 end
-
-
-
-
-
-----------------------------------------------
--------------ASPETTANDO MINETEST--------------
-----------------------------------------------
-arena_lib.temp = {}
