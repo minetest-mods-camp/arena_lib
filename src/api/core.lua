@@ -1202,7 +1202,7 @@ function init_storage(mod, mod_ref)
 
       if arena.sign then
         arena.entrance_type = "sign"
-        arena.entrance = table.copy(arena.sign)
+        arena.entrance = next(arena.sign) and table.copy(arena.sign) or nil
         arena.sign = nil
         to_update = true
       end
