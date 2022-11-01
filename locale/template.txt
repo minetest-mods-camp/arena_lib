@@ -5,6 +5,8 @@
 
 # commands.lua
 player=
+[!] This minigame doesn't exist!=
+[!] Parameters don't seem right!=
 Kicks a player from an ongoing game=
 [!] This player is not online!=
 [!] The player must be in a game to perform this action!=
@@ -13,7 +15,6 @@ minigame=
 Tweaks the minigame settings for the current server=
 arena name=
 Forcibly ends an ongoing game=
-[!] Parameters don't seem right!=
 Game in arena @1 successfully terminated=
 DEBUG ONLY: reset the properties of a bugged arena=
 Quits an ongoing game=
@@ -23,57 +24,6 @@ message=
 Writes a message in the arena global chat while in a game=
 Writes a message in the arena team chat while in a game (if teams are enabled)=
 [!] Teams are not enabled!=
-
-# debug_utilities.lua
-name: =
-Total arenas: =
-[!] This arena doesn't exist!=
-Players required per team: =
-Players supported per team: =
-Players inside per team: =
-Spectators inside per team: =
-Current spectatable entities: =
-Current spectatable areas: =
-in queue=
-loading=
-in game=
-celebrating=
-waiting=
-Initial time: =
-current: =
-Name: =
-Author: =
-BGM: =
-Teams: =
-Disabled damage types: =
-Players required: =
-Players supported: =
-Players inside: =
-Spectators inside: =
-Players and spectators inside: =
-Past and present players: =
-Past and present players inside: =
-Enabled: =
-Status: =
-Entrance: =
-Spawn points: =
-Custom sky: =
-Custom lighting: =
-Properties: =
-Temp properties: =
-Team properties: =
-[!] You can't perform this action during an ongoing game!=
-
-# minigame_settings.lua
-[!] You can't perform this action while in queue!=
-[!] You can't perform this action while in game!=
-[!] This minigame doesn't exist!=
-Minigame settings=
-Overwrite=
-
-# utils.lua
-[!] You must disable the arena first!=
-[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
 
 # api/core.lua
 arena=
@@ -137,6 +87,7 @@ Teams @1 win the game=
 There are no other teams left, you win!=
 You're the last player standing: you win!=
 You win the game due to not enough players=
+[!] This arena doesn't exist!=
 [!] No ongoing game!=
 The arena has been forcibly terminated by @1=
 @1 has been kicked by @2=
@@ -166,6 +117,8 @@ Game begins in @1!=
 Get ready!=
 
 # dependencies/parties.lua
+[!] You can't perform this action while in queue!=
+[!] You can't perform this action while in game!=
 [!] The party leader must not be in queue to perform this action!=
 [!] The party leader must not be in game to perform this action!=
 
@@ -296,8 +249,55 @@ Change entity=
 Change area=
 Enter the match=
 
+# utils/debug.lua
+name: =
+Total arenas: =
+Players required per team: =
+Players supported per team: =
+Players inside per team: =
+Spectators inside per team: =
+Current spectatable entities: =
+Current spectatable areas: =
+in queue=
+loading=
+in game=
+celebrating=
+waiting=
+Initial time: =
+current: =
+Name: =
+Author: =
+BGM: =
+Teams: =
+Disabled damage types: =
+Players required: =
+Players supported: =
+Players inside: =
+Spectators inside: =
+Players and spectators inside: =
+Past and present players: =
+Past and present players inside: =
+Enabled: =
+Status: =
+Entrance: =
+Spawn points: =
+Custom sky: =
+Custom lighting: =
+Properties: =
+Temp properties: =
+Team properties: =
+[!] You can't perform this action during an ongoing game!=
+
 # utils/entrance.lua
 Entrance type - @1=
 Pressing 'overwrite' will try to disable the arena first=
 OVERWRITE ALL=
+Overwrite=
 @1 - nothing to overwrite=
+
+# utils/macros.lua
+[!] You must disable the arena first!=
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
+
+# utils/minigame_settings.lua
+Minigame settings=

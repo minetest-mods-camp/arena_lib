@@ -5,6 +5,8 @@
 
 # commands.lua
 player=giocatore
+[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
+[!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
 [!] This player is not online!=[!] Questo giocatore non è online!
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
@@ -13,7 +15,6 @@ minigame=minigioco
 Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 arena name=nome arena
 Forcibly ends an ongoing game=Forza la conclusione di una partita in corso
-[!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
 DEBUG ONLY: reset the properties of a bugged arena=SOLO DEBUG: ripristina le proprietà di un'arena rotta
 Quits an ongoing game=Abbandona una partita in corso
@@ -23,57 +24,6 @@ message=messaggio
 Writes a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
 Writes a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
 [!] Teams are not enabled!=[!] Le squadre non sono abilitate!
-
-# debug_utilities.lua
-name: =nome: 
-Total arenas: =Arene totali: 
-[!] This arena doesn't exist!=[!] Quest'arena non esiste!
-Players required per team: =Giocatori minimi per squadra: 
-Players supported per team: =Giocatori massimi per squadra: 
-Players inside per team: =Giocatori dentro per squadra: 
-Spectators inside per team: =Spettatori dentro per squadra: 
-Current spectatable entities: =Entità attualmente seguibili: 
-Current spectatable areas: =Aree attualmente seguibili: 
-in queue=in coda
-loading=in caricamento
-in game=in partita
-celebrating=in celebrazione
-waiting=in attesa
-Initial time: =Tempo iniziale: 
-current: =corrente: 
-Name: =Nome: 
-Author: =Autore: 
-BGM: =Musica di sottofondo: 
-Teams: =Squadre: 
-Disabled damage types: =Tipi di danno disabilitati: 
-Players required: =Giocatori minimi: 
-Players supported: =Giocatori massimi: 
-Players inside: =Giocatori dentro: 
-Spectators inside: =Spettatori dentro: 
-Players and spectators inside: =Giocatori e spettatori dentro: 
-Past and present players: =Giocatori presenti e passati: 
-Past and present players inside: =Giocatori presenti e passati dentro: 
-Enabled: =Abilitata: 
-Status: =Stato: 
-Entrance: =Entrata: 
-Spawn points: =Punti di spawn: 
-Custom sky: =Cielo personalizzato: 
-Custom lighting: =Illuminazione personalizzata: 
-Properties: =Proprietà: 
-Temp properties: =Proprietà temporanee: 
-Team properties: =Proprietà squadra: 
-[!] You can't perform this action during an ongoing game!=[!] Non puoi eseguire quest'azione mentre c'è una partita in corso!
-
-# minigame_settings.lua
-[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
-[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
-[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
-Minigame settings=Impostazioni minigioco
-Overwrite=Sovrascrivi
-
-# utils.lua
-[!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
-[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
 
 # api/core.lua
 arena=arena
@@ -137,6 +87,7 @@ Teams @1 win the game=Le squadre @1 hanno vinto la partita
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
+[!] This arena doesn't exist!=[!] Quest'arena non esiste!
 [!] No ongoing game!=[!] Nessuna partita in corso!
 Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
 The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
@@ -167,6 +118,8 @@ Game begins in @1!=La partita inizierà tra @1!
 Get ready!=Preparati!
 
 # dependencies/parties.lua
+[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
+[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
 [!] The party leader must not be in queue to perform this action!=[!] Il capo gruppo non deve essere in coda per eseguire quest'azione!
 [!] The party leader must not be in game to perform this action!=[!] Il capo gruppo non deve essere in partita per eseguire quest'azione!
 
@@ -297,8 +250,55 @@ Change entity=Cambia entità
 Change area=Cambia area
 Enter the match=Entra in partita
 
+# utils/debug.lua
+name: =nome: 
+Total arenas: =Arene totali: 
+Players required per team: =Giocatori minimi per squadra: 
+Players supported per team: =Giocatori massimi per squadra: 
+Players inside per team: =Giocatori dentro per squadra: 
+Spectators inside per team: =Spettatori dentro per squadra: 
+Current spectatable entities: =Entità attualmente seguibili: 
+Current spectatable areas: =Aree attualmente seguibili: 
+in queue=in coda
+loading=in caricamento
+in game=in partita
+celebrating=in celebrazione
+waiting=in attesa
+Initial time: =Tempo iniziale: 
+current: =corrente: 
+Name: =Nome: 
+Author: =Autore: 
+BGM: =Musica di sottofondo: 
+Teams: =Squadre: 
+Disabled damage types: =Tipi di danno disabilitati: 
+Players required: =Giocatori minimi: 
+Players supported: =Giocatori massimi: 
+Players inside: =Giocatori dentro: 
+Spectators inside: =Spettatori dentro: 
+Players and spectators inside: =Giocatori e spettatori dentro: 
+Past and present players: =Giocatori presenti e passati: 
+Past and present players inside: =Giocatori presenti e passati dentro: 
+Enabled: =Abilitata: 
+Status: =Stato: 
+Entrance: =Entrata: 
+Spawn points: =Punti di spawn: 
+Custom sky: =Cielo personalizzato: 
+Custom lighting: =Illuminazione personalizzata: 
+Properties: =Proprietà: 
+Temp properties: =Proprietà temporanee: 
+Team properties: =Proprietà squadra: 
+[!] You can't perform this action during an ongoing game!=[!] Non puoi eseguire quest'azione mentre c'è una partita in corso!
+
 # utils/entrance.lua
 Entrance type - @1=Tipo d'entrata - @1
 Pressing 'overwrite' will try to disable the arena first=Premere 'sovrascrivi' proverà prima a disabilitare l'arena
 OVERWRITE ALL=SOVRASCRIVI TUTTO
+Overwrite=Sovrascrivi
 @1 - nothing to overwrite=@1 - niente da sovrascrivere
+
+# utils/macros.lua
+[!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
+[!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
+
+# utils/minigame_settings.lua
+Minigame settings=Impostazioni minigioco
