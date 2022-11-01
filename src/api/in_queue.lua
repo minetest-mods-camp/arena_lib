@@ -193,7 +193,7 @@ function arena_lib.join_queue(mod, arena, p_name)
   if arena.in_game then
     for _, pl_name in pairs(players_to_add) do
       arena_lib.join_arena(mod, pl_name, arenaID)
-      arena_lib.update_sign(arena)
+      arena_lib.entrances[arena.entrance_type].update(arena)
     end
     return
   else
@@ -242,7 +242,7 @@ function arena_lib.join_queue(mod, arena, p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
   return true
 end
 
@@ -330,7 +330,7 @@ function arena_lib.remove_player_from_queue(p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
   return true
 end
 
@@ -459,7 +459,7 @@ function go_to_arena(mod, arena)
   active_queues[mod][arena.name] = nil
   arena.in_queue = false
   arena.in_game = true
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 
   for pl_name, _ in pairs(arena.players) do
     players_in_queue[pl_name] = nil

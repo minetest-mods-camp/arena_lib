@@ -33,7 +33,7 @@ function arena_lib.load_arena(mod, arena_ID)
   local arena = mod_ref.arenas[arena_ID]
 
   arena.in_loading = true
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 
   local shuffled_spawners = table.copy(arena.spawn_points)
   local sorted_team_players = {}
@@ -123,7 +123,7 @@ function arena_lib.start_arena(mod_ref, arena)
     return end
 
   arena.in_loading = false
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 
   -- parte l'eventuale tempo
   if mod_ref.time_mode ~= "none" then
@@ -215,7 +215,7 @@ function arena_lib.load_celebration(mod, arena, winners)
     return end
 
   arena.in_celebration = true
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 
   -- ripristino HP e visibilità nome di ogni giocatore
   for pl_name, stats in pairs(arena.players) do
@@ -359,7 +359,7 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
   arena.in_celebration = false
   arena.in_game = false
 
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 end
 
 
@@ -478,7 +478,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     end
   end
 
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
 end
 
 

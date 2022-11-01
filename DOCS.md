@@ -16,11 +16,12 @@
 		* [1.5.2 Player properties](#152-player-properties)
 		* [1.5.3 Team properties](#153-team-properties)
 	* [1.6 HUD](#16-hud)
-	* [1.7 Extendable editor](#17-extendable-editor)
-	* [1.8 Utils](#18-utils)
-	* [1.9 Getters](#19-getters)
-	* [1.10 Things you don't want to do with a light heart](#110-things-you-dont-want-to-do-with-a-light-heart)
-	* [1.11 Example file](#111-example-file)
+	* [1.7 Utils](#17-utils)
+	* [1.8 Getters](#18-getters)
+	* [1.9 Custom entrances](#19-custom-entrances)
+	* [1.10 Extendable editor](#110-extendable-editor)
+	* [1.11 Things you don't want to do with a light heart](#111-things-you-dont-want-to-do-with-a-light-heart)
+	* [1.12 Example file](#112-example-file)
 * [2. Arenas](#2-arenas)
 	* [2.1 Storing arenas](#21-storing-arenas)
 	* [2.2 Setting up an arena](#22-setting-up-an-arena)
@@ -31,7 +32,7 @@
 			* [2.2.2.3 Players management](#2223-players-management)
 			* [2.2.2.4 Enabling/Disabling teams](#2224-enablingdisabling-teams)
 			* [2.2.2.5 Spawners](#2225-spawners)
-			* [2.2.2.6 Signs](#2226-signs)
+			* [2.2.2.6 Entrance](#2226-entrance)
 			* [2.2.2.7 Enabling/Disabling an arena](#2227-enablingdisabling-an-arena)
 			* [2.2.2.8 Arena properties](#2228-arena-properties)
 			* [2.2.2.9 Timers](#2229-timers)
@@ -111,6 +112,7 @@ A couple of general commands are already declared inside arena_lib, them being:
 A couple more are available for players having the `arenalib_admin` privilege:
 
 * `/minigamesettings mod`: change `mod` settings
+* `/arenas <minigame> entrances`: change the entrance types of `<minigame>`
 * `/arenakick player_name`: kicks a player out of an ongoing game, no matter the mod
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 * `/flusharena mod arena_name`: restores a broken arena (when not in progress)
@@ -240,27 +242,13 @@ end)
 #### 1.5.3 Team properties
 Same as above, but for teams. For instance, you could count how many rounds of a single match has been won by a specific team, and then call a load_celebration when one of them reaches 3 wins.
 
-#### 1.6 HUD
+### 1.6 HUD
 `arena_lib` also comes with a triple practical HUD: `title`, `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following functions:
 * `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: sends a message to the specified player/spectator in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players and spectators inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both a player/spectator and a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make all the HUDs disappear
 
-#### 1.7 Extendable editor
-Since 4.0, every minigame can extend the editor with an additional custom section on the 5th slot. To do that, the function is
-```lua
-arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
-```
-On the contrary of when an arena is registered, every parameter here is mandatory. They are:
-* `name`: the name of the item that will represent the section
-* `icon`: the icon of the item that will represent the section
-* `hotbar_message`: the message that will appear in the hotbar HUD once the section has been opened
-* `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or nil if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly
-
-When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
-
-
-### 1.8 Utils
+### 1.7 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
@@ -291,7 +279,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
-### 1.9 Getters
+### 1.8 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
@@ -310,13 +298,52 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(...)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if any
 
-### 1.10 Things you don't want to do with a light heart
+### 1.9 Custom entrances
+Since 5.3, signs are not the only way anymore to link an arena with the rest of the world. Instead, modders can create third party mods to register their own custom entrance type. To do that, the function is
+```lua
+arena_lib.register_entrance_type(mod, entrance, def)
+```
+* `mod`: (string) the name of the third party mod. There can only be one entrance type per mod
+* `entrance`: (string) the name used to register the entrance type
+* `def`: (table) a table containing the following fields:
+	* `name`: (string) the name of the entrance. Contrary to the previous `entrance` field, this can be translated
+	* `on_add`: (function(sender, mod, arena, ...)) must return the value that will be used by arena_lib to identify the entrance. For instance, built-in signs return their position. If nothing is returned, the adding process will be aborted. Substitute `...` with any additional parameters you may need (signs use it for their position). BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then set the new entrance. Use this callback just to run entrance-specific checks and return the value that arena_lib will then store as an entrance
+	* `on_remove`: (function(mod, arena)) additional actions to perform when an arena entrance is removed. BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then remove the entrance. Use this callback just to run entrance-specific checks.
+	* `on_update`: (function(arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
+	* `on_load`: (function(arena)) additional actions to perform when the server starts. Useful for nodes, since they don't have an `on_activate` callback, contrary to entities
+	* `editor_settings`: (table) how the editor section should be structured, when an arena uses this entrance type. Fields are:
+		* `name`: (string) the name of the item representing the section
+		* `icon`: (string) the image of the item representing the section
+		* `description`: (string) the description of the section, shown in the semi-transparent black bar above the hotbar
+		* `tools`: (table) item list of max 6 entries. These items will be put into the entrance section, once opened
+	* `debug_output`: (function(entrance)): what the debug log should print (via `arena_lib.print_arena_info()`)
+
+Then, a useful function you want to call through the tools in the editor section is `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`, where `action` is a string taking either `"add"` or `"remove"`. In case of `"add"`, you can also attach whatever parameter you want after (`...`). For instance, built-in signs pass the pointed position, which is then checked on `on_add` and lastly returned so that arena_lib can add it. These checks are not run in the tool itself because this won't allow to run them outside the editor (i.e. CLI and custom calls from other mods).  
+
+If you're a bit confused, have a look at [this mod](https://gitlab.com/marco_a/arena_lib-entrance-test) for a practical implementation.  
+
+If the registration was successful, it'll appear in the list of entrances type displayed with `/arenas <minigame> entrances`.
+
+### 1.10 Extendable editor
+Since 4.0, every minigame can extend the editor with an additional custom section on the 6th slot. To do that, the function is
+```lua
+arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
+```
+On the contrary of when an arena is registered, every parameter here is mandatory. They are:
+* `name`: the name of the item that will represent the section
+* `icon`: the icon of the item that will represent the section
+* `hotbar_message`: the message that will appear in the hotbar HUD once the section has been opened
+* `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or nil if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly
+
+When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
+
+### 1.11 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
 * Disabling timers (`time_mode = "decremental"` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
 
-### 1.11 Example file
+### 1.12 Example file
 Check [this](mod-init.lua.example) out for a full configuration file  
 <br>  
 
@@ -326,7 +353,8 @@ It all starts with a table called `arena_lib.mods = {}`. This table allows `aren
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
 * `author`: (string) the name of the one who built/designed the map. Default is `"???"`. It appears in the signs infobox (right-click an arena sign)
-* `sign`: (pos) the position of the sign associated with the arena
+* `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
+* `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
 * `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
 * `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
@@ -350,8 +378,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `bgm`: (table) if present, contains the information about the audio track to play whilst in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`.
   In-depth fields, all empty by default, are:
   * `track`: (string) the audio file, without `.ogg`. Mandatory. If no track is specified, all the other fields will be consequently empty
-  * `title`: (string) the title to display in the infobox (right-clicking a sign)
-  * `author`: (string) the author to display in the infobox (right-clicking a sign)
+  * `title`: (string) the title. Built-in signs feature it in the infobox (shown by right-clicking a sign)
+  * `author`: (string) the author. Built-in signs feature it in the infobox (shown by right-clicking a sign)
   * `gain`: (int) the volume of the track
   * `pitch`: (int) the pitch of the track
 * `in_queue`: (bool) about phases, look at "Arena phases" down below
@@ -378,7 +406,7 @@ Arenas and their settings are stored inside the mod storage. What is *not* store
 Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
 
 ### 2.2 Setting up an arena
-In order for an arena to be playable, three conditions must be satisfied: the arena has to exist, spawners have to be set, and an arena sign must be placed (to allow players to enter the minigame).  
+In order for an arena to be playable, three conditions must be satisfied: the arena has to exist, spawners have to be set, and an arena entrance must be put (to allow players to enter the minigame).  
 
 If you love yourself, there is a built-in editor that allows you to easily make these things and many many more. Or, if you don't love yourself, you can connect every setup function to your custom CLI. Either way, both the approaches require you to connect at least the `arena_lib.create_arena` function inside your mod. It follows an example using [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/):  
 
@@ -464,14 +492,15 @@ Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_ch
    -- etc.
 ```
 
-##### 2.2.2.6 Signs
-`arena_lib.set_sign(sender, mod, arena_name, <pos, remove>)` allows to either set or remove the sign of that specific arena. `pos` is a table, and it must correspond to an arena_lib sign to be set. `remove` is a boolean, and if `true`, `pos` will be ignored, as it'll erase the current arena sign (if exists)
+##### 2.2.2.6 Entrance
+To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.9 Custom entrances](#19-custom-entrances).  
+To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use
 
 ##### 2.2.2.7 Enabling/Disabling an arena
-When a sign has been set, it won't work. This because an arena must be enabled manually via `arena_lib.enable_arena(sender, mod, arena_name)`.
+When an entrance has been set, it won't work. This because an arena must be enabled manually via `arena_lib.enable_arena(sender, mod, arena_name)`.
 If all the conditions are met, it'll return `true` and you'll receive a confirmation. If not, you'll receive the reason why it didn't through and the arena will remain disabled. Conditions are:
 * all spawn points set
-* sign placed
+* entrance set
 * potential custom checks through `arena_lib.on_enable` callback
   
 Arenas can be disabled too, via `arena_lib.disable_arena(sender, mod, arena_name)`.  
@@ -508,14 +537,14 @@ By default, the arena's lighting settings reflect the lighting settings of the p
 
 ### 2.3 Arena phases
 An arena comes in 4 phases:
-* `waiting phase`: the queuing process. People hit a sign waiting for other players to play with
+* `queuing phase`: the queuing process. People interact with the entrance waiting for other players to play with
 * `loading phase`: the pre-match. By default players get teleported in the arena, waiting for the game to start. Relevant callback: `on_load`
 * `fighting phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
 * `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant function: `arena_lib.load_celebration(...)`. Relevant callbacks: `on_celebration`, `on_end`.
 
 
 ### 2.4 Spectate mode
-Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), while the other is through the very sign of the arena. In this last case, users just need to right-click the sign and press the "eye" button to be turned into spectators (a game must be in progress). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
+Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), whereas the other is through the very entrance of the arena (if implemented). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
 By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(...)` and `arena_lib.add_spectate_area(...)`
 <br>  
 

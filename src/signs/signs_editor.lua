@@ -1,15 +1,4 @@
 local S = minetest.get_translator("arena_lib")
-local spawners_tools = {
-  "arena_lib:sign_add",
-  "arena_lib:sign_remove",
-  "",
-  "arena_lib:sign",
-  "",
-  "",
-  "",
-  "arena_lib:editor_return",
-  "arena_lib:editor_quit",
-}
 
 
 
@@ -29,7 +18,7 @@ minetest.register_tool("arena_lib:sign_add", {
 
       if not pos then return end -- nel caso sia aria, sennò crasha
 
-      arena_lib.set_sign(p_name, mod, arena_name, pos, nil, true)
+      arena_lib.set_entrance(p_name, mod, arena_name, "add", pos)
     end
 })
 
@@ -47,10 +36,10 @@ minetest.register_tool("arena_lib:sign_remove", {
       local p_name      = user:get_player_name()
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
 
-      if not next(arena.sign) then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no sign to remove assigned to @1!", arena.name)))
+      if not arena.entrance then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no entrance to remove assigned to @1!", arena_name)))
         return end
 
       minetest.show_formspec(p_name, "arena_lib:sign_delete", get_sign_formspec(p_name, arena_name))
@@ -59,15 +48,11 @@ minetest.register_tool("arena_lib:sign_remove", {
 
 
 
-function arena_lib.give_signs_tools(player)
-  player:get_inventory():set_list("main", spawners_tools)
-end
 
 
-
-
-
----
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
 
 function get_sign_formspec(p_name, arena_name)
 
@@ -86,17 +71,22 @@ end
 
 
 
+
+----------------------------------------------
+---------------GESTIONE CAMPI-----------------
+----------------------------------------------
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   if formname ~= "arena_lib:sign_delete" then return end
 
-  local p_name      =   player:get_player_name()
+  local p_name = player:get_player_name()
 
   if fields.delete_confirm then
-    local mod         =   player:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name  =   player:get_meta():get_string("arena_lib_editor.arena")
+    local mod         = player:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
 
-    arena_lib.set_sign(p_name, mod, arena_name, nil, true, true)
+    arena_lib.set_entrance(p_name, mod, arena_name, "remove")
     minetest.close_formspec(p_name, formname)
 
   elseif fields.delete_cancel then

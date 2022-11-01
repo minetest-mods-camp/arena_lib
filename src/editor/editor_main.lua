@@ -5,10 +5,10 @@ local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv, pos, hotba
 local editor_tools = {
   "arena_lib:editor_players",
   "arena_lib:editor_spawners",
-  "arena_lib:editor_signs",
+  "",                               -- entrance
   "arena_lib:editor_customise",
   "arena_lib:editor_settings",
-  "",
+  "",                               -- optional additional editor section
   "arena_lib:editor_info",
   "arena_lib:editor_enable",
   "arena_lib:editor_quit"
@@ -190,8 +190,10 @@ function arena_lib.show_main_editor(player)
 
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   player:get_inventory():set_list("main", editor_tools)
+  player:get_inventory():set_stack("main", 3, arena_lib.entrances[arena.entrance_type].mod .. ":editor_entrance")
   if minetest.registered_items[mod .. ":arenalib_editor_slot_custom"] then
     player:get_inventory():set_stack("main", 6, mod .. ":arenalib_editor_slot_custom")
   end

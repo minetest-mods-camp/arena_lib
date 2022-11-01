@@ -49,22 +49,6 @@ minetest.register_tool("arena_lib:editor_spawners", {
 
 
 
-minetest.register_tool("arena_lib:editor_signs", {
-
-    description = S("Signs"),
-    inventory_image = "arenalib_editor_signs.png",
-    groups = {not_in_creative_inventory = 1},
-    on_place = function() end,
-    on_drop = function() end,
-
-    on_use = function(itemstack, user)
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("One sign per arena"))
-      arena_lib.give_signs_tools(user)
-    end
-})
-
-
-
 minetest.register_tool("arena_lib:editor_customise", {
 
     description = S("Customise"),

@@ -6,6 +6,44 @@ local S = minetest.get_translator("arena_lib")
 -----------------ADMINS ONLY------------------
 ----------------------------------------------
 
+minetest.register_chatcommand("arenas", {
+
+  description = "Manage arena_lib arenas",
+  privs = {
+    arenalib_admin = true
+  },
+
+  func = function(sender, param)
+
+    --TODO: sostituisci con chatcmdbuilder e metti azione prima del minigioco
+    local mg = string.match(param, "^([%a%d_-]+)")
+
+    -- se non è specificato niente, annullo
+    if not mg then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return false end
+
+    if not arena_lib.mods[mg] then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] This minigame doesn't exist!"))
+      return false end
+
+    local action = string.match(param, "%s([%a]+)")
+
+    if not action then return false end
+
+    if action == "settings" then
+      --TODO in separate commit: arena_lib.enter_minigame_settings(sender, mg)
+
+    elseif action == "entrances" then
+      arena_lib.enter_entrance_settings(sender, mg)
+    else
+      return false
+    end
+
+    return true
+  end
+})
+
 minetest.register_chatcommand("arenakick", {
 
   params = "<" .. S("player") .. ">",

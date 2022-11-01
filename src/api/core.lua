@@ -1,6 +1,7 @@
 -- in here: whatever needs to access the storage (minigames and arenas management) + deprecations
 arena_lib = {}
 arena_lib.mods = {}
+arena_lib.entrances = {}
 
 local S = minetest.get_translator("arena_lib")
 local storage = minetest.get_mod_storage()
@@ -17,12 +18,12 @@ local function update_storage() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
-local function warn_deprecated_set_sign() end
 
 local arena_default = {
   name = "",
   author = "???",
-  sign = {},
+  entrance = nil,
+  entrance_type = arena_lib.DEFAULT_ENTRANCE,
   players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
   spectators = {},                    -- KEY: player name, VALUE: true
   players_and_spectators = {},        -- KEY: pl/sp name,  VALUE: true
@@ -243,6 +244,40 @@ end
 
 
 
+function arena_lib.register_entrance_type(mod, entrance, def)
+  arena_lib.entrances[entrance] = {
+    mod    = mod,
+    name   = def.name,
+    load   = def.on_load   or function() end,
+    add    = def.on_add    or function() end,
+    update = def.on_update or function() end,
+    remove = def.on_remove or function() end,
+    print  = def.debug_output
+  }
+
+  local editor = def.editor_settings
+  local tools = editor.tools
+
+  table.insert(tools, 8, "arena_lib:editor_return")
+  table.insert(tools, 9, "arena_lib:editor_quit")
+
+  minetest.register_tool( mod ..":editor_entrance", {
+
+    description = editor.name,
+    inventory_image = editor.icon,
+    groups = {not_in_creative_inventory = 1},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user)
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), editor.description)
+      user:get_inventory():set_list("main", editor.tools)
+    end
+  })
+end
+
+
+
 function arena_lib.change_mod_settings(sender, mod, setting, new_value)
 
   local mod_settings = arena_lib.mods[mod].settings
@@ -374,10 +409,10 @@ function arena_lib.remove_arena(sender, mod, arena_name, in_editor)
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  -- rimozione cartello coi rispettivi metadati
-  if arena.sign ~= nil then
-    minetest.set_node(arena.sign, {name = "air"})
-    end
+  -- rimozione eventuale entrata
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].remove(mod, arena)
+  end
 
   local mod_ref = arena_lib.mods[mod]
 
@@ -409,9 +444,9 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   arena.name = new_name
 
-  -- aggiorno il cartello, se esiste
-  if next(arena.sign) then
-    arena_lib.update_sign(arena)
+  -- aggiorno l'entrata, se esiste
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].update(arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -523,9 +558,9 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
   end
 
-  -- aggiorno il cartello, se esiste
-  if next(arena.sign) then
-    arena_lib.update_sign(arena)
+  -- aggiorno l'entrata, se esiste
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].update(arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -586,9 +621,9 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   -- svuoto i vecchi spawner per evitare problemi
   arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
 
-  -- aggiorno il cartello, se esiste
-  if next(arena.sign) then
-    arena_lib.update_sign(arena)
+  -- aggiorno l'entrata, se esiste
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].update(arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -755,71 +790,72 @@ end
 
 
 
-function arena_lib.set_sign(sender, mod, arena_name, pos, remove, in_editor)
-
-  -- remove in 7.0
-  if type(pos) == "string" and type(remove) == "string" then
-    warn_deprecated_set_sign(sender)
-    return
-  end
+function arena_lib.set_entrance_type(sender, mod, arena_name, type)
 
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
-  if not in_editor then
+  if not arena_lib.is_player_in_edit_mode(sender) then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  local mod_ref = arena_lib.mods[mod]
+  if arena.entrance_type == type then return end
 
-  -- se rimuovo
-  if remove then
+  if not arena_lib.entrances[type] then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no entrance type with this name!")))
+    return end
 
-    -- se non ha cartelli da rimuovere, annullo
-    if not next(arena.sign) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no sign to remove assigned to @1!", arena.name)))
+  -- se esiste, rimuovo l'entrata attuale onde evitare danni
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].remove(mod, arena)
+    arena.entrance = nil
+  end
+
+  arena.entrance_type = type
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance type of arena @1 successfully changed (@2)", arena_name, type))
+
+  update_storage(false, mod, id, arena)
+end
+
+
+
+-- `action` = "add", "remove"
+-- `...` è utile per "add", in quanto si vorrà passare perlomeno una posizione (nodi) o una stringa (entità) da salvare in arena.entrance
+function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
+
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not arena_lib.is_player_in_edit_mode(sender) then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  local entrance = arena_lib.entrances[arena.entrance_type]
+
+  if action == "add" then
+
+    if arena.entrance then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already an entrance for this arena!")))
       return end
 
-    minetest.load_area(arena.sign)
+    local new_entrance = entrance.add(sender, mod, arena, ...)
+    if not new_entrance then return end
 
-    local sign_meta = minetest.get_meta(arena.sign)
+    arena.entrance = new_entrance
+    entrance.update(arena)
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance of arena @1 successfully set", arena_name))
 
-    -- se il cartello non è stato spostato lo rimuovo, sennò evito di far sparire il blocco che c'è ora
-    -- (può capitare se qualcuno sposta un'area con WorldEdit). Le altre condizioni assicurano poi che si stia
-    -- cancellando il cartello giusto, nel caso qualcuno con WorldEdit ne abbia spostato un altro appartenente
-    -- a un'arena diversa nella stessa posizione
-    if minetest.get_node(arena.sign).name == "arena_lib:sign" and sign_meta:get_string("mod") == mod and
-                                                                  sign_meta:get_int("arenaID") == id then
-      minetest.set_node(arena.sign, {name = "air"})
-    end
+  elseif action == "remove" then
 
-    arena.sign = {}
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully removed", arena.name))
+    if not arena.entrance then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no entrance to remove assigned to @1!", arena_name)))
+      return end
 
-  -- sennò aggiungo
+    entrance.remove(mod, arena)
+    arena.entrance = nil
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance of arena @1 successfully removed", arena_name))
+
   else
-
-    if next(arena.sign) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already a sign for this arena!")))
-      return end
-
-    if not pos or type(pos) ~= "table" then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return end
-
-    -- se non ha trovato niente, esco
-    if minetest.get_node(pos).name ~= "arena_lib:sign" then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
-      return end
-
-    -- aggiungo il cartello all'arena e cambio la scritta
-    arena.sign = pos
-    arena_lib.update_sign(arena)
-
-    -- salvo il nome della mod e l'ID come metadato nel cartello
-    minetest.get_meta(pos):set_string("mod", mod)
-    minetest.get_meta(pos):set_int("arenaID", id)
-
-    minetest.chat_send_player(sender, mod_ref.prefix .. S("Sign of arena @1 successfully set", arena.name))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
   end
 
   update_storage(false, mod, id, arena)
@@ -949,15 +985,15 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   local arena_max_players = arena.max_players * #arena.teams
 
-  -- check requisiti: spawner
+  -- se non ci sono abbastanza punti rinascita
   if arena_lib.get_arena_spawners_count(arena) < arena_max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Insufficient spawners, the arena can't be enabled!")))
     arena.enabled = false
   return end
 
-  -- cartello
-  if not next(arena.sign) then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Sign not set, the arena can't be enabled!")))
+  -- se non c'è l'entrata
+  if not arena.entrance then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Entrance not set, the arena can't be enabled!")))
     arena.enabled = false
   return end
 
@@ -980,7 +1016,7 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   -- abilito
   arena.enabled = true
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
@@ -1023,7 +1059,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
 
   -- disabilito
   arena.enabled = false
-  arena_lib.update_sign(arena)
+  arena_lib.entrances[arena.entrance_type].update(arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
@@ -1163,6 +1199,13 @@ function init_storage(mod, mod_ref)
         arena.celestial_vault = nil
         to_update = true
       end
+
+      if arena.sign then
+        arena.entrance_type = "sign"
+        arena.entrance = table.copy(arena.sign)
+        arena.sign = nil
+        to_update = true
+      end
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
 
       -- gestione squadre
@@ -1186,7 +1229,7 @@ function init_storage(mod, mod_ref)
 
       local arena_max_players = arena.max_players * #arena.teams
 
-      -- resetto spawner se ho cambiato il numero di team
+      -- resetto punti rinascita se ho cambiato il numero di squadre
       if arena_max_players ~= #arena.spawn_points then
         to_update = true
         arena.enabled = false
@@ -1216,10 +1259,11 @@ function init_storage(mod, mod_ref)
         update_storage(false, mod, i, arena)
       end
 
-      --signs_lib ha bisogno di un attimo per caricare sennò tira errore
-      minetest.after(0.01, function()
-        if next(arena.sign) then                                        -- se non è ancora stato registrato nessun cartello per l'arena, evito il crash
-          arena_lib.update_sign(arena)
+      -- Contrariamente alle entità, i nodi non hanno un richiamo `on_activate`,
+      -- ergo se si vogliono aggiornare all'avvio serve per forza un `on_load`
+      minetest.after(0.01, function()                                           -- signs_lib ha bisogno di un attimo per caricare sennò tira errore.
+        if arena.entrance then                                                  -- se non è ancora stato registrato nessun nodo per l'arena, evito il crash
+          arena_lib.entrances[arena.entrance_type].load(arena)
         end
       end)
 
@@ -1395,7 +1439,7 @@ function arena_lib.send_message_players_in_arena(arena, msg, teamID, except_team
   arena_lib.send_message_in_arena(arena, "players", msg, teamID, except_teamID)
 end
 
-function warn_deprecated_set_sign(sender)
-  minetest.log("warning", "[ARENA_LIB] set_sign(sender, <pos>, <remove>, mod, arena_name) is deprecated. Please use set_sign(sender, mod, arena_name, pos, <remove>) instead")
-  minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(sender, pos, remove, mod, arena_name) is deprecated and pos now mandatory. Watch the log, aborting...")
+function arena_lib.set_sign(sender)
+	minetest.log("warning", "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
+	minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
 end

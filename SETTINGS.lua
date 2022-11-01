@@ -1,3 +1,6 @@
+-- The entrance type that is set by default to every new arena
+arena_lib.DEFAULT_ENTRANCE = "sign"
+
 -- The physics override to apply when a player leaves a match (whether by quitting,
 -- winning etc). This comes in handy for hybrid servers (i.e. survival/creative
 -- ones featuring some minigames). If you're aiming for a full minigame server,

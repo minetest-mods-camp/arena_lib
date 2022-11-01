@@ -55,7 +55,7 @@ Past and present players: =Giocatori presenti e passati:
 Past and present players inside: =Giocatori presenti e passati dentro: 
 Enabled: =Abilitata: 
 Status: =Stato: 
-Sign: =Cartello: 
+Entrance: =Entrata: 
 Spawn points: =Punti di spawn: 
 Custom sky: =Cielo personalizzato: 
 Custom lighting: =Illuminazione personalizzata: 
@@ -70,10 +70,6 @@ Team properties: =Proprietà squadra:
 [!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 Minigame settings=Impostazioni minigioco
 Overwrite=Sovrascrivi
-
-# signs.lua
-Arena sign=Cartello dell'arena
-[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!==[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
 
 # utils.lua
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
@@ -104,11 +100,12 @@ All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
 [!] There's already a spawn in this point!=[!] C'è già uno spawn in questo punto!
 [!] Spawn points can't exceed the maximum number of players!=[!] I punti di spawn non possono superare i giocatori massimi!
 Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
-[!] There is no sign to remove assigned to @1!=[!] Non c'è nessun cartello da rimuovere assegnato a @1!
-Sign of arena @1 successfully removed=Cartello dell'arena @1 rimosso con successo
-[!] There is already a sign for this arena!=[!] Esiste già un cartello per quest'arena!
-[!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
-Sign of arena @1 successfully set=Cartello dell'arena @1 impostato con successo
+[!] There is no entrance type with this name!=[!] Non c'è nessun tipo di entrata con questo nome!
+Entrance type of arena @1 successfully changed (@2)=Tipo d'entrata dell'arena @1 cambiato con successo (@2)
+[!] There is no entrance to remove assigned to @1!=[!] Non c'è nessun'entrata da rimuovere assegnata a @1!
+Entrance of arena @1 successfully removed=Entrata dell'arena @1 rimosso con successo
+[!] There is already an entrance for this arena!=[!] Esiste già un'entrata per quest'arena!
+Entrance of arena @1 successfully set=Entrata dell'arena @1 impostata con successo
 Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
 (@1) Celestial vault of arena @2 successfully overwritten=(@1) Volta celeste dell'arena @2 sovrascritta con successo
 All=Tutto
@@ -121,7 +118,7 @@ Background music of arena @1 successfully overwritten=Musica di sottofondo dell'
 [!] Timers are not enabled in this mod!=[!] I timer non sono abilitati in questa mod!
 Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
 [!] Insufficient spawners, the arena can't be enabled!=[!] Spawner insufficienti, l'arena non può essere abilitata!
-[!] Sign not set, the arena can't be enabled!=[!] Cartello non impostato, l'arena non può essere abilitata!
+[!] Entrance not set, the arena can't be enabled!=[!] Entrata non dichiarata, l'arena non può essere abilitata!
 Arena @1 successfully enabled=Arena @1 abilitata con successo
 [!] The arena is already disabled=[!] L'arena è già disabilitata
 [!] You can't disable an arena during an ongoing game!=[!] Non puoi disabilitare un'arena mentre una partita è in corso!
@@ -183,8 +180,6 @@ Players | num to set: @1 (left/right click slot #3 to change)=Giocatori | num: @
 Values are PER TEAM!=I valori sono PER SQUADRA!
 Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
-Signs=Cartelli
-One sign per arena=Un cartello per arena
 Customise=Personalizza
 Pimp my arena=Rendila bella bellina
 Settings=Impostazioni
@@ -275,13 +270,21 @@ Selected team: @1=Squadra selezionata: @1
 Delete all spawners=Cancella tutti gli spawner
 Delete all spawners of a team=Cancella tutti gli spawner della squadra
 
-# editor/tools_sign.lua
+# hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
+
+# signs/signs.lua
+Sign=Cartello
+Signs=Cartelli
+One sign per arena=Un cartello per arena
+Arena sign=Cartello dell'arena
+[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
+[!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
+
+# signs/signs_editor.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
 Are you sure you want to delete the sign from @1?=Sei sicuro/a di voler rimuovere il cartello di @1?
-
-# hud/hud_waypoints.lua
-[!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
 
 # spectate/spectate_main.lua
 [!] Spectate mode not supported!=[!] Modalità spettatore non supportata!
@@ -293,3 +296,9 @@ Change team=Cambia squadra
 Change entity=Cambia entità
 Change area=Cambia area
 Enter the match=Entra in partita
+
+# utils/entrance.lua
+Entrance type - @1=Tipo d'entrata - @1
+Pressing 'overwrite' will try to disable the arena first=Premere 'sovrascrivi' proverà prima a disabilitare l'arena
+OVERWRITE ALL=SOVRASCRIVI TUTTO
+@1 - nothing to overwrite=@1 - niente da sovrascrivere

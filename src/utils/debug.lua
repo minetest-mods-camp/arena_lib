@@ -143,12 +143,11 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     status = S("waiting")
   end
 
-  -- calcolo cartello
-  local sign_pos
-  if next(arena.sign) then
-    sign_pos = minetest.pos_to_string(arena.sign)
+  -- calcolo entrata
+  if arena.entrance == nil then
+    entrance = "---"
   else
-    sign_pos = "---"
+    entrance = arena_lib.entrances[arena.entrance_type].print(arena.entrance)
   end
 
   -- calcolo coordinate punto di spawn
@@ -273,7 +272,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
-    minetest.colorize("#eea160", S("Sign: ")) .. minetest.colorize("#cfc6b8", sign_pos) .. "\n" ..
+    minetest.colorize("#eea160", S("Entrance: ")) .. minetest.colorize("#cfc6b8", "(" .. arena.entrance_type .. ") " .. entrance) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
 
     time ..

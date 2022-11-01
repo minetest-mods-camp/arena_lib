@@ -55,7 +55,7 @@ Past and present players: =
 Past and present players inside: =
 Enabled: =
 Status: =
-Sign: =
+Entrance: =
 Spawn points: =
 Custom sky: =
 Custom lighting: =
@@ -70,10 +70,6 @@ Team properties: =
 [!] This minigame doesn't exist!=
 Minigame settings=
 Overwrite=
-
-# signs.lua
-Arena sign=
-[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=
 
 # utils.lua
 [!] You must disable the arena first!=
@@ -104,11 +100,12 @@ All the spawn points have been removed=
 [!] There's already a spawn in this point!=
 [!] Spawn points can't exceed the maximum number of players!=
 Spawn point #@1 successfully set=
-[!] There is no sign to remove assigned to @1!=
-Sign of arena @1 successfully removed=
-[!] There is already a sign for this arena!=
-[!] That's not an arena_lib sign!=
-Sign of arena @1 successfully set=
+[!] There is no entrance type with this name!=
+Entrance type of arena @1 successfully changed (@2)=
+[!] There is no entrance to remove assigned to @1!=
+Entrance of arena @1 successfully removed=
+[!] There is already an entrance for this arena!=
+Entrance of arena @1 successfully set=
 Lighting of arena @1 successfully overwritten=
 (@1) Celestial vault of arena @2 successfully overwritten=
 All=
@@ -121,7 +118,7 @@ Background music of arena @1 successfully overwritten=
 [!] Timers are not enabled in this mod!=
 Arena @1's timer is now @2 seconds=
 [!] Insufficient spawners, the arena can't be enabled!=
-[!] Sign not set, the arena can't be enabled!=
+[!] Entrance not set, the arena can't be enabled!=
 Arena @1 successfully enabled=
 [!] The arena is already disabled!=
 [!] You can't disable an arena during an ongoing game!=
@@ -182,8 +179,6 @@ Players | num to set: @1 (left/right click slot #3 to change)=
 Values are PER TEAM!=
 Spawners=
 Spawners | sel. ID: @1 (right click slot #2 to change)=
-Signs=
-One sign per arena=
 Customise=
 Pimp my arena=
 Settings=
@@ -274,13 +269,21 @@ Selected team: @1=
 Delete all spawners=
 Delete all spawners of a team=
 
-# editor/tools_sign.lua
+# hud/hud_waypoints.lua
+[!] Waypoints are not enabled!=
+
+# signs/signs.lua
+Sign=
+Signs=
+One sign per arena=
+Arena sign=
+[!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=
+[!] That's not an arena_lib sign!=
+
+# signs/signs_editor.lua
 Add sign=
 Remove sign=
 Are you sure you want to delete the sign from @1?=
-
-# hud/hud_waypoints.lua
-[!] Waypoints are not enabled!=
 
 # spectate/spectate_main.lua
 [!] Spectate mode not supported!=
@@ -292,3 +295,9 @@ Change team=
 Change entity=
 Change area=
 Enter the match=
+
+# utils/entrance.lua
+Entrance type - @1=
+Pressing 'overwrite' will try to disable the arena first=
+OVERWRITE ALL=
+@1 - nothing to overwrite=
