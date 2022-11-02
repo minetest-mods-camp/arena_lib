@@ -20,6 +20,10 @@ function arena_lib.enter_entrance_settings(p_name, mod)
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action while in game!")))
     return end
 
+  if not arena_lib.mods[mod] then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[!] This minigame doesn't exist!"))
+    return end
+
   players_in_entrance_fs[p_name] = mod
   minetest.show_formspec(p_name, "arena_lib:entrance_settings", get_formspec(p_name, mod))
 end

@@ -2,6 +2,8 @@ local version = "5.3.0-dev"
 local modpath = minetest.get_modpath("arena_lib")
 local srcpath = modpath .. "/src"
 
+dofile(modpath .. "/libs/chatcmdbuilder.lua")
+
 dofile(srcpath .. "/api/core.lua")
 dofile(srcpath .. "/api/in_game.lua")
 dofile(srcpath .. "/api/in_queue.lua")

@@ -92,7 +92,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `team_properties`: ^ (it won't work if `teams` hasn't been declared)
 
 ### 1.1 Per server configuration
-There are also a couple of settings that can only be set in game via `/minigamesettings`. This because different servers might need different parameters. They are:
+There are also a couple of settings that can only be set in game via `/arenas settings`. This because different servers might need different parameters. They are:
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimum amount of players has been reached to start the queue. Default is `10`
 
@@ -111,13 +111,14 @@ A couple of general commands are already declared inside arena_lib, them being:
 #### 1.3.1 Admins only
 A couple more are available for players having the `arenalib_admin` privilege:
 
-* `/minigamesettings mod`: change `mod` settings
-* `/arenas <minigame> entrances`: change the entrance types of `<minigame>`
-* `/arenakick player_name`: kicks a player out of an ongoing game, no matter the mod
+* `/arenas`
+	* `entrances <minigame>`: change the entrance types of `<minigame>`
+	* `kick player_name`: kicks a player out of an ongoing game, no matter the mod
+	* `settings <minigame>`: change `<minigame>` settings
 * `/forceend mod arena_name`: forcibly ends an ongoing game
 * `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
-Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
+Those aside, you need to connect a few functions with your mod in order to use them. The best way is with commands and I suggest you the already bundled [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/) library by rubenwardy. [This](https://gitlab.com/zughy-friends-minetest/block_league/-/blob/master/src/commands.lua) is what I came up with in my Block League minigame, which relies on arena_lib. As you can see, I declared a `local mod = "block_league"` at the beginning, because it's how I stored my mod inside the library. Also, I created the support for both the editor and the chat commands.
 
 ### 1.4 Callbacks
 Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
@@ -263,10 +264,10 @@ There are also some other functions which might turn useful. They are:
 	* `reason` is an integer, and it equals to...
 		* `0`: player disconnected. Default used when: players disconnect
 		* `1`: player eliminated. Default used when: ---
-		* `2`: player kicked. Default used when: players are kicked through `/arenakick`
+		* `2`: player kicked. Default used when: players are kicked through `/arenas kick`
 		* `3`: player quits. Default used when: players do `/quit` or when they leave the spectator mode
 		* All these reasons call `on_quit`, with the only exception of `1`, that calls `on_eliminate` if declared, and that only calls `on_quit` if there is no spectator mode
-	* `executioner` can be passed to tell who removed the player. By default, this happens when someone uses `/arenakick` and `/forceend`, so that these commands can't be abused without consequences for the admin
+	* `executioner` can be passed to tell who removed the player. By default, this happens when someone uses `/arenas kick` and `/forceend`, so that these commands can't be abused without consequences for the admin
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
 * `arena_lib.add_spectate_entity(mod, arena, e_name, entity)`: adds to the current ongoing match a spectatable entity, allowing spectators to spectate more than just players. `e_name` is the name that will appear in the spectator info hotbar, and `entity` the `luaentity` table. When the entity is removed/unloaded, automatically calls `remove_spectate_entity(...)`
 * `arena_lib.add_spectate_area(mod, arena, pos_name, pos)`: same as `add_spectate_entity`, but it adds an area instead. `pos` is a table containing the coordinates of the area to spectate
@@ -322,7 +323,7 @@ Then, a useful function you want to call through the tools in the editor section
 
 If you're a bit confused, have a look at [this mod](https://gitlab.com/marco_a/arena_lib-entrance-test) for a practical implementation.  
 
-If the registration was successful, it'll appear in the list of entrances type displayed with `/arenas <minigame> entrances`.
+If the registration was successful, it'll appear in the list of entrances type displayed with `/arenas entrances <minigame>`.
 
 ### 1.10 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 6th slot. To do that, the function is

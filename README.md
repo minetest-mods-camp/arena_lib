@@ -14,6 +14,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 3) (modders only) Dive into the [full documentation](DOCS.md) to understand how to create minigames  
 
 ### Dependencies
+* (bundled) [ChatCMDBuilder](https://github.com/rubenwardy/ChatCmdBuilder/) by rubenwardy
 * [signs_lib](https://content.minetest.net/packages/VanessaE/signs_lib/) by Vanessa Dannenberg  
 * (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 

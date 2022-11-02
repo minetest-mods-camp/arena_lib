@@ -6,90 +6,37 @@ local S = minetest.get_translator("arena_lib")
 -----------------ADMINS ONLY------------------
 ----------------------------------------------
 
-minetest.register_chatcommand("arenas", {
+ChatCmdBuilder.new("arenas", function(cmd)
+  cmd:sub("entrances :minigame", function(sender, minigame)
+    arena_lib.enter_entrance_settings(sender, minigame)
+  end)
 
-  description = "Manage arena_lib arenas",
-  privs = {
-    arenalib_admin = true
-  },
+  cmd:sub("settings :minigame", function(sender, minigame)
+    arena_lib.enter_minigame_settings(sender, minigame)
+  end)
 
-  func = function(sender, param)
-
-    --TODO: sostituisci con chatcmdbuilder e metti azione prima del minigioco
-    local mg = string.match(param, "^([%a%d_-]+)")
-
-    -- se non è specificato niente, annullo
-    if not mg then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return false end
-
-    if not arena_lib.mods[mg] then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] This minigame doesn't exist!"))
-      return false end
-
-    local action = string.match(param, "%s([%a]+)")
-
-    if not action then return false end
-
-    if action == "settings" then
-      --TODO in separate commit: arena_lib.enter_minigame_settings(sender, mg)
-
-    elseif action == "entrances" then
-      arena_lib.enter_entrance_settings(sender, mg)
-    else
-      return false
-    end
-
-    return true
-  end
-})
-
-minetest.register_chatcommand("arenakick", {
-
-  params = "<" .. S("player") .. ">",
-  description = S("Kicks a player from an ongoing game"),
-  privs = {
-        arenalib_admin = true,
-    },
-
-  func = function(sender, param)
-    local p_name = string.match(param, "^([%a%d_-]+)$")
-
-    -- se non è specificato niente, annullo
-    if not p_name then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return false end
-
+  cmd:sub("kick :player", function(sender, p_name)
     -- se il giocatore non è online, annullo
     if not minetest.get_player_by_name(p_name) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This player is not online!")))
-      return false end
+      return end
 
     -- se il giocatore non è in partita, annullo
     if not arena_lib.is_player_in_arena(p_name) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e" ,S("[!] The player must be in a game to perform this action!")))
-      return false end
+      return end
 
-    minetest.chat_send_player(sender, S("Player successfully kicked"))
     arena_lib.remove_player_from_arena(p_name, 2, sender)
-    return true
-  end
-})
+    minetest.chat_send_player(sender, S("Player successfully kicked"))
+  end)
 
-
-
-minetest.register_chatcommand("minigamesettings", {
-
-  params = "<" ..S("minigame") .. ">",
-  description = S("Tweaks the minigame settings for the current server"),
-  privs = {
-    arenalib_admin = true,
-  },
-
-  func = function(sender, param)
-    local mod = param
-    arena_lib.enter_minigame_settings(sender, mod)
-  end
+end, {
+  params = "[entrances|kick|settings] <" .. S("minigame") .. "|" .. S("player") .. ">",
+  description = S("Manage arena_lib arenas; it requires arenalib_admin") .. "\n"
+    .. "/arenas entrances <" .. S("minigame") .. ">\n"
+    .. "/arenas kick <" .. S("player") .. ">\n"
+    .. "/arenas settings <" .. S("minigame") .. ">",
+  privs = { arenalib_admin = true }
 })
 
 
@@ -240,5 +187,38 @@ minetest.register_chatcommand("t", {
 
     arena_lib.send_message_in_arena(arena, "players", minetest.colorize(mod_ref.chat_team_color, mod_ref.chat_team_prefix .. minetest.format_chat_message(name, msg)), teamID)
     return true
+  end
+})
+
+
+
+
+
+
+----------------------------------------------
+------------------DEPRECATED------------------
+----------------------------------------------
+
+-- to remove in 7.0
+minetest.register_chatcommand("arenakick", {
+  params = "<" .. S("player") .. "> (deprecated)",
+  description = "DEPRECATED, use '/arenas kick <nick>' instead",
+  privs = {
+        arenalib_admin = true,
+    },
+  func = function(sender, param)
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] DEPRECATED! Use '/arenas kick <nick>' instead!"))
+  end
+})
+
+minetest.register_chatcommand("minigamesettings", {
+  params = "<" ..S("minigame") .. "> (deprecated)",
+  description = "DEPRECATED, use '/arenas settings <minigame>' instead",
+  privs = {
+    arenalib_admin = true,
+  },
+  func = function(sender, param)
+    local mod = param
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] DEPRECATED! Use '/arenas settings <minigame>' instead!"))
   end
 })
