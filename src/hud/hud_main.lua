@@ -14,7 +14,8 @@ function arena_lib.HUD_add(player)
 
   local HUD_TITLE_TXT = player:hud_add({
     hud_elem_type = "text",
-    position  = {x = 0.5, y = 0.33},
+    position  = { x = 0.5, y = 0.5},
+    offset    = { x = 0,   y = -155},
     text      = "",
     size      = { x = 2},
     number    = 0xFFFFFF,
@@ -23,7 +24,8 @@ function arena_lib.HUD_add(player)
 
   local HUD_BROADCAST_IMG = player:hud_add({
     hud_elem_type = "image",
-    position  = { x = 0.5, y = 0.2},
+    position  = { x = 0.5, y = 0.5},
+    offset    = { x = 0,   y = -280},
     text      = "",
     scale     = { x = 25, y = 2},
     number    = 0xFFFFFF,
@@ -32,7 +34,8 @@ function arena_lib.HUD_add(player)
 
   local HUD_BROADCAST_TXT = player:hud_add({
     hud_elem_type = "text",
-    position  = { x = 0.5, y = 0.2},
+    position  = { x = 0.5, y = 0.5},
+    offset    = {x = 0,    y = -280},
     text      = "",
     size      = { x = 1, y = 1},
     number    = 0xFFFFFF,
