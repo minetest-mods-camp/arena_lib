@@ -1,7 +1,10 @@
-local version = "5.4.0-dev"
+local version = "5.3.1"
 local modpath = minetest.get_modpath("arena_lib")
 local srcpath = modpath .. "/src"
 
+arena_lib = {}
+
+dofile(modpath .. "/SETTINGS.lua")
 dofile(modpath .. "/libs/chatcmdbuilder.lua")
 
 dofile(srcpath .. "/api/core.lua")
@@ -37,7 +40,5 @@ dofile(srcpath .. "/utils/entrances.lua")
 dofile(srcpath .. "/utils/macros.lua")
 dofile(srcpath .. "/utils/minigame_settings.lua")
 dofile(srcpath .. "/utils/temp.lua")
-
-dofile(modpath .. "/SETTINGS.lua")
 
 minetest.log("action", "[ARENA_LIB] Mod initialised, running version " .. version)

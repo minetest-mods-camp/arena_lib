@@ -1,5 +1,4 @@
 -- in here: whatever needs to access the storage (minigames and arenas management) + deprecations
-arena_lib = {}
 arena_lib.mods = {}
 arena_lib.entrances = {}
 
