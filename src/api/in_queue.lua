@@ -31,7 +31,7 @@ minetest.register_globalstep(function(dtime)
       -- per eseguire queste chiamate solo una volta al secondo, utilizzo un booleano
       if not info.was_second_run[time_left] then
 
-        if time_left == 0 then
+        if time_left <= 0 then
           go_to_arena(mod, arena)
         elseif time_left <= 5 then
           arena_lib.HUD_send_msg_all("broadcast", arena, S("Game begins in @1!", time_left), nil, "arenalib_countdown")
