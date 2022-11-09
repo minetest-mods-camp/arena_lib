@@ -1,4 +1,4 @@
-# version 5.3.1
+# version 5.4.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -83,6 +83,7 @@ Arena @1 successfully disabled=Arena @1 disabilitata con successo
 Team @1 wins the game=La squadra @1 ha vinto la partita
 @1 win the game=@1 hanno vinto la partita
 Teams @1 win the game=Le squadre @1 hanno vinto la partita
+Players and spectators can now interact with each other=Giocatori e spettatori possono ora interagire tra di loro
 @1 has been eliminated by @2=@1 è stato eliminato da @2
 @1 has been eliminated=@1 è stato eliminato
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!

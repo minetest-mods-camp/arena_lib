@@ -260,6 +260,7 @@ function arena_lib.load_celebration(mod, arena, winners)
   local mod_ref = arena_lib.mods[mod]
 
   arena_lib.HUD_send_msg_all("title", arena, winning_message, mod_ref.celebration_time)
+  arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", "> " .. S("Players and spectators can now interact with each other")))
 
   -- eventuale codice aggiuntivo
   if mod_ref.on_celebration then

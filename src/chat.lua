@@ -11,6 +11,27 @@ minetest.register_on_mods_loaded(function()
       local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(p_name)]
       local arena = arena_lib.get_arena_by_player(p_name)
 
+      -- se è in celebrazione, tutti posson parlare con tutti
+      if arena.in_celebration then
+        local col, prefix
+        if arena_lib.is_player_spectating(p_name) then
+          col = mod_ref.chat_spectate_color
+          prefix = mod_ref.chat_spectate_prefix
+        else
+          if arena.teams_enabled then
+            col = mod_ref.chat_team_color
+            prefix = mod_ref.chat_team_prefix
+          else
+            col = "#ffdddd"
+            prefix = mod_ref.chat_all_prefix
+          end
+        end
+
+        arena_lib.send_message_in_arena(arena, "both", minetest.colorize(col, prefix .. minetest.format_chat_message(p_name, message)))
+        return true
+      end
+
+
       if arena_lib.is_player_spectating(p_name) then
         arena_lib.send_message_in_arena(arena, "spectators", minetest.colorize(mod_ref.chat_spectate_color, mod_ref.chat_spectate_prefix .. minetest.format_chat_message(p_name, message)))
       else
