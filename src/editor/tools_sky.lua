@@ -76,6 +76,7 @@ function get_celvault_formspec(p_name, section)
     "position[0.5,0.5]",
     "no_prepend[]",
     "style_type[image_button;border=false]",
+    "scrollbaroptions[min=0;max=100;arrows=hide]",
     -- bottoni
     "container[1,1]",
     "tooltip[sky_btn;" .. S("Sky") .."]",
@@ -297,6 +298,10 @@ function get_stars_params(p_name)
       "label[0,-0.2;" .. S("Colour") .. "]",
       "dropdown[0,0;3.75,0.6;stars_color;" .. palette_str .. ";" .. (palette_id[temp_stars.star_color] or 1) .. "]",
       "field[4.15,0;3.75,0.6;stars_count;" .. S("Count") .. ";" .. (temp_stars.count or 1000) .. "]",
+      "label[0,1;" .. S("Opacity") .. "]",
+      "label[0,1.5;0]",
+      "label[7.6,1.5;1]",
+      "scrollbar[0.3,1.35;7.15,0.3;horizontal;stars_opacity;" .. (temp_stars.day_opacity or 0) * 100 .. "]",
       "container_end[]"
     }
 
@@ -325,7 +330,6 @@ function get_clouds_params(p_name)
     local col, alpha = get_clouds_col_alpha(temp_clouds.color)
     clouds = {
       "container[0,0.5]",
-      "scrollbaroptions[min=0;max=100;arrows=hide]",
       -- colour
       "container[0,0]",
       "label[0,0;" .. S("Colour") .. "]",
@@ -613,6 +617,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   if fields.stars_size then
     temp_stars.scale = tonumber(fields.stars_size) or temp_stars.scale
+  end
+
+  if fields.stars_opacity then
+    temp_stars.day_opacity = minetest.explode_scrollbar_event(fields.stars_opacity).value / 100
   end
 
   -- nuvole
