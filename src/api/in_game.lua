@@ -452,9 +452,9 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- se è già in celebrazione, non c'è bisogno di andare oltre
   if arena.in_celebration then return end
 
-  -- se l'ultimo rimasto abbandona con alt+f4, evito il crash
+  -- se l'ultimo rimasto abbandona, vai in celebrazione
   if arena.players_amount == 0 then
-    arena_lib.end_arena(mod_ref, mod, arena)
+    arena_lib.load_celebration(mod, arena)
 
   -- se l'arena è a squadre e sono rimasti solo i giocatori di una squadra, la loro squadra vince
   elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
@@ -463,7 +463,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
     arena_lib.load_celebration(mod, arena, winning_team_id)
-
 
   -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
   elseif arena.players_amount == 1 then
