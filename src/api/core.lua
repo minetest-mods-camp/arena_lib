@@ -210,6 +210,7 @@ function arena_lib.register_minigame(mod, def)
   end
 
   if def.celebration_time then
+    assert(def.celebration_time > 0, "[ARENA_LIB] celebration_time must be greater than 0 (everyone deserves to celebrate!)")
     mod_ref.celebration_time = def.celebration_time
   end
 

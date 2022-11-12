@@ -83,7 +83,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * `"incremental"`: incremental time (0, 1, 2, ...)
   * `"decremental"`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
 * `load_time`: (int) the time in seconds between the loading state and the start of the match. Default is `5`
-* `celebration_time`: (int) the time in seconds between the celebration state and the end of the match. Default is `5`
+* `celebration_time`: (int) the time in seconds between the celebration state and the end of the match. Must be greater than 0. Default is `5`
 * `in_game_physics`: (table) a physical override to set to each player when they enter an arena, following the Minetest `physics_override` parameters
 * `disabled_damage_types`: (table) contains which damage types will be disabled once in a game. Damage types are strings, the same as in reason.type in the [minetest API](https://github.com/minetest/minetest/blob/master/doc/lua_api.txt)
 * `properties`: see [1.5 Additional properties](#15-additional-properties)
