@@ -18,13 +18,8 @@ minetest.register_on_mods_loaded(function()
           col = mod_ref.chat_spectate_color
           prefix = mod_ref.chat_spectate_prefix
         else
-          if arena.teams_enabled then
-            col = mod_ref.chat_team_color
-            prefix = mod_ref.chat_team_prefix
-          else
-            col = "#ffdddd"
-            prefix = mod_ref.chat_all_prefix
-          end
+          col = "#ffdddd"
+          prefix = mod_ref.chat_all_prefix
         end
 
         arena_lib.send_message_in_arena(arena, "both", minetest.colorize(col, prefix .. minetest.format_chat_message(p_name, message)))
