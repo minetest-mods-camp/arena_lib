@@ -40,7 +40,7 @@ end, {
 })
 
 
-
+-- TODO: integrare in /arenas, "forceend", iterando per tutte le arene di tutti i minigiochi. Se trova doppioni, avvisa che va specificato anche il minigioco
 minetest.register_chatcommand("forceend", {
 
   params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",
@@ -69,7 +69,7 @@ minetest.register_chatcommand("forceend", {
 })
 
 
-
+-- TODO: idem come il comando sopra, "flush"
 minetest.register_chatcommand("flusharena", {
 
   params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",

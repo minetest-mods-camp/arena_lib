@@ -885,10 +885,10 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     player:hud_set_hotbar_selected_image(players_temp_storage[p_name].hotbar_selected_image)
   end
 
-  -- se ho hub_manager, restituisco gli oggetti e imposto fisica della lobby
-  if minetest.get_modpath("hub_manager") then
-    hub_manager.set_items(player)
-    hub_manager.set_hub_physics(player)
+  -- se ho Hub, restituisco gli oggetti e imposto fisica della lobby
+  if minetest.get_modpath("hub") then
+    hub.set_items(player)
+    hub.set_hub_physics(player)
   else
     player:set_physics_override(arena_lib.SERVER_PHYSICS)
   end

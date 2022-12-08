@@ -19,7 +19,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 * (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 #### Add-ons
-[Hub Manager](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server
+[Hub](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server
 
 ### Known conflicts
 * `Beds` or any other mod overriding the default respawn system
