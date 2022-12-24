@@ -271,8 +271,9 @@ function arena_lib.load_celebration(mod, arena, winners)
     callback(mod_ref, arena, winners)
   end
 
-  -- l'arena finisce dopo tot secondi
+  -- l'arena finisce dopo tot secondi, a meno che non sia stata terminata forzatamente nel mentre
   minetest.after(mod_ref.celebration_time, function()
+    if not arena.in_game then return end
     arena_lib.end_arena(mod_ref, mod, arena, winners)
   end)
 
