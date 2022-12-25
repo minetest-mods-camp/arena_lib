@@ -31,7 +31,7 @@ Tweaks the minigame settings for the current server=Modifica le impostazioni del
 # api/core.lua
 team=squadra
 spectator=spettatore
-[!] You can't change type!=[!] Non puoi cambiare tipo!
+[!] Property type doesn't match, aborting!=[!] Il tipo della proprietà non corrisponde, annullo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
 [!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 Arena @1 successfully created=Arena @1 creata con successo

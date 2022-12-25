@@ -31,7 +31,7 @@ Tweaks the minigame settings for the current server=
 # api/core.lua
 team=
 spectator=
-[!] You can't change type!=
+[!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
 [!] This minigame doesn't exist!=
 Arena @1 successfully created=

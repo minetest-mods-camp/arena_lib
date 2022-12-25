@@ -310,8 +310,8 @@ function arena_lib.change_mod_settings(sender, mod, setting, new_value)
 
   -- se il tipo è diverso dal precedente
   if type(mod_settings[setting]) ~= type(new_value) then
-    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change type!")))
-    else minetest.log("warning", "[ARENA_LIB] [!] Minigame parameters - You can't change type!") end
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Property type doesn't match, aborting!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Minigame parameters - Property type doesn't match, aborting!") end
     return end
 
   mod_settings[setting] = new_value
@@ -429,7 +429,6 @@ function arena_lib.remove_arena(sender, mod, arena_name, in_editor)
   update_storage(true, mod, id)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully removed", arena_name))
-
 end
 
 
@@ -523,8 +522,8 @@ function arena_lib.change_arena_property(sender, mod, arena_name, property, new_
 
   -- se il tipo è diverso dal precedente
   if type(arena[property]) ~= type(new_value) then
-    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't change type!")))
-    else minetest.log("warning", "[ARENA_LIB] [!] Properties - You can't change type!") end
+    if sender then minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Property type doesn't match, aborting!")))
+    else minetest.log("warning", "[ARENA_LIB] [!] Properties - Property type doesn't match, aborting!") end
     return end
 
   arena[property] = new_value

@@ -1,5 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
+local function get_minigames_by_arena() end
+
 
 
 ----------------------------------------------
@@ -7,6 +9,88 @@ local S = minetest.get_translator("arena_lib")
 ----------------------------------------------
 
 ChatCmdBuilder.new("arenas", function(cmd)
+
+  -- gestione arena
+  cmd:sub("create :minigame :arena", function(sender, minigame, arena)
+    arena_lib.create_arena(sender, minigame, arena)
+  end)
+
+  cmd:sub("create :minigame :arena :pmin:int :pmax:int", function(sender, minigame, arena, min, max)
+    arena_lib.create_arena(sender, minigame, arena, min, max)
+  end)
+
+  cmd:sub("edit :minigame :arena", function(sender, minigame, arena)
+    arena_lib.enter_editor(sender, minigame, arena)
+  end)
+
+  cmd:sub("edit :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.enter_editor(sender, minigames[1], arena)
+  end)
+
+  cmd:sub("remove :minigame :arena", function(sender, minigame, arena)
+    arena_lib.remove_arena(sender, minigame, arena)
+  end)
+
+  cmd:sub("remove :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.remove_arena(sender, minigames[1], arena)
+  end)
+
+  -- abilita/disabilita
+  cmd:sub("enable :minigame :arena", function(sender, minigame, arena)
+    arena_lib.enable_arena(sender, minigame, arena)
+  end)
+
+  cmd:sub("enable :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.enable_arena(sender, minigames[1], arena)
+  end)
+
+  cmd:sub("disable :minigame :arena", function(sender, minigame, arena)
+    arena_lib.disable_arena(sender, minigame, arena)
+  end)
+
+  cmd:sub("disable :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.disable_arena(sender, minigames[1], arena)
+  end)
+
+  -- utilità arene
+  cmd:sub("info :minigame :arena", function(sender, minigame, arena)
+    arena_lib.print_arena_info(sender, minigame, arena)
+  end)
+
+  cmd:sub("info :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.print_arena_info(sender, minigames[1], arena)
+  end)
+
+  cmd:sub("list :minigame", function(sender, minigame)
+    arena_lib.print_arenas(sender, minigame)
+  end)
+
+  -- impostazioni minigiochi
   cmd:sub("entrances :minigame", function(sender, minigame)
     arena_lib.enter_entrance_settings(sender, minigame)
   end)
@@ -15,6 +99,7 @@ ChatCmdBuilder.new("arenas", function(cmd)
     arena_lib.enter_minigame_settings(sender, minigame)
   end)
 
+  -- gestione utenti
   cmd:sub("kick :player", function(sender, p_name)
     -- se il giocatore non è online, annullo
     if not minetest.get_player_by_name(p_name) then
@@ -31,10 +116,17 @@ ChatCmdBuilder.new("arenas", function(cmd)
   end)
 
 end, {
-  params = "[entrances|kick|settings] <" .. S("minigame") .. "|" .. S("player") .. ">",
+  params = "[ create | disable | edit | enable | entrances | info | kick | list | remove | settings ]",
   description = S("Manage arena_lib arenas; it requires arenalib_admin") .. "\n"
+    .. "/arenas create <" .. S("minigame") .. "> <" .. S("arena") .. "> (<pmin> <pmax>)\n"
+    .. "/arenas disable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
+    .. "/arenas edit (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
+    .. "/arenas enable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas entrances <" .. S("minigame") .. ">\n"
+    .. "/arenas info (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas kick <" .. S("player") .. ">\n"
+    .. "/arenas list <" .. S("minigame") .. ">\n"
+    .. "/arenas remove (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas settings <" .. S("minigame") .. ">",
   privs = { arenalib_admin = true }
 })
@@ -190,6 +282,26 @@ minetest.register_chatcommand("t", {
   end
 })
 
+
+
+
+
+----------------------------------------------
+---------------FUNZIONI LOCALI----------------
+----------------------------------------------
+
+function get_minigames_by_arena(arena_name)
+  local mgs = {}
+  for mg, mg_data in pairs(arena_lib.mods) do
+    for _, arena in pairs(mg_data.arenas) do
+      if arena.name == arena_name then
+        table.insert(mgs, mg)
+        break
+      end
+    end
+  end
+  return mgs
+end
 
 
 

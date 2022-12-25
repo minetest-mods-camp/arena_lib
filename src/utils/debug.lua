@@ -6,6 +6,12 @@ local function table_to_string() end
 
 function arena_lib.print_arenas(sender, mod)
 
+  local mod_ref = arena_lib.mods[mod]
+
+  if not mod_ref then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame doesn't exist!")))
+    return end
+
   local n = 0
   for id, arena in pairs(arena_lib.mods[mod].arenas) do
     n = n+1
@@ -13,7 +19,6 @@ function arena_lib.print_arenas(sender, mod)
   end
 
   minetest.chat_send_player(sender, S("Total arenas: ") .. n )
-
 end
 
 
@@ -283,7 +288,6 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Temp properties: ")) .. minetest.colorize("#cfc6b8", temp_properties) .. "\n" ..
     minetest.colorize("#eea160", S("Team properties: ")) .. minetest.colorize("#cfc6b8", team_properties)
   )
-
 end
 
 
