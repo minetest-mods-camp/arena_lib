@@ -333,7 +333,10 @@ end
 function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
 
   local mod_ref = arena_lib.mods[mod]
-  local ID = next_available_ID(mod_ref)
+
+  if not mod_ref then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame doesn't exist!")))
+    return end
 
   -- controllo nome
   if not is_arena_name_allowed(sender, mod, arena_name) then return end
@@ -344,6 +347,8 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
   end
+
+  local ID = next_available_ID(mod_ref)
 
   -- creo l'arena
   mod_ref.arenas[ID] = table.copy(arena_default)
@@ -390,9 +395,9 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
 
   mod_ref.highest_arena_ID = table.maxn(mod_ref.arenas)
 
-  -- aggiungo allo storage
+  -- aggiungo allo spazio d'archiviazione
   update_storage(false, mod, ID, arena)
-  -- aggiorno l'ID globale nello storage
+  -- aggiorno l'ID globale nello spazio d'archiviazione
   storage:set_int(mod .. ".HIGHEST_ARENA_ID", mod_ref.highest_arena_ID)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully created", arena_name))

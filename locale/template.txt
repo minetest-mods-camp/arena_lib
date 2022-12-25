@@ -4,10 +4,12 @@
 # textdomain: arena_lib
 
 # commands.lua
+[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space=
 [!] Parameters don't seem right!=
 [!] This player is not online!=
 [!] The player must be in a game to perform this action!=
 Player successfully kicked=
+arena=
 minigame=
 player=
 Manage arena_lib arenas; it requires arenalib_admin=
@@ -27,11 +29,11 @@ Kicks a player from an ongoing game=
 Tweaks the minigame settings for the current server=
 
 # api/core.lua
-arena=
 team=
 spectator=
 [!] You can't change type!=
 Parameter @1 successfully overwritten=
+[!] This minigame doesn't exist!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
@@ -89,7 +91,6 @@ Players and spectators can now interact with each other=
 There are no other teams left, you win!=
 You're the last player standing: you win!=
 You win the game due to not enough players=
-[!] This minigame doesn't exist!=
 [!] This arena doesn't exist!=
 [!] No ongoing game!=
 The arena has been forcibly terminated by @1=

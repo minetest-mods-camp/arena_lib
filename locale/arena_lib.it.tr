@@ -4,10 +4,12 @@
 # textdomain: arena_lib
 
 # commands.lua
+[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space=[!] Ci sono più minigiochi contenenti un'arena chiamata @1: specifica il nome del minigioco prima del nome dell'arena, separandoli con uno spazio
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 [!] This player is not online!=[!] Questo giocatore non è online!
 [!] The player must be in a game to perform this action!=[!] Il giocatore deve essere in partita per eseguire questa azione!
 Player successfully kicked=Giocatore cacciato con successo
+arena=arena
 minigame=minigioco
 player=giocatore
 Manage arena_lib arenas; it requires arenalib_admin=Gestisce le arene di arena_lib; richiede arenalib_admin
@@ -27,11 +29,11 @@ Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
 Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 
 # api/core.lua
-arena=arena
 team=squadra
 spectator=spettatore
 [!] You can't change type!=[!] Non puoi cambiare tipo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
+[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
@@ -89,7 +91,6 @@ Players and spectators can now interact with each other=Giocatori e spettatori p
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
-[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 [!] This arena doesn't exist!=[!] Quest'arena non esiste!
 [!] No ongoing game!=[!] Nessuna partita in corso!
 Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
