@@ -152,9 +152,13 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
 
+  -- se non è in corso
+  if not arena.in_game then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
+    return end
+
   -- se prova a entrare come spettatore
   if as_spectator then
-
     -- se non supporta la spettatore
     if not arena_lib.mods[mod].spectate_mode then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Spectate mode not supported!")))
@@ -165,15 +169,15 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
       return end
 
-    -- se non è in corso
-    if not arena.in_game then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
-      return end
-
     -- se si è attaccati a qualcosa
     if minetest.get_player_by_name(p_name):get_attach() then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
       return end
+
+    -- se si era in coda
+    if arena_lib.is_player_in_queue(p_name) then
+      if not arena_lib.remove_player_from_queue(p_name) then return end
+    end
 
     operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
     arena_lib.enter_spectate_mode(p_name, arena)
@@ -181,11 +185,32 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
 
   -- se entra come giocatore
   else
+    if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name) then return end
+
+    -- se sta caricando o sta finendo
+    if arena.in_loading or arena.in_celebration then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is loading, try again in a few seconds!")))
+      return end
+
+    -- se è in corso e non permette l'entrata
+    if not mod_ref.join_while_in_progress then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't allow to join while in progress!")))
+      return end
+
+    -- se si era in coda
+    if arena_lib.is_player_in_queue(p_name) then
+      if not arena_lib.remove_player_from_queue(p_name) then return end
+    end
+
     if arena_lib.is_player_spectating(p_name) then                              -- se lo fa mentre è spettatore, controllo che ci sia spazio ecc.
       if not arena_lib.leave_spectate_mode(p_name, true) then return end
       operations_before_playing_arena(mod_ref, arena, p_name)
     else
-      operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)   -- sennò entra normalmente
+      local players = arena_lib.get_and_add_joining_players(mod_ref, arena, p_name)
+
+      for _, pl_name in pairs(players) do
+        operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
+      end
     end
 
     -- notifico e teletrasporto
@@ -201,6 +226,8 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
   for _, callback in ipairs(arena_lib.registered_on_join) do
     callback(mod_ref, arena, p_name, as_spectator)
   end
+
+  arena_lib.entrances[arena.entrance_type].update(arena)
 end
 
 

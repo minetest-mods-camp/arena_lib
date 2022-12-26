@@ -28,12 +28,24 @@ Writes a message in the arena team chat while in a game (if teams are enabled)=
 Kicks a player from an ongoing game=
 Tweaks the minigame settings for the current server=
 
+# admin_tools/entrances.lua
+[!] You can't perform this action while in game!=
+[!] This minigame doesn't exist!=
+Entrance type - @1=
+Pressing 'overwrite' will try to disable the arena first=
+OVERWRITE ALL=
+Overwrite=
+@1 - nothing to overwrite=
+
+# admin_tools/minigame_settings.lua
+[!] You can't perform this action while in queue!=
+Minigame settings=
+
 # api/core.lua
 team=
 spectator=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
-[!] This minigame doesn't exist!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
@@ -81,6 +93,12 @@ Arena @1 successfully disabled=
 [!] The name contains unsupported characters!=
 
 # api/in_game.lua
+[!] No ongoing game!=
+[!] Spectate mode not supported!=
+[!] The arena is not enabled!=
+[!] You must detach yourself from the entity you're attached to before entering!=
+[!] The arena is loading, try again in a few seconds!=
+[!] This minigame doesn't allow to join while in progress!=
 @1 wins the game=
 Team @1 wins the game=
 @1 win the game=
@@ -92,7 +110,6 @@ There are no other teams left, you win!=
 You're the last player standing: you win!=
 You win the game due to not enough players=
 [!] This arena doesn't exist!=
-[!] No ongoing game!=
 The arena has been forcibly terminated by @1=
 @1 has been kicked by @2=
 @1 has been kicked=
@@ -100,33 +117,20 @@ The arena has been forcibly terminated by @1=
 [!] on_timeout callback must be declared to properly use a decreasing timer!=
 
 # api/in_queue.lua
-[!] You must leave the editor first!=
-[!] Only the party leader can enter the queue!=
-[!] You must wait for all your party members to finish their ongoing games before entering a new one!=
-[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=
-[!] There is not enough space for the whole party!=
-[!] There is no team with enough space for the whole party!=
 [!] Only the party leader can leave the queue!=
-[!] You must detach yourself from the entity you're attached to before entering!=
-[!] The arena is not enabled!=
-[!] The arena is already full!=
-[!] The arena is loading, try again in a few seconds!=
-[!] This minigame doesn't allow to join while in progress!=
 [!] You're already queuing for this arena!=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=
-You've joined team @1=
 Game begins in @1!=
 Get ready!=
 
 # dependencies/parties.lua
-[!] You can't perform this action while in queue!=
-[!] You can't perform this action while in game!=
 [!] The party leader must not be in queue to perform this action!=
 [!] The party leader must not be in game to perform this action!=
 
 # editor/editor_main.lua
+[!] You must leave the editor first!=
 Wooosh!=
 Arena_lib editor | Now editing: @1=
 
@@ -243,7 +247,6 @@ Remove sign=
 Are you sure you want to delete the sign from @1?=
 
 # spectate/spectate_main.lua
-[!] Spectate mode not supported!=
 Currently spectating: @1=
 
 # spectate/spectate_tools.lua
@@ -292,16 +295,15 @@ Temp properties: =
 Team properties: =
 [!] You can't perform this action during an ongoing game!=
 
-# utils/entrance.lua
-Entrance type - @1=
-Pressing 'overwrite' will try to disable the arena first=
-OVERWRITE ALL=
-Overwrite=
-@1 - nothing to overwrite=
-
 # utils/macros.lua
 [!] You must disable the arena first!=
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=
+[!] Only the party leader can enter the queue!=
+[!] You must wait for all your party members to finish their ongoing games before entering a new one!=
+[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=
+[!] There is not enough space for the whole party!=
+[!] There is no team with enough space for the whole party!=
+[!] The arena is already full!=
 
-# utils/minigame_settings.lua
-Minigame settings=
+#utils/utils.lua
+You've joined team @1=

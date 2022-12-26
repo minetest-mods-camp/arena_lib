@@ -25,6 +25,79 @@ end
 
 
 
+function ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name, was_spectator)
+  -- se si è nell'editor
+  if arena_lib.is_player_in_edit_mode(p_name) then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
+    return end
+
+  -- se non è abilitata
+  if not arena.enabled then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
+    return end
+
+  -- se c'è `parties` e si è in gruppo...
+  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
+
+    -- se non si è il capo gruppo
+    if not parties.is_player_party_leader(p_name) then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can enter the queue!")))
+      return end
+
+    local party_members = parties.get_party_members(p_name)
+
+    -- per tutti i membri...
+    for _, pl_name in pairs(party_members) do
+      -- se uno è in partita
+      if arena_lib.is_player_in_arena(pl_name) then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
+        return end
+
+      -- se uno è attaccato a qualcosa
+      if not was_spectator and minetest.get_player_by_name(pl_name):get_attach() then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)")))
+        return end
+    end
+
+    --se non c'è spazio (no gruppo)
+    if not arena.teams_enabled then
+      if #party_members > arena.max_players - arena.players_amount then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is not enough space for the whole party!")))
+        return end
+    -- se non c'è spazio (gruppo)
+    else
+
+      local free_space = false
+      for _, amount in pairs(arena.players_amount_per_team) do
+        if #party_members <= arena.max_players - amount then
+          free_space = true
+          break
+        end
+      end
+
+      if not free_space then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no team with enough space for the whole party!")))
+        return end
+    end
+  end
+
+  local player = minetest.get_player_by_name(p_name)
+
+  -- se si è attaccati a qualcosa
+  if not was_spectator and player:get_attach() then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
+    return end
+
+  -- se l'arena è piena
+  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
+    return end
+
+  return true
+end
+
+
+
 function AL_property_to_string(property)
 
 	if type(property) == "string" then

@@ -28,12 +28,24 @@ Writes a message in the arena team chat while in a game (if teams are enabled)=S
 Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
 Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 
+# admin_tools/entrances.lua
+[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
+[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
+Entrance type - @1=Tipo d'entrata - @1
+Pressing 'overwrite' will try to disable the arena first=Premere 'sovrascrivi' proverà prima a disabilitare l'arena
+OVERWRITE ALL=SOVRASCRIVI TUTTO
+Overwrite=Sovrascrivi
+@1 - nothing to overwrite=@1 - niente da sovrascrivere
+
+# admin_tools/minigame_settings.lua
+[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
+Minigame settings=Impostazioni minigioco
+
 # api/core.lua
 team=squadra
 spectator=spettatore
 [!] Property type doesn't match, aborting!=[!] Il tipo della proprietà non corrisponde, annullo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
-[!] This minigame doesn't exist!=[!] Questo minigioco non esiste!
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
@@ -81,6 +93,12 @@ Arena @1 successfully disabled=Arena @1 disabilitata con successo
 [!] The name contains unsupported characters!=[!] Il nome contiene caratteri non supportati!
 
 # api/in_game.lua
+[!] No ongoing game!=[!] Nessuna partita in corso!
+[!] Spectate mode not supported!=[!] Modalità spettatore non supportata!
+[!] The arena is not enabled!=[!] L'arena non è attiva!
+[!] You must detach yourself from the entity you're attached to before entering!=[!] Devi prima staccarti dall'entità alla quale sei agganciato/a se vuoi entrare!
+[!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
+[!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
 @1 wins the game=@1 ha vinto la partita
 Team @1 wins the game=La squadra @1 ha vinto la partita
 @1 win the game=@1 hanno vinto la partita
@@ -92,7 +110,6 @@ There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai v
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
 [!] This arena doesn't exist!=[!] Quest'arena non esiste!
-[!] No ongoing game!=[!] Nessuna partita in corso!
 Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
 The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
 @1 has been kicked by @2=@1 è stato cacciato da @2
@@ -101,33 +118,20 @@ The arena has been forcibly terminated by @1=La conclusione della partita è sta
 [!] on_timeout callback must be declared to properly use a decreasing timer!=[!] il callback on_timeout deve essere dichiarato per poter usare correttamente un timer decrescente!
 
 # api/in_queue.lua
-[!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
-[!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
-[!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
-[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=[!] Non puoi entrare in partita se alcuni membri del gruppo sono attaccati a qualcosa! (es. navi, cavalli ecc.)
-[!] There is not enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
-[!] There is no team with enough space for the whole party!=[!] Non c'è un team con abbastanza spazio per tutto il gruppo!
 [!] Only the party leader can leave the queue!=[!] Solo il capo gruppo può abbandonare la coda!
-[!] You must detach yourself from the entity you're attached to before entering!=[!] Devi prima staccarti dall'entità alla quale sei agganciato/a se vuoi entrare!
-[!] The arena is not enabled!=[!] L'arena non è attiva!
-[!] The arena is already full!=[!] L'arena è già piena!
-[!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
-[!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
 [!] You're already queuing for this arena!=[!] Sei già in coda per quest'arena!
 Waiting for more players...=In attesa di più giocatori...
 The queue has been cancelled due to not enough players=La coda è stata annullata per troppi pochi giocatori
 @1 seconds for the match to start=@1 secondi all'inizio
-You've joined team @1=Ti sei unito alla squadra @1
 Game begins in @1!=La partita inizierà tra @1!
 Get ready!=Preparati!
 
 # dependencies/parties.lua
-[!] You can't perform this action while in queue!=[!] Non puoi eseguire quest'azione mentre sei in coda!
-[!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
 [!] The party leader must not be in queue to perform this action!=[!] Il capo gruppo non deve essere in coda per eseguire quest'azione!
 [!] The party leader must not be in game to perform this action!=[!] Il capo gruppo non deve essere in partita per eseguire quest'azione!
 
 # editor/editor_main.lua
+[!] You must leave the editor first!=[!] Devi prima uscire dall'editor!
 Wooosh!=Wooosh!
 Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
@@ -244,7 +248,6 @@ Remove sign=Rimuovi cartello
 Are you sure you want to delete the sign from @1?=Sei sicuro/a di voler rimuovere il cartello di @1?
 
 # spectate/spectate_main.lua
-[!] Spectate mode not supported!=[!] Modalità spettatore non supportata!
 Currently spectating: @1=Stai seguendo: @1
 
 # spectate/spectate_tools.lua
@@ -293,16 +296,15 @@ Temp properties: =Proprietà temporanee:
 Team properties: =Proprietà squadra: 
 [!] You can't perform this action during an ongoing game!=[!] Non puoi eseguire quest'azione mentre c'è una partita in corso!
 
-# utils/entrance.lua
-Entrance type - @1=Tipo d'entrata - @1
-Pressing 'overwrite' will try to disable the arena first=Premere 'sovrascrivi' proverà prima a disabilitare l'arena
-OVERWRITE ALL=SOVRASCRIVI TUTTO
-Overwrite=Sovrascrivi
-@1 - nothing to overwrite=@1 - niente da sovrascrivere
-
 # utils/macros.lua
 [!] You must disable the arena first!=[!] Devi prima disabilitare l'arena!
 [!] There must be no one inside the editor of the arena to perform this command! (now inside: @1)=[!] Non deve esserci nessuno nell'editor dell'arena per poter eseguire questo comando! (attualmente dentro: @1)
+[!] Only the party leader can enter the queue!=[!] Solo il capo gruppo può entrare nella coda!
+[!] You must wait for all your party members to finish their ongoing games before entering a new one!=[!] Devi aspettare che i membri della tua squadra terminino le loro partite in corso prima di iniziarne una nuova!
+[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)=[!] Non puoi entrare in partita se alcuni membri del gruppo sono attaccati a qualcosa! (es. navi, cavalli ecc.)
+[!] There is not enough space for the whole party!=[!] Non c'è abbastanza spazio per tutto il gruppo!
+[!] There is no team with enough space for the whole party!=[!] Non c'è una squadra con abbastanza spazio per tutto il gruppo!
+[!] The arena is already full!=[!] L'arena è già piena!
 
-# utils/minigame_settings.lua
-Minigame settings=Impostazioni minigioco
+#utils/utils.lua
+You've joined team @1=Ti sei unito alla squadra @1

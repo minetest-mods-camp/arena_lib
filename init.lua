@@ -7,6 +7,8 @@ arena_lib = {}
 dofile(modpath .. "/SETTINGS.lua")
 dofile(modpath .. "/libs/chatcmdbuilder.lua")
 
+dofile(srcpath .. "/admin_tools/entrances.lua")
+dofile(srcpath .. "/admin_tools/minigame_settings.lua")
 dofile(srcpath .. "/api/core.lua")
 dofile(srcpath .. "/api/in_game.lua")
 dofile(srcpath .. "/api/in_queue.lua")
@@ -36,9 +38,9 @@ dofile(srcpath .. "/spectate/spectate_main.lua")
 dofile(srcpath .. "/spectate/spectate_hand.lua")
 dofile(srcpath .. "/spectate/spectate_tools.lua")
 dofile(srcpath .. "/utils/debug.lua")
-dofile(srcpath .. "/utils/entrances.lua")
 dofile(srcpath .. "/utils/macros.lua")
-dofile(srcpath .. "/utils/minigame_settings.lua")
 dofile(srcpath .. "/utils/temp.lua")
+dofile(srcpath .. "/utils/utils.lua")
+
 
 minetest.log("action", "[ARENA_LIB] Mod initialised, running version " .. version)

@@ -1,7 +1,6 @@
 local S = minetest.get_translator("arena_lib")
 
 local function initialise_queue_container() end
-local function assign_team() end
 local function go_to_arena() end
 local function queue_format() end
 
@@ -54,87 +53,11 @@ end)
 ----------------------------------------------
 
 function arena_lib.join_queue(mod, arena, p_name)
-  -- se si è nell'editor
-  if arena_lib.is_player_in_edit_mode(p_name) then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
-    return end
+
+  if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name) then return end
 
   local arena_name = arena.name
   local arenaID = arena_lib.get_arena_by_name(mod, arena_name)
-
-  -- se c'è `parties` e si è in gruppo...
-  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
-
-    -- se non si è il capo gruppo
-    if not parties.is_player_party_leader(p_name) then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Only the party leader can enter the queue!")))
-      return end
-
-    local party_members = parties.get_party_members(p_name)
-
-    -- per tutti i membri...
-    for _, pl_name in pairs(party_members) do
-      -- se uno è in partita
-      if arena_lib.is_player_in_arena(pl_name) then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
-        return end
-
-      -- se uno è attaccato a qualcosa
-      if minetest.get_player_by_name(pl_name):get_attach() then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)")))
-        return end
-    end
-
-    --se non c'è spazio (no gruppo)
-    if not arena.teams_enabled then
-      if #party_members > arena.max_players - arena.players_amount then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is not enough space for the whole party!")))
-        return end
-    -- se non c'è spazio (gruppo)
-    else
-
-      local free_space = false
-      for _, amount in pairs(arena.players_amount_per_team) do
-        if #party_members <= arena.max_players - amount then
-          free_space = true
-          break
-        end
-      end
-
-      if not free_space then
-        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no team with enough space for the whole party!")))
-        return end
-    end
-  end
-
-  local player = minetest.get_player_by_name(p_name)
-
-  -- se si è attaccati a qualcosa
-  if player:get_attach() then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
-    return end
-
-  -- se non è abilitata
-  if not arena.enabled then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
-    return end
-
-  -- se l'arena è piena
-  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
-    return end
-
-  -- se sta caricando o sta finendo
-  if arena.in_loading or arena.in_celebration then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is loading, try again in a few seconds!")))
-    return end
-
-  local mod_ref = arena_lib.mods[mod]
-
-  -- se è in corso e non permette l'entrata
-  if arena.in_game and mod_ref.join_while_in_progress == false then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't allow to join while in progress!")))
-    return end
 
   -- se il giocatore è già in coda
   if arena_lib.is_player_in_queue(p_name) then
@@ -150,6 +73,8 @@ function arena_lib.join_queue(mod, arena, p_name)
     end
   end
 
+  local mod_ref = arena_lib.mods[mod]
+
   -- controlli aggiuntivi
   if mod_ref.on_prejoin_queue then
     if not mod_ref.on_prejoin_queue(arena, p_name) then return end
@@ -159,48 +84,12 @@ function arena_lib.join_queue(mod, arena, p_name)
     if not callback(mod_ref, arena, p_name) then return end
   end
 
-  local p_team_ID
-
-  -- determino eventuale squadra giocatore
-  if arena.teams_enabled then
-    p_team_ID = assign_team(mod_ref, arena, p_name)
-  end
-
-  local players_to_add = {}
-
-  -- potrei avere o un giocatore o un intero gruppo da aggiungere. Quindi per evitare mille if, metto a prescindere il/i giocatore/i in una tabella per iterare in alcune operazioni successive
-  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
-    for k, v in pairs(parties.get_party_members(p_name)) do
-      players_to_add[k] = v
-    end
-  else
-    table.insert(players_to_add, p_name)
-  end
-
-  -- aggiungo il giocatore
-  for _, pl_name in pairs(players_to_add) do
-    arena.players[pl_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
-    arena.players_and_spectators[pl_name] = true
-  end
-
-  -- aumento il conteggio di giocatori in partita
-  arena.players_amount = arena.players_amount + #players_to_add
-  if arena.teams_enabled then
-    arena.players_amount_per_team[p_team_ID] = arena.players_amount_per_team[p_team_ID] + #players_to_add
-  end
+  local players_to_add = arena_lib.get_and_add_joining_players(mod_ref, arena, p_name)
 
   -- notifico i vari giocatori del nuovo giocatore
-  if arena.in_game then
-    for _, pl_name in pairs(players_to_add) do
-      arena_lib.join_arena(mod, pl_name, arenaID)
-      arena_lib.entrances[arena.entrance_type].update(arena)
-    end
-    return
-  else
-    for _, pl_name in pairs(players_to_add) do
-      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena_name .. " > " ..  pl_name))
-      players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
-    end
+  for _, pl_name in pairs(players_to_add) do
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena_name .. " > " ..  pl_name))
+    players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
   end
 
   local arena_max_players = arena.max_players * #arena.teams
@@ -425,31 +314,6 @@ function initialise_queue_container()
   for mod, _ in pairs(arena_lib.mods) do
     active_queues[mod] = {}
   end
-end
-
-
-
-function assign_team(mod_ref, arena, p_name)
-
-  local assigned_team_ID = 1
-
-  for i = 1, #arena.teams do
-    if arena.players_amount_per_team[i] < arena.players_amount_per_team[assigned_team_ID] then
-      assigned_team_ID = i
-    end
-  end
-
-  local p_team = arena.teams[assigned_team_ID].name
-
-  if minetest.get_modpath("parties") and parties.is_player_in_party(p_name) then
-    for _, pl_name in pairs(parties.get_party_members(p_name)) do
-      minetest.chat_send_player(pl_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
-    end
-  else
-    minetest.chat_send_player(p_name, mod_ref.prefix .. S("You've joined team @1", minetest.colorize("#eea160", p_team)))
-  end
-
-  return assigned_team_ID
 end
 
 
