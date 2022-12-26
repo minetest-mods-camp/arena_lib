@@ -887,7 +887,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   end
 
   -- se ho Hub, restituisco gli oggetti e imposto fisica della lobby
-  if minetest.get_modpath("hub") then
+  if minetest.get_modpath("hub_core") then
     hub.set_items(player)
     hub.set_hub_physics(player)
   else
