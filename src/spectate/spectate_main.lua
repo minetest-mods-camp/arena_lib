@@ -87,6 +87,7 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
 
+  -- TODO: prob mano finta non serve più dato che non possono aprire inventario per spostare oggetti
   -- applico mano finta
   player:get_inventory():set_size("hand", 1)
   player:get_inventory():add_item("hand", "arena_lib:spectate_hand")
@@ -129,30 +130,9 @@ end
 
 
 
-function arena_lib.leave_spectate_mode(p_name, to_join_match)
+function arena_lib.leave_spectate_mode(p_name)
 
   local arena = arena_lib.get_arena_by_player(p_name)
-
-  if to_join_match then
-    --TODO-TEMP: 5.4, aspettare o dà problemi con after
-    minetest.chat_send_player(p_name, "[!] SoonTM!")
-    return
-
-    --TODO: questi controlli ha senso ridurli in un luogo unico per quando si prova a entrare, dato che appaiono pure sui cartelli
-    --[[
-    -- se è piena
-    if arena.players_amount == arena.max_players * #arena.teams then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
-      return end
-
-    -- se è in celebrazione
-    if arena.in_celebration then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is loading, try again in a few seconds!")))
-      return end
-      ]]
-  else
-    arena.players_and_spectators[p_name] = nil
-  end
 
   arena.spectators[p_name] = nil
   arena.spectators_amount = arena.spectators_amount -1

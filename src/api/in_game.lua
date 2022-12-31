@@ -146,7 +146,7 @@ end
 
 
 
--- per il giocatore singolo a match iniziato
+-- per chi entra a partita iniziata
 function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
 
   local mod_ref = arena_lib.mods[mod]
@@ -156,6 +156,9 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
   if not arena.in_game then
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] No ongoing game!")))
     return end
+
+  local players -- potrebbe essere un gruppo
+  local was_spectator = {}
 
   -- se prova a entrare come spettatore
   if as_spectator then
@@ -179,6 +182,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       if not arena_lib.remove_player_from_queue(p_name) then return end
     end
 
+    players = {[1] = p_name}
     operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, true)
     arena_lib.enter_spectate_mode(p_name, arena)
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", ">>> " .. p_name .. " (" .. S("spectator") .. ")"))
@@ -202,29 +206,56 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       if not arena_lib.remove_player_from_queue(p_name) then return end
     end
 
-    if arena_lib.is_player_spectating(p_name) then                              -- se lo fa mentre è spettatore, controllo che ci sia spazio ecc.
-      if not arena_lib.leave_spectate_mode(p_name, true) then return end
-      operations_before_playing_arena(mod_ref, arena, p_name)
-    else
-      local players = arena_lib.get_and_add_joining_players(mod_ref, arena, p_name)
+    players = arena_lib.get_and_add_joining_players(mod_ref, arena, p_name)
 
-      for _, pl_name in pairs(players) do
-        operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name)
+    for i, pl_name in pairs(players) do
+      -- se stava in spettatore..
+      if arena_lib.is_player_spectating(pl_name) then
+        local pl_arena = arena_lib.get_arena_by_player(pl_name)
+        local pl_mg = arena_lib.get_mod_by_player(pl_name)
+
+        -- ..controllo se stava seguendo la stessa arena in cui si sta entrando (in caso di gruppo sparso in più parti)
+        if pl_arena.name == arena.name and pl_mg == mod then
+          was_spectator[i] = true
+          arena_lib.leave_spectate_mode(pl_name)
+          minetest.get_player_by_name(pl_name):get_inventory():set_list("main", {}) -- rimuovo gli oggetti della spettatore
+          operations_before_playing_arena(mod_ref, arena, pl_name)
+        else
+          arena_lib.remove_player_from_arena(pl_name, 3)
+          operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
+        end
+
+      -- sennò entra normalmente
+      else
+        operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
       end
     end
 
+    local teamID = arena.players[p_name].teamID
+
     -- notifico e teletrasporto
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c6f154", " >>> " .. p_name))
-    minetest.get_player_by_name(p_name):set_pos(arena_lib.get_random_spawner(arena, arena.players[p_name].teamID))
+    for _, pl_name in pairs(players) do
+      local player = minetest.get_player_by_name(pl_name)
+      local random_spawner = arena_lib.get_random_spawner(arena, teamID)
+
+      arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c6f154", " >>> " .. pl_name))
+      player:set_pos(random_spawner)
+      -- TEMP: waiting for https://github.com/minetest/minetest/issues/12092 to be fixed. Forcing the teleport twice on two different steps. Necessary for whom was spectating
+      minetest.after(0.1, function()
+        player:set_pos(random_spawner)
+      end)
+    end
   end
 
   -- eventuale codice aggiuntivo
-  if mod_ref.on_join then
-    mod_ref.on_join(p_name, arena, as_spectator)
-  end
+  for i, pl_name in pairs(players) do
+    if mod_ref.on_join then
+      mod_ref.on_join(pl_name, arena, as_spectator, was_spectator[i])
+    end
 
-  for _, callback in ipairs(arena_lib.registered_on_join) do
-    callback(mod_ref, arena, p_name, as_spectator)
+    for _, callback in ipairs(arena_lib.registered_on_join) do
+      callback(mod_ref, arena, pl_name, as_spectator, was_spectator[i])
+    end
   end
 
   arena_lib.entrances[arena.entrance_type].update(arena)
@@ -437,6 +468,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   if mod_ref.spectate_mode and arena_lib.is_player_spectating(p_name) then
     arena_lib.leave_spectate_mode(p_name)
     operations_before_leaving_arena(mod_ref, arena, p_name, reason)
+    arena.players_and_spectators[p_name] = nil
     arena.past_present_players_inside[p_name] = nil
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
@@ -737,7 +769,7 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
     player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
   end
 
-  -- cambio eventuale colore texture (richiede i team)
+  -- cambio eventuale colore texture (richiede le squadre)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
    player:set_properties({
      textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}

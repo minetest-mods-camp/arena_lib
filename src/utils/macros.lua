@@ -25,7 +25,7 @@ end
 
 
 
-function ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name, was_spectator)
+function ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name)
   -- se si è nell'editor
   if arena_lib.is_player_in_edit_mode(p_name) then
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must leave the editor first!")))
@@ -49,12 +49,12 @@ function ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name, was_spectator)
     -- per tutti i membri...
     for _, pl_name in pairs(party_members) do
       -- se uno è in partita
-      if arena_lib.is_player_in_arena(pl_name) then
+      if arena_lib.is_player_in_arena(pl_name) and not arena_lib.is_player_spectating(pl_name) then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
         return end
 
       -- se uno è attaccato a qualcosa
-      if not was_spectator and minetest.get_player_by_name(pl_name):get_attach() then
+      if minetest.get_player_by_name(pl_name):get_attach() and not arena_lib.is_player_spectating(pl_name) then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)")))
         return end
     end
@@ -84,7 +84,7 @@ function ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name, was_spectator)
   local player = minetest.get_player_by_name(p_name)
 
   -- se si è attaccati a qualcosa
-  if not was_spectator and player:get_attach() then
+  if player:get_attach() and not arena_lib.is_player_spectating(p_name) then
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
     return end
 

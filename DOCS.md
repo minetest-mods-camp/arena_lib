@@ -136,7 +136,7 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_start(mod, function(arena))`: same as above
 * `arena_lib.on_celebration(mod, function(arena, winners)`: same as above. `winners` can be either a string, an integer or a table of string/integers. If you want to have a single winner, return their name (string). If you want to have a whole team, return the team ID (integer). If you want to have more single winners, a table of strings, and more teams, a table of integers.
 * `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` has already deleted them - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
-* `arena_lib.on_join(mod, function(p_name, arena, as_spectator))`: called when a player joins an ongoing match. If `as_spectator` is true, they'll be added as such
+* `arena_lib.on_join(mod, function(p_name, arena, as_spectator, was_spectator))`: called when a user joins an ongoing match. `as_spectator` returns true if they join as a spectator. `was_spectator` returns true if the user was spectating the arena when joining as an actual player
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_respawn(mod, function(arena, p_name))`: called when a player respawns
 * `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena.
@@ -175,7 +175,7 @@ Global callbacks act in the same way of minigame callbacks with the same name. K
 * `arena_lib.register_on_leave_queue(function(mod_ref, arena, p_name, has_queue_status_changed))`: check the previous callback for `has_queue_status_changed`
 * `arena_lib.register_on_load(function(mod_ref, arena))`
 * `arena_lib.register_on_start(function(mod_ref, arena))`
-* `arena_lib.register_on_join(function(mod_ref, arena, p_name, as_spectator))`
+* `arena_lib.register_on_join(function(mod_ref, arena, p_name, as_spectator, was_spectator))`
 * `arena_lib.register_on_celebration(function(mod_ref, arena, winners))`
 * `arena_lib.register_on_end(function(mod_ref, arena, players, winners, spectators, is_forced))`
 * `arena_lib.register_on_eliminate(function(mod_ref, arena, p_name))`

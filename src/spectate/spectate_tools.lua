@@ -86,7 +86,7 @@ minetest.register_tool("arena_lib:spectate_changearea", {
 minetest.register_tool("arena_lib:spectate_join", {
 
     description = S("Enter the match"),
-    inventory_image = "arenalib_editor_return.png",
+    inventory_image = "arenalib_spectate_join.png",
     groups = {not_in_creative_inventory = 1},
     on_place = function() end,
     on_drop = function() end,
@@ -95,6 +95,7 @@ minetest.register_tool("arena_lib:spectate_join", {
       local p_name = user:get_player_name()
       local mod = arena_lib.get_mod_by_player(p_name)
       local arena_ID = arena_lib.get_arenaID_by_player(p_name)
+
       arena_lib.join_arena(mod, p_name, arena_ID)
     end
 
