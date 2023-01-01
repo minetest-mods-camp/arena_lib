@@ -189,7 +189,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
 
   -- se entra come giocatore
   else
-    if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name) then return end
+    if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, arena_ID, p_name) then return end
 
     -- se sta caricando o sta finendo
     if arena.in_loading or arena.in_celebration then

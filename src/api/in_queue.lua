@@ -54,10 +54,10 @@ end)
 
 function arena_lib.join_queue(mod, arena, p_name)
 
-  if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, p_name) then return end
-
   local arena_name = arena.name
   local arenaID = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not ARENA_LIB_JOIN_CHECKS_PASSED(arena, arenaID, p_name) then return end
 
   -- se il giocatore è già in coda
   if arena_lib.is_player_in_queue(p_name) then
