@@ -5,7 +5,7 @@
 
 # commands.lua
 [!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space=
-[!] Parameters don't seem right!=
+Game in arena @1 successfully terminated=
 [!] This player is not online!=
 [!] The player must be in a game to perform this action!=
 Player successfully kicked=
@@ -14,9 +14,6 @@ minigame=
 player=
 Manage arena_lib arenas; it requires arenalib_admin=
 arena name=
-Forcibly ends an ongoing game=
-Game in arena @1 successfully terminated=
-DEBUG ONLY: reset the properties of a bugged arena=
 Quits an ongoing game=
 [!] You must be in a game to perform this action!=
 [!] You can't perform this action during the celebration phase!=
@@ -27,6 +24,8 @@ Writes a message in the arena team chat while in a game (if teams are enabled)=
 #TODO: for when /arenas help is implemented
 Kicks a player from an ongoing game=
 Tweaks the minigame settings for the current server=
+DEBUG ONLY: reset the properties of a bugged arena=
+Forcibly ends an ongoing game=
 
 # admin_tools/entrances.lua
 [!] You can't perform this action while in game!=
@@ -44,6 +43,7 @@ Minigame settings=
 # api/core.lua
 team=
 spectator=
+[!] Parameters don't seem right!=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
 Arena @1 successfully created=

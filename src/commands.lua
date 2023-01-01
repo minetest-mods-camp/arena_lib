@@ -90,6 +90,40 @@ ChatCmdBuilder.new("arenas", function(cmd)
     arena_lib.print_arenas(sender, minigame)
   end)
 
+  cmd:sub("flush :minigame :arena", function(sender, minigame, arena)
+    arena_lib.flush_arena(minigame, arena, sender)
+  end)
+
+  cmd:sub("flush :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+    arena_lib.flush_arena(minigames[1], arena, sender)
+  end)
+
+  cmd:sub("forceend :minigame :arena", function(sender, minigame, arena)
+    local id, ar = arena_lib.get_arena_by_name(minigame, arena)
+
+    if arena_lib.force_arena_ending(minigame, ar, sender) then
+      minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena))
+    end
+  end)
+
+  cmd:sub("forceend :arena", function(sender, arena)
+    local minigames = get_minigames_by_arena(arena)
+    if #minigames > 1 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
+      return end
+
+      local id, ar = arena_lib.get_arena_by_name(minigames[1], arena)
+
+    if arena_lib.force_arena_ending(minigames[1], ar, sender) then
+      minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena))
+    end
+  end)
+
   -- impostazioni minigiochi
   cmd:sub("entrances :minigame", function(sender, minigame)
     arena_lib.enter_entrance_settings(sender, minigame)
@@ -115,72 +149,29 @@ ChatCmdBuilder.new("arenas", function(cmd)
     minetest.chat_send_player(sender, S("Player successfully kicked"))
   end)
 
+  -- aiuto
+  --[[ TODO: per elencare comandi con descrizione geolocalizzata e con sintassi colorata tipo World Edit. In /help è orribile, rimuovere da lì. !Alcune traduzioni stanno già nei file di localizzazione!
+  cmd:sub("help", function(sender)
+    minetest.chat_send_player(sender, "TUTTI I VARI COMANDI")
+  end)
+  ]]
+
 end, {
-  params = "[ create | disable | edit | enable | entrances | info | kick | list | remove | settings ]",
+  params = "[ create | disable | edit | enable | entrances | flush | forceend | info | kick | list | remove | settings ]",
   description = S("Manage arena_lib arenas; it requires arenalib_admin") .. "\n"
     .. "/arenas create <" .. S("minigame") .. "> <" .. S("arena") .. "> (<pmin> <pmax>)\n"
     .. "/arenas disable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas edit (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas enable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas entrances <" .. S("minigame") .. ">\n"
+    .. "/arenas flush (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
+    .. "/arenas forceend (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas info (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas kick <" .. S("player") .. ">\n"
     .. "/arenas list <" .. S("minigame") .. ">\n"
     .. "/arenas remove (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas settings <" .. S("minigame") .. ">",
   privs = { arenalib_admin = true }
-})
-
-
--- TODO: integrare in /arenas, "forceend", iterando per tutte le arene di tutti i minigiochi. Se trova doppioni, avvisa che va specificato anche il minigioco
-minetest.register_chatcommand("forceend", {
-
-  params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",
-  description = S("Forcibly ends an ongoing game"),
-  privs = {
-        arenalib_admin = true,
-    },
-
-  func = function(sender, param)
-
-    local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
-
-    -- se i parametri sono errati, annullo
-    if not mod or not arena_name then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return end
-
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-
-    -- se è andata a buon fine, avviso chi ha eseguito il comando
-    if arena_lib.force_arena_ending(mod, arena, sender) then
-      minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena.name))
-    end
-  end
-
-})
-
-
--- TODO: idem come il comando sopra, "flush"
-minetest.register_chatcommand("flusharena", {
-
-  params = "<" .. S("minigame") .. "> <" .. S("arena name") .. ">",
-  description = S("DEBUG ONLY: reset the properties of a bugged arena"),
-  privs = {
-        arenalib_admin = true,
-    },
-
-  func = function(sender, param)
-    local mod, arena_name = string.match(param, "^([%a%d_-]+) ([%a%d_-]+)$")
-
-    -- se i parametri sono errati, annullo
-    if not mod or not arena_name then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-      return end
-
-    arena_lib.flush_arena(mod, arena_name, sender)
-  end
-
 })
 
 
@@ -313,7 +304,7 @@ end
 
 -- to remove in 7.0
 minetest.register_chatcommand("arenakick", {
-  params = "<" .. S("player") .. "> (deprecated)",
+  params = "(deprecated)",
   description = "DEPRECATED, use '/arenas kick <nick>' instead",
   privs = {
         arenalib_admin = true,
@@ -324,7 +315,7 @@ minetest.register_chatcommand("arenakick", {
 })
 
 minetest.register_chatcommand("minigamesettings", {
-  params = "<" ..S("minigame") .. "> (deprecated)",
+  params = "(deprecated)",
   description = "DEPRECATED, use '/arenas settings <minigame>' instead",
   privs = {
     arenalib_admin = true,
@@ -333,4 +324,30 @@ minetest.register_chatcommand("minigamesettings", {
     local mod = param
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] DEPRECATED! Use '/arenas settings <minigame>' instead!"))
   end
+})
+
+minetest.register_chatcommand("flusharena", {
+
+  params = "(deprecated)",
+  description = "DEPRECATED, use '/arenas flush (<minigame>) <arena>' instead",
+  privs = {
+        arenalib_admin = true,
+  },
+  func = function(sender, param)
+    local mod = param
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] DEPRECATED! Use '/arenas flush (<minigame>) <arena>' instead!"))
+  end
+})
+
+minetest.register_chatcommand("forceend", {
+  params = "(deprecated)",
+  description = "DEPRECATED, use '/arenas forceend (<minigame>) <arena>' instead",
+  privs = {
+        arenalib_admin = true,
+  },
+  func = function(sender, param)
+    local mod = param
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[!] DEPRECATED! Use '/arenas forceend (<minigame>) <arena>' instead!"))
+  end
+
 })
