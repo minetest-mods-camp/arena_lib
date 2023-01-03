@@ -79,8 +79,13 @@ signs_lib.register_sign("arena_lib:sign", {
     if arenaID == 0 then return end
 
     local mod = minetest.get_meta(pos):get_string("mod")
-    local arena = arena_lib.mods[mod].arenas[arenaID]
     local p_name = puncher:get_player_name()
+
+    if not arena_lib.mods[mod] then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't exist!") .. " (" .. mod .. ")"))
+      return end
+
+    local arena = arena_lib.mods[mod].arenas[arenaID]
 
     if not arena then return end -- nel caso qualche cartello dovesse impallarsi, si può rompere senza far crashare
 
