@@ -9,7 +9,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 
 1) Install it as any other mod
 
-2) Check [SETTINGS.lua](SETTINGS.lua)
+2) Launch the world at least once with arena_lib enabled and then check `worlds/nameofyourworld/arena_lib` to customise it
 
 3) (modders only) Dive into the [full documentation](DOCS.md) to understand how to create minigames  
 
@@ -19,7 +19,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 * (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
 
 #### Add-ons
-[Hub](https://gitlab.com/zughy-friends-minetest/hub-manager) by me: use it if you're aiming for a full minigame server. It can't be set as an optional dependency, since arena_lib is a hard dependency of Hub in the first place (and MT doesn't like cross dependencies) 
+* [Hub](https://gitlab.com/zughy-friends-minetest/hub) by me: use it if you're aiming for a full minigame server. It can't be set as an optional dependency, since arena_lib is a hard dependency of Hub in the first place (and MT doesn't like cross dependencies) 
 
 ### Known conflicts
 * `Beds` or any other mod overriding the default respawn system

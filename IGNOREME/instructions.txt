@@ -1,0 +1,3 @@
+DO NOT rename folders or the mod won't be able to read them.
+
+/BGMs is where arenas BGMs shall be put (to then be assigned through the editor specific section).

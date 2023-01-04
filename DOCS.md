@@ -90,7 +90,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `team_properties`: ^ (it won't work if `teams` hasn't been declared)
 
 ### 1.1 Per server configuration
-There are also a couple of settings that can only be set in game via `/arenas settings`. This because different servers might need different parameters. They are:
+There are also a couple of settings that can only be set in game via `/arenas settings <minigame>`. This because different servers might need different parameters. They are:
 * `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimum amount of players has been reached to start the queue. Default is `10`
 

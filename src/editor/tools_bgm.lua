@@ -1,6 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
 local function get_bgm_formspec() end
+local function get_audio_file() end
 local function calc_gain() end
 local function calc_pitch() end
 
@@ -95,6 +96,43 @@ end
 
 
 
+function get_audio_file(bgm_dir, name, mod, p_name)
+  local content = minetest.get_dir_list(bgm_dir, false)
+
+  local function iterate_dirs(dir)
+    for _, f_name in pairs(minetest.get_dir_list(dir, false)) do
+      local file = io.open(dir .. "/" .. name .. ".ogg", "r")
+      if file then
+        io.close(file)
+        return true
+      end
+    end
+
+    for _, subdir in pairs(minetest.get_dir_list(dir, true)) do
+       if iterate_dirs(dir .. "/" .. subdir) then
+         return true
+       end
+    end
+  end
+
+  local exists = iterate_dirs(bgm_dir)
+
+  --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v (insieme a 'mod' e 'p_name' come parametro)
+  if not exists then
+    local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. name .. ".ogg", "r")
+    if deprecated_file then
+      deprecated_file:close()
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: put it into the world folder instead!"))
+      exists = true
+    end
+  end
+  --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
+
+  return exists
+end
+
+
+
 function calc_gain(field)
   return minetest.explode_scrollbar_event(field).value / 100
 end
@@ -115,13 +153,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   if formname ~= "arena_lib:bgm" then return end
 
   local p_name = player:get_player_name()
+  local bgm_dir  = minetest.get_worldpath() .. "/arena_lib/BGM/"
 
   -- se premo su icona "riproduci", riproduco audio
   if fields.play then
-
     local mod = player:get_meta():get_string("arena_lib_editor.mod")
 
-    if not io.open(minetest.get_modpath(mod) .. "/sounds/" .. fields.bgm .. ".ogg", "r") then
+    if not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This audio track doesn't exist!")))
       return end
 
@@ -154,7 +192,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     if fields.bgm == "" then
       arena_lib.set_bgm(p_name, mod, arena_name, nil, nil, nil, nil, nil, true)
     -- se non esiste il file audio, annullo
-    elseif not io.open(minetest.get_modpath(mod) .. "/sounds/" .. fields.bgm .. ".ogg", "r") then
+  elseif not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This audio track doesn't exist!")))
       return
     -- sennò applico la traccia indicata
