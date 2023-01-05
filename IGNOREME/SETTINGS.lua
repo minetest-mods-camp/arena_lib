@@ -5,7 +5,7 @@ arena_lib.DEFAULT_ENTRANCE = "sign"
 -- winning etc). This comes in handy for hybrid servers (i.e. survival/creative
 -- ones featuring some minigames). If you're aiming for a full minigame server,
 -- ignore this parameter and let the mod Hub supersede it =>
--- https://gitlab.com/zughy-friends-minetest/hub-manager
+-- https://gitlab.com/zughy-friends-minetest/hub
 arena_lib.SERVER_PHYSICS = {
   speed = 1,
   jump = 1,

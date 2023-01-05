@@ -257,7 +257,7 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 ### 1.7 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
-* `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above
+* `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above. It doesn't distinguish between an actual player and a spectator (for the latter, use `arena_lib.is_player_spectating(p_name)`)
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.start_arena(mod_ref, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
@@ -295,8 +295,8 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_players_amount_left_to_start_queue(arena)`: returns the amount of player still needed to make a queue start, or `nil` if the arena is already in game
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
-* `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as index either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
-* `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as index either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
+* `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as value either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
+* `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as value either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
 * `arena_lib.get_player_spectators(p_name)`: returns a list containing all the people currently spectating `p_name`. Format `{sp_name = true}`
 * `arena_lib.get_player_spectated(sp_name)`: returns the player `sp_name` is currently spectating, if any
@@ -380,8 +380,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `celestial_vault`: (table) if present, contains the information about the celestial vault to display to each player whilst in game, overriding the default one. Default is `nil`.
-* `lighting`: (table) if present, contains the information about the lighting settings of the arena, overriding players' default ones. Default is `nil`.
-* `bgm`: (table) if present, contains the information about the audio track to play whilst in game. Audio tracks must be placed in the minigame `/sounds` path (not arena_lib's) in order to be found. Default is `nil`.
+* `lighting`: (table) if present, contains the information about the lighting settings of the arena, overriding players' default ones. Default is `nil`
+* `bgm`: (table) if present, contains the information about the audio track to play whilst in game. Audio tracks must be placed in the world folder in `/arena_lib/BGM` in order to be found. Default is `nil`
   In-depth fields, all empty by default, are:
   * `track`: (string) the audio file, without `.ogg`. Mandatory. If no track is specified, all the other fields will be consequently empty
   * `title`: (string) the title. Built-in signs feature it in the infobox (shown by right-clicking a sign)
