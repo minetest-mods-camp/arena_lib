@@ -24,7 +24,9 @@ local function load_world_folder()
     -- aggiungi musiche come contenuti dinamici per non appesantire il server
     local function iterate_dirs(dir)
       for _, f_name in pairs(minetest.get_dir_list(dir, false)) do
-        minetest.dynamic_add_media({filepath = dir .. "/" .. f_name}, function(name) end)
+        -- NOT REALLY DYNAMIC MEDIA, since it's run when the server launches and there are no players online
+        -- it's just to load these tracks from the world folder (so that `sound_play` recognises them without the full path)
+        minetest.dynamic_add_media({filepath = dir .. "/" .. f_name}, function(name) end) 
       end
       for _, subdir in pairs(minetest.get_dir_list(dir, true)) do
         iterate_dirs(dir .. "/" .. subdir)
