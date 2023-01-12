@@ -240,6 +240,14 @@ One sign per arena=
 Arena sign=
 [!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=
 [!] That's not an arena_lib sign!=
+The arena is not enabled=
+Leave the queue (you can also left-click the sign)=
+Full=
+This minigame can't be joined whilst a game is in progress=
+Play (you can also left-click the sign)=
+Spectate mode not supported=
+Spectate=
+Spectate (there must be a game in progress)=
 
 # signs/signs_editor.lua
 Add sign=

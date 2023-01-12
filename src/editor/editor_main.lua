@@ -56,7 +56,7 @@ end
 
 function arena_lib.enter_editor(sender, mod, arena_name)
 
-  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- se il giocatore sta già modificando un'arena
   if arena_lib.is_player_in_edit_mode(sender) then
@@ -124,7 +124,6 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)
-
 end
 
 
@@ -133,7 +132,7 @@ function arena_lib.quit_editor(player)
 
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
-  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if arena_name == "" then return end
 

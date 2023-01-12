@@ -241,6 +241,14 @@ One sign per arena=Un cartello per arena
 Arena sign=Cartello dell'arena
 [!] Uh-oh, it looks like this sign has been misplaced: well, fixed, hit it again!=[!]Oh oh, sembra che questo cartello sia fuori posto: beh, sistemato, colpiscilo di nuovo!
 [!] That's not an arena_lib sign!=[!] Questo non è un cartello di arena_lib!
+The arena is not enabled=L'arena non è abilitata
+Leave the queue (you can also left-click the sign)=Abbandona la coda (puoi farlo anche premendo il cartello col sinistro)
+Full=Piena
+This minigame can't be joined whilst a game is in progress=Questo minigioco non permette di entrare durante una partita in corso
+Play (you can also left-click the sign)=Gioca (puoi farlo anche premendo il cartello col sinistro)
+Spectate mode not supported=Modalità spettatore non supportata
+Spectate=Assisti
+Spectate (there must be a game in progress)=Assisti (ci deve essere una partita in corso)
 
 # signs/signs_editor.lua
 Add sign=Aggiungi cartello
