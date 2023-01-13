@@ -297,7 +297,7 @@ function get_infobox_formspec(mod, arenaID, player)
     -- scritte
     "hypertext[0.76,0.08;3.7,1;name;<global valign=middle><style size=23 font=mono color=#ffffff>" .. FS(arena.name) .. "</style>]",
     "hypertext[1,1.59;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
-    "hypertext[1,2.77;3.52,1.2;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
+    "hypertext[1,2.67;3.52,1.2;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
     -- suggerimenti e pulsanti
     "tooltip[play;" .. S(play_tip) .. "]",
     "tooltip[spectate;" .. S(spec_tip) .. "]",
