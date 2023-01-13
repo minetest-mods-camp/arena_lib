@@ -117,6 +117,8 @@ A few more are available for players having the `arenalib_admin` privilege:
 	* `entrances <minigame>`: changes the entrance types of `<minigame>`
 	* `flush (<minigame>) <arena>`: DEBUG ONLY: reset the properties of a bugged arena
 	* `forceend (<minigame>) <arena>`: forcibly ends an ongoing game
+	* `gamelist`: lists all the installed minigames, alphabetically
+	* `glist`: see `gamelist`
 	* `info (<minigame>) <arena>`: prints all the info related to `<arena>`
 	* `kick player_name`: kicks a player out of an ongoing game, no matter the mod
 	* `list <minigame>`: lists all the arenas of `<minigame>`

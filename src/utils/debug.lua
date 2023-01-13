@@ -4,8 +4,26 @@ local function property_val_to_string() end
 local function table_to_string() end
 
 
-function arena_lib.print_arenas(sender, mod)
 
+function arena_lib.print_minigames(sender)
+  local mgs = {}
+  local str = "-------------------------\n"
+
+  for mod, _ in pairs(arena_lib.mods) do
+    table.insert(mgs, mod)
+  end
+  table.sort(mgs, function(a, b) return a < b end)
+
+  for id, mod in pairs(mgs) do
+    str = str .. id .. ". " .. mod .. "\n"
+  end
+
+  str = str .. "-------------------------"
+  minetest.chat_send_player(sender, str)
+end
+
+
+function arena_lib.print_arenas(sender, mod)
   local mod_ref = arena_lib.mods[mod]
 
   if not mod_ref then
