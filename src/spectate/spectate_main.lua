@@ -600,7 +600,7 @@ function override_hotbar(player, mod, arena)
 
   local mod_ref = arena_lib.mods[mod]
   local tools = {
-    "arena_lib:spectate_changeplayer",
+    "arena_lib:spectate_changeplayer",      -- TODO: 6.0, with endless arenas I could have a situation where I have entities/areas to spectate but no players. Still hardcoded?
     "arena_lib:spectate_quit"
   }
 

@@ -97,6 +97,7 @@ Arena @1 successfully disabled=
 [!] Spectate mode not supported!=
 [!] The arena is not enabled!=
 [!] You must detach yourself from the entity you're attached to before entering!=
+[!] There is nothing to spectate!=
 [!] The arena is loading, try again in a few seconds!=
 [!] This minigame doesn't allow to join while in progress!=
 @1 wins the game=

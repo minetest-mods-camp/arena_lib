@@ -183,8 +183,10 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
       return end
 
-    -- se sta finendo
-    -- TODO #192
+    -- se non c'è niente da seguire
+    if arena.players_amount == 0 and not next(arena_lib.get_spectate_entities(mod, arena.name)) and not next(arena_lib.get_spectate_areas(mod, arena.name)) then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is nothing to spectate!")))
+      return end
 
     -- se si era in coda
     if arena_lib.is_player_in_queue(p_name) then
