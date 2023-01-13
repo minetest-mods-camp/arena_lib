@@ -6,6 +6,7 @@ local function queue_format() end
 
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local active_queues = {}              -- KEY: [mod] arena_name, VALUE: {(table) arena, (int) time_left, (table) was_second_run}
+local queue_hits = {}                  -- TODO: capisci struttura
 
 -- inizializzo il contenitore delle code una volta che tutti i minigiochi sono stati caricati
 minetest.after(0.1, function()
@@ -73,6 +74,8 @@ function arena_lib.join_queue(mod, arena, p_name)
     end
   end
 
+  -- TODO: controllo se spammano
+
   local mod_ref = arena_lib.mods[mod]
 
   -- controlli aggiuntivi
@@ -92,6 +95,7 @@ function arena_lib.join_queue(mod, arena, p_name)
     players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
   end
 
+  -- TODO: aumenta clic di 1
   local arena_max_players = arena.max_players * #arena.teams
   local has_queue_status_changed = false      -- per il richiamo globale, o non hanno modo di saperlo (dato che viene chiamato all'ultimo)
 
@@ -131,7 +135,7 @@ function arena_lib.join_queue(mod, arena, p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   return true
 end
 
@@ -219,7 +223,7 @@ function arena_lib.remove_player_from_queue(p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   return true
 end
 
@@ -323,7 +327,7 @@ function go_to_arena(mod, arena)
   active_queues[mod][arena.name] = nil
   arena.in_queue = false
   arena.in_game = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   for pl_name, _ in pairs(arena.players) do
     players_in_queue[pl_name] = nil

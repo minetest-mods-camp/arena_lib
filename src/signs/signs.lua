@@ -7,6 +7,20 @@ local function update_sign() end
 local function in_game_txt() end
 local function get_infobox_formspec() end
 
+local displaying_infobox = {}                   -- KEY: player name, VALUE: {(string) mod, (int) arena_id}
+
+--------------------------------------------------------------------------------
+-- There is no reliable way to know when someone closes a formspec, thus I override
+-- the basic `minetest.close_formspec` function, also calling it in `fields.quit` down below
+local original = minetest.close_formspec
+function minetest.close_formspec(p_name, formname)
+  if formname == "arena_lib:infobox" or formname == "" then
+    displaying_infobox[p_name] = nil
+  end
+  original(p_name, formname)
+end
+--------------------------------------------------------------------------------
+
 
 
 arena_lib.register_entrance_type("arena_lib", "sign", {
@@ -26,8 +40,8 @@ arena_lib.register_entrance_type("arena_lib", "sign", {
 
   on_add = function(sender, mod, arena, pos) return add_sign(sender, mod, arena, pos) end,
   on_remove = function(mod, arena) remove_sign(mod, arena) end,
-  on_load = function(arena) update_sign(arena) end,
-  on_update = function(arena) update_sign(arena) end,
+  on_load = function(arena) update_sign(nil, arena) end,
+  on_update = function(mod, arena) update_sign(mod, arena) end,
 
   debug_output = function(entrance) return minetest.pos_to_string(entrance) end
 })
@@ -69,8 +83,10 @@ signs_lib.register_sign("arena_lib:sign", {
 
     local mod = minetest.get_meta(pos):get_string("mod")
     local arenaID = minetest.get_meta(pos):get_int("arenaID")
+    local p_name = clicker:get_player_name()
 
-    minetest.show_formspec(clicker:get_player_name(), "arena_lib:infobox", get_infobox_formspec(mod, arenaID, clicker))
+    displaying_infobox[p_name] = {mod = mod, arena_id = arenaID}
+    minetest.show_formspec(p_name, "arena_lib:infobox", get_infobox_formspec(mod, arenaID, clicker))
   end,
 
 
@@ -162,7 +178,7 @@ end
 
 
 
-function update_sign(arena)
+function update_sign(mod, arena)
 
   local p_count = 0
   local t_count = #arena.teams
@@ -179,6 +195,13 @@ function update_sign(arena)
     ]] .. in_game_txt(arena) .. "\n" .. [[
 
     ]]})
+
+  for pl_name, pl_data in pairs(displaying_infobox) do
+    local id = arena_lib.get_arena_by_name(mod, arena.name)
+    if pl_data.mod == mod and pl_data.arena_id == id then
+      minetest.show_formspec(pl_name, "arena_lib:infobox", get_infobox_formspec(mod, id, minetest.get_player_by_name(pl_name)))
+    end
+  end
 end
 
 
@@ -200,9 +223,6 @@ end
 
 
 function get_infobox_formspec(mod, arenaID, player)
-
-  player:get_meta():set_string("arenalib_infobox_mod", mod)
-  player:get_meta():set_int("arenalib_infobox_arenaID", arenaID)
 
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arenaID]
@@ -246,9 +266,9 @@ function get_infobox_formspec(mod, arenaID, player)
       play_btn = "arenalib_infobox_play_go.png"
       play_tip = "Play" .. LMB_TIP
     end
-    -- tasto assisti
+    -- tasto "assisti"
     if not mod_ref.spectate_mode then
-      spec_btn = "arenalib_infobox_play_off.png"
+      spec_btn = "arenalib_infobox_spectate_off.png"
       spec_tip = "Spectate mode not supported"
     elseif arena.in_game then
       spec_btn = "arenalib_infobox_spectate_go.png"
@@ -277,7 +297,7 @@ function get_infobox_formspec(mod, arenaID, player)
     -- scritte
     "hypertext[0.76,0.08;3.7,1;name;<global valign=middle><style size=23 font=mono color=#ffffff>" .. FS(arena.name) .. "</style>]",
     "hypertext[1,1.59;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
-    "hypertext[1,2.77;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
+    "hypertext[1,2.77;3.52,1.2;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
     -- suggerimenti e pulsanti
     "tooltip[play;" .. S(play_tip) .. "]",
     "tooltip[spectate;" .. S(spec_tip) .. "]",
@@ -298,7 +318,9 @@ end
 
 
 
-------------------------------------------------
+
+
+----------------------------------------------
 ---------------GESTIONE CAMPI-----------------
 ----------------------------------------------
 
@@ -306,15 +328,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   if formname ~= "arena_lib:infobox" then return end
 
-  local mod = player:get_meta():get_string("arenalib_infobox_mod")
-  local arenaID = player:get_meta():get_int("arenalib_infobox_arenaID")
-  local arena = arena_lib.mods[mod].arenas[arenaID]
   local p_name = player:get_player_name()
+  local mod = displaying_infobox[p_name].mod
+  local arenaID = displaying_infobox[p_name].arena_id
+  local arena = arena_lib.mods[mod].arenas[arenaID]
 
   if fields.quit then
-    minetest.close_formspec(p_name, formname)
-    player:get_meta():set_string("arenalib_infobox_mod", "")
-    player:get_meta():set_int("arenalib_infobox_arenaID", 0)
+    minetest.close_formspec(p_name, formname) -- necessario per chiamare la funzione sovrascritta qui sopra, rimuovendo p_name da displaying_infobox
     return
 
   elseif fields.edit then
@@ -336,6 +356,4 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   elseif fields.spectate then
     arena_lib.join_arena(mod, p_name, arenaID, true)
   end
-
-  minetest.show_formspec(p_name, "arena_lib:infobox", get_infobox_formspec(mod, arenaID, player))
 end)

@@ -10,6 +10,7 @@ local function victory_particles() end
 local function show_victory_particles() end
 local function time_start() end
 local function deprecated_winning_team_celebration() end
+local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
@@ -33,7 +34,7 @@ function arena_lib.load_arena(mod, arena_ID)
   local arena = mod_ref.arenas[arena_ID]
 
   arena.in_loading = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   local shuffled_spawners = table.copy(arena.spawn_points)
   local sorted_team_players = {}
@@ -105,14 +106,18 @@ function arena_lib.load_arena(mod, arena_ID)
   -- avvio la partita dopo tot secondi, se non è già stata avviata manualmente
   minetest.after(mod_ref.load_time, function()
     if not arena.in_loading then return end
-    arena_lib.start_arena(mod_ref, arena)
+    arena_lib.start_arena(mod, arena)
   end)
 
 end
 
 
 
-function arena_lib.start_arena(mod_ref, arena)
+function arena_lib.start_arena(mod, arena)
+
+  if type(mod) == "table" then
+    mod = deprecated_start_arena(arena)
+  end
 
   -- nel caso sia terminata durante la fase di caricamento
   if arena.in_celebration or not arena.in_game then return end
@@ -123,7 +128,9 @@ function arena_lib.start_arena(mod_ref, arena)
     return end
 
   arena.in_loading = false
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
+
+  local mod_ref = arena_lib.mods[mod]
 
   -- parte l'eventuale tempo
   if mod_ref.time_mode ~= "none" then
@@ -141,7 +148,6 @@ function arena_lib.start_arena(mod_ref, arena)
   for _, callback in ipairs(arena_lib.registered_on_start) do
     callback(mod_ref, arena)
   end
-
 end
 
 
@@ -176,6 +182,9 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
     if minetest.get_player_by_name(p_name):get_attach() then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
       return end
+
+    -- se sta finendo
+    -- TODO #192
 
     -- se si era in coda
     if arena_lib.is_player_in_queue(p_name) then
@@ -258,7 +267,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
     end
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 end
 
 
@@ -273,7 +282,7 @@ function arena_lib.load_celebration(mod, arena, winners)
     return end
 
   arena.in_celebration = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   -- ripristino HP e visibilità nome di ogni giocatore
   for pl_name, stats in pairs(arena.players) do
@@ -419,7 +428,7 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
   arena.in_celebration = false
   arena.in_game = false
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 end
 
 
@@ -538,7 +547,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     end
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 end
 
 
@@ -1164,4 +1173,15 @@ function deprecated_winning_team_celebration(mod, arena, winners)
     .. "please pass the (integer) team ID instead"))
   local winner = arena.players[winners[1]].teamID
   return S("Team @1 wins the game", arena.teams[winner].name)
+end
+
+-- to remove in 7.0
+function deprecated_start_arena(arena)
+  local mod
+  for pl_name, _ in pairs(arena.players) do
+    mod = arena_lib.get_mod_by_player(pl_name)
+    break
+  end
+  minetest.log("warning", "[ARENA_LIB - " .. mod .. "] start_arena(mod_ref, arena) is deprecated. Please use start_arena(mod, arena) instead, where mod is the technical name of the minigame (and not its table)")
+  return mod
 end

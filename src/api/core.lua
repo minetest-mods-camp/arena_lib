@@ -450,7 +450,7 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -564,7 +564,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -627,7 +627,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -844,7 +844,7 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
     if not new_entrance then return end
 
     arena.entrance = new_entrance
-    entrance.update(arena)
+    entrance.update(mod, arena)
     minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance of arena @1 successfully set", arena_name))
 
   elseif action == "remove" then
@@ -1020,7 +1020,7 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   -- abilito
   arena.enabled = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
@@ -1063,7 +1063,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
 
   -- disabilito
   arena.enabled = false
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))

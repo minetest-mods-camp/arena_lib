@@ -260,7 +260,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above. It doesn't distinguish between an actual player and a spectator (for the latter, use `arena_lib.is_player_spectating(p_name)`)
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
-* `arena_lib.start_arena(mod_ref, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
+* `arena_lib.start_arena(mod, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
 * `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing arena, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team) or a table of strings/integers (more players/teams)
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing arena. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
 * `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
@@ -315,7 +315,7 @@ arena_lib.register_entrance_type(mod, entrance, def)
 	* `name`: (string) the name of the entrance. Contrary to the previous `entrance` field, this can be translated
 	* `on_add`: (function(sender, mod, arena, ...)) must return the value that will be used by arena_lib to identify the entrance. For instance, built-in signs return their position. If nothing is returned, the adding process will be aborted. Substitute `...` with any additional parameters you may need (signs use it for their position). BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then set the new entrance. Use this callback just to run entrance-specific checks and return the value that arena_lib will then store as an entrance
 	* `on_remove`: (function(mod, arena)) additional actions to perform when an arena entrance is removed. BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then remove the entrance. Use this callback just to run entrance-specific checks.
-	* `on_update`: (function(arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
+	* `on_update`: (function(mod, arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
 	* `on_load`: (function(arena)) additional actions to perform when the server starts. Useful for nodes, since they don't have an `on_activate` callback, contrary to entities
 	* `editor_settings`: (table) how the editor section should be structured, when an arena uses this entrance type. Fields are:
 		* `name`: (string) the name of the item representing the section
