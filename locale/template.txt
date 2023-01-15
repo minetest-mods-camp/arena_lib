@@ -120,6 +120,7 @@ The arena has been forcibly terminated by @1=
 # api/in_queue.lua
 [!] Only the party leader can leave the queue!=
 [!] You're already queuing for this arena!=
+[!] You've been blocked from entering any queue for 10 seconds, due to joining and leaving repeatedly in a short amount of time!=
 Waiting for more players...=
 The queue has been cancelled due to not enough players=
 @1 seconds for the match to start=

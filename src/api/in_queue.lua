@@ -1,12 +1,13 @@
 local S = minetest.get_translator("arena_lib")
 
 local function initialise_queue_container() end
+local function increase_join_count() end
 local function go_to_arena() end
 local function queue_format() end
 
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local active_queues = {}              -- KEY: [mod] arena_name, VALUE: {(table) arena, (int) time_left, (table) was_second_run}
-local queue_hits = {}                  -- TODO: capisci struttura
+local queue_joins = {}                 -- KEY: player name, VALUE: (int) amount
 
 -- inizializzo il contenitore delle code una volta che tutti i minigiochi sono stati caricati
 minetest.after(0.1, function()
@@ -74,7 +75,15 @@ function arena_lib.join_queue(mod, arena, p_name)
     end
   end
 
-  -- TODO: controllo se spammano
+  -- se ha fatto dentro-fuori troppe volte (in qualsiasi coda)
+  if queue_joins[p_name] and queue_joins[p_name] >= 3 then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You've been blocked from entering any queue for 10 seconds, due to joining and leaving repeatedly in a short amount of time!")))
+    if queue_joins[p_name] == 3 then  -- to avoid using a 2nd bool parameter to run the after just once
+      queue_joins[p_name] = 4
+      minetest.after(10, function() queue_joins[p_name] = nil end)
+    end
+    return
+  end
 
   local mod_ref = arena_lib.mods[mod]
 
@@ -95,7 +104,8 @@ function arena_lib.join_queue(mod, arena, p_name)
     players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
   end
 
-  -- TODO: aumenta clic di 1
+  increase_join_count(p_name)
+
   local arena_max_players = arena.max_players * #arena.teams
   local has_queue_status_changed = false      -- per il richiamo globale, o non hanno modo di saperlo (dato che viene chiamato all'ultimo)
 
@@ -318,6 +328,24 @@ function initialise_queue_container()
   for mod, _ in pairs(arena_lib.mods) do
     active_queues[mod] = {}
   end
+end
+
+
+
+function increase_join_count(p_name)
+  if not queue_joins[p_name] then
+    queue_joins[p_name] = 1
+  else
+    queue_joins[p_name] = queue_joins[p_name] + 1
+  end
+
+  local val = queue_joins[p_name]
+
+  minetest.after(3, function()
+    if queue_joins[p_name] and queue_joins[p_name] < 3 and queue_joins[p_name] <= val then
+      queue_joins[p_name] = nil
+    end
+  end)
 end
 
 

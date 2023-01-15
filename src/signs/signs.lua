@@ -7,7 +7,7 @@ local function update_sign() end
 local function in_game_txt() end
 local function get_infobox_formspec() end
 
-local displaying_infobox = {}                   -- KEY: player name, VALUE: {(string) mod, (int) arena_id}
+local displaying_infobox = {}                   -- KEY: player name, VALUE: {(string) mod, (int) arena_id}; si svuota con `close_formspec`
 
 --------------------------------------------------------------------------------
 -- There is no reliable way to know when someone closes a formspec, thus I override
