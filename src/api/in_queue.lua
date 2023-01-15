@@ -7,7 +7,7 @@ local function queue_format() end
 
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local active_queues = {}              -- KEY: [mod] arena_name, VALUE: {(table) arena, (int) time_left, (table) was_second_run}
-local queue_joins = {}                 -- KEY: player name, VALUE: (int) amount
+local queue_joins = {}                -- KEY: player name, VALUE: (int) amount
 
 -- inizializzo il contenitore delle code una volta che tutti i minigiochi sono stati caricati
 minetest.after(0.1, function()
@@ -55,7 +55,6 @@ end)
 ----------------------------------------------
 
 function arena_lib.join_queue(mod, arena, p_name)
-
   local arena_name = arena.name
   local arenaID = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -152,7 +151,6 @@ end
 
 
 function arena_lib.remove_player_from_queue(p_name)
-
   local mod = arena_lib.get_mod_by_player(p_name)
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
@@ -246,14 +244,12 @@ end
 ----------------------------------------------
 
 function arena_lib.get_players_amount_left_to_start_queue(arena)
-
   if not arena or arena.in_game then return end
 
   local arena_min_players = arena.min_players * #arena.teams
   local players_required
 
   if arena.teams_enabled then
-
     players_required = 0
 
     for _, amount in pairs(arena.players_amount_per_team) do
@@ -300,7 +296,6 @@ end
 ----------------------------------------------
 
 function arena_lib.is_player_in_queue(p_name, mod)
-
   if not players_in_queue[p_name] then
     return false
   else

@@ -36,8 +36,6 @@ minetest.register_tool("arena_lib:customise_bgm", {
 ----------------------------------------------
 
 function get_bgm_formspec(arena)
-
-
   local bgm = ""
   local bgm_title = ""
   local bgm_author = ""
@@ -117,6 +115,7 @@ function get_audio_file(bgm_dir, name, mod, p_name)
 
   local exists = iterate_dirs(bgm_dir)
 
+  -- TODO: move in core.lua, set_bgm
   --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v (insieme a 'mod' e 'p_name' come parametro)
   if not exists then
     local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. name .. ".ogg", "r")
@@ -160,7 +159,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local mod = player:get_meta():get_string("arena_lib_editor.mod")
 
     if not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This audio track doesn't exist!")))
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] File not found!")))
       return end
 
     if audio_currently_playing[p_name] then
@@ -193,7 +192,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       arena_lib.set_bgm(p_name, mod, arena_name, nil, nil, nil, nil, nil, true)
     -- se non esiste il file audio, annullo
   elseif not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This audio track doesn't exist!")))
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] File not found!")))
       return
     -- sennò applico la traccia indicata
     else

@@ -51,6 +51,7 @@ Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=
 @1's author successfully removed=
 @1's author successfully changed to @2=
+[!] File not found!=
 Players amount successfully changed ( min @1 | max @2 )=
 [!] Nothing to do here!=
 Teams successfully enabled for the arena @1=
@@ -160,7 +161,6 @@ Author=
 Volume=
 Pitch=
 Apply=
-[!] This audio track doesn't exist!=
 
 # editor/tools_lighting.lua
 Lighting=
@@ -173,11 +173,12 @@ Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 
 # editor/tools_settings.lua
-Arena name and author=
+Arena name, author and thumbnail=
 Arena properties=
 Delete arena=
 Rename arena=
-Change author=
+Set author=
+Set thumbnail=
 Set timer=
 Are you sure you want to delete arena @1?=
 Cancel=
@@ -284,6 +285,7 @@ Initial time: =
 current: =
 Name: =
 Author: =
+Thumbnail: =
 BGM: =
 Teams: =
 Disabled damage types: =

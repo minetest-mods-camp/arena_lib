@@ -48,6 +48,8 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This arena doesn't exist!")))
     return end
 
+  local thumbnail = arena.thumbnail == "" and "---" or arena.thumbnail
+
   -- calcolo eventuale musica sottofondo
   local arena_bgm = "---"
   if arena.bgm then
@@ -274,6 +276,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
     minetest.colorize("#eea160", "ID: ") .. minetest.colorize("#cfc6b8", arena_ID) .. "\n" ..
     minetest.colorize("#eea160", S("Author: ")) .. minetest.colorize("#cfc6b8", arena.author) .. "\n" ..
+    minetest.colorize("#eea160", S("Thumbnail: ")) .. minetest.colorize("#cfc6b8", thumbnail) .. "\n" ..
     minetest.colorize("#eea160", S("BGM: ")) .. minetest.colorize("#cfc6b8", arena_bgm) .. "\n" ..
     minetest.colorize("#eea160", S("Teams: ")) .. minetest.colorize("#cfc6b8", teams) .. "\n" ..
     minetest.colorize("#eea160", S("Disabled damage types: ")) .. minetest.colorize("#cfc6b8", disabled_damage_types) .. "\n\n" ..

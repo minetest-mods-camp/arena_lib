@@ -27,7 +27,7 @@
 	* [2.2 Setting up an arena](#22-setting-up-an-arena)
 		* [2.2.1 Editor](#221-editor)
 		* [2.2.2 CLI](#222-cli)
-			* [2.2.2.1 Renaming an arena](#2221-renaming-an-arena)
+			* [2.2.2.1 Changing arenas name, author, thumbnail](#2221-changing-arenas-name-author-thumbnail)
 			* [2.2.2.2 Players management](#2222-players-management)
 			* [2.2.2.3 Enabling/Disabling teams](#2223-enablingdisabling-teams)
 			* [2.2.2.4 Spawners](#2224-spawners)
@@ -361,6 +361,7 @@ It all starts with a table called `arena_lib.mods = {}`. This table allows `aren
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
 * `author`: (string) the name of the one who built/designed the map. Default is `"???"`. It appears in the signs infobox (right-click an arena sign)
+* `thumbnail`: (string) the name of the optional file representing the arena, extension included. Default is `""`, meaning no thumbnail is associated with the arena. It must be put inside the `arena_lib/Thumbnails` world folder. If present, it can be seen by right-clicking built-in arena signs.
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
@@ -427,10 +428,10 @@ The command calling the editor is `/arenas edit (<minigame>) <arena>`. Feel now 
 #### 2.2.2 CLI
 If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I've chosen to omit it.
 
-##### 2.2.2.1 Renaming an arena
-Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
-`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
-In order to do so, it must be disabled.
+##### 2.2.2.1 Changing arenas name, author, thumbnail
+`arena_lib.rename_arena(sender, mod, arena_name, new_name)`: renames an arena. Being arenas stored by ID, changing their names is no big deal.
+`arena_lib.set_author(sender, mod, arena_name, author)`: changes the name of the author who has built the arena.
+`arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail)`: changes the thumbnail of the arena. `thumbnail` is the name of the file, including its extension. It must be inside the `arena_lib/Thumbnails` world folder.
 
 ##### 2.2.2.2 Players management
 `arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.

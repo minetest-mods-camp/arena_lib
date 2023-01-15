@@ -14,6 +14,7 @@ local storage = minetest.get_mod_storage()
 local function load_settings() end
 local function init_storage() end
 local function update_storage() end
+local function file_exists() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
@@ -21,6 +22,7 @@ local function is_arena_name_allowed() end
 local arena_default = {
   name = "",
   author = "???",
+  thumbnail = "",
   entrance = nil,
   entrance_type = arena_lib.DEFAULT_ENTRANCE,
   players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
@@ -55,7 +57,6 @@ local arena_default = {
 
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.register_minigame(mod, def)
-
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
   --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
@@ -239,7 +240,6 @@ function arena_lib.register_minigame(mod, def)
   end
 
   init_storage(mod, mod_ref)
-
 end
 
 
@@ -279,7 +279,6 @@ end
 
 
 function arena_lib.change_mod_settings(sender, mod, setting, new_value)
-
   local mod_settings = arena_lib.mods[mod].settings
 
   -- se la proprietà non esiste
@@ -331,7 +330,6 @@ end
 ----------------------------------------------
 
 function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
-
   local mod_ref = arena_lib.mods[mod]
 
   if not mod_ref then
@@ -407,7 +405,6 @@ end
 
 
 function arena_lib.remove_arena(sender, mod, arena_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -434,7 +431,6 @@ end
 
 
 function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -462,7 +458,6 @@ end
 
 
 function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -485,8 +480,35 @@ end
 
 
 
-function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
+function arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if type(thumbnail) ~= "string" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
+  elseif thumbnail == nil or thumbnail == "" then
+    arena.thumbnail = ""
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's thumbnail successfully removed", arena.name))
+  else
+    local thmb_dir = minetest.get_worldpath() .. "/arena_lib/Thumbnails/"
+    if not file_exists(thmb_dir, thumbnail) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
+      return end
+
+    arena.thumbnail = thumbnail
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's thumbnail successfully changed to @2", arena.name, arena.thumbnail))
+  end
+
+  update_storage(false, mod, id, arena)
+end
+
+
+
+function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -536,7 +558,6 @@ end
 
 
 function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -578,7 +599,6 @@ end
 
 
 function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_editor)      -- enable can be 0 or 1
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -635,11 +655,10 @@ end
 
 
 
--- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
--- Non ci possono essere più spawn points del numero massimo di giocatori.
+-- I punti rinascita si impostano prendendo la coordinata del giocatore che lancia il comando.
+-- Non ci possono essere più punti rinascita del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
 function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -795,7 +814,6 @@ end
 
 
 function arena_lib.set_entrance_type(sender, mod, arena_name, type)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not arena_lib.is_player_in_edit_mode(sender) then
@@ -825,7 +843,6 @@ end
 -- `action` = "add", "remove"
 -- `...` è utile per "add", in quanto si vorrà passare perlomeno una posizione (nodi) o una stringa (entità) da salvare in arena.entrance
 function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not arena_lib.is_player_in_edit_mode(sender) then
@@ -868,7 +885,6 @@ end
 
 
 function arena_lib.set_lighting(sender, mod, arena_name, light_table, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -888,7 +904,6 @@ end
 
 
 function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -926,12 +941,13 @@ end
 
 
 function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
+
+  -- TODO: 'sta funzione senza mezzo controllo fa piangere
 
   if track == nil then
     arena.bgm = nil
@@ -952,7 +968,6 @@ end
 
 
 function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -980,7 +995,6 @@ end
 
 
 function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -1030,7 +1044,6 @@ end
 
 
 function arena_lib.disable_arena(sender, mod, arena_name)
-
   local mod_ref = arena_lib.mods[mod]
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -1210,6 +1223,11 @@ function init_storage(mod, mod_ref)
         arena.sign = nil
         to_update = true
       end
+
+      if not arena.thumbnail then
+        arena.thumbnail = ""
+        to_update = true
+      end
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
 
       -- gestione squadre
@@ -1294,6 +1312,30 @@ function update_storage(erase, mod, id, arena)
 
 end
 
+
+
+function file_exists(src_dir, name)
+  local content = minetest.get_dir_list(src_dir, false)
+
+  local function iterate_dirs(dir)
+    for _, f_name in pairs(minetest.get_dir_list(dir, false)) do
+      minetest.chat_send_all(f_name)
+      local file = io.open(dir .. "/" .. name, "r")
+      if file then
+        io.close(file)
+        return true
+      end
+    end
+
+    for _, subdir in pairs(minetest.get_dir_list(dir, true)) do
+       if iterate_dirs(dir .. "/" .. subdir) then
+         return true
+       end
+    end
+  end
+
+  return iterate_dirs(src_dir)
+end
 
 
 -- le proprietà vengono salvate nello storage senza valori, in una coppia id-proprietà. Sia per leggerezza, sia perché non c'è bisogno di paragonarne i valori

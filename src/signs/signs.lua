@@ -228,6 +228,7 @@ function get_infobox_formspec(mod, arenaID, player)
   local arena = mod_ref.arenas[arenaID]
   local p_name = player:get_player_name()
 
+  local thumbnail = arena.thumbnail ~= "" and arena.thumbnail or "arenalib_infobox_thumbnail.png"
   local bgm_info
 
   if arena.bgm then
@@ -287,7 +288,8 @@ function get_infobox_formspec(mod, arenaID, player)
     "no_prepend[]",
     "bgcolor[;true]",
     "style_type[image_button;border=false;bgimg=blank.png]",
-    "background[3,0;14,7;arenalib_infobox_bg2.png;]",
+    "image[3.85,0.78;7.94,5.43;" .. thumbnail .. "]",
+    "image[3,0;14,7;arenalib_infobox_bg2.png;]",
     -- corpo sx
     "container[12.2,0.7]",
     -- immagini
