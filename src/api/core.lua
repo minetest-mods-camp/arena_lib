@@ -1319,7 +1319,6 @@ function file_exists(src_dir, name)
 
   local function iterate_dirs(dir)
     for _, f_name in pairs(minetest.get_dir_list(dir, false)) do
-      minetest.chat_send_all(f_name)
       local file = io.open(dir .. "/" .. name, "r")
       if file then
         io.close(file)
