@@ -54,6 +54,7 @@ signs_lib.register_sign("arena_lib:sign", {
     { name = "arenalib_sign.png", backface_culling = true},
     "arenalib_sign_edge.png"
     },
+  use_texture_alpha = "opaque",
   inventory_image = "arenalib_sign_icon.png",
   default_color = "8",
   entity_info = "standard",
