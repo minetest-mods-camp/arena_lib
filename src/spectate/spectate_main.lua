@@ -87,7 +87,6 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
 
-  -- TODO: prob mano finta non serve più dato che non possono aprire inventario per spostare oggetti
   -- applico mano finta
   player:get_inventory():set_size("hand", 1)
   player:get_inventory():add_item("hand", "arena_lib:spectate_hand")
