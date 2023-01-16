@@ -1,7 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
 local function get_bgm_formspec() end
-local function get_audio_file() end
+local function file_exists() end
 local function calc_gain() end
 local function calc_pitch() end
 
@@ -94,7 +94,8 @@ end
 
 
 
-function get_audio_file(bgm_dir, name, mod, p_name)
+function file_exists(name, mod, p_name)
+  local bgm_dir = minetest.get_worldpath() .. "/arena_lib/BGM/"
   local content = minetest.get_dir_list(bgm_dir, false)
 
   local function iterate_dirs(dir)
@@ -115,7 +116,6 @@ function get_audio_file(bgm_dir, name, mod, p_name)
 
   local exists = iterate_dirs(bgm_dir)
 
-  -- TODO: move in core.lua, set_bgm
   --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v (insieme a 'mod' e 'p_name' come parametro)
   if not exists then
     local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. name .. ".ogg", "r")
@@ -152,13 +152,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   if formname ~= "arena_lib:bgm" then return end
 
   local p_name = player:get_player_name()
-  local bgm_dir  = minetest.get_worldpath() .. "/arena_lib/BGM/"
 
   -- se premo su icona "riproduci", riproduco audio
   if fields.play then
     local mod = player:get_meta():get_string("arena_lib_editor.mod")
 
-    if not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
+    if not file_exists(fields.bgm, mod, p_name) then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] File not found!")))
       return end
 
@@ -186,20 +185,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local mod         = player:get_meta():get_string("arena_lib_editor.mod")
     local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
     local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+    local title       = fields.title ~= "" and minetest.formspec_escape(fields.title) or nil
+    local author      = fields.author ~= "" and minetest.formspec_escape(fields.author) or nil
 
-    -- se il campo è vuoto, rimuovo la musica di sottofondo
-    if fields.bgm == "" then
-      arena_lib.set_bgm(p_name, mod, arena_name, nil, nil, nil, nil, nil, true)
-    -- se non esiste il file audio, annullo
-  elseif not get_audio_file(bgm_dir, fields.bgm, mod, p_name) then
-      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] File not found!")))
-      return
-    -- sennò applico la traccia indicata
-    else
-      local title = fields.title ~= "" and minetest.formspec_escape(fields.title) or nil
-      local author = fields.author ~= "" and minetest.formspec_escape(fields.author) or nil
-      arena_lib.set_bgm(p_name, mod, arena_name, fields.bgm, title, author, calc_gain(fields.gain), calc_pitch(fields.pitch), true)
-    end
+    arena_lib.set_bgm(p_name, mod, arena_name, fields.bgm, title, author, calc_gain(fields.gain), calc_pitch(fields.pitch), true)
 
     if audio_currently_playing[p_name] then
       minetest.sound_stop(audio_currently_playing[p_name])

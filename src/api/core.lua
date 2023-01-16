@@ -15,6 +15,7 @@ local function load_settings() end
 local function init_storage() end
 local function update_storage() end
 local function file_exists() end
+local function deprecated_audio_exists() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
@@ -947,9 +948,15 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  -- TODO: 'sta funzione senza mezzo controllo fa piangere
+  local bgm_dir = minetest.get_worldpath() .. "/arena_lib/BGM/"
 
-  if track == nil then
+  if not file_exists(bgm_dir, track .. ".ogg") then
+    if not deprecated_audio_exists(mod, track, sender) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
+      return end
+  end
+
+  if track == nil or track == "" then
     arena.bgm = nil
   else
     arena.bgm = {
@@ -1487,4 +1494,13 @@ end
 function arena_lib.set_sign(sender)
 	minetest.log("warning", "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
 	minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
+end
+
+function deprecated_audio_exists(mod, track, p_name)
+  local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. track .. ".ogg", "r")
+  if deprecated_file then
+    deprecated_file:close()
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: put it into the world folder instead!"))
+    return true
+  end
 end
