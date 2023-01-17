@@ -8,6 +8,8 @@ local function load_world_folder()
 
     minetest.cpdir(src_dir, wrld_dir)
     os.remove(wrld_dir .. "/README.md")
+    os.remove(wrld_dir .. "/BGM/.gitkeep")
+    os.remove(wrld_dir .. "/Thumbnails/.gitkeep")
 
     --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
     local old_settings = io.open(modpath .. "/SETTINGS.lua", "r")
