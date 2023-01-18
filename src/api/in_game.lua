@@ -782,9 +782,11 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
 
   -- cambio eventuale colore texture (richiede le squadre)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
-   player:set_properties({
-     textures = {player:get_properties().textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"}
-   })
+    local textures = player:get_properties().textures
+    textures[1] = textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"
+    player:set_properties({
+      textures = textures
+    })
   end
 
   -- disabilito eventualmente l'inventario
@@ -928,8 +930,10 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
 
     -- ripristino eventuali texture
     if arena.teams_enabled and mod_ref.teams_color_overlay then
+      local textures = player:get_properties().textures
+      textures[1] = string.match(textures[1], "(.*)^%[") or textures[1] -- in case an external mod messed up filters. TODO just store the texture when the match starts and then reapply it here
       player:set_properties({
-        textures = {string.match(player:get_properties().textures[1], "(.*)^%[")}
+        textures = textures
       })
     end
 
