@@ -1117,8 +1117,6 @@ function arena_lib.store_inventory(player)
     end
 
     storage:set_string(player:get_player_name() .. ".INVENTORY", minetest.serialize(stored_inv))
-  -- TODO: storaggio database esterno
-  --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
   end
 
   player:get_inventory():set_list("main",{})
@@ -1158,8 +1156,6 @@ function arena_lib.restore_inventory(p_name)
     end
 
     storage:set_string(p_name .. ".INVENTORY", "")
-  -- TODO: storaggio database esterno
-  --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
   end
 end
 

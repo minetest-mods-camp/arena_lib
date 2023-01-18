@@ -21,7 +21,6 @@ arena_lib.SERVER_PHYSICS = {
 -- if they disconnect/the server crashes, next time they log in.
 -- "none" = don't store
 -- "mod_db" = store in the arena_lib mod database
--- "external_db" = store in an external database -TODO: NOT YET IMPLEMENTED
 arena_lib.STORE_INVENTORY_MODE = "mod_db"
 
 -- instead of letting modders put whatever colour they want in the sky settings,
