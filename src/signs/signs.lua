@@ -1,6 +1,8 @@
 local S = minetest.get_translator("arena_lib")
 local FS = minetest.formspec_escape
 
+local NAMES_DIST = 0.64
+
 local function add_sign() end
 local function remove_sign() end
 local function update_sign() end
@@ -139,7 +141,6 @@ signs_lib.register_sign("arena_lib:sign", {
 ----------------------------------------------
 
 function add_sign(sender, mod, arena, pos)
-
   if not pos or type(pos) ~= "table" then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     return end
@@ -161,7 +162,6 @@ end
 
 
 function remove_sign(mod, arena)
-
   minetest.load_area(arena.entrance)
 
   local sign_meta = minetest.get_meta(arena.entrance)
@@ -180,7 +180,6 @@ end
 
 
 function update_sign(mod, arena)
-
   local p_count = 0
   local t_count = #arena.teams
 
@@ -224,12 +223,55 @@ end
 
 
 function get_infobox_formspec(mod, arenaID, player)
-
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arenaID]
   local p_name = player:get_player_name()
 
   local thumbnail = arena.thumbnail ~= "" and arena.thumbnail or "arenalib_infobox_thumbnail.png"
+  local list_bg, inside_col, pl_list
+
+  -- se è in partita...
+  if arena.in_game then
+    list_bg = "arenalib_infobox_list.png"
+    inside_col = "#5a5353"
+    pl_list = ""
+
+    local i = 1
+    -- renderizzo lɜ giocatorɜ
+    for pl_name, _ in pairs(arena.players) do
+      local y = 0.46 + (NAMES_DIST * i)
+      if i > 7 then
+        local txt = arena.players_amount > 8 and "..." or pl_name
+        pl_list = pl_list .. "hypertext[0.7," .. y .. ";3.9,1;name;<style size=17 font=mono color=#ffffff>" .. txt .. "</style>]"
+        break
+      else
+        pl_list = pl_list .. "hypertext[0.7," .. y .. ";3.9,1;name;<style size=17 font=mono color=#ffffff>" .. pl_name .. "</style>]"
+      end
+      i = i+1
+    end
+
+    -- renderizzo eventualmente lɜ spettatorɜ
+    if arena.players_amount < 9 then
+      for sp_name, _ in pairs(arena.spectators) do
+        local y = 0.46 + (NAMES_DIST * i)
+        if i > 7 then
+          local txt = arena.players_amount + arena.spectators_amount > 8 and "..." or sp_name
+          pl_list = pl_list .. "hypertext[0.7," .. y .. ";3.9,1;name;<style size=17 font=mono color=#453f40>" .. txt .. "</style>]"
+          break
+        else
+          pl_list = pl_list .. "hypertext[0.7," .. y .. ";3.9,1;name;<style size=17 font=mono color=#453f40>" .. sp_name .. "</style>]"
+        end
+        i = i+1
+      end
+    end
+
+  -- sennò
+  else
+    list_bg = "arenalib_infobox_list_off.png"
+    inside_col = "#d7ded7"
+    pl_list = "hypertext[0.7,2.22;3.6,2;name;<global halign=center valign=middle><style size=17 font=mono color=#d7ded7>" .. S("No ongoing match") .. "</style>]"
+  end
+
   local bgm_info
 
   if arena.bgm then
@@ -290,9 +332,10 @@ function get_infobox_formspec(mod, arenaID, player)
     "bgcolor[;true]",
     "style_type[image_button;border=false;bgimg=blank.png]",
     "image[3.82,0.75;8,5.49;" .. thumbnail .. "]",
-    "image[3,0;14,7;arenalib_infobox_bg2.png;]",
+    "image[0,0;20,7;arenalib_infobox_bg.png;]",
+    "image[0,0;20,7;" .. list_bg .. ";]",
     -- corpo sx
-    "container[12.2,0.7]",
+    "container[9.2,0.7]",
     -- immagini
     "image[-0.3,0;1,1;arenalib_infobox_name.png]",
     "image[0,1.7;0.9,0.65;arenalib_infobox_author.png]",
@@ -300,17 +343,21 @@ function get_infobox_formspec(mod, arenaID, player)
     -- scritte
     "hypertext[0.76,0.08;3.7,1;name;<global valign=middle><style size=23 font=mono color=#ffffff>" .. FS(arena.name) .. "</style>]",
     "hypertext[1,1.59;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
-    "hypertext[1,2.67;3.52,1.2;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
+    "hypertext[1,2.67;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
     -- suggerimenti e pulsanti
     "tooltip[play;" .. S(play_tip) .. "]",
     "tooltip[spectate;" .. S(spec_tip) .. "]",
     "image_button[0,4.52;2.1,1.1;" .. play_btn .. ";play;]",
     "image_button[2.1,4.52;2.1,1.1;" .. spec_btn .. ";spectate;]",
     "container_end[]",
-    -- corpo dx TODO
-    --
+    -- corpo dx
+    "container[14.1,0.3]",
+    "image[0,0;0.92,0.92;arenalib_editor_players.png;]",
+    "hypertext[1,0;3.7,1;name;<global valign=middle><style size=20 font=mono color=" .. inside_col .. ">" .. S("Now inside") .. "</style>]",
+    pl_list,
+    "container_end[]",
     -- pulsanti esterni
-    "container[17.1,0]",
+    "container[19.3,0.1]",
     "image_button[0,0.19;0.6,0.6;arenalib_infobox_quit.png;quit;]",
     edit,
     "container_end[]"
