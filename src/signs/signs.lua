@@ -331,7 +331,7 @@ function get_infobox_formspec(mod, arenaID, player)
     "no_prepend[]",
     "bgcolor[;true]",
     "style_type[image_button;border=false;bgimg=blank.png]",
-    "image[3.82,0.75;8,5.49;" .. thumbnail .. "]",
+    "image[0.82,0.75;8,5.49;" .. thumbnail .. "]",
     "image[0,0;20,7;arenalib_infobox_bg.png;]",
     "image[0,0;20,7;" .. list_bg .. ";]",
     -- corpo sx
