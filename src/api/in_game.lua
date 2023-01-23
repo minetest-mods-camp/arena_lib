@@ -468,14 +468,14 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
   -- reason 3 = has quit the arena
   assert(reason, "[ARENA_LIB] 'remove_player_from_arena': A reason must be specified!")
 
-  -- se il giocatore non è in partita, annullo
+  -- se lə giocatorə non è in partita, annullo
   if not arena_lib.is_player_in_arena(p_name) then return end
 
   local mod = arena_lib.get_mod_by_player(p_name)
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
 
-  -- se il giocatore era in spettatore
+  -- se lə giocatorə era in spettatore
   if mod_ref.spectate_mode and arena_lib.is_player_spectating(p_name) then
     arena_lib.leave_spectate_mode(p_name)
     operations_before_leaving_arena(mod_ref, arena, p_name, reason)
@@ -484,7 +484,6 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
     players_in_game[p_name] = nil
-    return
 
   -- sennò...
   else
@@ -518,34 +517,35 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
       handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
     end
-  end
 
-  -- se è già in celebrazione, non c'è bisogno di andare oltre
-  if arena.in_celebration then return end
+    -- se è già in celebrazione, basta solo aggiornare il cartello
+    if not arena.in_celebration then
 
-  -- se l'ultimo rimasto abbandona, vai in celebrazione
-  if arena.players_amount == 0 then
-    arena_lib.load_celebration(mod, arena)
+      -- se l'ultimə rimastə abbandona, vai in celebrazione
+      if arena.players_amount == 0 then
+        arena_lib.load_celebration(mod, arena)
 
-  -- se l'arena è a squadre e sono rimasti solo i giocatori di una squadra, la loro squadra vince
-  elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
+      -- se l'arena è a squadre e sono rimasti solo lɜ giocatorɜ di una squadra, la loro squadra vince
+      elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
 
-    local winning_team_id = arena_lib.get_active_teams(arena)[1]
+        local winning_team_id = arena_lib.get_active_teams(arena)[1]
 
-    arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
-    arena_lib.load_celebration(mod, arena, winning_team_id)
+        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
+        arena_lib.load_celebration(mod, arena, winning_team_id)
 
-  -- se invece erano rimasti solo 2 giocatori in partita, l'altro vince
-  elseif arena.players_amount == 1 then
+      -- se invece erano rimastɜ solo 2 giocatorɜ in partita, l'altrə vince
+      elseif arena.players_amount == 1 then
 
-    if reason == 1 then
-      arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You're the last player standing: you win!"))
-    else
-      arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You win the game due to not enough players"))
-    end
+        if reason == 1 then
+          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You're the last player standing: you win!"))
+        else
+          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You win the game due to not enough players"))
+        end
 
-    for pl_name, stats in pairs(arena.players) do
-      arena_lib.load_celebration(mod, arena, pl_name)
+        for pl_name, stats in pairs(arena.players) do
+          arena_lib.load_celebration(mod, arena, pl_name)
+        end
+      end
     end
   end
 
