@@ -230,8 +230,8 @@ function get_infobox_formspec(mod, arenaID, player)
   local thumbnail = arena.thumbnail ~= "" and arena.thumbnail or "arenalib_infobox_thumbnail.png"
   local list_bg, inside_col, pl_list
 
-  -- se è in partita...
-  if arena.in_game then
+  -- se c'è una partita o qualcunə in coda...
+  if arena.in_game or arena.players_amount > 0 then
     list_bg = "arenalib_infobox_list.png"
     inside_col = "#5a5353"
     pl_list = ""
@@ -269,7 +269,7 @@ function get_infobox_formspec(mod, arenaID, player)
   else
     list_bg = "arenalib_infobox_list_off.png"
     inside_col = "#d7ded7"
-    pl_list = "hypertext[0.7,2.22;3.6,2;name;<global halign=center valign=middle><style size=17 font=mono color=#d7ded7>" .. S("No ongoing match") .. "</style>]"
+    pl_list = "hypertext[0.7,2.22;3.6,2;name;<global halign=center valign=middle><style size=17 font=mono color=#d7ded7>" .. S("No ongoing activity") .. "</style>]"
   end
 
   local bgm_info
