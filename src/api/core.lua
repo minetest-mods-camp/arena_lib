@@ -1100,24 +1100,20 @@ end
 
 -- internal use only
 function arena_lib.store_inventory(player)
+  local p_inv = player:get_inventory()
+  local stored_inv = {}
 
-  if arena_lib.STORE_INVENTORY_MODE == "mod_db" then
-
-    local p_inv = player:get_inventory()
-    local stored_inv = {}
-
-    -- itero ogni lista non vuota per convertire tutti gli itemstack in tabelle (sennò non li serializza)
-    for listname, content in pairs(p_inv:get_lists()) do
-      if not p_inv:is_empty(listname) then
-        stored_inv[listname] = {}
-        for i_name, i_def in pairs(content) do
-          stored_inv[listname][i_name] = i_def:to_table()
-        end
+  -- itero ogni lista non vuota per convertire tutti gli itemstack in tabelle (sennò non li serializza)
+  for listname, content in pairs(p_inv:get_lists()) do
+    if not p_inv:is_empty(listname) then
+      stored_inv[listname] = {}
+      for i_name, i_def in pairs(content) do
+        stored_inv[listname][i_name] = i_def:to_table()
       end
     end
-
-    storage:set_string(player:get_player_name() .. ".INVENTORY", minetest.serialize(stored_inv))
   end
+
+  storage:set_string(player:get_player_name() .. ".INVENTORY", minetest.serialize(stored_inv))
 
   player:get_inventory():set_list("main",{})
   player:get_inventory():set_list("craft",{})
@@ -1128,7 +1124,7 @@ end
 -- internal use only
 function arena_lib.restore_inventory(p_name)
 
-  if arena_lib.STORE_INVENTORY_MODE == "mod_db" and storage:get_string(p_name .. ".INVENTORY") ~= "" then
+  if storage:get_string(p_name .. ".INVENTORY") ~= "" then
 
     local stored_inv = minetest.deserialize(storage:get_string(p_name .. ".INVENTORY"))
     local current_inv = minetest.get_player_by_name(p_name):get_inventory()

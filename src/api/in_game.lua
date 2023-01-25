@@ -887,9 +887,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     player:get_inventory():set_list("main", {})
     player:get_inventory():set_list("craft",{})
 
-    if arena_lib.STORE_INVENTORY_MODE ~= "none" then
-      arena_lib.restore_inventory(p_name)
-    end
+    arena_lib.restore_inventory(p_name)
   end
 
   local armor_groups = players_temp_storage[p_name].armor_groups
