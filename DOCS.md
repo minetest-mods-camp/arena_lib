@@ -124,8 +124,6 @@ A few more are available for players having the `arenalib_admin` privilege:
 	* `list <minigame>`: lists all the arenas of `<minigame>`
 	* `remove (<minigame>) <arena>`: deletes an arena
 	* `settings <minigame>`: changes `<minigame>` settings
-* `/forceend mod arena_name`: forcibly ends an ongoing game
-* `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
 ### 1.4 Callbacks
 Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
