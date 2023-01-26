@@ -1,11 +1,13 @@
 local S = minetest.get_translator("arena_lib")
 
 local function initialise_queue_container() end
+local function increase_join_count() end
 local function go_to_arena() end
 local function queue_format() end
 
 local players_in_queue = {}           -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local active_queues = {}              -- KEY: [mod] arena_name, VALUE: {(table) arena, (int) time_left, (table) was_second_run}
+local queue_joins = {}                -- KEY: player name, VALUE: (int) amount
 
 -- inizializzo il contenitore delle code una volta che tutti i minigiochi sono stati caricati
 minetest.after(0.1, function()
@@ -53,7 +55,6 @@ end)
 ----------------------------------------------
 
 function arena_lib.join_queue(mod, arena, p_name)
-
   local arena_name = arena.name
   local arenaID = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -71,6 +72,16 @@ function arena_lib.join_queue(mod, arena, p_name)
     else
       arena_lib.remove_player_from_queue(p_name)
     end
+  end
+
+  -- se ha fatto dentro-fuori troppe volte (in qualsiasi coda)
+  if queue_joins[p_name] and queue_joins[p_name] >= 3 then
+    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You've been blocked from entering any queue for 10 seconds, due to joining and leaving repeatedly in a short amount of time!")))
+    if queue_joins[p_name] == 3 then  -- to avoid using a 2nd bool parameter to run the after just once
+      queue_joins[p_name] = 4
+      minetest.after(10, function() queue_joins[p_name] = nil end)
+    end
+    return
   end
 
   local mod_ref = arena_lib.mods[mod]
@@ -91,6 +102,8 @@ function arena_lib.join_queue(mod, arena, p_name)
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#c8d692", arena_name .. " > " ..  pl_name))
     players_in_queue[pl_name] = {minigame = mod, arenaID = arenaID}
   end
+
+  increase_join_count(p_name)
 
   local arena_max_players = arena.max_players * #arena.teams
   local has_queue_status_changed = false      -- per il richiamo globale, o non hanno modo di saperlo (dato che viene chiamato all'ultimo)
@@ -131,14 +144,13 @@ function arena_lib.join_queue(mod, arena, p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   return true
 end
 
 
 
 function arena_lib.remove_player_from_queue(p_name)
-
   local mod = arena_lib.get_mod_by_player(p_name)
   local mod_ref = arena_lib.mods[mod]
   local arena = arena_lib.get_arena_by_player(p_name)
@@ -219,7 +231,7 @@ function arena_lib.remove_player_from_queue(p_name)
     callback(mod_ref, arena, p_name, has_queue_status_changed)
   end
 
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   return true
 end
 
@@ -232,14 +244,12 @@ end
 ----------------------------------------------
 
 function arena_lib.get_players_amount_left_to_start_queue(arena)
-
   if not arena or arena.in_game then return end
 
   local arena_min_players = arena.min_players * #arena.teams
   local players_required
 
   if arena.teams_enabled then
-
     players_required = 0
 
     for _, amount in pairs(arena.players_amount_per_team) do
@@ -286,7 +296,6 @@ end
 ----------------------------------------------
 
 function arena_lib.is_player_in_queue(p_name, mod)
-
   if not players_in_queue[p_name] then
     return false
   else
@@ -318,12 +327,30 @@ end
 
 
 
+function increase_join_count(p_name)
+  if not queue_joins[p_name] then
+    queue_joins[p_name] = 1
+  else
+    queue_joins[p_name] = queue_joins[p_name] + 1
+  end
+
+  local val = queue_joins[p_name]
+
+  minetest.after(3, function()
+    if queue_joins[p_name] and queue_joins[p_name] < 3 and queue_joins[p_name] <= val then
+      queue_joins[p_name] = nil
+    end
+  end)
+end
+
+
+
 function go_to_arena(mod, arena)
 
   active_queues[mod][arena.name] = nil
   arena.in_queue = false
   arena.in_game = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   for pl_name, _ in pairs(arena.players) do
     players_in_queue[pl_name] = nil

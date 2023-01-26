@@ -87,7 +87,6 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
 
-  -- TODO: prob mano finta non serve più dato che non possono aprire inventario per spostare oggetti
   -- applico mano finta
   player:get_inventory():set_size("hand", 1)
   player:get_inventory():add_item("hand", "arena_lib:spectate_hand")
@@ -187,7 +186,7 @@ end
 -- find next spectatatable target
 ----------------------------
 
-function arena_lib.find_and_spectate_player(sp_name, change_team)
+function arena_lib.find_and_spectate_player(sp_name, change_team, go_counterwise)
 
   local arena = arena_lib.get_arena_by_player(sp_name)
 
@@ -248,9 +247,15 @@ function arena_lib.find_and_spectate_player(sp_name, change_team)
     players_amount = arena.players_amount
   end
 
-  local watching_ID = spectator:get_meta():get_int("arenalib_watchID")
-  local new_ID = players_amount <= watching_ID and 1 or watching_ID + 1
   local mod = arena_lib.get_mod_by_player(sp_name)
+  local current_ID = spectator:get_meta():get_int("arenalib_watchID")
+  local new_ID
+
+  if go_counterwise then
+    new_ID = current_ID == 1 and players_amount or current_ID - 1
+  else
+    new_ID = players_amount <= current_ID and 1 or current_ID + 1
+  end
 
   -- trovo il giocatore da seguire
   -- squadre:
@@ -281,7 +286,7 @@ end
 
 
 
-function arena_lib.find_and_spectate_entity(mod, arena, sp_name)
+function arena_lib.find_and_spectate_entity(mod, arena, sp_name, go_counterwise)
 
   local e_amount = arena.spectate_entities_amount
 
@@ -304,11 +309,16 @@ function arena_lib.find_and_spectate_entity(mod, arena, sp_name)
   end
 
   local current_ID = spectator:get_meta():get_int("arenalib_watchID")
-  local new_ID = e_amount <= current_ID and 1 or current_ID + 1
+  local new_ID
+
+  if go_counterwise then
+    new_ID = current_ID == 1 and e_amount or current_ID - 1
+  else
+    new_ID = e_amount <= current_ID and 1 or current_ID + 1
+  end
+
   local i = 1
-
   for en_name, _ in pairs(entities_storage[mod][arena_name]) do
-
     if i == new_ID then
       set_spectator(mod, arena_name, spectator, "entity", en_name, i)
       return true
@@ -343,11 +353,16 @@ function arena_lib.find_and_spectate_area(mod, arena, sp_name)
   end
 
   local current_ID = spectator:get_meta():get_int("arenalib_watchID")
-  local new_ID = ar_amount <= current_ID and 1 or current_ID + 1
+  local new_ID
+
+  if go_counterwise then
+    new_ID = current_ID == 1 and ar_amount or current_ID - 1
+  else
+    new_ID = ar_amount <= current_ID and 1 or current_ID + 1
+  end
+
   local i = 1
-
   for pos_name, _ in pairs(areas_storage[mod][arena_name]) do
-
     if i == new_ID then
       set_spectator(mod, arena_name, spectator, "area", pos_name, i)
       return true
@@ -600,7 +615,7 @@ function override_hotbar(player, mod, arena)
 
   local mod_ref = arena_lib.mods[mod]
   local tools = {
-    "arena_lib:spectate_changeplayer",
+    "arena_lib:spectate_changeplayer",      -- TODO: 6.0, with endless arenas I could have a situation where I have entities/areas to spectate but no players. Still hardcoded?
     "arena_lib:spectate_quit"
   }
 

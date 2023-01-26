@@ -124,13 +124,21 @@ ChatCmdBuilder.new("arenas", function(cmd)
     end
   end)
 
-  -- impostazioni minigiochi
+  -- gestione minigiochi
   cmd:sub("entrances :minigame", function(sender, minigame)
     arena_lib.enter_entrance_settings(sender, minigame)
   end)
 
   cmd:sub("settings :minigame", function(sender, minigame)
     arena_lib.enter_minigame_settings(sender, minigame)
+  end)
+
+  cmd:sub("glist", function(sender)
+    arena_lib.print_minigames(sender)
+  end)
+
+  cmd:sub("gamelist", function(sender)
+    arena_lib.print_minigames(sender)
   end)
 
   -- gestione utenti
@@ -157,7 +165,7 @@ ChatCmdBuilder.new("arenas", function(cmd)
   ]]
 
 end, {
-  params = "[ create | disable | edit | enable | entrances | flush | forceend | info | kick | list | remove | settings ]",
+  params = "[ create | disable | edit | enable | entrances | flush | forceend | gamelist | glist | info | kick | list | remove | settings ]",
   description = S("Manage arena_lib arenas; it requires arenalib_admin") .. "\n"
     .. "/arenas create <" .. S("minigame") .. "> <" .. S("arena") .. "> (<pmin> <pmax>)\n"
     .. "/arenas disable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
@@ -166,6 +174,8 @@ end, {
     .. "/arenas entrances <" .. S("minigame") .. ">\n"
     .. "/arenas flush (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas forceend (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
+    .. "/arenas gamelist \n"
+    .. "/arenas glist \n"
     .. "/arenas info (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
     .. "/arenas kick <" .. S("player") .. ">\n"
     .. "/arenas list <" .. S("minigame") .. ">\n"

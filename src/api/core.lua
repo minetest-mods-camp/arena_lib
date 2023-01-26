@@ -14,6 +14,8 @@ local storage = minetest.get_mod_storage()
 local function load_settings() end
 local function init_storage() end
 local function update_storage() end
+local function file_exists() end
+local function deprecated_audio_exists() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
@@ -21,6 +23,7 @@ local function is_arena_name_allowed() end
 local arena_default = {
   name = "",
   author = "???",
+  thumbnail = "",
   entrance = nil,
   entrance_type = arena_lib.DEFAULT_ENTRANCE,
   players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
@@ -55,7 +58,6 @@ local arena_default = {
 
 -- per inizializzare. Da lanciare all'inizio di ogni mod
 function arena_lib.register_minigame(mod, def)
-
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
   --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
@@ -239,7 +241,6 @@ function arena_lib.register_minigame(mod, def)
   end
 
   init_storage(mod, mod_ref)
-
 end
 
 
@@ -279,7 +280,6 @@ end
 
 
 function arena_lib.change_mod_settings(sender, mod, setting, new_value)
-
   local mod_settings = arena_lib.mods[mod].settings
 
   -- se la proprietà non esiste
@@ -331,7 +331,6 @@ end
 ----------------------------------------------
 
 function arena_lib.create_arena(sender, mod, arena_name, min_players, max_players)
-
   local mod_ref = arena_lib.mods[mod]
 
   if not mod_ref then
@@ -407,7 +406,6 @@ end
 
 
 function arena_lib.remove_arena(sender, mod, arena_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -434,7 +432,6 @@ end
 
 
 function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -450,7 +447,7 @@ function arena_lib.rename_arena(sender, mod, arena_name, new_name, in_editor)
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -462,7 +459,6 @@ end
 
 
 function arena_lib.set_author(sender, mod, arena_name, author, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -485,8 +481,35 @@ end
 
 
 
-function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
+function arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if type(thumbnail) ~= "string" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return
+  elseif thumbnail == nil or thumbnail == "" then
+    arena.thumbnail = ""
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's thumbnail successfully removed", arena.name))
+  else
+    local thmb_dir = minetest.get_worldpath() .. "/arena_lib/Thumbnails/"
+    if not file_exists(thmb_dir, thumbnail) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
+      return end
+
+    arena.thumbnail = thumbnail
+    minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("@1's thumbnail successfully changed to @2", arena.name, arena.thumbnail))
+  end
+
+  update_storage(false, mod, id, arena)
+end
+
+
+
+function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -536,7 +559,6 @@ end
 
 
 function arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -564,7 +586,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -578,7 +600,6 @@ end
 
 
 function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_editor)      -- enable can be 0 or 1
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -627,7 +648,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
-    arena_lib.entrances[arena.entrance_type].update(arena)
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
   end
 
   update_storage(false, mod, id, arena)
@@ -635,11 +656,10 @@ end
 
 
 
--- Gli spawn points si impostano prendendo la coordinata del giocatore che lancia il comando.
--- Non ci possono essere più spawn points del numero massimo di giocatori.
+-- I punti rinascita si impostano prendendo la coordinata del giocatore che lancia il comando.
+-- Non ci possono essere più punti rinascita del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
 function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -795,7 +815,6 @@ end
 
 
 function arena_lib.set_entrance_type(sender, mod, arena_name, type)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not arena_lib.is_player_in_edit_mode(sender) then
@@ -825,7 +844,6 @@ end
 -- `action` = "add", "remove"
 -- `...` è utile per "add", in quanto si vorrà passare perlomeno una posizione (nodi) o una stringa (entità) da salvare in arena.entrance
 function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not arena_lib.is_player_in_edit_mode(sender) then
@@ -844,7 +862,7 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
     if not new_entrance then return end
 
     arena.entrance = new_entrance
-    entrance.update(arena)
+    entrance.update(mod, arena)
     minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance of arena @1 successfully set", arena_name))
 
   elseif action == "remove" then
@@ -868,7 +886,6 @@ end
 
 
 function arena_lib.set_lighting(sender, mod, arena_name, light_table, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -888,7 +905,6 @@ end
 
 
 function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -926,14 +942,21 @@ end
 
 
 function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  if track == nil then
+  local bgm_dir = minetest.get_worldpath() .. "/arena_lib/BGM/"
+
+  if not file_exists(bgm_dir, track .. ".ogg") then
+    if not deprecated_audio_exists(mod, track, sender) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
+      return end
+  end
+
+  if track == nil or track == "" then
     arena.bgm = nil
   else
     arena.bgm = {
@@ -952,7 +975,6 @@ end
 
 
 function arena_lib.set_timer(sender, mod, arena_name, timer, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -980,7 +1002,6 @@ end
 
 
 function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
-
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -1020,7 +1041,7 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
 
   -- abilito
   arena.enabled = true
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
@@ -1030,7 +1051,6 @@ end
 
 
 function arena_lib.disable_arena(sender, mod, arena_name)
-
   local mod_ref = arena_lib.mods[mod]
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -1063,7 +1083,7 @@ function arena_lib.disable_arena(sender, mod, arena_name)
 
   -- disabilito
   arena.enabled = false
-  arena_lib.entrances[arena.entrance_type].update(arena)
+  arena_lib.entrances[arena.entrance_type].update(mod, arena)
   update_storage(false, mod, id, arena)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully disabled", arena_name))
@@ -1080,26 +1100,20 @@ end
 
 -- internal use only
 function arena_lib.store_inventory(player)
+  local p_inv = player:get_inventory()
+  local stored_inv = {}
 
-  if arena_lib.STORE_INVENTORY_MODE == "mod_db" then
-
-    local p_inv = player:get_inventory()
-    local stored_inv = {}
-
-    -- itero ogni lista non vuota per convertire tutti gli itemstack in tabelle (sennò non li serializza)
-    for listname, content in pairs(p_inv:get_lists()) do
-      if not p_inv:is_empty(listname) then
-        stored_inv[listname] = {}
-        for i_name, i_def in pairs(content) do
-          stored_inv[listname][i_name] = i_def:to_table()
-        end
+  -- itero ogni lista non vuota per convertire tutti gli itemstack in tabelle (sennò non li serializza)
+  for listname, content in pairs(p_inv:get_lists()) do
+    if not p_inv:is_empty(listname) then
+      stored_inv[listname] = {}
+      for i_name, i_def in pairs(content) do
+        stored_inv[listname][i_name] = i_def:to_table()
       end
     end
-
-    storage:set_string(player:get_player_name() .. ".INVENTORY", minetest.serialize(stored_inv))
-  -- TODO: storaggio database esterno
-  --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
   end
+
+  storage:set_string(player:get_player_name() .. ".INVENTORY", minetest.serialize(stored_inv))
 
   player:get_inventory():set_list("main",{})
   player:get_inventory():set_list("craft",{})
@@ -1110,7 +1124,7 @@ end
 -- internal use only
 function arena_lib.restore_inventory(p_name)
 
-  if arena_lib.STORE_INVENTORY_MODE == "mod_db" and storage:get_string(p_name .. ".INVENTORY") ~= "" then
+  if storage:get_string(p_name .. ".INVENTORY") ~= "" then
 
     local stored_inv = minetest.deserialize(storage:get_string(p_name .. ".INVENTORY"))
     local current_inv = minetest.get_player_by_name(p_name):get_inventory()
@@ -1138,8 +1152,6 @@ function arena_lib.restore_inventory(p_name)
     end
 
     storage:set_string(p_name .. ".INVENTORY", "")
-  -- TODO: storaggio database esterno
-  --elseif arena_lib.STORE_INVENTORY_MODE == "external_db" then
   end
 end
 
@@ -1208,6 +1220,11 @@ function init_storage(mod, mod_ref)
         arena.entrance_type = "sign"
         arena.entrance = next(arena.sign) and table.copy(arena.sign) or nil
         arena.sign = nil
+        to_update = true
+      end
+
+      if not arena.thumbnail then
+        arena.thumbnail = ""
         to_update = true
       end
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
@@ -1294,6 +1311,29 @@ function update_storage(erase, mod, id, arena)
 
 end
 
+
+
+function file_exists(src_dir, name)
+  local content = minetest.get_dir_list(src_dir, false)
+
+  local function iterate_dirs(dir)
+    for _, f_name in pairs(minetest.get_dir_list(dir, false)) do
+      local file = io.open(dir .. "/" .. name, "r")
+      if file then
+        io.close(file)
+        return true
+      end
+    end
+
+    for _, subdir in pairs(minetest.get_dir_list(dir, true)) do
+       if iterate_dirs(dir .. "/" .. subdir) then
+         return true
+       end
+    end
+  end
+
+  return iterate_dirs(src_dir)
+end
 
 
 -- le proprietà vengono salvate nello storage senza valori, in una coppia id-proprietà. Sia per leggerezza, sia perché non c'è bisogno di paragonarne i valori
@@ -1446,4 +1486,13 @@ end
 function arena_lib.set_sign(sender)
 	minetest.log("warning", "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
 	minetest.chat_send_player(sender, "[ARENA_LIB] set_sign(...) is deprecated, please use the new entrance system. Aborting...")
+end
+
+function deprecated_audio_exists(mod, track, p_name)
+  local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. track .. ".ogg", "r")
+  if deprecated_file then
+    deprecated_file:close()
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: put it into the world folder instead!"))
+    return true
+  end
 end

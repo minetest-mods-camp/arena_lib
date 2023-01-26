@@ -27,7 +27,7 @@
 	* [2.2 Setting up an arena](#22-setting-up-an-arena)
 		* [2.2.1 Editor](#221-editor)
 		* [2.2.2 CLI](#222-cli)
-			* [2.2.2.1 Renaming an arena](#2221-renaming-an-arena)
+			* [2.2.2.1 Changing arenas name, author, thumbnail](#2221-changing-arenas-name-author-thumbnail)
 			* [2.2.2.2 Players management](#2222-players-management)
 			* [2.2.2.3 Enabling/Disabling teams](#2223-enablingdisabling-teams)
 			* [2.2.2.4 Spawners](#2224-spawners)
@@ -73,7 +73,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
-* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. Check out also `STORE_INVENTORY_MODE` in `SETTINGS.lua`, to choose whether and how to store players' inventory
+* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
 * `time_mode`: (string) whether arenas will keep track of the time or not.
@@ -117,6 +117,8 @@ A few more are available for players having the `arenalib_admin` privilege:
 	* `entrances <minigame>`: changes the entrance types of `<minigame>`
 	* `flush (<minigame>) <arena>`: DEBUG ONLY: reset the properties of a bugged arena
 	* `forceend (<minigame>) <arena>`: forcibly ends an ongoing game
+	* `gamelist`: lists all the installed minigames, sorted alphabetically
+	* `glist`: see `gamelist`
 	* `info (<minigame>) <arena>`: prints all the info related to `<arena>`
 	* `kick player_name`: kicks a player out of an ongoing game, no matter the mod
 	* `list <minigame>`: lists all the arenas of `<minigame>`
@@ -260,7 +262,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above. It doesn't distinguish between an actual player and a spectator (for the latter, use `arena_lib.is_player_spectating(p_name)`)
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
-* `arena_lib.start_arena(mod_ref, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
+* `arena_lib.start_arena(mod, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
 * `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing arena, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team) or a table of strings/integers (more players/teams)
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing arena. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
 * `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
@@ -315,7 +317,7 @@ arena_lib.register_entrance_type(mod, entrance, def)
 	* `name`: (string) the name of the entrance. Contrary to the previous `entrance` field, this can be translated
 	* `on_add`: (function(sender, mod, arena, ...)) must return the value that will be used by arena_lib to identify the entrance. For instance, built-in signs return their position. If nothing is returned, the adding process will be aborted. Substitute `...` with any additional parameters you may need (signs use it for their position). BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then set the new entrance. Use this callback just to run entrance-specific checks and return the value that arena_lib will then store as an entrance
 	* `on_remove`: (function(mod, arena)) additional actions to perform when an arena entrance is removed. BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then remove the entrance. Use this callback just to run entrance-specific checks.
-	* `on_update`: (function(arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
+	* `on_update`: (function(mod, arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
 	* `on_load`: (function(arena)) additional actions to perform when the server starts. Useful for nodes, since they don't have an `on_activate` callback, contrary to entities
 	* `editor_settings`: (table) how the editor section should be structured, when an arena uses this entrance type. Fields are:
 		* `name`: (string) the name of the item representing the section
@@ -359,6 +361,7 @@ It all starts with a table called `arena_lib.mods = {}`. This table allows `aren
 An arena is a table having as a key an ID and as a value its parameters. They are:
 * `name`: (string) the name of the arena, declared when creating it
 * `author`: (string) the name of the one who built/designed the map. Default is `"???"`. It appears in the signs infobox (right-click an arena sign)
+* `thumbnail`: (string) the name of the optional file representing the arena, extension included. Default is `""`, meaning no thumbnail is associated with the arena. It must be put inside the `arena_lib/Thumbnails` world folder. If present, it can be seen by right-clicking built-in arena signs.
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
@@ -425,10 +428,10 @@ The command calling the editor is `/arenas edit (<minigame>) <arena>`. Feel now 
 #### 2.2.2 CLI
 If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I've chosen to omit it.
 
-##### 2.2.2.1 Renaming an arena
-Being arenas stored by ID, changing their names is no big deal. An arena can be renamed via  
-`arena_lib.rename_arena(sender, mod, arena_name, new_name)`
-In order to do so, it must be disabled.
+##### 2.2.2.1 Changing arenas name, author, thumbnail
+`arena_lib.rename_arena(sender, mod, arena_name, new_name)`: renames an arena. Being arenas stored by ID, changing their names is no big deal.
+`arena_lib.set_author(sender, mod, arena_name, author)`: changes the name of the author who has built the arena.
+`arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail)`: changes the thumbnail of the arena. `thumbnail` is the name of the file, including its extension. It must be inside the `arena_lib/Thumbnails` world folder.
 
 ##### 2.2.2.2 Players management
 `arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.

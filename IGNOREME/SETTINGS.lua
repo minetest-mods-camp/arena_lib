@@ -15,15 +15,6 @@ arena_lib.SERVER_PHYSICS = {
   new_move = true
 }
 
--- for mods where `keep_inventory = false`.
--- It determines whether the inventory before entering an arena should be stored
--- and where. When stored, players will get it back either when the match ends or,
--- if they disconnect/the server crashes, next time they log in.
--- "none" = don't store
--- "mod_db" = store in the arena_lib mod database
--- "external_db" = store in an external database -TODO: NOT YET IMPLEMENTED
-arena_lib.STORE_INVENTORY_MODE = "mod_db"
-
 -- instead of letting modders put whatever colour they want in the sky settings,
 -- arena_lib offers a curated palette to pick from. The palette is Zughy 32 (yes,
 -- that's me) => https://lospec.com/palette-list/zughy-32. I invite you *not* to

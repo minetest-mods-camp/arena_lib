@@ -1,10 +1,7 @@
 minetest.register_on_joinplayer(function(player)
 
   arena_lib.HUD_add(player)
-
-  if arena_lib.STORE_INVENTORY_MODE ~= "none" then
-    arena_lib.restore_inventory(player:get_player_name())
-  end
+  arena_lib.restore_inventory(player:get_player_name())
 
   local p_meta = player:get_meta()
   local p_inv  = player:get_inventory()
