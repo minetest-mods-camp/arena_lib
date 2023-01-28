@@ -1,4 +1,4 @@
-# version 5.4.0
+# version 5.5.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -21,11 +21,20 @@ message=messaggio
 Writes a message in the arena global chat while in a game=Scrive un messaggio nella chat globale dell'arena mentre si è in una partita
 Writes a message in the arena team chat while in a game (if teams are enabled)=Scrive un messaggio nella chat di squadra dell'arena mentre si è in una partita (se le squadre sono abilitate)
 [!] Teams are not enabled!=[!] Le squadre non sono abilitate!
-# TODO: for when /arenas help is implemented
-Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
-Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
-DEBUG ONLY: reset the properties of a bugged arena=SOLO DEBUG: ripristina le proprietà di un'arena rotta
+Creates an arena for the specified minigame=Crea un'arena per il minigioco specificato
+Disables an arena=Disabilita un'arena
+Enters the arena editor=Entra nell'editor dell'arena
+Enables an arena=Abilita un'arena
+Changes the entrance types of the specified minigame=Cambia i tipi d'entrata del minigioco specificato
+DEBUG ONLY - resets the properties of a bugged arena=SOLO DEBUG - ripristina le proprietà di un'arena rotta
 Forcibly ends an ongoing game=Forza la conclusione di una partita in corso
+Lists all the installed minigames, alphabetically sorted=Elenca tutti i minigiochi installati, in ordine alfabetico
+See @1=Vedi @1
+Prints all the arena's info=Stampa a schermo tutte le informazioni dell'arena
+Kicks a player from an ongoing game=Caccia un giocatore da una partita in corso
+Lists all the arenas of the specified minigame=Elenca tutte le arene del minigioco specificato
+Deletes an arena=Cancella un'arena
+Tweaks the minigame settings for the current server=Modifica le impostazioni del minigioco per il server corrente
 
 # admin_tools/entrances.lua
 [!] You can't perform this action while in game!=[!] Non puoi eseguire quest'azione mentre sei in partita!
