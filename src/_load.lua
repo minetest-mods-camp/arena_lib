@@ -1,3 +1,6 @@
+----------------------------------------------
+-----------------WORLD FOLDER-----------------
+----------------------------------------------
 local function load_world_folder()
   local wrld_dir = minetest.get_worldpath() .. "/arena_lib"
   local content = minetest.get_dir_list(wrld_dir)
@@ -43,3 +46,17 @@ local function load_world_folder()
 end
 
 load_world_folder()
+
+
+
+
+
+----------------------------------------------
+-------------------SETTINGS-------------------
+----------------------------------------------
+dofile(minetest.get_worldpath() .. "/arena_lib/SETTINGS.lua")
+
+-- deprecated, to remove in 7.0
+if arena_lib.STORE_INVENTORY_MODE then
+  minetest.log("warning", "[ARENA_LIB] Setting 'STORE_INVENTORY_MODE' is of no use now, please delete it from SETTINGS.lua (inside the arena_lib world folder)")
+end
