@@ -122,6 +122,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
+  mod_ref.spectator_properties = {}
   mod_ref.team_properties = {}
 
   if def.prefix then
@@ -234,6 +235,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.player_properties then
     mod_ref.player_properties = def.player_properties
+  end
+
+  if def.spectator_properties then
+    mod_ref.spectator_properties = def.spectator_properties
   end
 
   if def.team_properties then

@@ -74,7 +74,6 @@ function arena_lib.load_arena(mod, arena_ID)
 
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
-
     operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
 
     -- teletrasporto i giocatori
