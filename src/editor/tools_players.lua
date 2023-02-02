@@ -16,7 +16,7 @@ local players_tools = {
 
 
 
-minetest.register_tool("arena_lib:players_min", {
+minetest.register_node("arena_lib:players_min", {
 
     description = S("Players required"),
     inventory_image = "arenalib_tool_players_min.png",
@@ -40,7 +40,7 @@ minetest.register_tool("arena_lib:players_min", {
 
 
 
-minetest.register_tool("arena_lib:players_max", {
+minetest.register_node("arena_lib:players_max", {
 
     description = S("Players supported"),
     inventory_image = "arenalib_tool_players_max.png",
