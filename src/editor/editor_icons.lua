@@ -22,7 +22,7 @@ minetest.register_tool("arena_lib:editor_players", {
 
       user:get_meta():set_int("arena_lib_editor.players_number", 2)
 
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #3 to change)", 2))
+      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #4 to change)", 2))
       arena_lib.give_players_tools(user:get_inventory(), mod, arena)
     end
 })

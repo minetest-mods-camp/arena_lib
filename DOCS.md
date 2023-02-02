@@ -54,7 +54,8 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `name`: (string) the name of your minigame. If not specified, it takes the name used to register the minigame
 * `prefix`: (string) what's going to appear in most of the lines printed by your mod. Default is `[<mg name>] `, where `<mg name>` is the name of your minigame
 * `icon`: (string) optional icon to represent your minigame. Currently unused by default (`nil`), it comes in handy for external mods
-* `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
+* `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = 12 players in total)
+* `variable_teams_amount`: (boolean) whether to support a variable amount of teams per arena. It requires `teams`. Default is `false`
 * `teams_color_overlay`: (table) [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires `teams`. Default is `nil`
 * `is_team_chat_default`: (bool) whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
 * `chat_all_prefix`: (string) prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
@@ -435,7 +436,9 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail)`: changes the thumbnail of the arena. `thumbnail` is the name of the file, including its extension. It must be inside the `arena_lib/Thumbnails` world folder.
 
 ##### 2.2.2.2 Players management
-`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeds.
+
+`arena_lib.change_teams_amount(sender, mod, arena_name, amount)` changes the amount of teams in a specific arena. It'll use the first N teams declared, where N is `amount`. It returns `true` if it succeeds.
 
 ##### 2.2.2.3 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.

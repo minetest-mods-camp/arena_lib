@@ -63,6 +63,7 @@ Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2
 [!] File not found!=[!] File non trovato!
 Players amount successfully changed ( min @1 | max @2 )=Numero dei giocatori modificato con successo ( min @1 | max @2 )
 [!] Nothing to do here!=[!] È già tutto a posto qui!
+Teams amount successfully changed (@1)=Numero delle squadre modificato con successo (@1)
 Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
 Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
 [!] This team doesn't exist!=[!] Questo team non esiste!
@@ -149,7 +150,7 @@ Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
 # editor/editor_icons.lua
 Players=Giocatori
-Players | num to set: @1 (left/right click slot #3 to change)=Giocatori | num: @1 (click sx/dx su slot #3 per cambiare)
+Players | num to set: @1 (left/right click slot #4 to change)=Giocatori | num: @1 (click sx/dx su slot #4 per cambiare)
 Values are PER TEAM!=I valori sono PER SQUADRA!
 Spawners=Spawner
 Spawners | sel. ID: @1 (right click slot #2 to change)=Spawner | ID sel.: @1 (tasto dx su slot #2 per cambiare)
@@ -178,6 +179,9 @@ Global light=Luce globale
 Shadows=Ombre
 
 # editor/tools_players.lua
+Players required=Giocatori minimi
+Players supported=Giocatori massimi
+Teams amount=Numero squadre
 Change the current number=Cambia il numero attuale
 Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)

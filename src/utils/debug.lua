@@ -69,6 +69,11 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   if arena.teams_enabled then
     min_players_per_team = minetest.colorize("#eea160", S("Players required per team: ")) .. minetest.colorize("#cfc6b8", arena.min_players) .. "\n"
     max_players_per_team = minetest.colorize("#eea160", S("Players supported per team: ")) .. minetest.colorize("#cfc6b8", arena.max_players) .. "\n"
+
+    if mod_ref.variable_teams_amount then
+      teams = "(" .. #arena.teams .. ") "
+    end
+
     for i = 1, #arena.teams do
       teams = teams .. "'" .. arena.teams[i].name .. "' "
       players_inside_per_team = players_inside_per_team .. "'" .. arena.teams[i].name .. "' : " .. arena.players_amount_per_team[i] .. " "
@@ -76,6 +81,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
         spectators_inside_per_team = spectators_inside_per_team .. "'" .. arena.teams[i].name .. "' : " .. arena.spectators_amount_per_team[i] .. " "
       end
     end
+
     players_inside_per_team = minetest.colorize("#eea160", S("Players inside per team: ")) .. minetest.colorize("#cfc6b8", players_inside_per_team) .. "\n"
     if mod_ref.spectate_mode then
       spectators_inside_per_team = minetest.colorize("#eea160", S("Spectators inside per team: ")) .. minetest.colorize("#cfc6b8", spectators_inside_per_team) .. "\n"
