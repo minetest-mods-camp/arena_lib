@@ -7,8 +7,6 @@ arena_lib = {}
 dofile(srcpath .. "/_load.lua")
 dofile(modpath .. "/libs/chatcmdbuilder.lua")
 
-dofile(minetest.get_worldpath() .. "/arena_lib/SETTINGS.lua")
-
 dofile(srcpath .. "/admin_tools/entrances.lua")
 dofile(srcpath .. "/admin_tools/minigame_settings.lua")
 dofile(srcpath .. "/api/core.lua")

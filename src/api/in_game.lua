@@ -74,7 +74,6 @@ function arena_lib.load_arena(mod, arena_ID)
 
   -- per ogni giocatore...
   for pl_name, _ in pairs(arena.players) do
-
     operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
 
     -- teletrasporto i giocatori
@@ -481,9 +480,9 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     arena.players_and_spectators[p_name] = nil
     arena.past_present_players_inside[p_name] = nil
+    players_in_game[p_name] = nil
 
     handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
-    players_in_game[p_name] = nil
 
   -- sennò...
   else

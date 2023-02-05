@@ -97,6 +97,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.prefix = "[" .. mod_ref.name .. "] "
   mod_ref.icon = def.icon
   mod_ref.teams = {-1}
+  mod_ref.variable_teams_amount = false
   mod_ref.teams_color_overlay = nil
   mod_ref.is_team_chat_default = false
   mod_ref.chat_all_prefix = "[" .. S("arena") .. "] "
@@ -122,6 +123,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.properties = {}
   mod_ref.temp_properties = {}
   mod_ref.player_properties = {}
+  mod_ref.spectator_properties = {}
   mod_ref.team_properties = {}
 
   if def.prefix then
@@ -131,12 +133,16 @@ function arena_lib.register_minigame(mod, def)
   if def.teams and type(def.teams) == "table" then
     mod_ref.teams = def.teams
 
+    if def.variable_teams_amount == true then
+      mod_ref.variable_teams_amount = true
+    end
+
     if def.teams_color_overlay then
       mod_ref.teams_color_overlay = def.teams_color_overlay
     end
 
     if def.is_team_chat_default == true then
-      mod_ref.is_team_chat_default = def.is_team_chat_default
+      mod_ref.is_team_chat_default = true
     end
 
     if def.chat_team_prefix then
@@ -234,6 +240,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.player_properties then
     mod_ref.player_properties = def.player_properties
+  end
+
+  if def.spectator_properties then
+    mod_ref.spectator_properties = def.spectator_properties
   end
 
   if def.team_properties then
@@ -579,7 +589,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     arena.max_players = old_max_players
   return end
 
-  -- se i giocatori massimi sono cambiati, svuoto i vecchi spawner per evitare problemi
+  -- se i giocatori massimi sono cambiati, svuoto i vecchi punti rinascita per evitare problemi
   if max_players and old_max_players ~= max_players then
     arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
   end
@@ -590,8 +600,53 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   end
 
   update_storage(false, mod, id, arena)
-
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
+
+  -- ritorno true per procedere al cambio di stack nell'editor
+  return true
+end
+
+
+
+function arena_lib.change_teams_amount(sender, mod, arena_name, amount, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  -- se le squadre non sono abilitate, annullo
+  if not arena.teams_enabled then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Teams are not enabled!")))
+    return end
+
+  -- se il numero inserito è lo stesso delle squadre attuali, annullo
+  if #arena.teams == amount then
+    minetest.chat_send_player(sender, minetest.colorize("#cfc6b8", S("[!] Nothing to do here!")))
+    return end
+
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se il numero è minore di 2, o maggiore delle squadre dichiarate nella mod, annullo
+  if amount < 2 or amount > #mod_ref.teams then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  -- svuoto i vecchi punti rinascita per evitare problemi
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
+
+  arena.teams = {}
+  for i = 1, amount do
+    arena.teams[i] = {name = mod_ref.teams[i]}
+  end
+
+  -- aggiorno l'entrata, se esiste
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].update(mod, arena)
+  end
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Teams amount successfully changed (@1)", amount))
 
   -- ritorno true per procedere al cambio di stack nell'editor
   return true
@@ -606,14 +661,14 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  -- se non ci sono team nella mod, annullo
+  -- se non ci sono squadre nella mod, annullo
   if not next(arena_lib.mods[mod].teams) then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Teams are not enabled!")))
     return end
 
-  -- se i team sono già in quello stato, annullo
+  -- se le squadre sono già in quello stato, annullo
   if enable == arena.teams_enabled then
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Nothing to do here!")))
+    minetest.chat_send_player(sender, minetest.colorize("#cfc6b8", S("[!] Nothing to do here!")))
     return end
 
   -- se abilito
@@ -643,7 +698,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
     return
   end
 
-  -- svuoto i vecchi spawner per evitare problemi
+  -- svuoto i vecchi punti rinascita per evitare problemi
   arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
 
   -- aggiorno l'entrata, se esiste
@@ -1231,11 +1286,11 @@ function init_storage(mod, mod_ref)
 
       -- gestione squadre
       if arena.teams_enabled and not (#mod_ref.teams > 1) then                  -- se avevo abilitato le squadre e ora le ho rimosse
-        arena.players_amount_per_team = nil
         arena.teams = {-1}
         arena.teams_enabled = false
+        arena.players_amount_per_team = nil
         arena.spectators_amount_per_team = nil
-      elseif #mod_ref.teams > 1 and arena.teams_enabled then                    -- sennò le genero per tutte le arene con teams_enabled
+      elseif #mod_ref.teams > 1 and not arena.teams_enabled then                -- sennò le genero per tutte le arene con teams_enabled
         arena.players_amount_per_team = {}
         arena.spectators_amount_per_team = {}
         arena.teams = {}
@@ -1245,12 +1300,11 @@ function init_storage(mod, mod_ref)
           arena.spectators_amount_per_team[k] = 0
           arena.teams[k] = {name = t_name}
         end
-
       end
 
       local arena_max_players = arena.max_players * #arena.teams
 
-      -- resetto punti rinascita se ho cambiato il numero di squadre
+      -- reimposto punti rinascita se ho cambiato il numero di squadre
       if arena_max_players ~= #arena.spawn_points then
         to_update = true
         arena.enabled = false

@@ -252,9 +252,10 @@ function arena_lib.get_players_amount_left_to_start_queue(arena)
   if arena.teams_enabled then
     players_required = 0
 
-    for _, amount in pairs(arena.players_amount_per_team) do
-      if arena.min_players - amount > 0 then
-        players_required = players_required + (arena.min_players - amount)
+    for i = 1, #arena.teams do
+      local p_per_team = arena.players_amount_per_team[i]
+      if arena.min_players - p_per_team > 0 then
+        players_required = players_required + (arena.min_players - p_per_team)
       end
     end
   else

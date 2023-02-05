@@ -13,7 +13,7 @@
 		* [1.5.1 Arena properties](#151-arena-properties)
 			* [1.5.1.1 Updating non temporary properties via code](#1511-updating-non-temporary-properties-via-code)
 			* [1.5.1.2 Updating properties for old arenas](#1512-updating-properties-for-old-arenas)
-		* [1.5.2 Player properties](#152-player-properties)
+		* [1.5.2 Player and spectator properties](#152-player-and-spectator-properties)
 		* [1.5.3 Team properties](#153-team-properties)
 	* [1.6 HUD](#16-hud)
 	* [1.7 Utils](#17-utils)
@@ -54,7 +54,8 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `name`: (string) the name of your minigame. If not specified, it takes the name used to register the minigame
 * `prefix`: (string) what's going to appear in most of the lines printed by your mod. Default is `[<mg name>] `, where `<mg name>` is the name of your minigame
 * `icon`: (string) optional icon to represent your minigame. Currently unused by default (`nil`), it comes in handy for external mods
-* `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = `max_players = 12`)
+* `teams`: (table) contains team names. If not declared, your minigame won't have teams and the table will be equal to `{-1}`. You can add as many teams as you like, as the number of spawners (and players) will be multiplied by the number of teams (so `max_players = 4` * 3 teams = 12 players in total)
+* `variable_teams_amount`: (boolean) whether to support a variable amount of teams per arena. It requires `teams`. Default is `false`
 * `teams_color_overlay`: (table) [color strings](https://drafts.csswg.org/css-color/#named-colors). It applies a color overlay onto the players' skin according to their team, to better distinguish them. It requires `teams`. Default is `nil`
 * `is_team_chat_default`: (bool) whether players messages in a game should be sent to their teammates only. It requires `teams`, default is false
 * `chat_all_prefix`: (string) prefix for every message sent in arena, team chat aside. Default is `[arena] ` (geolocalised)
@@ -87,6 +88,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `properties`: see [1.5 Additional properties](#15-additional-properties)
 * `temp_properties`: ^
 * `player_properties`: ^
+* `spectator_properties`: ^
 * `team_properties`: ^ (it won't work if `teams` hasn't been declared)
 
 ### 1.1 Per server configuration
@@ -124,8 +126,6 @@ A few more are available for players having the `arenalib_admin` privilege:
 	* `list <minigame>`: lists all the arenas of `<minigame>`
 	* `remove (<minigame>) <arena>`: deletes an arena
 	* `settings <minigame>`: changes `<minigame>` settings
-* `/forceend mod arena_name`: forcibly ends an ongoing game
-* `/flusharena mod arena_name`: restores a broken arena (when not in progress)
 
 ### 1.4 Callbacks
 Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
@@ -143,7 +143,7 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator, was_spectator))`: called when a user joins an ongoing match. `as_spectator` returns true if they join as a spectator. `was_spectator` returns true if the user was spectating the arena when joining as an actual player
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_respawn(mod, function(arena, p_name))`: called when a player respawns
-* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena.
+* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated, is_forced))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena. `is_forced` returns true when the change is a result of `spectate_target(...)`
     * `t_type` represents the type of the target (either `"player"`, `"entity"` or `"area"`)
     * `t_name` its name. If it's an entity or an area, it'll be the name used to register it through the `arena_lib.add_spectate...` functions
     * if they were following someone/something else earlier, `prev_type` and `prev_spectated` follow the same logic of the aforementioned parameters
@@ -225,8 +225,8 @@ Instead, the right way to permanently update a property for an arena is calling 
 ##### 1.5.1.2 Updating properties for old arenas
 This is done automatically by arena_lib every time you change the properties declaration in `register_minigame`, so don't worry. Just, keep in mind that when a property is removed, it'll be removed from every arena; so if you're not sure about what you're doing, do a backup first.
 
-#### 1.5.2 Player properties
-These are a particular type of temporary properties, as they're attached to every player in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
+#### 1.5.2 Player and spectator properties
+These are a particular type of temporary properties, as they're attached to every player/spectator in the arena. Let's say you now want to keep track of how many kills a player does in a streak without dying. You just need to create a killstreak parameter, declaring it like so
 ```lua
 arena_lib.register_minigame("mymod", {
   --stuff
@@ -280,6 +280,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.add_spectate_area(mod, arena, pos_name, pos)`: same as `add_spectate_entity`, but it adds an area instead. `pos` is a table containing the coordinates of the area to spectate
 * `arena_lib.remove_spectate_entity(mod, arena, e_name)`: removes an entity from the spectatable entities of an ongoing match
 * `arena_lib.remove_spectate_area(mod, arena, pos_name)`: removes an area from the spectatable areas of an ongoing match
+* `arena_lib.spectate_target(mod, arena, sp_name, type, t_name)`: forces `sp_name` to spectate a specific target, if exists. `type` is a string that can either be `"player"`, `"entity"` or `"area"`
 * `arena_lib.is_player_spectating(sp_name)`: returns whether a player is spectating a match, as a boolean
 * `arena_lib.is_player_spectated(p_name)`: returns whether a player is being spectated
 * `arena_lib.is_entity_spectated(mod, arena_name, e_name)`: returns whether an entity is being spectated
@@ -300,7 +301,8 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_players_in_minigame(mod, <to_player>)`: returns a table containing as value either the names of all the players inside the specified minigame (`mod`) or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as value either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
-* `arena_lib.get_player_spectators(p_name)`: returns a list containing all the people currently spectating `p_name`. Format `{sp_name = true}`
+* `arena_lib.get_target_spectators(mod, arena_name, type, t_name)`: returns a list containing all the spectators currently following `t_name`. Format `{sp_name = true}`. For players, consider using the next function instead
+* `arena_lib.get_player_spectators(p_name)`: Like `get_target_spectators(...)` but cleaner and just for players. It's cleaner since there can't be two players with the same name, contrary to areas and entities
 * `arena_lib.get_player_spectated(sp_name)`: returns the player `sp_name` is currently spectating, if any
 * `arena_lib.get_spectate_entities(mod, arena_name)`: returns a table containing all the spectatable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectate_entity(...)` and `entity` the `luaentity` table
 * `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(...)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
@@ -434,7 +436,9 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.set_thumbnail(sender, mod, arena_name, thumbnail)`: changes the thumbnail of the arena. `thumbnail` is the name of the file, including its extension. It must be inside the `arena_lib/Thumbnails` world folder.
 
 ##### 2.2.2.2 Players management
-`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeded.
+`arena_lib.change_players_amount(sender, mod, arena_name, min_players, max_players)` changes the amount of players in a specific arena. It also works by specifying only one field (such as `([...] myarena, 3)` or `([...] myarena, nil, 6)`). It returns true if it succeeds.
+
+`arena_lib.change_teams_amount(sender, mod, arena_name, amount)` changes the amount of teams in a specific arena. It'll use the first N teams declared, where N is `amount`. It returns `true` if it succeeds.
 
 ##### 2.2.2.3 Enabling/Disabling teams
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.

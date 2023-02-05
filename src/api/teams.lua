@@ -9,7 +9,6 @@ end
 
 
 function arena_lib.is_team_declared(mod_ref, team_name)
-
   if not mod_ref.teams then return false end
 
   for _, t_name in pairs(mod_ref.teams) do
@@ -52,7 +51,6 @@ end
 
 
 function arena_lib.get_active_teams(arena)
-
   if #arena.teams == 1 then
     minetest.log("warning", "Attempt to call get_active_teams in arena " .. arena.name .. " when teams are not enabled. Aborting...")
     return end

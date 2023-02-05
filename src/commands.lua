@@ -158,29 +158,28 @@ ChatCmdBuilder.new("arenas", function(cmd)
   end)
 
   -- aiuto
-  --[[ TODO: per elencare comandi con descrizione geolocalizzata e con sintassi colorata tipo World Edit. In /help è orribile, rimuovere da lì. !Alcune traduzioni stanno già nei file di localizzazione!
   cmd:sub("help", function(sender)
-    minetest.chat_send_player(sender, "TUTTI I VARI COMANDI")
+    minetest.chat_send_player(sender,
+      minetest.colorize("#00ffff", "/arenas create") .. " <" .. S("minigame") .. "> <" .. S("arena") .. "> (<pmin> <pmax>): " .. S("Creates an arena for the specified minigame") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas disable") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Disables an arena") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas edit") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Enters the arena editor") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas enable") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Enables an arena") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas entrances") .. " <" .. S("minigame") .. ">: " .. S("Changes the entrance types of the specified minigame") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas flush") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("DEBUG ONLY - resets the properties of a bugged arena") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas forceend") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Forcibly ends an ongoing game") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas gamelist") .. ": " .. S("Lists all the installed minigames, alphabetically sorted") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas glist") .. ": " .. S("See @1", "gamelist") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas info") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Prints all the arena's info") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas kick") .. " <" .. S("player") .. ">: " .. S("Kicks a player from an ongoing game") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas list") .. " <" .. S("minigame") .. ">: " .. S("Lists all the arenas of the specified minigame") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas remove") .. " (<" .. S("minigame") .. ">) <" .. S("arena") .. ">: " .. S("Deletes an arena") .. "\n"
+      .. minetest.colorize("#00ffff", "/arenas settings") .. " <" .. S("minigame") .. ">: " .. S("Tweaks the minigame settings for the current server")
+    )
   end)
-  ]]
 
 end, {
-  params = "[ create | disable | edit | enable | entrances | flush | forceend | gamelist | glist | info | kick | list | remove | settings ]",
-  description = S("Manage arena_lib arenas; it requires arenalib_admin") .. "\n"
-    .. "/arenas create <" .. S("minigame") .. "> <" .. S("arena") .. "> (<pmin> <pmax>)\n"
-    .. "/arenas disable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas edit (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas enable (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas entrances <" .. S("minigame") .. ">\n"
-    .. "/arenas flush (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas forceend (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas gamelist \n"
-    .. "/arenas glist \n"
-    .. "/arenas info (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas kick <" .. S("player") .. ">\n"
-    .. "/arenas list <" .. S("minigame") .. ">\n"
-    .. "/arenas remove (<" .. S("minigame") .. ">) <" .. S("arena") .. ">\n"
-    .. "/arenas settings <" .. S("minigame") .. ">",
+  params = "help",
+  description = S("Manage arena_lib arenas; it requires arenalib_admin"),
   privs = { arenalib_admin = true }
 })
 

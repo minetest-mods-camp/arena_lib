@@ -83,9 +83,18 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   local hand     = player:get_inventory():get_list("hand")
 
   players_in_spectate_mode[p_name] = { minigame = mod, arenaID = arena_ID, teamID = team_ID, hand = hand}
-  arena.spectators[p_name] = true
+  arena.spectators[p_name] = {}
   arena.players_and_spectators[p_name] = true
   arena.spectators_amount = arena.spectators_amount + 1
+
+  -- eventuali proprietà aggiuntive
+  for k, v in pairs(arena_lib.mods[mod].spectator_properties) do
+    if type(v) == "table" then
+      arena.spectators[p_name][k] = table.copy(v)
+    else
+      arena.spectators[p_name][k] = v
+    end
+  end
 
   -- applico mano finta
   player:get_inventory():set_size("hand", 1)
@@ -183,7 +192,7 @@ end
 
 
 ----------------------------
--- find next spectatatable target
+-- find next spectatable target
 ----------------------------
 
 function arena_lib.find_and_spectate_player(sp_name, change_team, go_counterwise)
@@ -273,7 +282,6 @@ function arena_lib.find_and_spectate_player(sp_name, change_team, go_counterwise
   else
     local i = 1
     for pl_name, _ in pairs(arena.players) do
-
       if i == new_ID then
         set_spectator(mod, arena.name, spectator, "player", pl_name, i)
         return true
@@ -362,9 +370,9 @@ function arena_lib.find_and_spectate_area(mod, arena, sp_name)
   end
 
   local i = 1
-  for pos_name, _ in pairs(areas_storage[mod][arena_name]) do
+  for ar_name, _ in pairs(areas_storage[mod][arena_name]) do
     if i == new_ID then
-      set_spectator(mod, arena_name, spectator, "area", pos_name, i)
+      set_spectator(mod, arena_name, spectator, "area", ar_name, i)
       return true
     end
 
@@ -379,8 +387,6 @@ end
 ----------------------------------------------
 ---------------------CORE---------------------
 ----------------------------------------------
-
-
 
 function arena_lib.add_spectate_entity(mod, arena, e_name, entity)
 
@@ -483,6 +489,27 @@ end
 
 
 
+function arena_lib.spectate_target(mod, arena, sp_name, type, t_name)
+  if type == "player" then
+    if arena.players_amount == 0 or not players_spectated[t_name]then return end
+  elseif type == "entity" then
+    if arena.spectate_entities_amount == 0 or not entities_spectated[mod][arena.name][t_name] then return end
+  elseif type == "area" then
+    if arena.spectate_areas_amount == 0 or not areas_spectated[mod][arena.name][t_name] then return end
+  else
+    return
+  end
+
+  -- sì, potrei richiedere direttamente 'spectator', ma per coesione con il resto dell'API e con il fatto che
+  -- arena_lib salva lɜ spettatorɜ indicizzandolɜ per nome, tanto vale una conversione in più qui
+  local spectator = minetest.get_player_by_name(sp_name)
+  local i = spectator:get_meta():get_int("arenalib_watchID")     -- non c'è bisogno di calcolare l'ID, riapplico quello che già ha
+  set_spectator(mod, arena.name, spectator, type, t_name, i, true)
+end
+
+
+
+
 
 ----------------------------------------------
 --------------------UTILS---------------------
@@ -524,6 +551,18 @@ end
 
 
 
+function arena_lib.get_target_spectators(mod, arena_name, type, t_name)
+  if type == "player" then
+    return players_spectated[p_name]
+  elseif type == "entity" then
+    return entities_spectated[mod][arena_name][t_name]
+  elseif type == "area" then
+    return areas_spectated[mod][arena_name][t_name]
+  end
+end
+
+
+
 function arena_lib.get_player_spectated(sp_name)
   if arena_lib.is_player_spectating(sp_name) then
     return players_in_spectate_mode[sp_name].spectating
@@ -544,14 +583,11 @@ end
 
 
 
-
-
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function set_spectator(mod, arena_name, spectator, type, name, i)
-
+function set_spectator(mod, arena_name, spectator, type, name, i, is_forced)
   local sp_name = spectator:get_player_name()
   local prev_spectated = players_in_spectate_mode[sp_name].spectating
   local prev_type = players_in_spectate_mode[sp_name].type
@@ -602,7 +638,7 @@ function set_spectator(mod, arena_name, spectator, type, name, i)
   -- eventuale codice aggiuntivo
   if mod_ref.on_change_spectated_target then
     local arena = arena_lib.get_arena_by_player(sp_name)
-    mod_ref.on_change_spectated_target(arena, sp_name, type, name, prev_type, prev_spectated)
+    mod_ref.on_change_spectated_target(arena, sp_name, type, name, prev_type, prev_spectated, is_forced)
   end
 end
 
