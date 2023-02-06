@@ -379,6 +379,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   if formname ~= "arena_lib:infobox" then return end
 
   local p_name = player:get_player_name()
+
+  -- TEMP: il secondo controllo è stato messo a causa di crash sporadici che non
+  -- riusciamo a capire. Considerando che questa è una pezza in attesa di
+  -- https://github.com/minetest/minetest/issues/13142  e che potrebbe essere dovuto
+  -- a un problema di Minetest, tanto vale non dannarsi e aspettare che venga
+  -- implementato come si deve lato motore di gioco
+  if not displaying_infobox[p_name] then return end
+
   local mod = displaying_infobox[p_name].mod
   local arenaID = displaying_infobox[p_name].arena_id
   local arena = arena_lib.mods[mod].arenas[arenaID]
@@ -405,5 +413,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   elseif fields.spectate then
     arena_lib.join_arena(mod, p_name, arenaID, true)
+  end
+end)
+
+
+
+-- TEMP: da rimuovere con https://github.com/minetest/minetest/issues/13142
+minetest.register_on_leaveplayer(function(player)
+  if displaying_infobox[player:get_player_name()] then
+    displaying_infobox[player:get_player_name()] = nil
   end
 end)
