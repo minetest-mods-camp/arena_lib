@@ -900,7 +900,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
   -- teletrasporto con un po' di rumore
-  local clean_pos = arena.custom_return_point or mod_ref.settings.hub_spawn_point
+  local clean_pos = arena.custom_return_point or mod_ref.settings.return_point
   local noise_x = math.random(-1.5, 1.5)
   local noise_z = math.random(-1.5, 1.5)
   local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}

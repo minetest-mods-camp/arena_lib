@@ -1241,25 +1241,31 @@ function load_settings(mod)
   -- primo avvio
   if storage:get_string(mod .. ".SETTINGS") == "" then
     local default_settings = {
-      hub_spawn_point = { x = 0, y = 20, z = 0},
+      return_point = { x = 0, y = 20, z = 0},
       queue_waiting_time = 10
     }
     arena_lib.mods[mod].settings = default_settings
     storage:set_string(mod .. ".SETTINGS", minetest.serialize(default_settings))
   else
     arena_lib.mods[mod].settings = minetest.deserialize(storage:get_string(mod .. ".SETTINGS"))
+
+    --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
+    if arena_lib.mods[mod].settings.hub_spawn_point then
+      arena_lib.mods[mod].settings.return_point = table.copy(arena_lib.mods[mod].settings.hub_spawn_point)
+      arena_lib.mods[mod].settings.hub_spawn_point = nil
+      storage:set_string(mod .. ".SETTINGS", minetest.serialize(arena_lib.mods[mod].settings))
+    end
+    --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
   end
 end
 
 
 
 function init_storage(mod, mod_ref)
-
   arena_lib.mods[mod] = mod_ref
 
   -- aggiungo le arene
   for i = 1, arena_lib.mods[mod].highest_arena_ID do
-
     local arena_str = storage:get_string(mod .. "." .. i)
 
     -- se c'è una stringa con quell'ID, aggiungo l'arena e ne aggiorno l'eventuale cartello

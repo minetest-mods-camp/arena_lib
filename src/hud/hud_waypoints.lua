@@ -38,7 +38,7 @@ function arena_lib.show_waypoints(p_name, mod, arena)
       name = arena.custom_return_point and S("Return point (custom)") or S("Return point"),
       hud_elem_type = "waypoint",
       precision = 0,
-      world_pos = arena.custom_return_point or arena_lib.mods[mod].hub_spawn_point
+      world_pos = arena.custom_return_point or arena_lib.mods[mod].return_point
     })
 
     table.insert(waypoints[p_name], HUD_ID)
