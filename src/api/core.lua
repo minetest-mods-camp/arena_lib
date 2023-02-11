@@ -328,6 +328,15 @@ function arena_lib.change_mod_settings(sender, mod, setting, new_value)
   mod_settings[setting] = new_value
   storage:set_string(mod .. ".SETTINGS", minetest.serialize(mod_settings))
 
+  -- in caso sia stato cambiato il punto di ritorno
+  if setting == "return_point" then
+    for _, arena in pairs(arena_lib.mods[mod].arenas) do
+      if arena_lib.is_arena_in_edit_mode(arena.name) and not arena.custom_return_point then
+        arena_lib.update_waypoints(arena_lib.get_player_in_edit_mode(arena.name), mod, arena)
+      end
+    end
+  end
+
   if sender then minetest.chat_send_player(sender, S("Parameter @1 successfully overwritten", setting))
   else minetest.log("action", "[ARENA_LIB] Parameter " .. setting .. " successfully overwritten") end
 
