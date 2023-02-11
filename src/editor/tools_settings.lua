@@ -73,7 +73,7 @@ minetest.register_tool("arena_lib:settings_returnpoint", {
     local mod         = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
 
-    arena_lib.set_custom_return_point(p_name, mod, arena_name, user:get_pos(), true)
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, vector.round(user:get_pos()), true)
   end,
 
   on_secondary_use = function(itemstack, placer, pointed_thing)

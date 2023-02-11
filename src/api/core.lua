@@ -949,17 +949,15 @@ function arena_lib.set_custom_return_point(sender, mod, arena_name, pos, in_edit
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     return end
 
-  local msg
-
-  if pos == nil then
-    msg = "Custom return point of arena @1 succesfully removed"
-  else
-    pos = vector.round(pos)
-    msg = "Custom return point of arena @1 succesfully set"
-  end
+  if arena.custom_return_point == pos then
+    minetest.chat_send_player(sender, minetest.colorize("#cfc6b8", S("[!] Nothing to do here!")))
+    return end
 
   arena.custom_return_point = pos
   arena_lib.update_waypoints(sender, mod, arena)
+
+  local msg = arena.custom_return_point and "Custom return point of arena @1 succesfully set"
+                                         or "Custom return point of arena @1 succesfully removed"
 
   update_storage(false, mod, id, arena)
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S(msg, arena_name))
