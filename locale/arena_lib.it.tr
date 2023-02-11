@@ -80,6 +80,8 @@ Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
 Entrance type of arena @1 successfully changed (@2)=Tipo d'entrata dell'arena @1 cambiato con successo (@2)
 [!] There is no entrance to remove assigned to @1!=[!] Non c'è nessun'entrata da rimuovere assegnata a @1!
 Entrance of arena @1 successfully removed=Entrata dell'arena @1 rimosso con successo
+Custom return point of arena @1 succesfully removed=Punto di ritorno personalizzato dell'arena @1 rimosso con successo
+Custom return point of arena @1 succesfully set=Punto di ritorno personalizzato dell'arena @1 impostato con successo
 [!] There is already an entrance for this arena!=[!] Esiste già un'entrata per quest'arena!
 Entrance of arena @1 successfully set=Entrata dell'arena @1 impostata con successo
 Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
@@ -122,7 +124,6 @@ There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai v
 You're the last player standing: you win!=Sei l'ultimo giocatore rimasto in partita: hai vinto!
 You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatori
 [!] This arena doesn't exist!=[!] Quest'arena non esiste!
-Game in arena @1 successfully terminated=La partita nell'arena @1 è stata terminata con successo
 The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
 @1 has been kicked by @2=@1 è stato cacciato da @2
 @1 has been kicked=@1 è stato cacciato
@@ -189,6 +190,7 @@ Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 # editor/tools_settings.lua
 Arena name, author and thumbnail=Nome arena, autore e miniatura
 Arena properties=Proprietà arena
+Custom return point (LMB sets, RMB removes)=Punto di ritorno personalizzato (sx imposta, dx rimuove)
 Delete arena=Cancella arena
 Rename arena=Rinomina arena
 Set author=Imposta autore
@@ -248,6 +250,8 @@ Delete all spawners=Cancella tutti gli spawner
 Delete all spawners of a team=Cancella tutti gli spawner della squadra
 
 # hud/hud_waypoints.lua
+Return point (custom)=Punto di ritorno (personalizzato)
+Return point=Punto di ritorno
 [!] Waypoints are not enabled!=[!] I waypoint non sono abilitati!
 
 # signs/signs.lua
@@ -315,6 +319,7 @@ Past and present players inside: =Giocatori presenti e passati dentro:
 Enabled: =Abilitata: 
 Status: =Stato: 
 Entrance: =Entrata: 
+Custom return point: =Punto di ritorno personalizzato: 
 Spawn points: =Punti di spawn: 
 Custom sky: =Cielo personalizzato: 
 Custom lighting: =Illuminazione personalizzata: 

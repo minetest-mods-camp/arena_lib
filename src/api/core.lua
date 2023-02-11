@@ -26,6 +26,7 @@ local arena_default = {
   thumbnail = "",
   entrance = nil,
   entrance_type = arena_lib.DEFAULT_ENTRANCE,
+  custom_return_point = nil,
   players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
   spectators = {},                    -- KEY: player name, VALUE: true
   players_and_spectators = {},        -- KEY: pl/sp name,  VALUE: true
@@ -744,10 +745,10 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   -- controllo parametri
   if param then
-    -- se overwrite, sovrascrivo
+    -- se `overwrite`, sovrascrivo
     if param == "overwrite" then
 
-      -- se lo spawner da sovrascrivere non esiste, annullo
+      -- se il punto rinascita da sovrascrivere non esiste, annullo
       if arena.spawn_points[ID].pos == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
         return end
@@ -755,7 +756,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       arena.spawn_points[ID].pos = pos
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
 
-    -- se delete, cancello
+    -- se `delete`, cancello
     elseif param == "delete" then
 
       if arena.spawn_points[ID] == nil then
@@ -763,15 +764,10 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         return end
 
       arena.spawn_points[ID] = nil
-
-      -- se i waypoint sono mostrati, li aggiorno
-      if arena_lib.are_waypoints_shown(sender) then
-        arena_lib.show_waypoints(sender, arena)
-      end
-
+      arena_lib.update_waypoints(sender, mod, arena)
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
 
-    -- se deleteall, li cancello tutti
+    -- se `deleteall`, li cancello tutti
     elseif param == "deleteall" then
 
       if team then
@@ -786,10 +782,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         minetest.chat_send_player(sender, S("All the spawn points have been removed"))
       end
 
-      -- se i waypoint sono mostrati, li aggiorno
-      if arena_lib.are_waypoints_shown(sender) then
-        arena_lib.show_waypoints(sender, arena)
-      end
+      arena_lib.update_waypoints(sender, mod, arena)
 
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
@@ -799,9 +792,9 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   return
   end
 
-  -- sennò sto creando un nuovo spawner
+  -- sennò sto creando un nuovo punto rinascita
 
-  -- se c'è già uno spawner in quel punto, annullo
+  -- se c'è già un punto rinascita a quelle coordinate, annullo
   for id, spawn in pairs(arena.spawn_points) do
     if vector.equals(pos, spawn.pos) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
@@ -810,7 +803,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti spawn totali)
 
-  -- se provo a impostare uno spawn point di troppo, annullo
+  -- se provo a impostare un punto rinascita di troppo, annullo
   if spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
   return end
@@ -818,7 +811,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   local next_available_spawnID = 1
 
   if team then
-    -- ottengo l'ID del team se non mi è stato passato come parametro
+    -- ottengo l'ID della squadra se non mi è stato passato come parametro
     if type(team_ID) ~= "number" then
       for i = 1, #arena.teams do
         if arena.teams[i].name == team then
@@ -827,16 +820,16 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       end
     end
 
-    -- prendo il primo spawner di quel team
+    -- prendo il primo punto rinascita di quella squadra
     next_available_spawnID = 1 + (arena.max_players * (team_ID -1))
 
     -- se già esiste...
     if arena.spawn_points[next_available_spawnID] then
 
-      -- ...itero tra gli spawner seguenti finché non ne trovo uno vuoto
+      -- ...itero tra i punti seguenti finché non ne trovo uno vuoto
       while next(arena.spawn_points, next_available_spawnID) do
-        -- ma se il next mi trova uno spawner con distacco > 1, vuol dire che sono al capolinea
-        -- perché quello trovato appartiene o a un altro team o è un buco nello stesso team (ottenuto dal cancellare). Rompo l'iterare
+        -- ma se il next mi trova un punto rinascita con distacco > 1, vuol dire che sono al capolinea
+        -- perché quello trovato appartiene o a un'altra squadra o è un buco nella stessa squadra (ottenuto dal cancellare). Rompo l'iterare
         if next(arena.spawn_points, next_available_spawnID) ~= next_available_spawnID +1 then
           break
         end
@@ -848,20 +841,16 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     end
 
   else
-    -- ottengo l'ID del prossimo spawner disponibile
+    -- ottengo l'ID del prossimo punto rinascita disponibile
     for k, v in ipairs(arena.spawn_points) do
       next_available_spawnID = k +1
     end
   end
 
-  -- imposto lo spawner
+  -- imposto il punto rinascita
   arena.spawn_points[next_available_spawnID] = {pos = pos, teamID = team_ID}
 
-  -- se i waypoint sono mostrati, li aggiorno
-  if arena_lib.are_waypoints_shown(sender) then
-    arena_lib.show_waypoints(sender, arena)
-  end
-
+  arena_lib.update_waypoints(sender, mod, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
 
   update_storage(false, mod, id, arena)
@@ -936,6 +925,35 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
   end
 
   update_storage(false, mod, id, arena)
+end
+
+
+
+function arena_lib.set_custom_return_point(sender, mod, arena_name, pos, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not arena_lib.is_player_in_edit_mode(sender) then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if pos ~= nil and not vector.check(pos) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  local msg
+
+  if pos == nil then
+    msg = "Custom return point of arena @1 succesfully removed"
+  else
+    pos = vector.round(pos)
+    msg = "Custom return point of arena @1 succesfully set"
+  end
+
+  arena.custom_return_point = pos
+  arena_lib.update_waypoints(sender, mod, arena)
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S(msg, arena_name))
 end
 
 

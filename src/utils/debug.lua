@@ -181,7 +181,10 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     entrance = arena_lib.entrances[arena.entrance_type].print(arena.entrance)
   end
 
-  -- calcolo coordinate punto di spawn
+  -- calcolo eventuale punto di ritorno personalizzato
+  local custom_return_point = not arena.custom_return_point and "---" or minetest.pos_to_string(arena.custom_return_point)
+
+  -- calcolo coordinate punti rinascita
   local spawners_pos = ""
   if arena.teams_enabled then
 
@@ -305,6 +308,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Entrance: ")) .. minetest.colorize("#cfc6b8", "(" .. arena.entrance_type .. ") " .. entrance) .. "\n" ..
+    minetest.colorize("#eea160", S("Custom return point: ")) .. minetest.colorize("#cfc6b8", custom_return_point) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
 
     time ..

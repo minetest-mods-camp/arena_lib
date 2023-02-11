@@ -8,9 +8,9 @@ local function get_delete_formspec() end
 
 local settings_tools = {
   "arena_lib:settings_rename_author",
+  "arena_lib:settings_returnpoint",
   "arena_lib:settings_properties",
   "",                                       -- timer_off/_on
-  "",
   "",
   "arena_lib:settings_delete",
   "",
@@ -31,7 +31,6 @@ minetest.register_tool("arena_lib:settings_rename_author", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
       local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
@@ -51,7 +50,6 @@ minetest.register_tool("arena_lib:settings_properties", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-
       local p_name      = user:get_player_name()
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
@@ -59,6 +57,40 @@ minetest.register_tool("arena_lib:settings_properties", {
 
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, 1))
     end
+})
+
+
+
+minetest.register_tool("arena_lib:settings_returnpoint", {
+
+  description = S("Custom return point (LMB sets, RMB removes)"),
+  inventory_image = "arenalib_tool_settings_returnpoint.png", -- TODO: immagine
+  groups = {not_in_creative_inventory = 1},
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+    local p_name      = user:get_player_name()
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, user:get_pos(), true)
+  end,
+
+  on_secondary_use = function(itemstack, placer, pointed_thing)
+    local p_name      = placer:get_player_name()
+    local mod         = placer:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = placer:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
+  end,
+
+  on_place = function(itemstack, user, pointed_thing)
+    local p_name      = user:get_player_name()
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
+  end
 })
 
 
@@ -73,20 +105,7 @@ minetest.register_craftitem("arena_lib:timer", {
 
     on_use = function(itemstack, user, pointed_thing)
       minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec())
-    end,
-
-    on_secondary_use = function(itemstack, placer, pointed_thing)
-
-      local mod = placer:get_meta():get_string("arena_lib_editor.mod")
-      local arena_name = placer:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
-      local inv = placer:get_inventory()
-
-      arena_lib.set_timer(placer:get_player_name(), mod, arena_name, -1, true)
-
-      inv:set_stack("main", 1, "arena_lib:timer_off")
     end
-
 })
 
 
@@ -100,7 +119,6 @@ minetest.register_tool("arena_lib:settings_delete", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-
       local p_name      = user:get_player_name()
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
 
@@ -121,7 +139,7 @@ function arena_lib.give_settings_tools(user)
   local mod_ref = arena_lib.mods[mod]
 
   if mod_ref.time_mode == "decremental" then
-    inv:set_stack("main", 3, "arena_lib:timer")
+    inv:set_stack("main", 4, "arena_lib:timer")
   end
 end
 

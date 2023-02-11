@@ -80,6 +80,8 @@ Spawn point #@1 successfully set=
 Entrance type of arena @1 successfully changed (@2)=
 [!] There is no entrance to remove assigned to @1!=
 Entrance of arena @1 successfully removed=
+Custom return point of arena @1 succesfully removed=
+Custom return point of arena @1 succesfully set=
 [!] There is already an entrance for this arena!=
 Entrance of arena @1 successfully set=
 Lighting of arena @1 successfully overwritten=
@@ -188,6 +190,7 @@ Teams: off (click to toggle on)=
 # editor/tools_settings.lua
 Arena name, author and thumbnail=
 Arena properties=
+Custom return point (LMB sets, RMB removes)=
 Delete arena=
 Rename arena=
 Set author=
@@ -247,6 +250,8 @@ Delete all spawners=
 Delete all spawners of a team=
 
 # hud/hud_waypoints.lua
+Return point (custom)=
+Return point=
 [!] Waypoints are not enabled!=
 
 # signs/signs.lua
@@ -314,6 +319,7 @@ Past and present players inside: =
 Enabled: =
 Status: =
 Entrance: =
+Custom return point: =
 Spawn points: =
 Custom sky: =
 Custom lighting: =

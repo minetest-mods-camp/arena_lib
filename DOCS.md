@@ -31,7 +31,7 @@
 			* [2.2.2.2 Players management](#2222-players-management)
 			* [2.2.2.3 Enabling/Disabling teams](#2223-enablingdisabling-teams)
 			* [2.2.2.4 Spawners](#2224-spawners)
-			* [2.2.2.5 Entrance](#2225-entrance)
+			* [2.2.2.5 Entering and leaving](#2225-entering-and-leaving)
 			* [2.2.2.6 Arena properties](#2226-arena-properties)
 			* [2.2.2.7 Timers](#2227-timers)
 			* [2.2.2.8 Music](#2228-music)
@@ -366,6 +366,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `thumbnail`: (string) the name of the optional file representing the arena, extension included. Default is `""`, meaning no thumbnail is associated with the arena. It must be put inside the `arena_lib/Thumbnails` world folder. If present, it can be seen by right-clicking built-in arena signs.
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
+* `custom_return_point`: (table) a position that, if declared, overrides the `hub_spawn_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
 * `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
 * `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
@@ -478,9 +479,11 @@ Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_ch
    -- etc.
 ```
 
-##### 2.2.2.5 Entrance
+##### 2.2.2.5 Entering and leaving
 To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.9 Custom entrances](#19-custom-entrances).  
-To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use
+To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use.
+
+To customise the arena return point (by default `hub_spawn_point`), use `arena_lib.set_custom_return_point(sender, mod, arena_name, pos)`. To remove the custom return point, set `pos` to `nil`.
 
 ##### 2.2.2.6 Arena properties
 [Arena properties](#151-arena-properties) allow you to create additional persistent attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
@@ -490,7 +493,7 @@ To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_nam
 `arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (`time_mode = "decremental"`).
 
 ##### 2.2.2.8 Music
-`arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
+`arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too.
 
 ##### 2.2.2.9 Celestial vault
 By default, the arena's celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  

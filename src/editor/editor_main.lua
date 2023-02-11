@@ -120,7 +120,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     minetest.chat_send_player(sender, S("Wooosh!"))
   end
 
-  arena_lib.show_waypoints(sender, arena)
+  arena_lib.show_waypoints(sender, mod, arena)
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)
