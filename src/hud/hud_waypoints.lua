@@ -48,10 +48,6 @@ end
 
 
 function arena_lib.remove_waypoints(p_name)
-  if not waypoints[p_name] then
-    minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Waypoints are not enabled!"))) --TODO: guarda se ha senso metterla nella documentazione, sennò rimuovi 'sta stringa
-    return end
-
   local player = minetest.get_player_by_name(p_name)
 
   -- potrebbe essersi disconnesso. Evito di computare in caso
