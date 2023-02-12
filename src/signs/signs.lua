@@ -36,7 +36,9 @@ arena_lib.register_entrance_type("arena_lib", "sign", {
       "arena_lib:sign_add",
       "arena_lib:sign_remove",
       "",
-      "arena_lib:sign"
+      "arena_lib:sign",
+      "",
+      "arena_lib:sign_teleport_in"
     }
   },
 

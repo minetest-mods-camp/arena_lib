@@ -78,7 +78,7 @@ All the spawn points have been removed=
 Spawn point #@1 successfully set=
 [!] There is no entrance type with this name!=
 Entrance type of arena @1 successfully changed (@2)=
-[!] There is no entrance to remove assigned to @1!=
+[!] There is no entrance assigned to @1!=
 Entrance of arena @1 successfully removed=
 Custom return point of arena @1 succesfully removed=
 Custom return point of arena @1 succesfully set=
@@ -276,6 +276,8 @@ Spectate (there must be a game in progress)=
 Add sign=
 Remove sign=
 Are you sure you want to delete the sign from @1?=
+Teleport onto the sign=
+Return where you were=
 
 # spectate/spectate_main.lua
 Currently spectating: @1=

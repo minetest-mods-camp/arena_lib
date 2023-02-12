@@ -78,7 +78,7 @@ All the spawn points have been removed=Tutti i punti di spawn sono stati rimossi
 Spawn point #@1 successfully set=Punto di spawn #@1 impostato con successo
 [!] There is no entrance type with this name!=[!] Non c'è nessun tipo di entrata con questo nome!
 Entrance type of arena @1 successfully changed (@2)=Tipo d'entrata dell'arena @1 cambiato con successo (@2)
-[!] There is no entrance to remove assigned to @1!=[!] Non c'è nessun'entrata da rimuovere assegnata a @1!
+[!] There is no entrance assigned to @1!=[!] Non c'è nessun'entrata assegnata a @1!
 Entrance of arena @1 successfully removed=Entrata dell'arena @1 rimosso con successo
 Custom return point of arena @1 succesfully removed=Punto di ritorno personalizzato dell'arena @1 rimosso con successo
 Custom return point of arena @1 succesfully set=Punto di ritorno personalizzato dell'arena @1 impostato con successo
@@ -275,7 +275,9 @@ Spectate (there must be a game in progress)=Assisti (ci deve essere una partita 
 # signs/signs_editor.lua
 Add sign=Aggiungi cartello
 Remove sign=Rimuovi cartello
-Are you sure you want to delete the sign from @1?=Sei sicuro/a di voler rimuovere il cartello di @1?
+Are you sure you want to delete the sign from @1?=Sei sicurə di voler rimuovere il cartello di @1?
+Teleport onto the sign=Teletrasportati al cartello
+Return where you were=Torna dov'eri
 
 # spectate/spectate_main.lua
 Currently spectating: @1=Stai seguendo: @1
