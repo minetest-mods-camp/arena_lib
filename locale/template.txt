@@ -177,7 +177,6 @@ Apply=
 # editor/tools_lighting.lua
 Lighting=
 Global light=
-Shadows=
 
 # editor/tools_players.lua
 Players required=
@@ -252,7 +251,6 @@ Delete all spawners of a team=
 # hud/hud_waypoints.lua
 Return point (custom)=
 Return point=
-[!] Waypoints are not enabled!=
 
 # signs/signs.lua
 Sign=
