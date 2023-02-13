@@ -257,21 +257,18 @@ end
 
 
 function arena_lib.register_entrance_type(mod, entrance, def)
-  arena_lib.entrances[entrance] = {
-    mod    = mod,
-    name   = def.name,
-    load   = def.on_load   or function() end,
-    add    = def.on_add    or function() end,
-    update = def.on_update or function() end,
-    remove = def.on_remove or function() end,
-    print  = def.debug_output
-  }
-
   local editor = def.editor_settings
-  local tools = editor.tools
 
-  table.insert(tools, 8, "arena_lib:editor_return")
-  table.insert(tools, 9, "arena_lib:editor_quit")
+  arena_lib.entrances[entrance] = {
+    mod           = mod,
+    name          = def.name,
+    load          = def.on_load   or function() end,
+    add           = def.on_add    or function() end,
+    update        = def.on_update or function() end,
+    remove        = def.on_remove or function() end,
+    enter_editor  = editor.on_enter or function() end,
+    print         = def.debug_output
+  }
 
   minetest.register_tool( mod ..":editor_entrance", {
 
@@ -282,8 +279,23 @@ function arena_lib.register_entrance_type(mod, entrance, def)
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), editor.description)
-      user:get_inventory():set_list("main", editor.tools)
+      local p_name = user:get_player_name()
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local items = editor.items and editor.items(p_name, mod, arena) or editor.tools
+
+      --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
+      if editor.tools then
+        minetest.log("warning", "[ARENA_LIB] editor_settings.tools is deprecated. Please use the editor_settings.items function instead, which shall return a table")
+      end
+      --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
+
+      table.insert(items, 8, "arena_lib:editor_return")
+      table.insert(items, 9, "arena_lib:editor_quit")
+
+      arena_lib.HUD_send_msg("hotbar", p_name, editor.description)
+      user:get_inventory():set_list("main", items)
     end
   })
 end

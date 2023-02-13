@@ -114,13 +114,18 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     player:override_day_night_ratio(arena.lighting.light)
   end
 
-  -- se c'è almeno uno spawner, teletrasporto
+  -- se c'è almeno un punto di rinascita, teletrasporto
   if next(arena.spawn_points) then
     player:set_pos(arena.spawn_points[next(arena.spawn_points)].pos)
     minetest.chat_send_player(sender, S("Wooosh!"))
   end
 
   arena_lib.show_waypoints(sender, mod, arena)
+
+  -- eventuale codice aggiuntivo dell'entrata
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].enter_editor(sender, mod, arena)
+  end
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)

@@ -32,14 +32,8 @@ arena_lib.register_entrance_type("arena_lib", "sign", {
     name = S("Signs"),
     icon = "arenalib_editor_signs.png",
     description = S("One sign per arena"),
-    tools = {
-      "arena_lib:sign_add",
-      "arena_lib:sign_remove",
-      "",
-      "arena_lib:sign",
-      "",
-      "arena_lib:sign_teleport_in"
-    }
+    items = function(p_name, mod, arena) return arena_lib.give_signs_tools(p_name) end,
+    on_enter = function(p_name, mod, arena) arena_lib.editor_reset_sign_values(p_name) end
   },
 
   on_add = function(sender, mod, arena, pos) return add_sign(sender, mod, arena, pos) end,

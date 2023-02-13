@@ -325,7 +325,8 @@ arena_lib.register_entrance_type(mod, entrance, def)
 		* `name`: (string) the name of the item representing the section
 		* `icon`: (string) the image of the item representing the section
 		* `description`: (string) the description of the section, shown in the semi-transparent black bar above the hotbar
-		* `tools`: (table) item list of max 6 entries. These items will be put into the entrance section, once opened
+		* `items`: (function(p_name, mod, arena)) must return a table containing the name of the items that shall be put into the editor section once opened. Max 6 entries. Contrary to a table, the function allows to dynamically change the given items according to external factors (e.g. a specific arena property)
+		* `on_enter`: (function(p_name, mod, arena)) called when entering the editor. Useful to reset entrance properties bound to `p_name`, as it's the only way the player has to know that the editor has been entered by someone
 	* `debug_output`: (function(entrance)): what the debug log should print (via `arena_lib.print_arena_info()`)
 
 Then, a useful function you want to call through the tools in the editor section is `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`, where `action` is a string taking either `"add"` or `"remove"`. In case of `"add"`, you can also attach whatever parameter you want after (`...`). For instance, built-in signs pass the pointed position, which is then checked on `on_add` and lastly returned so that arena_lib can add it. These checks are not run in the tool itself because this won't allow to run them outside the editor (i.e. CLI and custom calls from other mods).  

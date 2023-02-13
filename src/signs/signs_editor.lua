@@ -99,6 +99,32 @@ minetest.register_tool("arena_lib:sign_teleport_out", {
 
 
 
+function arena_lib.give_signs_tools(p_name)
+  local items = {
+    "arena_lib:sign_add",
+    "arena_lib:sign_remove",
+    "",
+    "arena_lib:sign",
+    ""
+  }
+
+  if pos_before_tp[p_name] then
+    table.insert(items, 6, "arena_lib:sign_teleport_out")
+  else
+    table.insert(items, 6, "arena_lib:sign_teleport_in")
+  end
+
+  return items
+end
+
+
+
+function arena_lib.editor_reset_sign_values(p_name)
+  pos_before_tp[p_name] = nil
+end
+
+
+
 
 
 ----------------------------------------------
