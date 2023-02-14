@@ -482,7 +482,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     arena.past_present_players_inside[p_name] = nil
     players_in_game[p_name] = nil
 
-    handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
+    handle_leaving_callbacks(mod, arena, p_name, reason, executioner, true)
 
   -- sennò...
   else
@@ -504,7 +504,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     -- se è stato eliminato e c'è la spettatore, non va rimosso, bensì solo spostato in spettatore
     if reason == 1 and mod_ref.spectate_mode and arena.players_amount > 0 then
-      eliminate_player(mod_ref, arena, p_name, executioner)
+      eliminate_player(mod, arena, p_name, executioner)
       arena_lib.enter_spectate_mode(p_name, arena)
 
     -- sennò procedo a rimuoverlo normalmente
@@ -514,7 +514,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       arena.past_present_players_inside[p_name] = nil
       players_in_game[p_name] = nil
 
-      handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
+      handle_leaving_callbacks(mod, arena, p_name, reason, executioner)
     end
 
     -- se è già in celebrazione, basta solo aggiornare il cartello
@@ -526,20 +526,16 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
       -- se l'arena è a squadre e sono rimasti solo lɜ giocatorɜ di una squadra, la loro squadra vince
       elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
-
         local winning_team_id = arena_lib.get_active_teams(arena)[1]
+        local mod_S = mod_ref.custom_messages.last_standing_team and minetest.get_translator(mod) or S
 
-        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
+        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. mod_S(mod_ref.messages.last_standing_team))
         arena_lib.load_celebration(mod, arena, winning_team_id)
 
       -- se invece erano rimastɜ solo 2 giocatorɜ in partita, l'altrə vince
       elseif arena.players_amount == 1 then
-
-        if reason == 1 then
-          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You're the last player standing: you win!"))
-        else
-          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You win the game due to not enough players"))
-        end
+        local mod_S = mod_ref.custom_messages.last_standing and minetest.get_translator(mod) or S
+        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S(mod_ref.messages.last_standing))
 
         for pl_name, stats in pairs(arena.players) do
           arena_lib.load_celebration(mod, arena, pl_name)
@@ -977,11 +973,15 @@ end
 
 
 
-function eliminate_player(mod_ref, arena, p_name, executioner)
+function eliminate_player(mod, arena, p_name, executioner)
+  local mod_ref = arena_lib.mods[mod]
+
   if executioner then
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
+    local mod_S = mod_ref.custom_messages.eliminated_by and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. mod_S(mod_ref.messages.eliminated_by, p_name, executioner)))
   else
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+    local mod_S = mod_ref.custom_messages.eliminated and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. mod_S(mod_ref.messages.eliminated, p_name)))
   end
 
   if mod_ref.on_eliminate then
@@ -995,7 +995,7 @@ end
 
 
 
-function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, is_spectator)
+function handle_leaving_callbacks(mod, arena, p_name, reason, executioner, is_spectator)
 
   local msg_color = reason < 3 and "#f16a54" or "#d69298"
   local spect_str = ""
@@ -1004,6 +1004,8 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
     msg_color = "#cfc6b8"
     spect_str = " (" .. S("spectator") .. ")"
   end
+
+  local mod_ref = arena_lib.mods[mod]
 
   -- se si è disconnesso
   if reason == 0 then
@@ -1017,7 +1019,7 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
   -- se è stato eliminato (no spettatore, quindi viene rimosso dall'arena)
   elseif reason == 1 then
-    eliminate_player(mod_ref, arena, p_name, executioner)
+    eliminate_player(mod, arena, p_name, executioner)
 
   -- se è stato cacciato
   elseif reason == 2 then
@@ -1035,7 +1037,8 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
 
   -- se ha abbandonato
   elseif reason == 3 then
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
+    local mod_S = mod_ref.custom_messages.quit and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. mod_S(mod_ref.messages.quit, p_name) .. spect_str))
   end
 
   if mod_ref.on_quit then

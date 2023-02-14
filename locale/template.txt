@@ -52,6 +52,11 @@ Minigame settings=
 # api/core.lua
 team=
 spectator=
+@1 has been eliminated by @2=
+@1 has been eliminated=
+You're the last player standing: you win!=
+There are no other teams left, you win!=
+@1 has quit the match=
 [!] Parameters don't seem right!=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
@@ -118,16 +123,10 @@ Team @1 wins the game=
 @1 win the game=
 Teams @1 win the game=
 Players and spectators can now interact with each other=
-@1 has been eliminated by @2=
-@1 has been eliminated=
-There are no other teams left, you win!=
-You're the last player standing: you win!=
-You win the game due to not enough players=
 [!] This arena doesn't exist!=
 The arena has been forcibly terminated by @1=
 @1 has been kicked by @2=
 @1 has been kicked=
-@1 has quit the match=
 [!] on_timeout callback must be declared to properly use a decreasing timer!=
 
 # api/in_queue.lua

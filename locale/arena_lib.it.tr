@@ -52,6 +52,11 @@ Minigame settings=Impostazioni minigioco
 # api/core.lua
 team=squadra
 spectator=spettatore
+@1 has been eliminated by @2=@1 è statə eliminatə da @2
+@1 has been eliminated=@1 è statə eliminatə
+You're the last player standing: you win!=Sei l'ultimə giocatorə rimastə in partita: hai vinto!
+There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
+@1 has quit the match=@1 ha abbandonatə la partita
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 [!] Property type doesn't match, aborting!=[!] Il tipo della proprietà non corrisponde, annullo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
@@ -118,16 +123,10 @@ Team @1 wins the game=La squadra @1 ha vinto la partita
 @1 win the game=@1 hanno vinto la partita
 Teams @1 win the game=Le squadre @1 hanno vinto la partita
 Players and spectators can now interact with each other=Giocatorɜ e spettatorɜ possono ora interagire tra di loro
-@1 has been eliminated by @2=@1 è statə eliminatə da @2
-@1 has been eliminated=@1 è statə eliminatə
-There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
-You're the last player standing: you win!=Sei l'ultimə giocatorə rimastə in partita: hai vinto!
-You win the game due to not enough players=Hai vinto la partita per troppi pochi giocatorɜ
 [!] This arena doesn't exist!=[!] Quest'arena non esiste!
 The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1
 @1 has been kicked by @2=@1 è stato cacciatə da @2
 @1 has been kicked=@1 è stato cacciatə
-@1 has quit the match=@1 ha abbandonatə la partita
 [!] on_timeout callback must be declared to properly use a decreasing timer!=[!] il richiamo on_timeout deve essere dichiarato per poter usare correttamente un timer decrescente!
 
 # api/in_queue.lua

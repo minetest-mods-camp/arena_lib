@@ -85,7 +85,7 @@ function arena_lib.register_minigame(mod, def)
   --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
   arena_lib.mods[mod] = {}
-  arena_lib.mods[mod].arenas = {}           -- KEY: (int) arenaID , VALUE: (table) arena properties
+  arena_lib.mods[mod].arenas = {}                                               -- KEY: (int) arenaID , VALUE: (table) arena properties
   arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
 
   local mod_ref = arena_lib.mods[mod]
@@ -107,6 +107,16 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
   mod_ref.chat_spectate_color = "#dddddd"
+  mod_ref.messages = {
+    eliminated = "@1 has been eliminated",
+    eliminated_by = "@1 has been eliminated by @2",                             -- I won't include `kicked` and `kicked_by` as it's more of a maintenance function
+    last_standing = "You're the last player standing: you win!",
+    last_standing_team = "There are no other teams left, you win!",
+    quit = "@1 has quit the match",
+    --TODO: celebration, since I'd like to completely review its structure first with arena_lib 6.0
+    -- celebration = "",
+  }
+  mod_ref.custom_messages = {}     -- used internally to check whether a custom message has been registered (so to call the minigame translator rather than arena_lib's); KEY = msg name, VALUE = true
   mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
@@ -169,6 +179,13 @@ function arena_lib.register_minigame(mod, def)
 
   if def.chat_spectate_color then
     mod_ref.chat_spectate_color = def.chat_spectate_color
+  end
+
+  if def.custom_messages then
+    for k, msg in pairs(def.custom_messages) do
+      mod_ref.messages[k] = msg
+      mod_ref.custom_messages[k] = true
+    end
   end
 
   if def.fov then
@@ -1589,7 +1606,8 @@ function deprecated_audio_exists(mod, track, p_name)
   local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. track .. ".ogg", "r")
   if deprecated_file then
     deprecated_file:close()
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: put it into the world folder instead!"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: "
+      .. "put it into the world folder instead!"))
     return true
   end
 end

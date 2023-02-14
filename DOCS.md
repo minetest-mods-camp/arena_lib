@@ -64,6 +64,20 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `chat_all_color`: (string) color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `chat_team_color`: (string) color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
 * `chat_spectate_color`: color for every message sent in the spectate chat. Default is gray (`"#dddddd"`)
+* `custom_messages`: (table) series of messages to optionally customise the minigame experience. Beware:
+  * Default fields are:
+    ```lua
+    {
+      eliminated = "@1 has been eliminated",
+      eliminated_by = "@1 has been eliminated by @2",
+      last_standing = "You're the last player standing: you win!",
+      last_standing_team = "There are no other teams left, you win!",
+      quit = "@1 has quit the match"
+    }
+    ```
+  * If the overriden message contains translation variables (e.g. `@1`), these must be present in the exact same amount in the custom message or it'll crash
+  * Arena_lib will automatically translate the new strings using the textdomain of the minigame: do NOT push translated strings, just put their translation in the locale folder of the minigame
+  * If for any reason you want to retrieve these messages in your minigame, these are saved in a `messages` field, and not in a `custom_messages` one. The latter is just a table `msg_name = true` used to check whether the message is a custom one
 * `fov`: (int) changes the fov of every player
 * `camera_offset`: (table) changes the offset of the camera for every player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
