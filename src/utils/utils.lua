@@ -25,7 +25,7 @@ function arena_lib.get_and_add_joining_players(mod_ref, arena, p_name)
 
   -- aggiungo il giocatore
   for _, pl_name in pairs(players_to_add) do
-    arena.players[pl_name] = {kills = 0, deaths = 0, teamID = p_team_ID}
+    arena.players[pl_name] = {deaths = 0, teamID = p_team_ID}
     arena.players_and_spectators[pl_name] = true
   end
 
