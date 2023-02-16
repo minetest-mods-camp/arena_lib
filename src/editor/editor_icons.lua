@@ -13,7 +13,7 @@ minetest.register_tool("arena_lib:editor_players", {
     on_use = function(itemstack, user)
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
       if arena.teams_enabled then
         minetest.chat_send_player(user:get_player_name(), minetest.colorize("#ffdddd", "[arena_lib] " .. S("Values are PER TEAM!")))

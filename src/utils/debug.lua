@@ -324,8 +324,7 @@ end
 
 
 function arena_lib.flush_arena(mod, arena_name, sender)
-
-  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
 
@@ -351,7 +350,6 @@ function arena_lib.flush_arena(mod, arena_name, sender)
   end
 
   arena.current_time = nil
-
   minetest.chat_send_player(sender, "Sluuush!")
 end
 

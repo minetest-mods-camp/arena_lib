@@ -306,7 +306,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
-* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing in
+* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing or spectating in
 * `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
@@ -417,15 +417,15 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 
 > **BEWARE**: don't edit these parameters manually! Each one of them can be set through some arena_lib function, which runs the required checks in order to avoid any collateral damage
 
-
-Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
+Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[ARENAID]`.  
 
 There are two ways to know an arena ID: the first is in-game via the two built-in commands:
 * `/arenas list <minigame>`: concise
 * `/arenas info (<minigame>) <arena>`: extended with much more information (this is also implemented in the editor by default - the "i" icon)
 
 The second is via code through the functions:
-* `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
+* `arena_lib.get_queueID_by_player(p_name)`: the player must be queueing for the arena
+* `arena_lib.get_arenaID_by_player(p_name)`: the player must be either playing or spectating in the arena
 * `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so the table)
 
 ### 2.1 Storing arenas

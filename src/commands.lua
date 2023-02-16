@@ -104,7 +104,7 @@ ChatCmdBuilder.new("arenas", function(cmd)
   end)
 
   cmd:sub("forceend :minigame :arena", function(sender, minigame, arena)
-    local id, ar = arena_lib.get_arena_by_name(minigame, arena)
+    local _, ar = arena_lib.get_arena_by_name(minigame, arena)
 
     if arena_lib.force_arena_ending(minigame, ar, sender) then
       minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena))
@@ -117,7 +117,7 @@ ChatCmdBuilder.new("arenas", function(cmd)
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are more minigames having an arena called @1: please specify the name of the minigame before the name of the arena, separating them with a space", arena)))
       return end
 
-      local id, ar = arena_lib.get_arena_by_name(minigames[1], arena)
+      local _, ar = arena_lib.get_arena_by_name(minigames[1], arena)
 
     if arena_lib.force_arena_ending(minigames[1], ar, sender) then
       minetest.chat_send_player(sender, S("Game in arena @1 successfully terminated", arena))

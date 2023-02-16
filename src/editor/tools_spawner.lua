@@ -142,7 +142,7 @@ minetest.register_tool("arena_lib:spawner_team_switch", {
       team_ID = team_ID +1
     end
 
-    local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+    local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
     minetest.chat_send_player(user:get_player_name(), S("Selected team: @1", mod_ref.teams[team_ID]))
 
@@ -201,7 +201,7 @@ function arena_lib.give_spawners_tools(player)
 
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
-  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if arena.teams_enabled then
     player:get_inventory():set_list("main", spawners_tools_team)
@@ -223,7 +223,7 @@ function change_spawner_ID(player)
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
   local spawner_ID = player:get_meta():get_int("arena_lib_editor.spawner_ID")
-  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if spawner_ID >= table.maxn(arena.spawn_points) then
     spawner_ID = 1

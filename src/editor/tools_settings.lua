@@ -33,7 +33,7 @@ minetest.register_tool("arena_lib:settings_rename_author", {
     on_use = function(itemstack, user, pointed_thing)
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
 
       minetest.show_formspec(user:get_player_name(), "arena_lib:settings_rename_author_thumbnail", get_rename_author_thumbnail_formspec(arena))
     end
@@ -53,7 +53,7 @@ minetest.register_tool("arena_lib:settings_properties", {
       local p_name      = user:get_player_name()
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
 
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, 1))
     end

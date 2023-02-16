@@ -19,7 +19,7 @@ minetest.register_tool("arena_lib:customise_lighting", {
 
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
       local p_name      = user:get_player_name()
 
       fill_templight(p_name, arena)
@@ -80,7 +80,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   local p_name = player:get_player_name()
   local mod         = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
-  local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
   local light_table = arena.lighting or {}
 
   -- se abbandona...

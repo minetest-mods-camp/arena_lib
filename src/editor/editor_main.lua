@@ -36,7 +36,7 @@ function arena_lib.register_editor_section(mod, def)
 
         local mod = user:get_meta():get_string("arena_lib_editor.mod")
         local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
-        local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+        local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
         local item_list = def.give_items(itemstack, user, arena)
 
         if not item_list then return end

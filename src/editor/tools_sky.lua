@@ -29,7 +29,7 @@ minetest.register_tool("arena_lib:customise_sky", {
 
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
       local p_name      = user:get_player_name()
 
       fill_tempsky(p_name, arena)
@@ -445,7 +445,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   local mod         = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
-  local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
   local celvault    = arena.celestial_vault
 
   -- se abbandona...
