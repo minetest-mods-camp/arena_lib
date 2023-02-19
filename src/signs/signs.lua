@@ -146,7 +146,7 @@ function add_sign(sender, mod, arena, pos)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
     return end
 
-  local id = arena_lib.get_arena_by_name(mod, arena.name) -- TODO 6.0 sostituire con arena.ID
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- salvo il nome della mod e l'ID come metadato nel cartello
   minetest.get_meta(pos):set_string("mod", mod)
@@ -161,7 +161,7 @@ function remove_sign(mod, arena)
   minetest.load_area(arena.entrance)
 
   local sign_meta = minetest.get_meta(arena.entrance)
-  local id = arena_lib.get_arena_by_name(mod, arena.name) -- TODO 6.0 sostituire con arena.ID
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- se il cartello non è stato spostato lo rimuovo, sennò evito di far sparire il blocco che c'è ora
   -- (può capitare se qualcuno sposta un'area con WorldEdit). Le altre condizioni assicurano poi che si stia

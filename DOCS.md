@@ -303,7 +303,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
 ### 1.8 Getters
-* `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
+* `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena. Contrary to the duo `get_arena_by_player` and `get_arenaID_by_player`, this is not split in two as these two variables are often needed together inside arena_lib
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in (game or queue)
 * `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's in (game or queue)
