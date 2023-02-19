@@ -89,7 +89,7 @@ function ARENA_LIB_JOIN_CHECKS_PASSED(arena, arenaID, p_name)
     return end
 
   -- se l'arena è piena
-  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
+  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_arenaID_by_player(p_name) ~= arenaID then
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
     return end
 

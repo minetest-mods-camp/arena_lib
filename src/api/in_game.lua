@@ -605,8 +605,11 @@ end
 
 
 function arena_lib.get_arenaID_by_player(p_name)
-  if players_in_game[p_name] then
+  if players_in_game[p_name] then                   -- è in partita
     return players_in_game[p_name].arenaID
+
+  elseif arena_lib.is_player_in_queue(p_name) then   -- è in coda
+    return arena_lib.get_arenaID_by_queuing_player(p_name)
   end
 end
 

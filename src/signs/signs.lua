@@ -69,7 +69,7 @@ signs_lib.register_sign("arena_lib:sign", {
     minetest.get_meta(pos):set_int("widefont", 1)
     end,
 
-    -- cartello indistruttibile se c'è un'arena assegnata
+  -- cartello indistruttibile se c'è un'arena assegnata
   on_dig = function(pos, node, digger)
     if minetest.get_meta(pos):get_int("arenaID") ~= 0 then return end
 
@@ -116,7 +116,7 @@ signs_lib.register_sign("arena_lib:sign", {
       return end
 
     -- se si è già in coda nella stessa arena, esci, sennò prova ad aggiungere il giocatore
-    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_queueID_by_player(p_name) == arenaID then
+    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       arena_lib.remove_player_from_queue(p_name)
     else
       if arena.in_game then
@@ -288,7 +288,7 @@ function get_infobox_formspec(mod, arenaID, player)
     spec_tip = "The arena is not enabled"
   else
     -- tasto "gioca"
-    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_queueID_by_player(p_name) == arenaID then
+    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       play_btn = "arenalib_infobox_play_leave.png"
       play_tip = "Leave the queue" .. LMB_TIP
     elseif arena.players_amount == arena.max_players and (arena.in_queue or (arena.in_game and mod_ref.join_while_in_progress)) then

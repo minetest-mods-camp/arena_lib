@@ -305,9 +305,8 @@ There are also some other functions which might turn useful. They are:
 ### 1.8 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
-* `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
-* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing or spectating in
-* `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
+* `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in (game or queue)
+* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's in (game or queue)
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_players_amount_left_to_start_queue(arena)`: returns the amount of player still needed to make a queue start, or `nil` if the arena is already in game
@@ -424,7 +423,6 @@ There are two ways to know an arena ID: the first is in-game via the two built-i
 * `/arenas info (<minigame>) <arena>`: extended with much more information (this is also implemented in the editor by default - the "i" icon)
 
 The second is via code through the functions:
-* `arena_lib.get_queueID_by_player(p_name)`: the player must be queueing for the arena
 * `arena_lib.get_arenaID_by_player(p_name)`: the player must be either playing or spectating in the arena
 * `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so the table)
 

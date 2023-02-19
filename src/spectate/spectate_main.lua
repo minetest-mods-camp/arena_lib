@@ -77,7 +77,7 @@ end
 function arena_lib.enter_spectate_mode(p_name, arena)
 
   local mod      = arena_lib.get_mod_by_player(p_name)
-  local arena_ID = arena_lib.get_arenaID_by_player(p_name)      -- TODO 6.0: use arena.ID
+  local arena_ID = arena_lib.get_arenaID_by_player(p_name)
   local team_ID  = #arena.teams > 1 and 1 or nil
   local player   = minetest.get_player_by_name(p_name)
   local hand     = player:get_inventory():get_list("hand")
