@@ -61,29 +61,6 @@ local arena_default = {
 function arena_lib.register_minigame(mod, def)
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
-  --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
-  if def.hub_spawn_point then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") hub_spawn_point is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
-  end
-
-  if def.queue_waiting_time then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") queue_waiting_time is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
-  end
-
-  if def.time_mode and type(def.time_mode) == "number" then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") time_mode with numeric values is deprecated. Use `none`, `incremental` or `decremental` instead")
-    if def.time_mode == nil or def.time_mode == 0 then
-      def.time_mode = "none"
-    elseif def.time_mode == 1 then
-      def.time_mode = "incremental"
-    elseif def.time_mode == 2 then
-      def.time_mode = "decremental"
-    else
-      def.time_mode = "none"
-    end
-  end
-  --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
-
   arena_lib.mods[mod] = {}
   arena_lib.mods[mod].arenas = {}                                               -- KEY: (int) arenaID , VALUE: (table) arena properties
   arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
@@ -1308,13 +1285,6 @@ function init_storage(mod, mod_ref)
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
       local to_update = false
-
-      --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
-      if not arena.author then
-        arena.author = "???"
-        to_update = true
-      end
-      --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
       if not arena.spectators then

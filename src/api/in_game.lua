@@ -9,7 +9,6 @@ local function handle_leaving_callbacks() end
 local function victory_particles() end
 local function show_victory_particles() end
 local function time_start() end
-local function deprecated_winning_team_celebration() end
 local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -306,12 +305,7 @@ function arena_lib.load_celebration(mod, arena, winners)
   -- se è una tabella, può essere o più giocatori singoli, o più squadre
   elseif type(winners) == "table" then
 
-    -- v DEPRECATED, da rimuovere in 6.0 ----- v
-    if arena.teams_enabled and type(winners[1]) == "string" then
-      winning_message = deprecated_winning_team_celebration(mod, arena, winners)
-    -- ^ -------------------------------------^
-
-    elseif type(winners[1]) == "string" then
+    if type(winners[1]) == "string" then
       for _, pl_name in pairs(winners) do
         winning_message = winning_message .. pl_name .. ", "
       end
@@ -1014,12 +1008,6 @@ function handle_leaving_callbacks(mod, arena, p_name, reason, executioner, is_sp
   if reason == 0 then
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
 
-    -- DEPRECATED: remove in 6.0
-    if mod_ref.on_disconnect then
-      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_disconnect is deprecated. Please use on_quit with reason `0` instead")
-      mod_ref.on_disconnect(arena, p_name, is_spectator)
-    end
-
   -- se è stato eliminato (no spettatore, quindi viene rimosso dall'arena)
   elseif reason == 1 then
     eliminate_player(mod, arena, p_name, executioner)
@@ -1030,12 +1018,6 @@ function handle_leaving_callbacks(mod, arena, p_name, reason, executioner, is_sp
       arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked by @2", p_name, executioner) .. spect_str))
     else
       arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
-    end
-
-    -- DEPRECATED: remove in 6.0
-    if mod_ref.on_kick then
-      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_kick is deprecated. Please use on_quit with reason `2` instead")
-      mod_ref.on_kick(arena, p_name, is_spectator)
     end
 
   -- se ha abbandonato
@@ -1079,28 +1061,8 @@ function victory_particles(arena, players, winners)
   -- più vincitori
   elseif type(winners) == "table" then
 
-    -- v DEPRECATED, da rimuovere in 6.0 ----- v
-    if arena.teams_enabled and type(winners[1]) == "string" then
-      local teamID = 0
-      for pl_name, pl_stats in pairs(players) do
-        if pl_name == winners[1] then
-          teamID = pl_stats.teamID
-          break
-        end
-      end
-
-      for pl_name, pl_stats in pairs(players) do
-        if pl_stats.teamID == winners then
-          local winner = minetest.get_player_by_name(pl_name)
-
-          if winner then
-            show_victory_particles(winner:get_pos())
-          end
-        end
-      end
-    -- ^ -------------------------------------^
     -- singoli giocatori
-    elseif type(winners[1]) == "string" then
+    if type(winners[1]) == "string" then
       for _, pl_name in pairs(winners) do
         local winner = minetest.get_player_by_name(pl_name)
 
@@ -1175,14 +1137,6 @@ end
 ----------------------------------------------
 ------------------DEPRECATED------------------
 ----------------------------------------------
-
--- to remove in 6.0
-function deprecated_winning_team_celebration(mod, arena, winners)
-  minetest.log("warning", debug.traceback("[ARENA_LIB - " .. mod .. "] passing a single winning team as a table made of one of its players is deprecated, "
-    .. "please pass the (integer) team ID instead"))
-  local winner = arena.players[winners[1]].teamID
-  return S("Team @1 wins the game", arena.teams[winner].name)
-end
 
 -- to remove in 7.0
 function deprecated_start_arena(arena)
