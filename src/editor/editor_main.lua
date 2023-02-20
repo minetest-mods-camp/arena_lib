@@ -46,8 +46,8 @@ function arena_lib.register_editor_section(mod, def)
         local inv = user:get_inventory()
 
         inv:set_list("main", item_list)
-        inv:set_stack("main", 7, "arena_lib:editor_return")
-        inv:set_stack("main", 8, "arena_lib:editor_quit")
+        inv:set_stack("main", 8, "arena_lib:editor_return")
+        inv:set_stack("main", 9, "arena_lib:editor_quit")
       end
   })
 end
