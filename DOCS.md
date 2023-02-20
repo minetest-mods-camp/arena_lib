@@ -78,6 +78,8 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * If the overriden message contains translation variables (e.g. `@1`), these must be present in the exact same amount in the custom message or it'll crash
   * Arena_lib will automatically translate the new strings using the textdomain of the minigame: do NOT push translated strings, just put their translation in the locale folder of the minigame
   * If for any reason you want to retrieve these messages in your minigame, these are saved in a `messages` field, and not in a `custom_messages` one. The latter is just a table `msg_name = true` used to check whether the message is a custom one
+* `player_aspect`: (table) changes the aspect of every player entering a game. It supports a few parameters from Minetest [Object Properties](https://minetest.gitlab.io/minetest/definition-tables/), namely `visual`, `visual_size`, `mesh`, `textures`, `collisionbox` and `selectionbox`
+  * If you want a custom aspect for each player, this can't be achieved here (callbacks like `on_load` will suit your needs). However, by declaring at least an empty table, you can still rely on arena_lib automatically restoring the player aspect when they leave
 * `fov`: (int) changes the fov of every player
 * `camera_offset`: (table) changes the offset of the camera for every player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
@@ -91,7 +93,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
-* `time_mode`: (string) whether arenas will keep track of the time or not.
+* `time_mode`: (string) whether arenas will keep track of the time or not
   * `"none"`: no time tracking at all (default)
   * `"incremental"`: incremental time (0, 1, 2, ...)
   * `"decremental"`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena

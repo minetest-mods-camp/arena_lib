@@ -94,6 +94,7 @@ function arena_lib.register_minigame(mod, def)
     -- celebration = "",
   }
   mod_ref.custom_messages = {}     -- used internally to check whether a custom message has been registered (so to call the minigame translator rather than arena_lib's); KEY = msg name, VALUE = true
+  mod_ref.player_aspect = nil
   mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
@@ -163,6 +164,11 @@ function arena_lib.register_minigame(mod, def)
       mod_ref.messages[k] = msg
       mod_ref.custom_messages[k] = true
     end
+  end
+
+  if def.player_aspect then
+    local aspect = def.player_aspect
+    mod_ref.player_aspect = { visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox }
   end
 
   if def.fov then

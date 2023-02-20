@@ -12,8 +12,8 @@ local function time_start() end
 local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
+local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle,
+                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
 
 
 
@@ -772,13 +772,23 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
     player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
   end
 
+  -- cambio eventuale aspetto
+  if mod_ref.player_aspect then
+    local p_prps = player:get_properties()
+    local aspect = mod_ref.player_aspect
+    players_temp_storage[p_name].player_aspect = {
+      visual = p_prps.visual, mesh = p_prps.mesh, textures = p_prps.textures, visual_size = p_prps.visual_size, collisionbox = p_prps.collisionbox, selectionbox = p_prps.selectionbox
+    }
+    player:set_properties({
+      visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox
+    })
+  end
+
   -- cambio eventuale colore texture (richiede le squadre)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
     local textures = player:get_properties().textures
     textures[1] = textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"
-    player:set_properties({
-      textures = textures
-    })
+    player:set_properties({ textures = textures })
   end
 
   -- disabilito eventualmente l'inventario
@@ -924,6 +934,14 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
       textures[1] = string.match(textures[1], "(.*)^%[") or textures[1] -- in case an external mod messed up filters. TODO just store the texture when the match starts and then reapply it here
       player:set_properties({
         textures = textures
+      })
+    end
+
+    -- riprsitino eventuale aspetto
+    if mod_ref.player_aspect then
+      local aspect = players_temp_storage[p_name].player_aspect
+      player:set_properties({
+        visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox
       })
     end
 
