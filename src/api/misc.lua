@@ -43,7 +43,6 @@ end
 ----------------------------------------------
 
 function arena_lib.get_arena_by_name(mod, arena_name)
-
   if not arena_lib.mods[mod] then return end
 
   for id, arena in pairs(arena_lib.mods[mod].arenas) do

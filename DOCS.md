@@ -31,7 +31,7 @@
 			* [2.2.2.2 Players management](#2222-players-management)
 			* [2.2.2.3 Enabling/Disabling teams](#2223-enablingdisabling-teams)
 			* [2.2.2.4 Spawners](#2224-spawners)
-			* [2.2.2.5 Entrance](#2225-entrance)
+			* [2.2.2.5 Entering and leaving](#2225-entering-and-leaving)
 			* [2.2.2.6 Arena properties](#2226-arena-properties)
 			* [2.2.2.7 Timers](#2227-timers)
 			* [2.2.2.8 Music](#2228-music)
@@ -64,6 +64,22 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `chat_all_color`: (string) color for every message sent in arena, team chat aside. Default is white (`"#ffffff"`)
 * `chat_team_color`: (string) color for every message sent in the team chat. Default is light sky blue (`"#ddfdff"`)
 * `chat_spectate_color`: color for every message sent in the spectate chat. Default is gray (`"#dddddd"`)
+* `custom_messages`: (table) series of messages to optionally customise the minigame experience. Beware:
+  * Default fields are:
+    ```lua
+    {
+      eliminated = "@1 has been eliminated",
+      eliminated_by = "@1 has been eliminated by @2",
+      last_standing = "You're the last player standing: you win!",
+      last_standing_team = "There are no other teams left, you win!",
+      quit = "@1 has quit the match"
+    }
+    ```
+  * If the overriden message contains translation variables (e.g. `@1`), these must be present in the exact same amount in the custom message or it'll crash
+  * Arena_lib will automatically translate the new strings using the textdomain of the minigame: do NOT push translated strings, just put their translation in the locale folder of the minigame
+  * If for any reason you want to retrieve these messages in your minigame, these are saved in a `messages` field, and not in a `custom_messages` one. The latter is just a table `msg_name = true` used to check whether the message is a custom one
+* `player_aspect`: (table) changes the aspect of every player entering a game. It supports a few parameters from Minetest [Object Properties](https://minetest.gitlab.io/minetest/definition-tables/), namely `visual`, `visual_size`, `mesh`, `textures`, `collisionbox` and `selectionbox`
+  * If you want a custom aspect for each player, this can't be achieved here (callbacks like `on_load` will suit your needs). However, by declaring at least an empty table, you can still rely on arena_lib automatically restoring the player aspect when they leave
 * `fov`: (int) changes the fov of every player
 * `camera_offset`: (table) changes the offset of the camera for every player. It's structured as such: `{1st_person, 3rd_person}`, e.g. `{nil, {x=5, y=3, z=-4}}`
 * `hotbar`: (table) overrides the server hotbar while inside an arena. Its fields are:
@@ -77,7 +93,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
 * `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
-* `time_mode`: (string) whether arenas will keep track of the time or not.
+* `time_mode`: (string) whether arenas will keep track of the time or not
   * `"none"`: no time tracking at all (default)
   * `"incremental"`: incremental time (0, 1, 2, ...)
   * `"decremental"`: decremental time, as in a timer (3, 2, 1, 0). The timer value is 300 seconds by default, but it can be changed per arena
@@ -254,7 +270,7 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 `arena_lib` also comes with a triple practical HUD: `title`, `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following functions:
 * `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: sends a message to the specified player/spectator in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players and spectators inside the arena
-* `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both a player/spectator and a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make all the HUDs disappear
+* `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both the name of the player/spectator and a whole arena. Also, a special parameter `all` can be used in `HUD_type` to make all the HUDs disappear
 
 ### 1.7 Utils
 There are also some other functions which might turn useful. They are:
@@ -289,11 +305,10 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
 
 ### 1.8 Getters
-* `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena (so a table)
+* `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena. Contrary to the duo `get_arena_by_player` and `get_arenaID_by_player`, this is not split in two as these two variables are often needed together inside arena_lib
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
-* `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in, (game or queue)
-* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's playing in
-* `arena_lib.get_queueID_by_player(p_name)`: returns the ID of the arena the player's queueing for
+* `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in (game or queue)
+* `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's in (game or queue)
 * `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_players_amount_left_to_start_queue(arena)`: returns the amount of player still needed to make a queue start, or `nil` if the arena is already in game
@@ -325,7 +340,8 @@ arena_lib.register_entrance_type(mod, entrance, def)
 		* `name`: (string) the name of the item representing the section
 		* `icon`: (string) the image of the item representing the section
 		* `description`: (string) the description of the section, shown in the semi-transparent black bar above the hotbar
-		* `tools`: (table) item list of max 6 entries. These items will be put into the entrance section, once opened
+		* `items`: (function(p_name, mod, arena)) must return a table containing the name of the items that shall be put into the editor section once opened. Max 6 entries. Contrary to a table, the function allows to dynamically change the given items according to external factors (e.g. a specific arena property)
+		* `on_enter`: (function(p_name, mod, arena)) called when entering the editor. Useful to reset entrance properties bound to `p_name`, as it's the only way the player has to know that the editor has been entered by someone
 	* `debug_output`: (function(entrance)): what the debug log should print (via `arena_lib.print_arena_info()`)
 
 Then, a useful function you want to call through the tools in the editor section is `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`, where `action` is a string taking either `"add"` or `"remove"`. In case of `"add"`, you can also attach whatever parameter you want after (`...`). For instance, built-in signs pass the pointed position, which is then checked on `on_add` and lastly returned so that arena_lib can add it. These checks are not run in the tool itself because this won't allow to run them outside the editor (i.e. CLI and custom calls from other mods).  
@@ -366,6 +382,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `thumbnail`: (string) the name of the optional file representing the arena, extension included. Default is `""`, meaning no thumbnail is associated with the arena. It must be put inside the `arena_lib/Thumbnails` world folder. If present, it can be seen by right-clicking built-in arena signs.
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
+* `custom_return_point`: (table) a position that, if declared, overrides the `hub_spawn_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
 * `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
 * `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
@@ -401,15 +418,14 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 
 > **BEWARE**: don't edit these parameters manually! Each one of them can be set through some arena_lib function, which runs the required checks in order to avoid any collateral damage
 
-
-Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[THEARENAID]`.  
+Being arenas stored by ID, they can be easily retrieved by `arena_libs.mods[yourmod].arenas[ARENAID]`.  
 
 There are two ways to know an arena ID: the first is in-game via the two built-in commands:
 * `/arenas list <minigame>`: concise
 * `/arenas info (<minigame>) <arena>`: extended with much more information (this is also implemented in the editor by default - the "i" icon)
 
 The second is via code through the functions:
-* `arena_lib.get_arenaID_by_player(p_name)`: the player must be queueing for the arena, or playing it
+* `arena_lib.get_arenaID_by_player(p_name)`: the player must be either playing or spectating in the arena
 * `arena_lib.get_arena_by_name(mod, arena_name)`: it returns both the ID and the arena (so the table)
 
 ### 2.1 Storing arenas
@@ -478,9 +494,11 @@ Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_ch
    -- etc.
 ```
 
-##### 2.2.2.5 Entrance
+##### 2.2.2.5 Entering and leaving
 To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.9 Custom entrances](#19-custom-entrances).  
-To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use
+To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use.
+
+To customise the arena return point (by default `hub_spawn_point`), use `arena_lib.set_custom_return_point(sender, mod, arena_name, pos)`. To remove the custom return point, set `pos` to `nil`.
 
 ##### 2.2.2.6 Arena properties
 [Arena properties](#151-arena-properties) allow you to create additional persistent attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
@@ -490,7 +508,7 @@ To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_nam
 `arena_lib.set_timer(sender, mod, arena_name, timer)` changes the timer of the arena. It only works if timers are enabled (`time_mode = "decremental"`).
 
 ##### 2.2.2.8 Music
-`arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too
+`arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume, pitch)` sets the background music of the arena. The audio file (`track`) must be inside the `sounds` folder of the minigame mod (NOT arena_lib's), and `.ogg` shall be omitted from the string. If `track` is nil, `arena.bgm` will be set to `nil` too.
 
 ##### 2.2.2.9 Celestial vault
 By default, the arena's celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  

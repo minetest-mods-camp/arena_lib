@@ -144,7 +144,7 @@ minetest.register_tool("arena_lib:players_teams_off", {
       arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1, true)
 
       if arena_lib.mods[mod].variable_teams_amount then
-        local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+        local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
         user:get_inventory():set_stack("main", 3, "arena_lib:players_teams_amount " .. #arena.teams)
       end
       user:get_inventory():set_stack("main", 6, "arena_lib:players_teams_on")

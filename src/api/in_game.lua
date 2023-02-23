@@ -9,12 +9,11 @@ local function handle_leaving_callbacks() end
 local function victory_particles() end
 local function show_victory_particles() end
 local function time_start() end
-local function deprecated_winning_team_celebration() end
 local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
-local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image,
-                                      --                           (int) bgm_handle, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
+local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle,
+                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
 
 
 
@@ -306,12 +305,7 @@ function arena_lib.load_celebration(mod, arena, winners)
   -- se è una tabella, può essere o più giocatori singoli, o più squadre
   elseif type(winners) == "table" then
 
-    -- v DEPRECATED, da rimuovere in 6.0 ----- v
-    if arena.teams_enabled and type(winners[1]) == "string" then
-      winning_message = deprecated_winning_team_celebration(mod, arena, winners)
-    -- ^ -------------------------------------^
-
-    elseif type(winners[1]) == "string" then
+    if type(winners[1]) == "string" then
       for _, pl_name in pairs(winners) do
         winning_message = winning_message .. pl_name .. ", "
       end
@@ -482,7 +476,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
     arena.past_present_players_inside[p_name] = nil
     players_in_game[p_name] = nil
 
-    handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, true)
+    handle_leaving_callbacks(mod, arena, p_name, reason, executioner, true)
 
   -- sennò...
   else
@@ -504,7 +498,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     -- se è stato eliminato e c'è la spettatore, non va rimosso, bensì solo spostato in spettatore
     if reason == 1 and mod_ref.spectate_mode and arena.players_amount > 0 then
-      eliminate_player(mod_ref, arena, p_name, executioner)
+      eliminate_player(mod, arena, p_name, executioner)
       arena_lib.enter_spectate_mode(p_name, arena)
 
     -- sennò procedo a rimuoverlo normalmente
@@ -514,7 +508,7 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       arena.past_present_players_inside[p_name] = nil
       players_in_game[p_name] = nil
 
-      handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner)
+      handle_leaving_callbacks(mod, arena, p_name, reason, executioner)
     end
 
     -- se è già in celebrazione, basta solo aggiornare il cartello
@@ -526,20 +520,16 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
       -- se l'arena è a squadre e sono rimasti solo lɜ giocatorɜ di una squadra, la loro squadra vince
       elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
-
         local winning_team_id = arena_lib.get_active_teams(arena)[1]
+        local mod_S = mod_ref.custom_messages.last_standing_team and minetest.get_translator(mod) or S
 
-        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("There are no other teams left, you win!"))
+        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. mod_S(mod_ref.messages.last_standing_team))
         arena_lib.load_celebration(mod, arena, winning_team_id)
 
       -- se invece erano rimastɜ solo 2 giocatorɜ in partita, l'altrə vince
       elseif arena.players_amount == 1 then
-
-        if reason == 1 then
-          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You're the last player standing: you win!"))
-        else
-          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S("You win the game due to not enough players"))
-        end
+        local mod_S = mod_ref.custom_messages.last_standing and minetest.get_translator(mod) or S
+        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S(mod_ref.messages.last_standing))
 
         for pl_name, stats in pairs(arena.players) do
           arena_lib.load_celebration(mod, arena, pl_name)
@@ -609,8 +599,11 @@ end
 
 
 function arena_lib.get_arenaID_by_player(p_name)
-  if players_in_game[p_name] then
+  if players_in_game[p_name] then                   -- è in partita
     return players_in_game[p_name].arenaID
+
+  elseif arena_lib.is_player_in_queue(p_name) then   -- è in coda
+    return arena_lib.get_arenaID_by_queuing_player(p_name)
   end
 end
 
@@ -779,13 +772,23 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
     player:set_eye_offset(mod_ref.camera_offset[1], mod_ref.camera_offset[2])
   end
 
+  -- cambio eventuale aspetto
+  if mod_ref.player_aspect then
+    local p_prps = player:get_properties()
+    local aspect = mod_ref.player_aspect
+    players_temp_storage[p_name].player_aspect = {
+      visual = p_prps.visual, mesh = p_prps.mesh, textures = p_prps.textures, visual_size = p_prps.visual_size, collisionbox = p_prps.collisionbox, selectionbox = p_prps.selectionbox
+    }
+    player:set_properties({
+      visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox
+    })
+  end
+
   -- cambio eventuale colore texture (richiede le squadre)
   if arena.teams_enabled and mod_ref.teams_color_overlay then
     local textures = player:get_properties().textures
     textures[1] = textures[1] .. "^[colorize:" .. mod_ref.teams_color_overlay[arena.players[p_name].teamID] .. ":85"
-    player:set_properties({
-      textures = textures
-    })
+    player:set_properties({ textures = textures })
   end
 
   -- disabilito eventualmente l'inventario
@@ -900,7 +903,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
   -- teletrasporto con un po' di rumore
-  local clean_pos = mod_ref.settings.hub_spawn_point
+  local clean_pos = arena.custom_return_point or mod_ref.settings.return_point
   local noise_x = math.random(-1.5, 1.5)
   local noise_z = math.random(-1.5, 1.5)
   local noise_pos = {x = clean_pos.x + noise_x, y = clean_pos.y, z = clean_pos.z + noise_z}
@@ -931,6 +934,14 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
       textures[1] = string.match(textures[1], "(.*)^%[") or textures[1] -- in case an external mod messed up filters. TODO just store the texture when the match starts and then reapply it here
       player:set_properties({
         textures = textures
+      })
+    end
+
+    -- riprsitino eventuale aspetto
+    if mod_ref.player_aspect then
+      local aspect = players_temp_storage[p_name].player_aspect
+      player:set_properties({
+        visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox
       })
     end
 
@@ -977,11 +988,15 @@ end
 
 
 
-function eliminate_player(mod_ref, arena, p_name, executioner)
+function eliminate_player(mod, arena, p_name, executioner)
+  local mod_ref = arena_lib.mods[mod]
+
   if executioner then
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated by @2", p_name, executioner)))
+    local mod_S = mod_ref.custom_messages.eliminated_by and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. mod_S(mod_ref.messages.eliminated_by, p_name, executioner)))
   else
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. S("@1 has been eliminated", p_name)))
+    local mod_S = mod_ref.custom_messages.eliminated and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#f16a54", "<<< " .. mod_S(mod_ref.messages.eliminated, p_name)))
   end
 
   if mod_ref.on_eliminate then
@@ -995,7 +1010,7 @@ end
 
 
 
-function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, is_spectator)
+function handle_leaving_callbacks(mod, arena, p_name, reason, executioner, is_spectator)
 
   local msg_color = reason < 3 and "#f16a54" or "#d69298"
   local spect_str = ""
@@ -1005,19 +1020,15 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
     spect_str = " (" .. S("spectator") .. ")"
   end
 
+  local mod_ref = arena_lib.mods[mod]
+
   -- se si è disconnesso
   if reason == 0 then
     arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. p_name .. spect_str))
 
-    -- DEPRECATED: remove in 6.0
-    if mod_ref.on_disconnect then
-      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_disconnect is deprecated. Please use on_quit with reason `0` instead")
-      mod_ref.on_disconnect(arena, p_name, is_spectator)
-    end
-
   -- se è stato eliminato (no spettatore, quindi viene rimosso dall'arena)
   elseif reason == 1 then
-    eliminate_player(mod_ref, arena, p_name, executioner)
+    eliminate_player(mod, arena, p_name, executioner)
 
   -- se è stato cacciato
   elseif reason == 2 then
@@ -1027,15 +1038,10 @@ function handle_leaving_callbacks(mod_ref, arena, p_name, reason, executioner, i
       arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has been kicked", p_name) .. spect_str))
     end
 
-    -- DEPRECATED: remove in 6.0
-    if mod_ref.on_kick then
-      minetest.log("warning", "[ARENA_LIB] (" .. mod_ref.name .. ") on_kick is deprecated. Please use on_quit with reason `2` instead")
-      mod_ref.on_kick(arena, p_name, is_spectator)
-    end
-
   -- se ha abbandonato
   elseif reason == 3 then
-    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. S("@1 has quit the match", p_name) .. spect_str))
+    local mod_S = mod_ref.custom_messages.quit and minetest.get_translator(mod) or S
+    arena_lib.send_message_in_arena(arena, "both", minetest.colorize(msg_color, "<<< " .. mod_S(mod_ref.messages.quit, p_name) .. spect_str))
   end
 
   if mod_ref.on_quit then
@@ -1073,28 +1079,8 @@ function victory_particles(arena, players, winners)
   -- più vincitori
   elseif type(winners) == "table" then
 
-    -- v DEPRECATED, da rimuovere in 6.0 ----- v
-    if arena.teams_enabled and type(winners[1]) == "string" then
-      local teamID = 0
-      for pl_name, pl_stats in pairs(players) do
-        if pl_name == winners[1] then
-          teamID = pl_stats.teamID
-          break
-        end
-      end
-
-      for pl_name, pl_stats in pairs(players) do
-        if pl_stats.teamID == winners then
-          local winner = minetest.get_player_by_name(pl_name)
-
-          if winner then
-            show_victory_particles(winner:get_pos())
-          end
-        end
-      end
-    -- ^ -------------------------------------^
     -- singoli giocatori
-    elseif type(winners[1]) == "string" then
+    if type(winners[1]) == "string" then
       for _, pl_name in pairs(winners) do
         local winner = minetest.get_player_by_name(pl_name)
 
@@ -1169,14 +1155,6 @@ end
 ----------------------------------------------
 ------------------DEPRECATED------------------
 ----------------------------------------------
-
--- to remove in 6.0
-function deprecated_winning_team_celebration(mod, arena, winners)
-  minetest.log("warning", debug.traceback("[ARENA_LIB - " .. mod .. "] passing a single winning team as a table made of one of its players is deprecated, "
-    .. "please pass the (integer) team ID instead"))
-  local winner = arena.players[winners[1]].teamID
-  return S("Team @1 wins the game", arena.teams[winner].name)
-end
 
 -- to remove in 7.0
 function deprecated_start_arena(arena)

@@ -11,10 +11,9 @@ minetest.register_tool("arena_lib:editor_players", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
       if arena.teams_enabled then
         minetest.chat_send_player(user:get_player_name(), minetest.colorize("#ffdddd", "[arena_lib] " .. S("Values are PER TEAM!")))
@@ -38,7 +37,6 @@ minetest.register_tool("arena_lib:editor_spawners", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       user:get_meta():set_int("arena_lib_editor.spawner_ID", 1)
       user:get_meta():set_int("arena_lib_editor.team_ID", 1)
 
@@ -74,9 +72,7 @@ minetest.register_tool("arena_lib:editor_settings", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Arena settings"))
-
       arena_lib.give_settings_tools(user)
     end
 
@@ -93,7 +89,6 @@ minetest.register_tool("arena_lib:editor_info", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
@@ -129,7 +124,6 @@ minetest.register_tool("arena_lib:editor_enable", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 

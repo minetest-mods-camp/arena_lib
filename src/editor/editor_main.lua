@@ -36,7 +36,7 @@ function arena_lib.register_editor_section(mod, def)
 
         local mod = user:get_meta():get_string("arena_lib_editor.mod")
         local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
-        local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+        local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
         local item_list = def.give_items(itemstack, user, arena)
 
         if not item_list then return end
@@ -46,8 +46,8 @@ function arena_lib.register_editor_section(mod, def)
         local inv = user:get_inventory()
 
         inv:set_list("main", item_list)
-        inv:set_stack("main", 7, "arena_lib:editor_return")
-        inv:set_stack("main", 8, "arena_lib:editor_quit")
+        inv:set_stack("main", 8, "arena_lib:editor_return")
+        inv:set_stack("main", 9, "arena_lib:editor_quit")
       end
   })
 end
@@ -114,13 +114,18 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     player:override_day_night_ratio(arena.lighting.light)
   end
 
-  -- se c'è almeno uno spawner, teletrasporto
+  -- se c'è almeno un punto di rinascita, teletrasporto
   if next(arena.spawn_points) then
     player:set_pos(arena.spawn_points[next(arena.spawn_points)].pos)
     minetest.chat_send_player(sender, S("Wooosh!"))
   end
 
-  arena_lib.show_waypoints(sender, arena)
+  arena_lib.show_waypoints(sender, mod, arena)
+
+  -- eventuale codice aggiuntivo dell'entrata
+  if arena.entrance then
+    arena_lib.entrances[arena.entrance_type].enter_editor(sender, mod, arena)
+  end
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)

@@ -26,7 +26,8 @@ local arena_default = {
   thumbnail = "",
   entrance = nil,
   entrance_type = arena_lib.DEFAULT_ENTRANCE,
-  players = {},                       -- KEY: player name, VALUE: {kills, deaths, teamID, <player_properties>}
+  custom_return_point = nil,
+  players = {},                       -- KEY: player name, VALUE: {deaths, teamID, <player_properties>}
   spectators = {},                    -- KEY: player name, VALUE: true
   players_and_spectators = {},        -- KEY: pl/sp name,  VALUE: true
   past_present_players = {},          -- KEY: player_name, VALUE: true
@@ -60,31 +61,8 @@ local arena_default = {
 function arena_lib.register_minigame(mod, def)
   local highest_arena_ID = storage:get_int(mod .. ".HIGHEST_ARENA_ID")
 
-  --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
-  if def.hub_spawn_point then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") hub_spawn_point is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
-  end
-
-  if def.queue_waiting_time then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") queue_waiting_time is deprecated. The parameter must be edited in game through /minigamesettings " .. mod)
-  end
-
-  if def.time_mode and type(def.time_mode) == "number" then
-    minetest.log("warning", "[ARENA_LIB] (" .. mod .. ") time_mode with numeric values is deprecated. Use `none`, `incremental` or `decremental` instead")
-    if def.time_mode == nil or def.time_mode == 0 then
-      def.time_mode = "none"
-    elseif def.time_mode == 1 then
-      def.time_mode = "incremental"
-    elseif def.time_mode == 2 then
-      def.time_mode = "decremental"
-    else
-      def.time_mode = "none"
-    end
-  end
-  --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
-
   arena_lib.mods[mod] = {}
-  arena_lib.mods[mod].arenas = {}           -- KEY: (int) arenaID , VALUE: (table) arena properties
+  arena_lib.mods[mod].arenas = {}                                               -- KEY: (int) arenaID , VALUE: (table) arena properties
   arena_lib.mods[mod].highest_arena_ID = highest_arena_ID
 
   local mod_ref = arena_lib.mods[mod]
@@ -106,6 +84,17 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.chat_all_color = "#ffffff"
   mod_ref.chat_team_color = "#ddfdff"
   mod_ref.chat_spectate_color = "#dddddd"
+  mod_ref.messages = {
+    eliminated = "@1 has been eliminated",
+    eliminated_by = "@1 has been eliminated by @2",                             -- I won't include `kicked` and `kicked_by` as it's more of a maintenance function
+    last_standing = "You're the last player standing: you win!",
+    last_standing_team = "There are no other teams left, you win!",
+    quit = "@1 has quit the match",
+    --TODO: celebration, since I'd like to completely review its structure first with arena_lib 6.0
+    -- celebration = "",
+  }
+  mod_ref.custom_messages = {}     -- used internally to check whether a custom message has been registered (so to call the minigame translator rather than arena_lib's); KEY = msg name, VALUE = true
+  mod_ref.player_aspect = nil
   mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
@@ -168,6 +157,18 @@ function arena_lib.register_minigame(mod, def)
 
   if def.chat_spectate_color then
     mod_ref.chat_spectate_color = def.chat_spectate_color
+  end
+
+  if def.custom_messages then
+    for k, msg in pairs(def.custom_messages) do
+      mod_ref.messages[k] = msg
+      mod_ref.custom_messages[k] = true
+    end
+  end
+
+  if def.player_aspect then
+    local aspect = def.player_aspect
+    mod_ref.player_aspect = { visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox }
   end
 
   if def.fov then
@@ -256,21 +257,18 @@ end
 
 
 function arena_lib.register_entrance_type(mod, entrance, def)
-  arena_lib.entrances[entrance] = {
-    mod    = mod,
-    name   = def.name,
-    load   = def.on_load   or function() end,
-    add    = def.on_add    or function() end,
-    update = def.on_update or function() end,
-    remove = def.on_remove or function() end,
-    print  = def.debug_output
-  }
-
   local editor = def.editor_settings
-  local tools = editor.tools
 
-  table.insert(tools, 8, "arena_lib:editor_return")
-  table.insert(tools, 9, "arena_lib:editor_quit")
+  arena_lib.entrances[entrance] = {
+    mod           = mod,
+    name          = def.name,
+    load          = def.on_load   or function() end,
+    add           = def.on_add    or function() end,
+    update        = def.on_update or function() end,
+    remove        = def.on_remove or function() end,
+    enter_editor  = editor.on_enter or function() end,
+    print         = def.debug_output
+  }
 
   minetest.register_tool( mod ..":editor_entrance", {
 
@@ -281,8 +279,23 @@ function arena_lib.register_entrance_type(mod, entrance, def)
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), editor.description)
-      user:get_inventory():set_list("main", editor.tools)
+      local p_name = user:get_player_name()
+      local mod = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+      local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+      local items = editor.items and editor.items(p_name, mod, arena) or editor.tools
+
+      --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
+      if editor.tools then
+        minetest.log("warning", "[ARENA_LIB] editor_settings.tools is deprecated. Please use the editor_settings.items function instead, which shall return a table")
+      end
+      --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
+
+      table.insert(items, 8, "arena_lib:editor_return")
+      table.insert(items, 9, "arena_lib:editor_quit")
+
+      arena_lib.HUD_send_msg("hotbar", p_name, editor.description)
+      user:get_inventory():set_list("main", items)
     end
   })
 end
@@ -326,6 +339,15 @@ function arena_lib.change_mod_settings(sender, mod, setting, new_value)
 
   mod_settings[setting] = new_value
   storage:set_string(mod .. ".SETTINGS", minetest.serialize(mod_settings))
+
+  -- in caso sia stato cambiato il punto di ritorno
+  if setting == "return_point" then
+    for _, arena in pairs(arena_lib.mods[mod].arenas) do
+      if arena_lib.is_arena_in_edit_mode(arena.name) and not arena.custom_return_point then
+        arena_lib.update_waypoints(arena_lib.get_player_in_edit_mode(arena.name), mod, arena)
+      end
+    end
+  end
 
   if sender then minetest.chat_send_player(sender, S("Parameter @1 successfully overwritten", setting))
   else minetest.log("action", "[ARENA_LIB] Parameter " .. setting .. " successfully overwritten") end
@@ -744,10 +766,10 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   -- controllo parametri
   if param then
-    -- se overwrite, sovrascrivo
+    -- se `overwrite`, sovrascrivo
     if param == "overwrite" then
 
-      -- se lo spawner da sovrascrivere non esiste, annullo
+      -- se il punto rinascita da sovrascrivere non esiste, annullo
       if arena.spawn_points[ID].pos == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
         return end
@@ -755,7 +777,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       arena.spawn_points[ID].pos = pos
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
 
-    -- se delete, cancello
+    -- se `delete`, cancello
     elseif param == "delete" then
 
       if arena.spawn_points[ID] == nil then
@@ -763,15 +785,10 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         return end
 
       arena.spawn_points[ID] = nil
-
-      -- se i waypoint sono mostrati, li aggiorno
-      if arena_lib.are_waypoints_shown(sender) then
-        arena_lib.show_waypoints(sender, arena)
-      end
-
+      arena_lib.update_waypoints(sender, mod, arena)
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
 
-    -- se deleteall, li cancello tutti
+    -- se `deleteall`, li cancello tutti
     elseif param == "deleteall" then
 
       if team then
@@ -786,10 +803,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
         minetest.chat_send_player(sender, S("All the spawn points have been removed"))
       end
 
-      -- se i waypoint sono mostrati, li aggiorno
-      if arena_lib.are_waypoints_shown(sender) then
-        arena_lib.show_waypoints(sender, arena)
-      end
+      arena_lib.update_waypoints(sender, mod, arena)
 
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
@@ -799,9 +813,9 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   return
   end
 
-  -- sennò sto creando un nuovo spawner
+  -- sennò sto creando un nuovo punto rinascita
 
-  -- se c'è già uno spawner in quel punto, annullo
+  -- se c'è già un punto rinascita a quelle coordinate, annullo
   for id, spawn in pairs(arena.spawn_points) do
     if vector.equals(pos, spawn.pos) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
@@ -810,7 +824,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti spawn totali)
 
-  -- se provo a impostare uno spawn point di troppo, annullo
+  -- se provo a impostare un punto rinascita di troppo, annullo
   if spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
   return end
@@ -818,7 +832,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   local next_available_spawnID = 1
 
   if team then
-    -- ottengo l'ID del team se non mi è stato passato come parametro
+    -- ottengo l'ID della squadra se non mi è stato passato come parametro
     if type(team_ID) ~= "number" then
       for i = 1, #arena.teams do
         if arena.teams[i].name == team then
@@ -827,16 +841,16 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       end
     end
 
-    -- prendo il primo spawner di quel team
+    -- prendo il primo punto rinascita di quella squadra
     next_available_spawnID = 1 + (arena.max_players * (team_ID -1))
 
     -- se già esiste...
     if arena.spawn_points[next_available_spawnID] then
 
-      -- ...itero tra gli spawner seguenti finché non ne trovo uno vuoto
+      -- ...itero tra i punti seguenti finché non ne trovo uno vuoto
       while next(arena.spawn_points, next_available_spawnID) do
-        -- ma se il next mi trova uno spawner con distacco > 1, vuol dire che sono al capolinea
-        -- perché quello trovato appartiene o a un altro team o è un buco nello stesso team (ottenuto dal cancellare). Rompo l'iterare
+        -- ma se il next mi trova un punto rinascita con distacco > 1, vuol dire che sono al capolinea
+        -- perché quello trovato appartiene o a un'altra squadra o è un buco nella stessa squadra (ottenuto dal cancellare). Rompo l'iterare
         if next(arena.spawn_points, next_available_spawnID) ~= next_available_spawnID +1 then
           break
         end
@@ -848,20 +862,16 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     end
 
   else
-    -- ottengo l'ID del prossimo spawner disponibile
+    -- ottengo l'ID del prossimo punto rinascita disponibile
     for k, v in ipairs(arena.spawn_points) do
       next_available_spawnID = k +1
     end
   end
 
-  -- imposto lo spawner
+  -- imposto il punto rinascita
   arena.spawn_points[next_available_spawnID] = {pos = pos, teamID = team_ID}
 
-  -- se i waypoint sono mostrati, li aggiorno
-  if arena_lib.are_waypoints_shown(sender) then
-    arena_lib.show_waypoints(sender, arena)
-  end
-
+  arena_lib.update_waypoints(sender, mod, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
 
   update_storage(false, mod, id, arena)
@@ -936,6 +946,33 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
   end
 
   update_storage(false, mod, id, arena)
+end
+
+
+
+function arena_lib.set_custom_return_point(sender, mod, arena_name, pos, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not arena_lib.is_player_in_edit_mode(sender) then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if pos ~= nil and not vector.check(pos) then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  if arena.custom_return_point == pos then
+    minetest.chat_send_player(sender, minetest.colorize("#cfc6b8", S("[!] Nothing to do here!")))
+    return end
+
+  arena.custom_return_point = pos
+  arena_lib.update_waypoints(sender, mod, arena)
+
+  local msg = arena.custom_return_point and "Custom return point of arena @1 succesfully set"
+                                         or "Custom return point of arena @1 succesfully removed"
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S(msg, arena_name))
 end
 
 
@@ -1223,38 +1260,37 @@ function load_settings(mod)
   -- primo avvio
   if storage:get_string(mod .. ".SETTINGS") == "" then
     local default_settings = {
-      hub_spawn_point = { x = 0, y = 20, z = 0},
+      return_point = { x = 0, y = 20, z = 0},
       queue_waiting_time = 10
     }
     arena_lib.mods[mod].settings = default_settings
     storage:set_string(mod .. ".SETTINGS", minetest.serialize(default_settings))
   else
     arena_lib.mods[mod].settings = minetest.deserialize(storage:get_string(mod .. ".SETTINGS"))
+
+    --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
+    if arena_lib.mods[mod].settings.hub_spawn_point then
+      arena_lib.mods[mod].settings.return_point = table.copy(arena_lib.mods[mod].settings.hub_spawn_point)
+      arena_lib.mods[mod].settings.hub_spawn_point = nil
+      storage:set_string(mod .. ".SETTINGS", minetest.serialize(arena_lib.mods[mod].settings))
+    end
+    --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
   end
 end
 
 
 
 function init_storage(mod, mod_ref)
-
   arena_lib.mods[mod] = mod_ref
 
   -- aggiungo le arene
   for i = 1, arena_lib.mods[mod].highest_arena_ID do
-
     local arena_str = storage:get_string(mod .. "." .. i)
 
     -- se c'è una stringa con quell'ID, aggiungo l'arena e ne aggiorno l'eventuale cartello
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
       local to_update = false
-
-      --v------------------ LEGACY UPDATE, to remove in 6.0 -------------------v
-      if not arena.author then
-        arena.author = "???"
-        to_update = true
-      end
-      --^------------------ LEGACY UPDATE, to remove in 6.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
       if not arena.spectators then
@@ -1546,7 +1582,8 @@ function deprecated_audio_exists(mod, track, p_name)
   local deprecated_file = io.open(minetest.get_modpath(mod) .. "/sounds/" .. track .. ".ogg", "r")
   if deprecated_file then
     deprecated_file:close()
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: put it into the world folder instead!"))
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", "[arena_lib] loading sounds from the minigame folder is deprecated and it'll be removed in future versions: "
+      .. "put it into the world folder instead!"))
     return true
   end
 end

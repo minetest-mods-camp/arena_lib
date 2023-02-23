@@ -21,7 +21,7 @@ minetest.register_tool("arena_lib:customise_bgm", {
 
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
 
       minetest.show_formspec(user:get_player_name(), "arena_lib:bgm", get_bgm_formspec(arena))
     end
@@ -184,7 +184,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     local mod         = player:get_meta():get_string("arena_lib_editor.mod")
     local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
-    local id, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+    local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
     local title       = fields.title ~= "" and minetest.formspec_escape(fields.title) or nil
     local author      = fields.author ~= "" and minetest.formspec_escape(fields.author) or nil
 

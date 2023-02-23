@@ -1,4 +1,4 @@
-# version 5.5.0-dev
+# version 5.5.0
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -52,6 +52,11 @@ Minigame settings=
 # api/core.lua
 team=
 spectator=
+@1 has been eliminated by @2=
+@1 has been eliminated=
+You're the last player standing: you win!=
+There are no other teams left, you win!=
+@1 has quit the match=
 [!] Parameters don't seem right!=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
@@ -78,8 +83,10 @@ All the spawn points have been removed=
 Spawn point #@1 successfully set=
 [!] There is no entrance type with this name!=
 Entrance type of arena @1 successfully changed (@2)=
-[!] There is no entrance to remove assigned to @1!=
+[!] There is no entrance assigned to @1!=
 Entrance of arena @1 successfully removed=
+Custom return point of arena @1 succesfully removed=
+Custom return point of arena @1 succesfully set=
 [!] There is already an entrance for this arena!=
 Entrance of arena @1 successfully set=
 Lighting of arena @1 successfully overwritten=
@@ -116,16 +123,10 @@ Team @1 wins the game=
 @1 win the game=
 Teams @1 win the game=
 Players and spectators can now interact with each other=
-@1 has been eliminated by @2=
-@1 has been eliminated=
-There are no other teams left, you win!=
-You're the last player standing: you win!=
-You win the game due to not enough players=
 [!] This arena doesn't exist!=
 The arena has been forcibly terminated by @1=
 @1 has been kicked by @2=
 @1 has been kicked=
-@1 has quit the match=
 [!] on_timeout callback must be declared to properly use a decreasing timer!=
 
 # api/in_queue.lua
@@ -175,7 +176,6 @@ Apply=
 # editor/tools_lighting.lua
 Lighting=
 Global light=
-Shadows=
 
 # editor/tools_players.lua
 Players required=
@@ -188,6 +188,7 @@ Teams: off (click to toggle on)=
 # editor/tools_settings.lua
 Arena name, author and thumbnail=
 Arena properties=
+Custom return point (LMB sets, RMB removes)=
 Delete arena=
 Rename arena=
 Set author=
@@ -247,7 +248,8 @@ Delete all spawners=
 Delete all spawners of a team=
 
 # hud/hud_waypoints.lua
-[!] Waypoints are not enabled!=
+Return point (custom)=
+Return point=
 
 # signs/signs.lua
 Sign=
@@ -271,6 +273,8 @@ Spectate (there must be a game in progress)=
 Add sign=
 Remove sign=
 Are you sure you want to delete the sign from @1?=
+Teleport onto the sign=
+Return where you were=
 
 # spectate/spectate_main.lua
 Currently spectating: @1=
@@ -314,6 +318,7 @@ Past and present players inside: =
 Enabled: =
 Status: =
 Entrance: =
+Custom return point: =
 Spawn points: =
 Custom sky: =
 Custom lighting: =

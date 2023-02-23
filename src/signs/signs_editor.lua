@@ -1,5 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
+local pos_before_tp = {}            -- KEY: p_name, VALUE: p_pos
+
 
 
 minetest.register_tool("arena_lib:sign_add", {
@@ -45,6 +47,81 @@ minetest.register_tool("arena_lib:sign_remove", {
       minetest.show_formspec(p_name, "arena_lib:sign_delete", get_sign_formspec(p_name, arena_name))
     end
 })
+
+
+
+minetest.register_tool("arena_lib:sign_teleport_in", {
+
+    description = S("Teleport onto the sign"),
+    inventory_image = "arenalib_tool_sign_tp_in.png",
+    groups = {not_in_creative_inventory = 1},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+      local p_name      = user:get_player_name()
+      local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+      local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
+
+      if not arena.entrance then
+        minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] There is no entrance assigned to @1!", arena_name)))
+        return end
+
+      pos_before_tp[p_name] = user:get_pos()
+      user:set_pos(arena.entrance)
+
+      user:set_wielded_item("arena_lib:sign_teleport_out")
+    end
+})
+
+
+
+minetest.register_tool("arena_lib:sign_teleport_out", {
+
+    description = S("Return where you were"),
+    inventory_image = "arenalib_tool_sign_tp_out.png",
+    groups = {not_in_creative_inventory = 1},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+      local p_name      = user:get_player_name()
+      local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+
+      user:set_pos(pos_before_tp[p_name])
+      pos_before_tp[p_name] = nil
+
+      user:set_wielded_item("arena_lib:sign_teleport_in")
+    end
+})
+
+
+
+function arena_lib.give_signs_tools(p_name)
+  local items = {
+    "arena_lib:sign_add",
+    "arena_lib:sign_remove",
+    "",
+    "arena_lib:sign",
+    ""
+  }
+
+  if pos_before_tp[p_name] then
+    table.insert(items, 6, "arena_lib:sign_teleport_out")
+  else
+    table.insert(items, 6, "arena_lib:sign_teleport_in")
+  end
+
+  return items
+end
+
+
+
+function arena_lib.editor_reset_sign_values(p_name)
+  pos_before_tp[p_name] = nil
+end
 
 
 

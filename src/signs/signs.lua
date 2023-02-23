@@ -32,12 +32,8 @@ arena_lib.register_entrance_type("arena_lib", "sign", {
     name = S("Signs"),
     icon = "arenalib_editor_signs.png",
     description = S("One sign per arena"),
-    tools = {
-      "arena_lib:sign_add",
-      "arena_lib:sign_remove",
-      "",
-      "arena_lib:sign"
-    }
+    items = function(p_name, mod, arena) return arena_lib.give_signs_tools(p_name) end,
+    on_enter = function(p_name, mod, arena) arena_lib.editor_reset_sign_values(p_name) end
   },
 
   on_add = function(sender, mod, arena, pos) return add_sign(sender, mod, arena, pos) end,
@@ -73,7 +69,7 @@ signs_lib.register_sign("arena_lib:sign", {
     minetest.get_meta(pos):set_int("widefont", 1)
     end,
 
-    -- cartello indistruttibile se c'è un'arena assegnata
+  -- cartello indistruttibile se c'è un'arena assegnata
   on_dig = function(pos, node, digger)
     if minetest.get_meta(pos):get_int("arenaID") ~= 0 then return end
 
@@ -120,7 +116,7 @@ signs_lib.register_sign("arena_lib:sign", {
       return end
 
     -- se si è già in coda nella stessa arena, esci, sennò prova ad aggiungere il giocatore
-    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_queueID_by_player(p_name) == arenaID then
+    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       arena_lib.remove_player_from_queue(p_name)
     else
       if arena.in_game then
@@ -150,7 +146,7 @@ function add_sign(sender, mod, arena, pos)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] That's not an arena_lib sign!")))
     return end
 
-  local id = arena_lib.get_arena_by_name(mod, arena.name) -- TODO 6.0 sostituire con arena.ID
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- salvo il nome della mod e l'ID come metadato nel cartello
   minetest.get_meta(pos):set_string("mod", mod)
@@ -165,7 +161,7 @@ function remove_sign(mod, arena)
   minetest.load_area(arena.entrance)
 
   local sign_meta = minetest.get_meta(arena.entrance)
-  local id = arena_lib.get_arena_by_name(mod, arena.name) -- TODO 6.0 sostituire con arena.ID
+  local id = arena_lib.get_arena_by_name(mod, arena.name)
 
   -- se il cartello non è stato spostato lo rimuovo, sennò evito di far sparire il blocco che c'è ora
   -- (può capitare se qualcuno sposta un'area con WorldEdit). Le altre condizioni assicurano poi che si stia
@@ -292,7 +288,7 @@ function get_infobox_formspec(mod, arenaID, player)
     spec_tip = "The arena is not enabled"
   else
     -- tasto "gioca"
-    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_queueID_by_player(p_name) == arenaID then
+    if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       play_btn = "arenalib_infobox_play_leave.png"
       play_tip = "Leave the queue" .. LMB_TIP
     elseif arena.players_amount == arena.max_players and (arena.in_queue or (arena.in_game and mod_ref.join_while_in_progress)) then
@@ -379,6 +375,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   if formname ~= "arena_lib:infobox" then return end
 
   local p_name = player:get_player_name()
+
+  -- TEMP: il secondo controllo è stato messo a causa di crash sporadici che non
+  -- riusciamo a capire. Considerando che questa è una pezza in attesa di
+  -- https://github.com/minetest/minetest/issues/13142  e che potrebbe essere dovuto
+  -- a un problema di Minetest, tanto vale non dannarsi e aspettare che venga
+  -- implementato come si deve lato motore di gioco
+  if not displaying_infobox[p_name] then return end
+
   local mod = displaying_infobox[p_name].mod
   local arenaID = displaying_infobox[p_name].arena_id
   local arena = arena_lib.mods[mod].arenas[arenaID]
@@ -405,5 +409,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   elseif fields.spectate then
     arena_lib.join_arena(mod, p_name, arenaID, true)
+  end
+end)
+
+
+
+-- TEMP: da rimuovere con https://github.com/minetest/minetest/issues/13142
+minetest.register_on_leaveplayer(function(player)
+  if displaying_infobox[player:get_player_name()] then
+    displaying_infobox[player:get_player_name()] = nil
   end
 end)

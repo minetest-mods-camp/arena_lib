@@ -63,7 +63,7 @@ function arena_lib.join_queue(mod, arena, p_name)
   -- se il giocatore è già in coda
   if arena_lib.is_player_in_queue(p_name) then
     local queued_mod = arena_lib.get_mod_by_player(p_name)
-    local queued_ID = arena_lib.get_queueID_by_player(p_name)
+    local queued_ID = arena_lib.get_arenaID_by_player(p_name)
 
     -- se era in coda per la stessa arena, interrompo qua, sennò procedo per aggiungerlo nella nuova
     if queued_mod == mod and queued_ID == arenaID then
@@ -267,14 +267,6 @@ end
 
 
 
-function arena_lib.get_queueID_by_player(p_name)
-  if players_in_queue[p_name] then
-    return players_in_queue[p_name].arenaID
-  end
-end
-
-
-
 -- internal use only, don't use it. It makes the API smoother for modders
 function arena_lib.get_mod_by_queuing_player(p_name)
   return players_in_queue[p_name].minigame
@@ -289,6 +281,16 @@ function arena_lib.get_arena_by_queuing_player(p_name)
 
   return arena_lib.mods[mod].arenas[arenaID]
 end
+
+
+
+function arena_lib.get_arenaID_by_queuing_player(p_name)
+  if players_in_queue[p_name] then
+    return players_in_queue[p_name].arenaID
+  end
+end
+
+
 
 
 
@@ -369,4 +371,18 @@ end
 function queue_format(arena, msg)
   local arena_max_players = arena.max_players * #arena.teams
   return arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players  .. " | " .. msg
+end
+
+
+
+
+
+----------------------------------------------
+------------------DEPRECATED------------------
+----------------------------------------------
+
+-- to remove in 7.0
+function arena_lib.get_queueID_by_player(p_name)
+  minetest.log("warning", "[ARENA_LIB] get_queueID_by_player is deprecated. Please use get_arenaID_by_player instead")
+  return arena_lib.get_arenaID_by_player(p_name)
 end

@@ -24,7 +24,7 @@ function ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, skip_enabled)
 end
 
 
--- TODO: 6.0, remove arenaID, use arena.ID instead
+
 function ARENA_LIB_JOIN_CHECKS_PASSED(arena, arenaID, p_name)
   -- se si è nell'editor
   if arena_lib.is_player_in_edit_mode(p_name) then
@@ -89,7 +89,7 @@ function ARENA_LIB_JOIN_CHECKS_PASSED(arena, arenaID, p_name)
     return end
 
   -- se l'arena è piena
-  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_queueID_by_player(p_name) ~= arenaID then
+  if arena.players_amount == arena.max_players * #arena.teams and arena_lib.get_arenaID_by_player(p_name) ~= arenaID then
     minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is already full!")))
     return end
 
