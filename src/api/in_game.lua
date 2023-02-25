@@ -5,6 +5,7 @@ local function operations_before_entering_arena() end
 local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
 local function remove_attachments() end
+local function restore_attachments() end
 local function eliminate_player() end
 local function handle_leaving_callbacks() end
 local function victory_particles() end
