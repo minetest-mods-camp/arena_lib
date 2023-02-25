@@ -747,6 +747,12 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     end
   end
 
+  -- sgancio/mantengo eventuali entità figlie
+  if not mod_ref.keep_attachments and next(player:get_children()) then
+    players_temp_storage[p_name].attachments = {}
+    remove_attachments(p_name, player)
+  end
+
   if not as_spectator then
     operations_before_playing_arena(mod_ref, arena, p_name)
   end
@@ -768,12 +774,6 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   end
 
   local player = minetest.get_player_by_name(p_name)
-
-  -- sgancio/mantengo eventuali entità figlie
-  if not mod_ref.keep_attachments and next(player:get_children()) then
-    players_temp_storage[p_name].attachments = {}
-    remove_attachments(p_name, player)
-  end
 
   -- applico eventuale fov
   if mod_ref.fov then
@@ -914,6 +914,14 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     player:set_armor_groups(armor_groups)
   end
 
+  -- ripristino eventuali entità figlie
+  if not mod_ref.keep_attachments then
+    local attachments = players_temp_storage[p_name].attachments or {}
+    for i, data in pairs(attachments) do
+      restore_attachments(p_name, player, i)
+    end
+  end
+
   -- ripristino gli HP
   player:set_hp(minetest.PLAYER_MAX_HP_DEFAULT)
 
@@ -958,14 +966,6 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
       player:set_properties({
         visual = aspect.visual, mesh = aspect.mesh, textures = aspect.textures, visual_size = aspect.visual_size, collisionbox = aspect.collisionbox, selectionbox = aspect.selectionbox
       })
-    end
-
-    -- ripristino eventuali entità figlie
-    if not mod_ref.keep_attachments then
-      local attachments = players_temp_storage[p_name].attachments or {}
-      for i, data in pairs(attachments) do
-        restore_attachments(p_name, player, i)
-      end
     end
 
     -- ripristino eventuale fov
