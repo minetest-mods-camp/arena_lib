@@ -4,6 +4,7 @@ local function assign_team_spawner() end
 local function operations_before_entering_arena() end
 local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
+local function remove_attachments() end
 local function eliminate_player() end
 local function handle_leaving_callbacks() end
 local function victory_particles() end
@@ -13,7 +14,8 @@ local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle,
-                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs)}
+                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs).
+                                      --                           (table) attachments}
 
 
 
@@ -112,7 +114,6 @@ end
 
 
 function arena_lib.start_arena(mod, arena)
-
   if type(mod) == "table" then
     mod = deprecated_start_arena(arena)
   end
@@ -176,7 +177,7 @@ function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] The arena is not enabled!")))
       return end
 
-    -- se si è attaccati a qualcosa
+    -- se si è attaccatɜ a qualcosa
     if minetest.get_player_by_name(p_name):get_attach() then
       minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must detach yourself from the entity you're attached to before entering!")))
       return end
@@ -738,6 +739,13 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     players_temp_storage[p_name].hotbar_selected_image = player:hud_get_hotbar_selected_image()
   end
 
+  -- sgancio eventuali giocatorɜ figlɜ
+  for _, child in pairs(player:get_children()) do
+    if child:is_player() then
+      child:set_detach()
+    end
+  end
+
   if not as_spectator then
     operations_before_playing_arena(mod_ref, arena, p_name)
   end
@@ -759,6 +767,12 @@ function operations_before_playing_arena(mod_ref, arena, p_name)
   end
 
   local player = minetest.get_player_by_name(p_name)
+
+  -- sgancio/mantengo eventuali entità figlie
+  if not mod_ref.keep_attachments and next(player:get_children()) then
+    players_temp_storage[p_name].attachments = {}
+    remove_attachments(p_name, player)
+  end
 
   -- applico eventuale fov
   if mod_ref.fov then
@@ -945,6 +959,14 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
       })
     end
 
+    -- ripristino eventuali entità figlie
+    if not mod_ref.keep_attachments then
+      local attachments = players_temp_storage[p_name].attachments or {}
+      for i, data in pairs(attachments) do
+        restore_attachments(p_name, player, i)
+      end
+    end
+
     -- ripristino eventuale fov
     if mod_ref.fov then
       player:set_fov(players_temp_storage[p_name].fov)
@@ -988,6 +1010,68 @@ end
 
 
 
+function remove_attachments(p_name, entity, parent_idx)
+  for i, child in pairs(entity:get_children()) do
+    -- `get_luaentity` ritorna solo i parametri extra, che salvo in `params`
+    -- per mantenerli invariati a ricreare l'entità
+    local luaentity = child:get_luaentity()
+    local params = {}
+
+    for param, v in pairs(luaentity) do
+      if param ~= "object" then
+        params[param] = v
+      end
+    end
+
+    -- uso `children_amount` per capire quante volte ciclare in `restore_attachments`
+    -- la generazione successiva, in quanto questa verrà salvata subito dopo
+    -- l'ID dell'entità genitrice (p -> e1 -> ee1 -> ee2 -> e2 -> e3)
+    local children_amount = 0
+    for j, grandchild in pairs(child:get_children()) do
+      if not grandchild:is_player() then
+        children_amount = children_amount + 1
+      end
+    end
+
+    local _, bone, position, rotation, forced_visible = child:get_attach()
+    local attachment_info = {
+      entity = {name = luaentity.name, children_amount = children_amount, params = params},
+      properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
+    }
+
+    table.insert(players_temp_storage[p_name].attachments, attachment_info)
+
+    remove_attachments(p_name, child, i)
+    child:remove()
+  end
+end
+
+
+
+function restore_attachments(p_name, parent, i)
+  local data = players_temp_storage[p_name].attachments[i]
+  local child = minetest.add_entity(parent:get_pos(), data.entity.name)
+  local entity = child:get_luaentity()
+  local properties = data.properties
+
+  for k, v in pairs(data.entity.params) do
+    entity.k = v
+  end
+
+  child:set_attach(parent, properties.bone, properties.position, properties.rotation, properties.forced_visible)
+
+  for j = 1, data.entity.children_amount do
+    if players_temp_storage[p_name].attachments[j+i] then
+      restore_attachments(p_name, child, j + i)
+    end
+  end
+
+  -- evita di iterare le entità dalla 2° generazione in poi nel for di keep_attachments
+  players_temp_storage[p_name].attachments[i] = nil
+end
+
+
+
 function eliminate_player(mod, arena, p_name, executioner)
   local mod_ref = arena_lib.mods[mod]
 
@@ -1011,7 +1095,6 @@ end
 
 
 function handle_leaving_callbacks(mod, arena, p_name, reason, executioner, is_spectator)
-
   local msg_color = reason < 3 and "#f16a54" or "#d69298"
   local spect_str = ""
 
@@ -1126,7 +1209,6 @@ end
 
 
 function time_start(mod_ref, arena)
-
   if arena.on_celebration or not arena.in_game then return end
 
   if mod_ref.time_mode == "incremental" then

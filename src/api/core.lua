@@ -102,6 +102,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.spectate_mode = true
   mod_ref.disable_inventory = false
   mod_ref.keep_inventory = false
+  mod_ref.keep_attachments = false
   mod_ref.show_nametags = false
   mod_ref.show_minimap = false
   mod_ref.time_mode = "none"
@@ -200,6 +201,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.keep_inventory == true then
     mod_ref.keep_inventory = true
+  end
+
+  if def.keep_attachments == true then
+    mod_ref.keep_attachments = true
   end
 
   if def.show_nametags == true then

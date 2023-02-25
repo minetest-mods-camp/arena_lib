@@ -90,8 +90,9 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
-* `keep_inventory`: (bool) whether to keep players inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
-* `show_nametags`: (bool) whether to show the players nametags while in game. Default is `false`
+* `keep_inventory`: (bool) whether to keep players' inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
+* `keep_attachments`: (bool) whether to keep the entities attached to the player. If `false`, entities are removed when entering, and re-created (alongside their properties) when leaving. No matter the option, players are always detached. Default is `false`
+* `show_nametags`: (bool) whether to show players' nametags while in game. Default is `false`
 * `show_minimap`: (bool) whether to allow players to use the builtin minimap function. Default is `false`
 * `time_mode`: (string) whether arenas will keep track of the time or not
   * `"none"`: no time tracking at all (default)
