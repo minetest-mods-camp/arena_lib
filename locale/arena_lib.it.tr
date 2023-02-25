@@ -1,4 +1,4 @@
-# version 5.5.0
+# version 6.0.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -57,6 +57,11 @@ spectator=spettatore
 You're the last player standing: you win!=Sei l'ultimə giocatorə rimastə in partita: hai vinto!
 There are no other teams left, you win!=Non ci sono altre squadre rimaste, hai vinto!
 @1 has quit the match=@1 ha abbandonatə la partita
+@1 wins the game=@1 ha vinto la partita
+Team @1 wins the game=La squadra @1 ha vinto la partita
+@1 win the game=@1 hanno vinto la partita
+Teams @1 win the game=Le squadre @1 hanno vinto la partita
+There are no winners=Non ci sono vincitorɜ
 [!] Parameters don't seem right!=[!] I parametri hanno qualcosa che non va!
 [!] Property type doesn't match, aborting!=[!] Il tipo della proprietà non corrisponde, annullo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
@@ -118,10 +123,6 @@ Arena @1 successfully disabled=Arena @1 disabilitata con successo
 [!] There is nothing to spectate!=[!] Non c'è niente a cui assistere!
 [!] The arena is loading, try again in a few seconds!=[!] L'arena è in caricamento, riprova tra qualche secondo!
 [!] This minigame doesn't allow to join while in progress!=[!] Questo minigioco non permette di entrare a partita iniziata!
-@1 wins the game=@1 ha vinto la partita
-Team @1 wins the game=La squadra @1 ha vinto la partita
-@1 win the game=@1 hanno vinto la partita
-Teams @1 win the game=Le squadre @1 hanno vinto la partita
 Players and spectators can now interact with each other=Giocatorɜ e spettatorɜ possono ora interagire tra di loro
 [!] This arena doesn't exist!=[!] Quest'arena non esiste!
 The arena has been forcibly terminated by @1=La conclusione della partita è stata forzata da @1

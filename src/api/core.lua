@@ -90,8 +90,11 @@ function arena_lib.register_minigame(mod, def)
     last_standing = "You're the last player standing: you win!",
     last_standing_team = "There are no other teams left, you win!",
     quit = "@1 has quit the match",
-    --TODO: celebration, since I'd like to completely review its structure first with arena_lib 6.0
-    -- celebration = "",
+    celebration_one_player = "@1 wins the game",
+    celebration_one_team = "Team @1 wins the game",
+    celebration_more_players = "@1 win the game",
+    celebration_more_teams = "Teams @1 win the game",
+    celebration_nobody = "There are no winners"
   }
   mod_ref.custom_messages = {}     -- used internally to check whether a custom message has been registered (so to call the minigame translator rather than arena_lib's); KEY = msg name, VALUE = true
   mod_ref.player_aspect = nil

@@ -72,7 +72,12 @@ The second field, on the contrary, is a table of optional parameters: they defin
       eliminated_by = "@1 has been eliminated by @2",
       last_standing = "You're the last player standing: you win!",
       last_standing_team = "There are no other teams left, you win!",
-      quit = "@1 has quit the match"
+      quit = "@1 has quit the match",
+      celebration_one_player = "@1 wins the game",
+      celebration_one_team = "Team @1 wins the game",
+      celebration_more_players = "@1 win the game",
+      celebration_more_teams = "Teams @1 win the game",
+      celebration_nobody = "There are no winners"
     }
     ```
   * If the overriden message contains translation variables (e.g. `@1`), these must be present in the exact same amount in the custom message or it'll crash
@@ -280,7 +285,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
 * `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.start_arena(mod, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
-* `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing arena, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team) or a table of strings/integers (more players/teams)
+* `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing arena, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team), a table of strings/integers (more players/teams) or `nil` (no winners)
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing arena. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
 * `arena_lib.join_queue(mod, arena, p_name)`: adds `p_name` to the queue of `arena`. Returns `true` if successful. If the player is already in a different queue, they'll be removed from the one they're currently in and automatically added to the new one
 * `arena_lib.remove_player_from_queue(p_name)`: removes the player from the queue is in, if any. Returns `true` if successful

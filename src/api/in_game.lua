@@ -293,35 +293,41 @@ function arena_lib.load_celebration(mod, arena, winners)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 
+  local mod_ref = arena_lib.mods[mod]
   local winning_message = ""
 
   -- determino il messaggio da inviare
   -- se è stringa, è giocatore singolo
   if type(winners) == "string" then
-      winning_message = S("@1 wins the game", winners)
+      local mod_S = mod_ref.custom_messages.celebration_one_player and minetest.get_translator(mod) or S
+      winning_message = mod_S(mod_ref.messages.celebration_one_player, winners)
 
   -- se è un ID è una squadra
   elseif type(winners) == "number" then
-    winning_message = S("Team @1 wins the game", arena.teams[winners].name)
+    local mod_S = mod_ref.custom_messages.celebration_one_team and minetest.get_translator(mod) or S
+    winning_message = mod_S(mod_ref.messages.celebration_one_team, arena.teams[winners].name)
 
   -- se è una tabella, può essere o più giocatori singoli, o più squadre
   elseif type(winners) == "table" then
-
     if type(winners[1]) == "string" then
       for _, pl_name in pairs(winners) do
         winning_message = winning_message .. pl_name .. ", "
       end
-      winning_message = S("@1 win the game", winning_message:sub(1, -3))
+      local mod_S = mod_ref.custom_messages.celebration_more_players and minetest.get_translator(mod) or S
+      winning_message = mod_S(mod_ref.messages.celebration_more_players, winning_message:sub(1, -3))
 
     else
       for _, team_ID in pairs(winners) do
         winning_message = winning_message .. arena.teams[team_ID].name .. ", "
       end
-    winning_message = S("Teams @1 win the game", winning_message:sub(1, -3))
+      local mod_S = mod_ref.custom_messages.celebration_more_teams and minetest.get_translator(mod) or S
+      winning_message = mod_S(mod_ref.messages.celebration_more_teams, winning_message:sub(1, -3))
     end
-  end
 
-  local mod_ref = arena_lib.mods[mod]
+  elseif winners == nil then
+    local mod_S = mod_ref.custom_messages.celebration_nobody and minetest.get_translator(mod) or S
+    winning_message = mod_S(mod_ref.messages.celebration_nobody)
+  end
 
   arena_lib.HUD_send_msg_all("title", arena, winning_message, mod_ref.celebration_time)
   arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#cfc6b8", "> " .. S("Players and spectators can now interact with each other")))
