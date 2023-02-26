@@ -1045,9 +1045,10 @@ function remove_attachments(p_name, entity, parent_idx)
         end
       end
 
+      local staticdata = luaentity.get_staticdata and luaentity:get_staticdata() or nil
       local _, bone, position, rotation, forced_visible = child:get_attach()
       local attachment_info = {
-        entity = {name = luaentity.name, staticdata = luaentity:get_staticdata(), children_amount = children_amount, params = params},
+        entity = {name = luaentity.name, staticdata = staticdata, children_amount = children_amount, params = params},
         properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
       }
 
