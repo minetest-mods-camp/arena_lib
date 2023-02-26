@@ -1047,7 +1047,7 @@ function remove_attachments(p_name, entity, parent_idx)
 
       local _, bone, position, rotation, forced_visible = child:get_attach()
       local attachment_info = {
-        entity = {name = luaentity.name, children_amount = children_amount, params = params},
+        entity = {name = luaentity.name, staticdata = luaentity:get_staticdata(), children_amount = children_amount, params = params},
         properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
       }
 
@@ -1063,19 +1063,22 @@ end
 
 function restore_attachments(p_name, parent, i)
   local data = players_temp_storage[p_name].attachments[i]
-  local child = minetest.add_entity(parent:get_pos(), data.entity.name)
-  local entity = child:get_luaentity()
-  local properties = data.properties
+  local child = minetest.add_entity(parent:get_pos(), data.entity.name, data.entity.staticdata)
 
-  for k, v in pairs(data.entity.params) do
-    entity.k = v
-  end
+  if child then
+    local entity = child:get_luaentity()
+    local properties = data.properties
 
-  child:set_attach(parent, properties.bone, properties.position, properties.rotation, properties.forced_visible)
+    for k, v in pairs(data.entity.params) do
+      entity.k = v
+    end
 
-  for j = 1, data.entity.children_amount do
-    if players_temp_storage[p_name].attachments[j+i] then
-      restore_attachments(p_name, child, j + i)
+    child:set_attach(parent, properties.bone, properties.position, properties.rotation, properties.forced_visible)
+
+    for j = 1, data.entity.children_amount do
+      if players_temp_storage[p_name].attachments[j+i] then
+        restore_attachments(p_name, child, j + i)
+      end
     end
   end
 
