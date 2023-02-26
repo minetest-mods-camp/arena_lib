@@ -1024,32 +1024,38 @@ function remove_attachments(p_name, entity, parent_idx)
     local luaentity = child:get_luaentity()
     local params = {}
 
-    for param, v in pairs(luaentity) do
-      if param ~= "object" then
-        params[param] = v
+    -- TEMP: entities aren't always removed, creating some sort of empty shell that
+    -- can't even be deleted with `:remove()`. This is a MT issue, so the only thing
+    -- I can do is skip these hollow entities (they only answer to `get_hp` and `is_player`).
+    -- Probably due to https://github.com/minetest/minetest/issues/12092
+    if luaentity then
+      for param, v in pairs(luaentity) do
+        if param ~= "object" then
+          params[param] = v
+        end
       end
-    end
 
-    -- uso `children_amount` per capire quante volte ciclare in `restore_attachments`
-    -- la generazione successiva, in quanto questa verrà salvata subito dopo
-    -- l'ID dell'entità genitrice (p -> e1 -> ee1 -> ee2 -> e2 -> e3)
-    local children_amount = 0
-    for j, grandchild in pairs(child:get_children()) do
-      if not grandchild:is_player() then
-        children_amount = children_amount + 1
+      -- uso `children_amount` per capire quante volte ciclare in `restore_attachments`
+      -- la generazione successiva, in quanto questa verrà salvata subito dopo
+      -- l'ID dell'entità genitrice (p -> e1 -> ee1 -> ee2 -> e2 -> e3)
+      local children_amount = 0
+      for j, grandchild in pairs(child:get_children()) do
+        if not grandchild:is_player() then
+          children_amount = children_amount + 1
+        end
       end
+
+      local _, bone, position, rotation, forced_visible = child:get_attach()
+      local attachment_info = {
+        entity = {name = luaentity.name, children_amount = children_amount, params = params},
+        properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
+      }
+
+      table.insert(players_temp_storage[p_name].attachments, attachment_info)
+
+      remove_attachments(p_name, child, i)
+      child:remove()
     end
-
-    local _, bone, position, rotation, forced_visible = child:get_attach()
-    local attachment_info = {
-      entity = {name = luaentity.name, children_amount = children_amount, params = params},
-      properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
-    }
-
-    table.insert(players_temp_storage[p_name].attachments, attachment_info)
-
-    remove_attachments(p_name, child, i)
-    child:remove()
   end
 end
 
