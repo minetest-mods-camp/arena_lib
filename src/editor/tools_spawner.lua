@@ -35,7 +35,6 @@ minetest.register_tool("arena_lib:spawner_add", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
@@ -54,7 +53,6 @@ minetest.register_tool("arena_lib:spawner_remove", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
@@ -82,7 +80,6 @@ minetest.register_tool("arena_lib:spawner_team_add", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
@@ -103,7 +100,6 @@ minetest.register_tool("arena_lib:spawner_team_remove", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local spawner_ID = user:get_meta():get_int("arena_lib_editor.spawner_ID")
@@ -130,7 +126,6 @@ minetest.register_tool("arena_lib:spawner_team_switch", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")
@@ -163,7 +158,6 @@ minetest.register_tool("arena_lib:spawner_deleteall", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local p_name = user:get_player_name()
@@ -184,7 +178,6 @@ minetest.register_tool("arena_lib:spawner_team_deleteall", {
   on_drop = function() end,
 
   on_use = function(itemstack, user, pointed_thing)
-
     local mod = user:get_meta():get_string("arena_lib_editor.mod")
     local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
     local team_ID = user:get_meta():get_int("arena_lib_editor.team_ID")

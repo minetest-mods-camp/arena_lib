@@ -101,6 +101,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.fov = nil
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
+  mod_ref.min_players = 1
   mod_ref.join_while_in_progress = false
   mod_ref.spectate_mode = true
   mod_ref.disable_inventory = false
@@ -188,6 +189,10 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.hotbar.slots = def.hotbar.slots
     mod_ref.hotbar.background_image = def.hotbar.background_image
     mod_ref.hotbar.selected_image = def.hotbar.selected_image
+  end
+
+  if def.min_players then
+    mod_ref.min_players = def.min_players
   end
 
   if def.join_while_in_progress == true then
@@ -385,6 +390,10 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     if min_players > max_players or min_players == 0 or max_players < 2 then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
+
+    if min_players > mod_ref.min_players then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame needs at least @1 players!", mod_ref.min_players)))
+      return end
   end
 
   local ID = next_available_ID(mod_ref)
@@ -399,6 +408,10 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   if min_players and max_players then
     arena.min_players = min_players
     arena.max_players = max_players
+  end
+
+  if arena.min_players < mod_ref.min_players then
+    arena.min_players = mod_ref.min_players
   end
 
   -- eventuali squadre
@@ -572,7 +585,6 @@ function arena_lib.change_arena_property(sender, mod, arena_name, property, new_
       return end
 
     setfenv(func, {})
-
     local good, result = pcall(func)
 
     -- se le operazioni della funzione causano errori
@@ -617,9 +629,18 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     arena.min_players = old_min_players
     arena.max_players = old_max_players
-  return end
+    return end
 
-  -- se i giocatori massimi sono cambiati, svuoto i vecchi punti rinascita per evitare problemi
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se ha meno giocatorɜ di quellɜ richiestɜ dal minigioco, annullo
+  if arena.min_players < mod_ref.min_players then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame needs at least @1 players!", mod_ref.min_players)))
+    arena.min_players = old_min_players
+    arena.max_players = old_max_players
+    return end
+
+  -- se lɜ giocatorɜ massimɜ sono cambiatɜ, svuoto i vecchi punti rinascita per evitare problemi
   if max_players and old_max_players ~= max_players then
     arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
   end
@@ -1349,12 +1370,25 @@ function init_storage(mod, mod_ref)
       local arena_max_players = arena.max_players * #arena.teams
 
       -- reimposto punti rinascita se ho cambiato il numero di squadre
-      if arena_max_players ~= #arena.spawn_points then
+      if arena_max_players ~= #arena.spawn_points and arena.enabled then
         to_update = true
         arena.enabled = false
         arena.spawn_points = {}
         minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
           " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
+      end
+
+      -- aggiorna lɜ giocatorɜ minimɜ in caso di conflitto
+      if arena.min_players < mod_ref.min_players then
+        arena.min_players = mod_ref.min_players
+        if arena.max_players < mod_ref.min_players then
+          arena.max_players = mod_ref.min_players
+          arena.spawn_points = {}
+          arena.enabled = false
+          minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
+            " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
+        end
+        to_update = true
       end
 
       -- gestione tempo

@@ -65,6 +65,7 @@ There are no winners=
 [!] Parameters don't seem right!=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
+[!] This minigame needs at least @1 players!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=

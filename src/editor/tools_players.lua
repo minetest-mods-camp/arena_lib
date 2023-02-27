@@ -26,7 +26,6 @@ minetest.register_node("arena_lib:players_min", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
       local players_amount = user:get_meta():get_int("arena_lib_editor.players_number")
