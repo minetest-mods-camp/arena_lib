@@ -151,7 +151,7 @@ A few more are available for players having the `arenalib_admin` privilege:
 	* `settings <minigame>`: changes `<minigame>` settings
 
 ### 1.4 Callbacks
-Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
+Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more and can be called just once per minigame, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
 
 #### 1.4.1 Minigame callbacks
 * `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
