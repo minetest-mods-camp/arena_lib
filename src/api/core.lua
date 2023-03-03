@@ -391,7 +391,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
 
-    if min_players > mod_ref.min_players then
+    if min_players < mod_ref.min_players then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame needs at least @1 players!", mod_ref.min_players)))
       return end
   end
