@@ -53,7 +53,7 @@ function ARENA_LIB_JOIN_CHECKS_PASSED(arena, arenaID, p_name)
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] You must wait for all your party members to finish their ongoing games before entering a new one!")))
         return end
 
-      -- se uno è attaccato a qualcosa
+      -- se si è attaccatɜ a qualcosa
       if minetest.get_player_by_name(pl_name):get_attach() and not arena_lib.is_player_spectating(pl_name) then
         minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] Can't enter a game if some of your party members are attached to something! (e.g. boats, horses etc.)")))
         return end

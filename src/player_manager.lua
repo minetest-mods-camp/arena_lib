@@ -21,7 +21,7 @@ minetest.register_on_joinplayer(function(player)
     p_inv:set_list("craft", {})
 
   -- se invece era in spettatore
-elseif p_inv:get_list("hand") and p_inv:contains_item("hand", "arena_lib:spectate_hand") then
+  elseif p_inv:get_list("hand") and p_inv:contains_item("hand", "arena_lib:spectate_hand") then
     p_inv:set_stack("hand", 1, nil)
     p_inv:set_size("hand", 0)
   end
