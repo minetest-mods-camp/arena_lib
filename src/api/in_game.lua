@@ -1028,40 +1028,40 @@ function remove_attachments(p_name, entity, parent_idx)
     -- can't even be deleted with `:remove()`. This is a MT issue, so the only thing
     -- I can do is skip these hollow entities (they only answer to `get_hp` and `is_player`).
     -- Probably due to https://github.com/minetest/minetest/issues/12092
-    if luaentity and luaentity.initial_properties.static_save then
-      
-      -- rimuovo l'entità senza salvarla se non è fatta per essere salvata staticamente
-      if not luaentity.initial_properties.static_save then
-        child:remove()
-        return
-      end
+    if luaentity then
 
-      for param, v in pairs(luaentity) do
-        if param ~= "object" then
-          params[param] = v
+      -- salvo l'entità solo se è fatta per essere salvata staticamente, sennò
+      -- la rimuovo e basta
+      if luaentity.initial_properties.static_save then
+        for param, v in pairs(luaentity) do
+          if param ~= "object" then
+            params[param] = v
+          end
         end
-      end
 
-      -- uso `children_amount` per capire quante volte ciclare in `restore_attachments`
-      -- la generazione successiva, in quanto questa verrà salvata subito dopo
-      -- l'ID dell'entità genitrice (p -> e1 -> ee1 -> ee2 -> e2 -> e3)
-      local children_amount = 0
-      for j, grandchild in pairs(child:get_children()) do
-        if not grandchild:is_player() then
-          children_amount = children_amount + 1
+        -- uso `children_amount` per capire quante volte ciclare in `restore_attachments`
+        -- la generazione successiva, in quanto questa verrà salvata subito dopo
+        -- l'ID dell'entità genitrice (p -> e1 -> ee1 -> ee2 -> e2 -> e3)
+        local children_amount = 0
+        for j, grandchild in pairs(child:get_children()) do
+          if not grandchild:is_player() then
+            children_amount = children_amount + 1
+          end
         end
+
+        local staticdata = luaentity.get_staticdata and luaentity:get_staticdata() or nil
+        local _, bone, position, rotation, forced_visible = child:get_attach()
+        local attachment_info = {
+          entity = {name = luaentity.name, staticdata = staticdata, children_amount = children_amount, params = params},
+          properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
+        }
+
+        table.insert(players_temp_storage[p_name].attachments, attachment_info)
+
+        -- in caso l'entità avesse a sua volta entità attaccate, rimuovo anche queste
+        remove_attachments(p_name, child, i)
       end
 
-      local staticdata = luaentity.get_staticdata and luaentity:get_staticdata() or nil
-      local _, bone, position, rotation, forced_visible = child:get_attach()
-      local attachment_info = {
-        entity = {name = luaentity.name, staticdata = staticdata, children_amount = children_amount, params = params},
-        properties = {bone = bone, position = position, rotation = rotation, forced_visible = forced_visible}
-      }
-
-      table.insert(players_temp_storage[p_name].attachments, attachment_info)
-
-      remove_attachments(p_name, child, i)
       child:remove()
     end
   end
