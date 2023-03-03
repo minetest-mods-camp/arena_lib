@@ -1028,7 +1028,14 @@ function remove_attachments(p_name, entity, parent_idx)
     -- can't even be deleted with `:remove()`. This is a MT issue, so the only thing
     -- I can do is skip these hollow entities (they only answer to `get_hp` and `is_player`).
     -- Probably due to https://github.com/minetest/minetest/issues/12092
-    if luaentity then
+    if luaentity and luaentity.initial_properties.static_save then
+      
+      -- rimuovo l'entità senza salvarla se non è fatta per essere salvata staticamente
+      if not luaentity.initial_properties.static_save then
+        child:remove()
+        return
+      end
+
       for param, v in pairs(luaentity) do
         if param ~= "object" then
           params[param] = v
