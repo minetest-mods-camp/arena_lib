@@ -95,6 +95,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
   If a field is not declared, it'll keep the server defaults
 * `min_players`: (int) The mimimum amount of players every arena must have. Default is `1`
 * `endless`: (bool) Whether the minigame is of type endless. If `true`, `join_while_in_progress` is automatically `true` and `min_players` is `0`. Default is `false`. For further information, check out the specific section [1.9 Endless minigames](#19-endless-minigames)
+* `end_when_too_few`: (bool) Whether the minigame should end its matches when only one player/team is left. Default il `true`
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
@@ -337,7 +338,7 @@ As the name suggests, endless minigames have got no end. When the server starts,
 
 Endless minigames have got no celebration phase: if this phase is called, arena_lib will ignore it. On the contrary, they do have a loading phase, which is useful to get the arena ready and avoid collateral damage through the entrance of players.  
 
-If declared, minigame parameters `join_while_in_progress` and `min_players` are ignored, as they're forced respectively to `true` and `0`. The same applies to the arena parameter `min_players`, that will always be `0`, and to whatever timer setting (timers won't start).
+If declared, minigame parameters `join_while_in_progress` and `min_players` are ignored, as they're forced respectively to `true` and `0`. Minigame parameter `end_when_too_few` is ignored as well, since the match can't end anyway. The same applies to the arena parameter `min_players` (always `0`) and to whatever timer setting (timers won't start).
 
 ### 1.10 Custom entrances
 Since 5.3, signs are not the only way anymore to link an arena with the rest of the world. Instead, modders can create third party mods to register their own custom entrance type. To do that, the function is

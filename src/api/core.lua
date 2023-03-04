@@ -103,6 +103,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.hotbar = nil
   mod_ref.min_players = 1
   mod_ref.endless = false
+  mod_ref.end_when_too_few = true
   mod_ref.join_while_in_progress = false
   mod_ref.spectate_mode = true
   mod_ref.disable_inventory = false
@@ -200,6 +201,10 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.endless = true
     mod_ref.join_while_in_progress = true
     mod_ref.min_players = 0
+  end
+
+  if def.end_when_too_few == false then
+    mod_ref.end_when_too_few = false
   end
 
   if def.join_while_in_progress == true then

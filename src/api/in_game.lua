@@ -522,26 +522,27 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
 
     -- se è un minigioco infinito o l'arena è già in celebrazione, basta solo aggiornare il cartello
     if not mod_ref.endless and not arena.in_celebration then
-
       -- se l'ultimə rimastə abbandona, vai in celebrazione
       if arena.players_amount == 0 then
         arena_lib.load_celebration(mod, arena)
 
-      -- se l'arena è a squadre e sono rimasti solo lɜ giocatorɜ di una squadra, la loro squadra vince
-      elseif arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
-        local winning_team_id = arena_lib.get_active_teams(arena)[1]
-        local mod_S = mod_ref.custom_messages.last_standing_team and minetest.get_translator(mod) or S
+      elseif mod_ref.end_when_too_few then
+        -- se l'arena è a squadre e sono rimasti solo lɜ giocatorɜ di una squadra, la loro squadra vince
+        if arena.teams_enabled and #arena_lib.get_active_teams(arena) == 1 then
+          local winning_team_id = arena_lib.get_active_teams(arena)[1]
+          local mod_S = mod_ref.custom_messages.last_standing_team and minetest.get_translator(mod) or S
 
-        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. mod_S(mod_ref.messages.last_standing_team))
-        arena_lib.load_celebration(mod, arena, winning_team_id)
+          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. mod_S(mod_ref.messages.last_standing_team))
+          arena_lib.load_celebration(mod, arena, winning_team_id)
 
-      -- se invece erano rimastɜ solo 2 giocatorɜ in partita, l'altrə vince
-      elseif arena.players_amount == 1 then
-        local mod_S = mod_ref.custom_messages.last_standing and minetest.get_translator(mod) or S
-        arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S(mod_ref.messages.last_standing))
+        -- se invece erano rimastɜ solo 2 giocatorɜ in partita, l'altrə vince
+        elseif arena.players_amount == 1 then
+          local mod_S = mod_ref.custom_messages.last_standing and minetest.get_translator(mod) or S
+          arena_lib.send_message_in_arena(arena, "players", mod_ref.prefix .. S(mod_ref.messages.last_standing))
 
-        for pl_name, stats in pairs(arena.players) do
-          arena_lib.load_celebration(mod, arena, pl_name)
+          for pl_name, stats in pairs(arena.players) do
+            arena_lib.load_celebration(mod, arena, pl_name)
+          end
         end
       end
     end
