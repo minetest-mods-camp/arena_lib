@@ -102,6 +102,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.camera_offset = nil
   mod_ref.hotbar = nil
   mod_ref.min_players = 1
+  mod_ref.endless = false
   mod_ref.join_while_in_progress = false
   mod_ref.spectate_mode = true
   mod_ref.disable_inventory = false
@@ -195,6 +196,12 @@ function arena_lib.register_minigame(mod, def)
     mod_ref.min_players = def.min_players
   end
 
+  if def.endless == true then
+    mod_ref.endless = true
+    mod_ref.join_while_in_progress = true
+    mod_ref.min_players = 0
+  end
+
   if def.join_while_in_progress == true then
     mod_ref.join_while_in_progress = def.join_while_in_progress
   end
@@ -232,7 +239,7 @@ function arena_lib.register_minigame(mod, def)
   end
 
   if def.celebration_time then
-    assert(def.celebration_time > 0, "[ARENA_LIB] celebration_time must be greater than 0 (everyone deserves to celebrate!)")
+    assert(def.celebration_time > 0 or def.endless, "[ARENA_LIB] celebration_time must be greater than 0 (everyone deserves to celebrate!)")
     mod_ref.celebration_time = def.celebration_time
   end
 
@@ -385,7 +392,7 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   -- controllo nome
   if not is_arena_name_allowed(sender, mod, arena_name) then return end
 
-  -- controllo che non abbiano messo parametri assurdi per i giocatori minimi/massimi
+  -- controllo che non abbiano messo parametri assurdi per lɜ giocatorɜ minimɜ/massimɜ
   if min_players and max_players then
     if min_players > max_players or min_players == 0 or max_players < 2 then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
@@ -393,6 +400,10 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
 
     if min_players < mod_ref.min_players then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This minigame needs at least @1 players!", mod_ref.min_players)))
+      return end
+
+    if mod_ref.endless and min_players ~= 0 then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] In endless minigames, the minimum amount of players must always be 0!")))
       return end
   end
 
@@ -403,15 +414,16 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
 
   local arena = mod_ref.arenas[ID]
 
-  -- sovrascrivo con i parametri della funzione
   arena.name = arena_name
+
+  -- numero giocatorɜ
+  if mod_ref.endless then
+    arena.min_players = 0
+  end
+
   if min_players and max_players then
     arena.min_players = min_players
     arena.max_players = max_players
-  end
-
-  if arena.min_players < mod_ref.min_players then
-    arena.min_players = mod_ref.min_players
   end
 
   -- eventuali squadre
@@ -453,7 +465,6 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
   storage:set_int(mod .. ".HIGHEST_ARENA_ID", mod_ref.highest_arena_ID)
 
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully created", arena_name))
-
 end
 
 
@@ -617,6 +628,13 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se il minigioco è infinito e si prova a modificare lɜ giocatorɜ minimɜ
+  if mod_ref.endless and min_players and min_players ~= 0 then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] In endless minigames, the minimum amount of players must always be 0!")))
+    return end
+
   -- salvo i vecchi parametri così da poterne modificare anche solo uno senza if lunghissimi
   local old_min_players = arena.min_players
   local old_max_players = arena.max_players
@@ -630,8 +648,6 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
     arena.min_players = old_min_players
     arena.max_players = old_max_players
     return end
-
-  local mod_ref = arena_lib.mods[mod]
 
   -- se ha meno giocatorɜ di quellɜ richiestɜ dal minigioco, annullo
   if arena.min_players < mod_ref.min_players then
@@ -653,7 +669,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   update_storage(false, mod, id, arena)
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Players amount successfully changed ( min @1 | max @2 )", arena.min_players, arena.max_players))
 
-  -- ritorno true per procedere al cambio di stack nell'editor
+  -- ritorno true per procedere al cambio di quantità nell'editor
   return true
 end
 
@@ -1165,6 +1181,10 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
   arena_lib.entrances[arena.entrance_type].update(mod, arena)
   update_storage(false, mod, id, arena)
 
+  if mod_ref.endless then
+    arena_lib.load_arena(mod, id)
+  end
+
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Arena @1 successfully enabled", arena_name))
   return true
 end
@@ -1182,8 +1202,14 @@ function arena_lib.disable_arena(sender, mod, arena_name)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] The arena is already disabled!")))
     return end
 
+  -- se il minigioco è infinito e non ci son giocatorɜ, forzo la chiusura e ne
+  -- estrapolo l'esito (rilancerà questa funzione ma con in_game = false)
+  if mod_ref.endless and arena.in_game and arena.players_amount == 0 then
+    return arena_lib.force_arena_ending(mod, arena, sender)
+  end
+
   -- se una partita è in corso, annullo
-  if arena.in_loading or arena.in_game or arena.in_celebration then
+  if arena.in_game then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] You can't disable an arena during an ongoing game!")))
     return end
 
@@ -1379,6 +1405,11 @@ function init_storage(mod, mod_ref)
       end
 
       -- aggiorna lɜ giocatorɜ minimɜ in caso di conflitto
+      if mod_ref.endless and arena.min_players > 0 then
+        arena.min_players = 0
+        to_update = true
+      end
+
       if arena.min_players < mod_ref.min_players then
         arena.min_players = mod_ref.min_players
         if arena.max_players < mod_ref.min_players then
@@ -1414,16 +1445,27 @@ function init_storage(mod, mod_ref)
 
       -- Contrariamente alle entità, i nodi non hanno un richiamo `on_activate`,
       -- ergo se si vogliono aggiornare all'avvio serve per forza un `on_load`
-      minetest.after(0.01, function()                                           -- signs_lib ha bisogno di un attimo per caricare sennò tira errore.
-        if arena.entrance then                                                  -- se non è ancora stato registrato nessun nodo per l'arena, evito il crash
-          arena_lib.entrances[arena.entrance_type].load(arena)
+      minetest.after(0.01, function()
+        if arena.entrance then                                                  -- signs_lib ha bisogno di un attimo per caricare sennò tira errore. Se
+          arena_lib.entrances[arena.entrance_type].load(mod, arena)             -- non è ancora stato registrato nessun nodo per l'arena, evito il crash
         end
       end)
-
     end
   end
 
   check_for_properties(mod, mod_ref)
+
+  -- se il minigioco è infinito, avvia tutte le arene non disabilitate
+  if mod_ref.endless then
+    for id, arena in pairs(mod_ref.arenas) do
+      if arena.enabled then
+        minetest.after(0.1, function()
+          arena_lib.load_arena(mod, id)
+        end)
+      end
+    end
+  end
+
   minetest.log("action", "[ARENA_LIB] Mini-game " .. mod .. " loaded")
 end
 
@@ -1468,7 +1510,7 @@ function file_exists(src_dir, name)
 end
 
 
--- le proprietà vengono salvate nello storage senza valori, in una coppia id-proprietà. Sia per leggerezza, sia perché non c'è bisogno di paragonarne i valori
+-- le proprietà vengono salvate nello spazio d'archiviazione senza valori, in una coppia id-proprietà. Sia per leggerezza, sia perché non c'è bisogno di paragonarne i valori
 function check_for_properties(mod, mod_ref)
 
   local old_properties = storage:get_string(mod .. ".PROPERTIES")
@@ -1526,9 +1568,7 @@ function check_for_properties(mod, mod_ref)
 
   -- aggiungo le nuove proprietà
   for property, v in pairs(mod_ref.properties) do
-
     if old_properties_table[property] == nil then
-
       assert(arena_default[property] == nil, "[ARENA_LIB] Custom property " .. property .. " can't be added " ..
                                       " as it has the same name of an arena default property. Please change name")
       minetest.log("action", "[ARENA_LIB] Adding property " .. property)
@@ -1543,7 +1583,6 @@ function check_for_properties(mod, mod_ref)
 
   -- rimuovo quelle non più presenti
   for old_property, _ in pairs(old_properties_table) do
-
     if mod_ref.properties[old_property] == nil then
       minetest.log("action", "[ARENA_LIB] Removing property " .. old_property)
 

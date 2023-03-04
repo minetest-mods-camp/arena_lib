@@ -66,6 +66,7 @@ There are no winners=
 [!] Property type doesn't match, aborting!=
 Parameter @1 successfully overwritten=
 [!] This minigame needs at least @1 players!=
+[!] In endless minigames, the minimum amount of players must always be 0!=
 Arena @1 successfully created=
 Arena @1 successfully removed=
 Arena @1 successfully renamed in @2=

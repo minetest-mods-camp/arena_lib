@@ -23,7 +23,6 @@ local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_
 
 -- per tutti i giocatori quando finisce la coda
 function arena_lib.load_arena(mod, arena_ID)
-
   -- my child, let's talk about some black magic: in order to teleport players in their team spawners, first of all I need to
   -- sort them by team. Once it's done, I need to skip every spawner of that team if the maximum number of players is not reached:
   -- otherwise, people will find theirselves in the wrong team (and you don't want that to happen). So I use this int to prevent it,
@@ -35,6 +34,7 @@ function arena_lib.load_arena(mod, arena_ID)
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
 
+  arena.in_game = true
   arena.in_loading = true
   arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
@@ -109,7 +109,6 @@ function arena_lib.load_arena(mod, arena_ID)
     if not arena.in_loading then return end
     arena_lib.start_arena(mod, arena)
   end)
-
 end
 
 
@@ -133,7 +132,7 @@ function arena_lib.start_arena(mod, arena)
   local mod_ref = arena_lib.mods[mod]
 
   -- parte l'eventuale tempo
-  if mod_ref.time_mode ~= "none" then
+  if not mod_ref.endless and mod_ref.time_mode ~= "none" then
     arena.current_time = arena.initial_time
     minetest.after(1, function()
       time_start(mod_ref, arena)
@@ -154,7 +153,6 @@ end
 
 -- per chi entra a partita iniziata
 function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
-
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
 
@@ -283,6 +281,12 @@ function arena_lib.load_celebration(mod, arena, winners)
     minetest.log("error", debug.traceback("[" .. mod .. "] There has been an attempt to call the celebration phase whilst already in it. This shall not be done, aborting..."))
     return end
 
+  local mod_ref = arena_lib.mods[mod]
+
+  if mod_ref.endless then
+    minetest.log("error", debug.traceback("[" .. mod .. "] There has been an attempt to call the celebration phase for an endless minigame, aborting..."))
+    return end
+
   arena.in_celebration = true
   arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
@@ -293,7 +297,6 @@ function arena_lib.load_celebration(mod, arena, winners)
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 
-  local mod_ref = arena_lib.mods[mod]
   local winning_message = ""
 
   -- determino il messaggio da inviare
@@ -346,13 +349,11 @@ function arena_lib.load_celebration(mod, arena, winners)
     if not arena.in_game then return end
     arena_lib.end_arena(mod_ref, mod, arena, winners)
   end)
-
 end
 
 
 
 function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
-
   -- copie da passare a on_end
   local spectators = {}
   local players = {}
@@ -519,8 +520,8 @@ function arena_lib.remove_player_from_arena(p_name, reason, executioner)
       handle_leaving_callbacks(mod, arena, p_name, reason, executioner)
     end
 
-    -- se è già in celebrazione, basta solo aggiornare il cartello
-    if not arena.in_celebration then
+    -- se è un minigioco infinito o l'arena è già in celebrazione, basta solo aggiornare il cartello
+    if not mod_ref.endless and not arena.in_celebration then
 
       -- se l'ultimə rimastə abbandona, vai in celebrazione
       if arena.players_amount == 0 then
@@ -552,7 +553,6 @@ end
 
 
 function arena_lib.force_arena_ending(mod, arena, sender)
-
   local mod_ref = arena_lib.mods[mod]
 
   -- se il minigioco non esiste, annullo
@@ -572,7 +572,21 @@ function arena_lib.force_arena_ending(mod, arena, sender)
 
   arena_lib.send_message_in_arena(arena, "both", minetest.colorize("#d69298", S("The arena has been forcibly terminated by @1", sender)))
   arena_lib.end_arena(mod_ref, mod, arena, nil, true)
-  return true
+
+  -- se è in modalità infinita, disabilito. Se qualche controllo personalizzato
+  -- dovesse ritornare `false`, impedendone la disabilitazione, rifaccio andare l'arena
+  if mod_ref.endless then
+    local can_disable = arena_lib.disable_arena(sender, mod, arena.name)
+
+    if not can_disable then
+      local id = arena_lib.get_arena_by_name(mod, arena.name)
+      arena_lib.load_arena(mod, id)
+    end
+
+    return can_disable
+  else
+    return true
+  end
 end
 
 

@@ -66,6 +66,7 @@ There are no winners=Non ci sono vincitorɜ
 [!] Property type doesn't match, aborting!=[!] Il tipo della proprietà non corrisponde, annullo!
 Parameter @1 successfully overwritten=Parametro @1 sovrascritto con successo
 [!] This minigame needs at least @1 players!=[!] Questo minigioco ha bisogno di almeno @1 giocatorɜ!
+[!] In endless minigames, the minimum amount of players must always be 0!=[!] Nei minigiochi infiniti, il numero minimo di giocatorɜ deve sempre essere 0!
 Arena @1 successfully created=Arena @1 creata con successo
 Arena @1 successfully removed=Arena @1 rimossa con successo
 Arena @1 successfully renamed in @2=Arena @1 rinominata con successo in @2

@@ -18,10 +18,11 @@
 	* [1.6 HUD](#16-hud)
 	* [1.7 Utils](#17-utils)
 	* [1.8 Getters](#18-getters)
-	* [1.9 Custom entrances](#19-custom-entrances)
-	* [1.10 Extendable editor](#110-extendable-editor)
-	* [1.11 Things you don't want to do with a light heart](#111-things-you-dont-want-to-do-with-a-light-heart)
-	* [1.12 Example file](#112-example-file)
+	* [1.9 Endless minigames](#19-endless-minigames)
+	* [1.10 Custom entrances](#110-custom-entrances)
+	* [1.11 Extendable editor](#111-extendable-editor)
+	* [1.12 Things you don't want to do with a light heart](#112-things-you-dont-want-to-do-with-a-light-heart)
+	* [1.13 Example file](#113-example-file)
 * [2. Arenas](#2-arenas)
 	* [2.1 Storing arenas](#21-storing-arenas)
 	* [2.2 Setting up an arena](#22-setting-up-an-arena)
@@ -93,6 +94,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * `selected_image =`: (string) the image to show when a slot is selected  
   If a field is not declared, it'll keep the server defaults
 * `min_players`: (int) The mimimum amount of players every arena must have. Default is `1`
+* `endless`: (bool) Whether the minigame is of type endless. If `true`, `join_while_in_progress` is automatically `true` and `min_players` is `0`. Default is `false`. For further information, check out the specific section [1.9 Endless minigames](#19-endless-minigames)
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
@@ -162,7 +164,7 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
 * `arena_lib.on_start(mod, function(arena))`: same as above
 * `arena_lib.on_celebration(mod, function(arena, winners)`: same as above. `winners` can be either a string, an integer or a table of string/integers. If you want to have a single winner, return their name (string). If you want to have a whole team, return the team ID (integer). If you want to have more single winners, a table of strings, and more teams, a table of integers.
-* `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because `end_arena` has already deleted them - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
+* `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because arena_lib has already deleted them - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator, was_spectator))`: called when a user joins an ongoing match. `as_spectator` returns true if they join as a spectator. `was_spectator` returns true if the user was spectating the arena when joining as an actual player
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_respawn(mod, function(arena, p_name))`: called when a player respawns
@@ -330,7 +332,14 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(...)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if any
 
-### 1.9 Custom entrances
+### 1.9 Endless minigames
+As the name suggests, endless minigames have got no end. When the server starts, all the enabled arenas of an endless minigame are automatically loaded and the only way to stop them is to disable them (e.g. by entering the editor). Calling the end of an arena will also try to disable the arena (i.e. through `/arenas forceend` or the respective function `force_arena_ending`); in case the disabling process should fail, the arena will be automatically launched again.  
+
+Endless minigames have got no celebration phase: if this phase is called, arena_lib will ignore it. On the contrary, they do have a loading phase, which is useful to get the arena ready and avoid collateral damage through the entrance of players.  
+
+If declared, minigame parameters `join_while_in_progress` and `min_players` are ignored, as they're forced respectively to `true` and `0`. The same applies to the arena parameter `min_players`, that will always be `0`, and to whatever timer setting (timers won't start).
+
+### 1.10 Custom entrances
 Since 5.3, signs are not the only way anymore to link an arena with the rest of the world. Instead, modders can create third party mods to register their own custom entrance type. To do that, the function is
 ```lua
 arena_lib.register_entrance_type(mod, entrance, def)
@@ -342,7 +351,7 @@ arena_lib.register_entrance_type(mod, entrance, def)
 	* `on_add`: (function(sender, mod, arena, ...)) must return the value that will be used by arena_lib to identify the entrance. For instance, built-in signs return their position. If nothing is returned, the adding process will be aborted. Substitute `...` with any additional parameters you may need (signs use it for their position). BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then set the new entrance. Use this callback just to run entrance-specific checks and return the value that arena_lib will then store as an entrance
 	* `on_remove`: (function(mod, arena)) additional actions to perform when an arena entrance is removed. BEWARE: arena_lib will already run general preliminar checks (e.g. the arena must exist) and then remove the entrance. Use this callback just to run entrance-specific checks.
 	* `on_update`: (function(mod, arena)) what should happen to each entrance when the status of the associated arena changes (e.g. when someone enters, when the arena gets disabled etc.)
-	* `on_load`: (function(arena)) additional actions to perform when the server starts. Useful for nodes, since they don't have an `on_activate` callback, contrary to entities
+	* `on_load`: (function(mod, arena)) additional actions to perform when the server starts. Useful for nodes, since they don't have an `on_activate` callback, contrary to entities
 	* `editor_settings`: (table) how the editor section should be structured, when an arena uses this entrance type. Fields are:
 		* `name`: (string) the name of the item representing the section
 		* `icon`: (string) the image of the item representing the section
@@ -357,7 +366,7 @@ If you're a bit confused, have a look at [this mod](https://gitlab.com/marco_a/a
 
 If the registration was successful, it'll appear in the list of entrances type displayed with `/arenas entrances <minigame>`.
 
-### 1.10 Extendable editor
+### 1.11 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 6th slot. To do that, the function is
 ```lua
 arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
@@ -370,13 +379,13 @@ On the contrary of when an arena is registered, every parameter here is mandator
 
 When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
 
-### 1.11 Things you don't want to do with a light heart
+### 1.12 Things you don't want to do with a light heart
 * Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
 * Disabling timers (`time_mode = "decremental"` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
 
-### 1.12 Example file
+### 1.13 Example file
 Check [this](mod-init.lua.example) out for a full configuration file  
 <br>  
 
@@ -404,8 +413,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `spectate_entities_amount`: (int) the amount of entities that can be currently spectated in an ongoing game. If spectate mode is disabled, it's `nil`. Outside of ongoing games is always `nil`
 * `spectate_areas_amount`: (int) like `spectate_entities_amount` but for areas
 * `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
-* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
+* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `celestial_vault`: (table) if present, contains the information about the celestial vault to display to each player whilst in game, overriding the default one. Default is `nil`.
@@ -502,7 +511,7 @@ Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_ch
 ```
 
 ##### 2.2.2.5 Entering and leaving
-To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.9 Custom entrances](#19-custom-entrances).  
+To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.10 Custom entrances](#110-custom-entrances).  
 To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use.
 
 To customise the arena return point (by default `hub_spawn_point`), use `arena_lib.set_custom_return_point(sender, mod, arena_name, pos)`. To remove the custom return point, set `pos` to `nil`.

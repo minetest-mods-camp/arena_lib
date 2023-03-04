@@ -55,7 +55,6 @@ end
 
 
 function arena_lib.enter_editor(sender, mod, arena_name)
-
   local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- se il giocatore sta già modificando un'arena
@@ -65,7 +64,9 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena, true) then return end
 
-  -- se l'arena è abilitata, provo a disabilitiarla
+  local mod_ref = arena_lib.mods[mod]
+
+  -- se l'arena è abilitata, provo a disabilitarla
   if arena.enabled then
     if not arena_lib.disable_arena(sender, mod, arena_name) then return end
   end
@@ -89,7 +90,7 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     hotbar_bg     = player:hud_get_hotbar_image()
   }
 
-  -- metto l'arena in modalità edit, associandoci il giocatore
+  -- metto l'arena in modalità modifica, associandoci lə giocatorə
   arenas_in_edit_mode[arena_name] = sender
 
   -- imposto i metadati che porto a spasso per l'editor

@@ -352,8 +352,6 @@ function go_to_arena(mod, arena)
 
   active_queues[mod][arena.name] = nil
   arena.in_queue = false
-  arena.in_game = true
-  arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   for pl_name, _ in pairs(arena.players) do
     players_in_queue[pl_name] = nil

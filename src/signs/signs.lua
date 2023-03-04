@@ -38,7 +38,7 @@ arena_lib.register_entrance_type("arena_lib", "sign", {
 
   on_add = function(sender, mod, arena, pos) return add_sign(sender, mod, arena, pos) end,
   on_remove = function(mod, arena) remove_sign(mod, arena) end,
-  on_load = function(arena) update_sign(nil, arena) end,
+  on_load = function(mod, arena) update_sign(mod, arena) end,
   on_update = function(mod, arena) update_sign(mod, arena) end,
 
   debug_output = function(entrance) return minetest.pos_to_string(entrance) end
@@ -178,6 +178,7 @@ end
 function update_sign(mod, arena)
   local p_count = 0
   local t_count = #arena.teams
+  local mod_ref = arena_lib.mods[mod]
 
   -- non uso il getter perché dovrei richiamare 2 funzioni (ID e count)
   for pl, stats in pairs(arena.players) do
@@ -188,7 +189,7 @@ function update_sign(mod, arena)
     ]] .. "\n\n" .. [[
     ]] .. arena.name .. "\n" .. [[
     ]] .. p_count .. "/".. arena.max_players * t_count .. "\n" .. [[
-    ]] .. in_game_txt(arena) .. "\n" .. [[
+    ]] .. in_game_txt(arena, mod_ref.endless) .. "\n" .. [[
 
     ]]})
 
@@ -202,16 +203,17 @@ end
 
 
 
-function in_game_txt(arena)
+function in_game_txt(arena, endless)
   local txt
 
   -- it's not possible to translate them => https://gitlab.com/VanessaE/signs_lib/-/issues/9
-  if not arena.enabled then txt = "#dWIP"
-  elseif arena.in_queue then txt = "#2Queueing"
+  if not arena.enabled        then txt = "#dWIP"
+  elseif arena.in_loading     then txt = "#4Loading"
+  elseif endless              then txt = "#2oo"
+  elseif arena.in_queue       then txt = "#2Queueing"
   elseif arena.in_celebration then txt = "#4Terminating"
-  elseif arena.in_loading then txt = "#4Loading"
-  elseif arena.in_game then txt = "#4In progress"
-  else txt = "#3Waiting" end
+  elseif arena.in_game        then txt = "#4In progress"
+  else                             txt = "#3Waiting" end
 
   return txt
 end
@@ -291,11 +293,11 @@ function get_infobox_formspec(mod, arenaID, player)
     if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       play_btn = "arenalib_infobox_play_leave.png"
       play_tip = "Leave the queue" .. LMB_TIP
-    elseif arena.players_amount == arena.max_players and (arena.in_queue or (arena.in_game and mod_ref.join_while_in_progress)) then
+    elseif arena.players_amount == arena.max_players and (arena.in_queue or (arena.in_game and (mod_ref.join_while_in_progress or mod_ref.endless))) then
       play_btn = "arenalib_infobox_play_full.png"
       play_tip = "Full"
     elseif arena.in_game then
-      if mod_ref.join_while_in_progress then
+      if mod_ref.join_while_in_progress or mod_ref.endless then
         play_btn = "arenalib_infobox_play_go.png"
         play_tip = "Play" .. LMB_TIP
       else
