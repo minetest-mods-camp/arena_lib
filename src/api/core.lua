@@ -786,7 +786,7 @@ end
 -- I punti rinascita si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più punti rinascita del numero massimo di giocatori.
 -- 'param' può essere: "overwrite", "delete", "deleteall"
-function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, ID, in_editor)
+function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -794,31 +794,18 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
   end
 
   local mod_ref = arena_lib.mods[mod]
-  local team
-  local team_ID
 
-  if teamID_or_name then
-    if type(teamID_or_name) == "number" then
-      team_ID = teamID_or_name
-      team = mod_ref.teams[teamID_or_name]
-    elseif type(teamID_or_name) == "string" then
-      team = teamID_or_name
-    end
-
-    -- controllo squadra
-    if not arena_lib.is_team_declared(mod_ref, team) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
-      return end
-  end
+  -- se l'eventuale squadra non esiste, annullo
+  if team_ID and not mod_ref.teams[team_ID] then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
+    return end
 
   local pos = vector.round(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
-  local mod_ref = arena_lib.mods[mod]
 
   -- controllo parametri
   if param then
     -- se `overwrite`, sovrascrivo
     if param == "overwrite" then
-
       -- se il punto rinascita da sovrascrivere non esiste, annullo
       if arena.spawn_points[ID].pos == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
@@ -829,7 +816,6 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
     -- se `delete`, cancello
     elseif param == "delete" then
-
       if arena.spawn_points[ID] == nil then
         minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
         return end
@@ -840,14 +826,13 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
 
     -- se `deleteall`, li cancello tutti
     elseif param == "deleteall" then
-
-      if team then
+      if team_ID then
         for id, spawner in pairs(arena.spawn_points) do
           if spawner.teamID == team_ID then
             arena.spawn_points[id] = nil
           end
         end
-        minetest.chat_send_player(sender, S("All the spawn points belonging to team @1 have been removed", team))
+        minetest.chat_send_player(sender, S("All the spawn points belonging to team @1 have been removed", mod_ref.teams[team_ID]))
       else
         arena.spawn_points = {}
         minetest.chat_send_player(sender, S("All the spawn points have been removed"))
@@ -872,25 +857,16 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
       return end
   end
 
-  local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti spawn totali)
+  local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti rinascita totali)
 
   -- se provo a impostare un punto rinascita di troppo, annullo
   if spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
-  return end
+    return end
 
   local next_available_spawnID = 1
 
-  if team then
-    -- ottengo l'ID della squadra se non mi è stato passato come parametro
-    if type(team_ID) ~= "number" then
-      for i = 1, #arena.teams do
-        if arena.teams[i].name == team then
-          team_ID = i
-        end
-      end
-    end
-
+  if team_ID then
     -- prendo il primo punto rinascita di quella squadra
     next_available_spawnID = 1 + (arena.max_players * (team_ID -1))
 
@@ -918,7 +894,7 @@ function arena_lib.set_spawner(sender, mod, arena_name, teamID_or_name, param, I
     end
   end
 
-  -- imposto il punto rinascita
+  -- imposto il punto di rinascita
   arena.spawn_points[next_available_spawnID] = {pos = pos, teamID = team_ID}
 
   arena_lib.update_waypoints(sender, mod, arena)

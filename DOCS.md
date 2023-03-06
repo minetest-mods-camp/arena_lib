@@ -287,7 +287,6 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
 * `arena_lib.is_player_in_arena(p_name, <mod>)`: returns a boolean. Same as above. It doesn't distinguish between an actual player and a spectator (for the latter, use `arena_lib.is_player_spectating(p_name)`)
 * `arena_lib.is_player_in_same_team(arena, p_name, t_name)`: compares two players teams by the players names. Returns true if on the same team, false if not
-* `arena_lib.is_team_declared(mod_ref, team_name)`: returns true if there is a team called `team_name`. Otherwise it returns false
 * `arena_lib.start_arena(mod, arena)`: instantly starts a loading arena (useful for when you don't want to wait until the end)
 * `arena_lib.load_celebration(mod, arena, winners)`: ends an ongoing arena, calling the celebration phase. `winners` can either be a string (the name of the winner), an integer (the ID of the winning team), a table of strings/integers (more players/teams) or `nil` (no winners)
 * `arena_lib.force_arena_ending(mod, arena, <sender>)`: forcibly ends an ongoing arena. It's usually called by `/forceend`, but it can be used, for instance, to annul a game. `sender` will inform players about who called the function. It returns `true` if successfully executed
@@ -477,39 +476,9 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.
 
 ##### 2.2.2.4 Spawners
-`arena_lib.set_spawner(sender, mod, arena_name, <teamID_or_name>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. Spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
-* `teamID_or_name` can be both a string and a number. It must be specified if your arena uses teams
+`arena_lib.set_spawner(sender, mod, arena_name, <teamID>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. Spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
 * `param` is a string, specifically `"overwrite"`, `"delete"` or `"deleteall"`. `"deleteall"` aside, the other ones need an ID after them. Also, if a team is specified with `"deleteall"`, it will only delete the spawners belonging to that team
 * `ID` is the spawner ID, for `param`
-
-Back on [ChatCmdBuilder](https://content.minetest.net/packages/rubenwardy/lib_chatcmdbuilder/), here are few `set_spawner` examples:
-
-```lua
-
-	-- whatever previous subcommand
-
-	-- for creating spawners without teams
-	cmd:sub("setspawn :arena", function(sender, arena)
-	  arena_lib.set_spawner(sender, yourmod, arena)
-	end)
-
-	-- for creating spawners with teams
-	cmd:sub("setspawn :arena :team:word", function(sender, arena, team)
-          arena_lib.set_spawner(sender, yourmod, arena, team)
-      	end)
-
-	-- for using 'param' (just pass a random number for deleteall as it won't matter)
-	cmd:sub("setspawn :arena :param:word :ID:int", function(sender, arena, param, ID)
-	  arena_lib.set_spawner(sender, yourmod, arena, nil, param, ID)
-	end)
-
-	-- for using 'param' with teams
-	cmd:sub("setspawn :arena :team:word :param:word :ID:int", function(sender, arena, team, param, ID)
-	  arena_lib.set_spawner(sender, yourmod, arena, team, param, ID)
-	end)
-
-   -- etc.
-```
 
 ##### 2.2.2.5 Entering and leaving
 To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.10 Custom entrances](#110-custom-entrances).  
