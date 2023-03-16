@@ -1,10 +1,12 @@
 local S = minetest.get_translator("arena_lib")
 
 local function change_amount() end
+local function to_pmax_limitless() end
+local function to_pmax_limit() end
 
 local players_tools = {
   "",                                 -- arena_lib:players_min
-  "",                                 -- arena_lib:players_max
+  "",                                 -- arena_lib:players_max or players_max_inf
   "",                                 -- arena_lib:teams_amount
   "arena_lib:players_change",
   "",
@@ -41,7 +43,7 @@ minetest.register_node("arena_lib:players_min", {
 
 minetest.register_node("arena_lib:players_max", {
 
-    description = S("Players supported"),
+    description = S("Players supported (right click to remove the limit)"),
     inventory_image = "arenalib_tool_players_max.png",
     wield_image = "arenalib_tool_players_max.png",
     groups = {not_in_creative_inventory = 1},
@@ -57,8 +59,42 @@ minetest.register_node("arena_lib:players_max", {
 
       -- aggiorno la quantità se il cambio è andato a buon fine
       user:set_wielded_item("arena_lib:players_max " .. players_amount)
+    end,
+
+    on_secondary_use = function(itemstack, user, pointed_thing)
+      to_pmax_limitless(user)
+    end,
+
+    on_place = function(itemstack, user, pointed_thing)
+      to_pmax_limitless(user)
     end
 })
+
+
+
+minetest.register_node("arena_lib:players_max_inf", {
+
+    description = S("Players supported (click to set a limit)"),
+    inventory_image = "arenalib_tool_players_max_inf.png",
+    wield_image = "arenalib_tool_players_max_inf.png",
+    groups = {not_in_creative_inventory = 1},
+    on_place = function() end,
+    on_drop = function() end,
+
+    on_use = function(itemstack, user, pointed_thing)
+      to_pmax_limit(user)
+    end,
+
+    on_secondary_use = function(itemstack, user, pointed_thing)
+      to_pmax_limit(user)
+    end,
+
+    on_place = function(itemstack, user, pointed_thing)
+      to_pmax_limit(user)
+    end
+})
+
+
 
 minetest.register_node("arena_lib:players_teams_amount", {
 
@@ -157,7 +193,12 @@ function arena_lib.give_players_tools(inv, mod, arena)
   inv:set_list("main", players_tools)
 
   inv:set_stack("main", 1, "arena_lib:players_min " .. arena.min_players)
-  inv:set_stack("main", 2, "arena_lib:players_max " .. arena.max_players)
+
+  if arena.max_players == -1 then
+    inv:set_stack("main", 2, "arena_lib:players_max_inf")
+  else
+    inv:set_stack("main", 2, "arena_lib:players_max " .. arena.max_players)
+  end
 
   local mod_ref = arena_lib.mods[mod]
 
@@ -195,4 +236,28 @@ function change_amount(player, decrease)
 
   player:get_meta():set_int("arena_lib_editor.players_number", amount)
   arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Players | num to set: @1 (left/right click slot #4 to change)", amount))
+end
+
+
+
+function to_pmax_limitless(user)
+  local mod = user:get_meta():get_string("arena_lib_editor.mod")
+  local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+
+  arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, -1, true)
+  user:set_wielded_item("arena_lib:players_max_inf")
+end
+
+
+
+function to_pmax_limit(user)
+  local mod = user:get_meta():get_string("arena_lib_editor.mod")
+  local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
+  local min_players = arena.min_players +1
+
+  if not arena_lib.change_players_amount(user:get_player_name(), mod, arena_name, nil, min_players, true) then return end
+
+  -- aggiorno la quantità se il cambio è andato a buon fine
+  user:set_wielded_item("arena_lib:players_max " .. min_players)
 end

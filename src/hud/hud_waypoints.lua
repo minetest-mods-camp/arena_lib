@@ -15,22 +15,30 @@ function arena_lib.show_waypoints(p_name, mod, arena)
 
   minetest.after(0.1, function()
     -- punti rinascita
-    for ID, spawn in pairs(arena.spawn_points) do
-      local caption = "#" .. ID
+    if not arena.teams_enabled then
+      for ID, pos in pairs(arena.spawn_points) do
+        local HUD_ID = player:hud_add({
+          name = "#" .. ID,
+          hud_elem_type = "waypoint",
+          precision = 0,
+          world_pos = pos
+        })
 
-      -- se ci sono squadre, lo specifico nel nome
-      if arena.teams_enabled then
-        caption = caption .. ", " .. arena.teams[spawn.teamID].name
+        table.insert(waypoints[p_name], HUD_ID)
       end
+    else
+      for i = 1, #arena.teams do
+        for ID, pos in pairs(arena.spawn_points[i]) do
+          local HUD_ID = player:hud_add({
+            name = "#" .. ID .. ", " .. arena.teams[i].name,
+            hud_elem_type = "waypoint",
+            precision = 0,
+            world_pos = pos
+          })
 
-      local HUD_ID = player:hud_add({
-        name = caption,
-        hud_elem_type = "waypoint",
-        precision = 0,
-        world_pos = spawn.pos
-      })
-
-      table.insert(waypoints[p_name], HUD_ID)
+          table.insert(waypoints[p_name], HUD_ID)
+        end
+      end
     end
 
     -- punto di ritorno

@@ -79,12 +79,10 @@ Teams amount successfully changed (@1)=Numero delle squadre modificato con succe
 Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
 Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
 [!] This team doesn't exist!=[!] Questa squadra non esiste!
-[!] No spawner with that ID to overwrite!=[!] Nessun punto di rinascita con quell'ID da sovrascrivere!
-Spawn point #@1 successfully overwritten=Punto di rinascita #@1 sovrascritto con successo
-[!] No spawner with that ID to delete!=[!] Nessun punto di rinascita con quell'ID da cancellare!
+[!] No spawner with ID @1 has been found!==[!] Non è stato trovato nessun punto di rinascita con ID @1!
 Spawn point #@1 successfully deleted=Punto di rinascita #@1 cancellato con successo
 All the spawn points belonging to team @1 have been removed=Tutti i punti di rinascita appartenenti alla squadra @1 sono stati rimossi
-All the spawn points have been removed=Tutti i punti di rinascita sono stati rimossi
+All spawn points have been removed=Tutti i punti di rinascita sono stati rimossi
 [!] There's already a spawn in this point!=[!] C'è già un punto di rinascita in questo punto!
 [!] Spawn points can't exceed the maximum number of players!=[!] I punti di rinascita non possono superare lɜ giocatorɜ massimi!
 Spawn point #@1 successfully set=Punto di rinascita #@1 impostato con successo
@@ -155,7 +153,7 @@ Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 Players=Giocatorɜ
 Players | num to set: @1 (left/right click slot #4 to change)=Giocatorɜ | num: @1 (click sx/dx su casella #4 per cambiare)
 Values are PER TEAM!=I valori sono PER SQUADRA!
-Spawners=Spawner
+Spawners=Punti di rinascita
 Spawners | sel. ID: @1 (right click slot #2 to change)=Punto di rinascita | ID sel.: @1 (tasto dx su casella #2 per cambiare)
 Customise=Personalizza
 Pimp my arena=Rendila bella bellina
@@ -182,7 +180,8 @@ Global light=Luce globale
 
 # editor/tools_players.lua
 Players required=Giocatorɜ minimɜ
-Players supported=Giocatorɜ massimɜ
+Players supported (right click to remove the limit)=Giocatorɜ massimɜ (tasto dx per rimuovere il limite)
+Players supported (click to set a limit)=Giocatorɜ massimɜ (premi per impostare un limite)
 Teams amount=Numero squadre
 Change the current number=Cambia il numero attuale
 Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)

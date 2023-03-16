@@ -1,6 +1,5 @@
 local S = minetest.get_translator("arena_lib")
 
-local function assign_team_spawner() end
 local function operations_before_entering_arena() end
 local function operations_before_playing_arena() end
 local function operations_before_leaving_arena() end
@@ -20,17 +19,7 @@ local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_
 
 
 
-
--- per tutti i giocatori quando finisce la coda
 function arena_lib.load_arena(mod, arena_ID)
-  -- my child, let's talk about some black magic: in order to teleport players in their team spawners, first of all I need to
-  -- sort them by team. Once it's done, I need to skip every spawner of that team if the maximum number of players is not reached:
-  -- otherwise, people will find theirselves in the wrong team (and you don't want that to happen). So I use this int to prevent it,
-  -- which increases by 1 or more every time I look for a spawner, comparing the 'team' spawner value to the player's. This happens
-  -- in assign_team_spawner, which also returns the new value for team_count
-  local team_count = 1
-
-  local count = 1
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
 
@@ -39,7 +28,41 @@ function arena_lib.load_arena(mod, arena_ID)
   arena_lib.entrances[arena.entrance_type].update(mod, arena)
 
   local shuffled_spawners = table.copy(arena.spawn_points)
-  local sorted_team_players = {}
+  local count
+
+  -- mescolo i punti e inizializzo il contatore per la rotazione
+  if not arena.teams_enabled then
+    table.shuffle(shuffled_spawners)
+    count = 1
+  else
+    count = {}
+    for i = 1, #arena.teams do
+      table.shuffle(shuffled_spawners[i])
+      count[i] = 1
+    end
+  end
+
+  -- per ogni giocatorə...
+  for pl_name, pl_data in pairs(arena.players) do
+    operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
+
+    -- teletrasporto
+    if not arena.teams_enabled then
+      minetest.get_player_by_name(pl_name):set_pos(shuffled_spawners[count])
+      count = count == #shuffled_spawners and 1 or count + 1
+    else
+      local team_ID = pl_data.teamID
+      minetest.get_player_by_name(pl_name):set_pos(shuffled_spawners[team_ID][count[team_ID]])
+      count[team_ID] = count[team_ID] == #shuffled_spawners[team_ID] and 1 or count[team_ID] + 1
+    end
+  end
+
+  -- se supporta la spettatore, inizializzo le varie tabelle
+  if mod_ref.spectate_mode then
+    arena.spectate_entities_amount = 0
+    arena.spectate_areas_amount = 0
+    arena_lib.init_spectate_containers(mod, arena.name)
+  end
 
   -- aggiungo eventuali proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
@@ -50,49 +73,13 @@ function arena_lib.load_arena(mod, arena_ID)
     end
   end
 
-  -- randomizzo gli spawner se non è a squadre
-  if not arena.teams_enabled then
-    for i = #shuffled_spawners, 2, -1 do
-      local j = math.random(i)
-      shuffled_spawners[i], shuffled_spawners[j] = shuffled_spawners[j], shuffled_spawners[i]
-    end
-  -- sennò ordino i giocatori per squadra
-  else
-    local j = 1
+  -- e aggiungo eventuali proprietà per ogni squadra
+  if arena.teams_enabled then
     for i = 1, #arena.teams do
-      for pl_name, pl_stats in pairs(arena.players) do
-        if pl_stats.teamID == i then
-          sorted_team_players[j] = {name = pl_name, teamID = pl_stats.teamID}
-          j = j +1
-        end
-      end
-
-      -- e aggiungo eventuali proprietà per ogni squadra
       for k, v in pairs(mod_ref.team_properties) do
         arena.teams[i][k] = v
       end
     end
-  end
-
-  -- per ogni giocatore...
-  for pl_name, _ in pairs(arena.players) do
-    operations_before_entering_arena(mod_ref, mod, arena, arena_ID, pl_name)
-
-    -- teletrasporto i giocatori
-    if not arena.teams_enabled then
-      minetest.get_player_by_name(pl_name):set_pos(shuffled_spawners[count].pos)
-    else
-      team_count = assign_team_spawner(arena.spawn_points, team_count, sorted_team_players[count].name, sorted_team_players[count].teamID)
-    end
-
-    count = count +1
-  end
-
-  -- se supporta la spettatore, inizializzo le varie tabelle
-  if mod_ref.spectate_mode then
-    arena.spectate_entities_amount = 0
-    arena.spectate_areas_amount = 0
-    arena_lib.init_spectate_containers(mod, arena.name)
   end
 
   -- eventuale codice aggiuntivo
@@ -151,7 +138,6 @@ end
 
 
 
--- per chi entra a partita iniziata
 function arena_lib.join_arena(mod, p_name, arena_ID, as_spectator)
   local mod_ref = arena_lib.mods[mod]
   local arena = mod_ref.arenas[arena_ID]
@@ -666,20 +652,7 @@ end
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
 
-function assign_team_spawner(spawn_points, ID, p_name, p_team_ID)
-
-  for i = ID, #spawn_points do
-    if p_team_ID == spawn_points[i].teamID then
-      minetest.get_player_by_name(p_name):set_pos(spawn_points[i].pos)
-      return i+1
-    end
-  end
-end
-
-
-
 function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name, as_spectator)
-
   players_temp_storage[p_name] = {}
 
   -- applico eventuale musica di sottofondo
@@ -785,7 +758,6 @@ end
 
 
 function operations_before_playing_arena(mod_ref, arena, p_name)
-
   arena.past_present_players[p_name] = true
   arena.past_present_players_inside[p_name] = true
 
@@ -884,9 +856,8 @@ end
 
 
 
--- reason parametro opzionale che passo solo quando potrebbe essersi disconnesso
+-- `reason` parametro opzionale che passo solo quando potrebbe essersi disconnesso
 function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
-
   -- disattivo eventuale musica di sottofondo
   if arena.bgm then
     minetest.sound_stop(players_temp_storage[p_name].bgm_handle)

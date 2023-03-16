@@ -79,12 +79,10 @@ Teams amount successfully changed (@1)=
 Teams successfully enabled for the arena @1=
 Teams successfully disabled for the arena @1=
 [!] This team doesn't exist!=
-[!] No spawner with that ID to overwrite!=
-Spawn point #@1 successfully overwritten=
-[!] No spawner with that ID to delete!=
+[!] No spawner with ID @1 has been found!=
 Spawn point #@1 successfully deleted=
 All the spawn points belonging to team @1 have been removed=
-All the spawn points have been removed=
+All spawn points have been removed=
 [!] There's already a spawn in this point!=
 [!] Spawn points can't exceed the maximum number of players!=
 Spawn point #@1 successfully set=
@@ -182,7 +180,8 @@ Global light=
 
 # editor/tools_players.lua
 Players required=
-Players supported=
+Players supported (right click to remove the limit)=
+Players supported (click to set a limit)=
 Teams amount=
 Change the current number=
 Teams: on (click to toggle off)=

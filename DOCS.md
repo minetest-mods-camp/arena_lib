@@ -318,7 +318,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_mod_by_player(p_name)`: returns the minigame a player's in (game or queue)
 * `arena_lib.get_arena_by_player(p_name)`: returns the arena the player's in (game or queue)
 * `arena_lib.get_arenaID_by_player(p_name)`: returns the ID of the arena the player's in (game or queue)
-* `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If team_ID is specified, it only counts the ones belonging to that team
+* `arena_lib.get_arena_spawners_count(arena, <team_ID>)`: returns the total amount of spawners declared in the specified arena. If `team_ID` is specified, it'll only return the amount of spawners belonging to that team
 * `arena_lib.get_random_spawner(arena, <team_ID>)`: returns a random spawner declared in the specified arena. If team_ID is specified, it only considers the ones belonging to that team
 * `arena_lib.get_players_amount_left_to_start_queue(arena)`: returns the amount of player still needed to make a queue start, or `nil` if the arena is already in game
 * `arena_lib.get_players_in_game()`: returns all the players playing in whatever arena of whatever minigame
@@ -380,7 +380,7 @@ On the contrary of when an arena is registered, every parameter here is mandator
 When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
 
 ### 1.12 Things you don't want to do with a light heart
-* Changing the number of the teams: it'll delete your spawners (this has to be done in order to avoid further problems)
+* Changing the number of teams, if `variable_teams_amount` is false: it'll delete your spawners (this has to be done in order to avoid further problems)
 * Any action in the "Players" section of the editor, except changing their minimum amount: it'll delete your spawners (same as above)
 * Removing properties in the minigame declaration: it'll delete them from every arena, without any possibility to get them back. Always do a backup first
 * Disabling timers (`time_mode = "decremental"` to something else) when arenas have custom timer values: it'll reset every custom value, so you have to put them again manually if/when you decide to turning timers back up
@@ -412,9 +412,9 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `spectators_amount_per_team`: (table) like `players_amount_per_team`, but for spectators
 * `spectate_entities_amount`: (int) the amount of entities that can be currently spectated in an ongoing game. If spectate mode is disabled, it's `nil`. Outside of ongoing games is always `nil`
 * `spectate_areas_amount`: (int) like `spectate_entities_amount` but for areas
-* `spawn_points`: (table) contains information about the spawn points. Format `{[spawnID] = {pos = coords, teamID = team ID}}`. If teams are disabled, `teamID` is `nil`
+* `spawn_points`: (table) contains information about the arena spawn points. The amount of spawners can't exceed the amount of max players, except when `max_players = -1` (there is no limit in this case). Format is `spawn_points[id]` when teams are not enabled, and `spawn_points[team_ID][id]` when they are
 * `min_players`: (string) default is 2. When this value is reached, a queue starts
-* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already
+* `max_players`: (string) default is 4. When this value is reached, queue time decreases to 5 if it's not lower already. If `-1`, the arena won't have any players limit.
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `celestial_vault`: (table) if present, contains the information about the celestial vault to display to each player whilst in game, overriding the default one. Default is `nil`.
@@ -449,7 +449,7 @@ Arenas and their settings are stored inside the mod storage. What is *not* store
 Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
 
 ### 2.2 Setting up an arena
-In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, spawners have to be set, an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through.  
+In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, at least one spawner has to be set (it's per team if teams are enabled), an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through.  
 
 If you love yourself, there is a built-in editor that allows you to easily make these things and many many more. Or, if you don't love yourself, you can connect every setup function to your custom CLI. Either way, run `/arenas create <minigame> <arena>` to create your first arena.
 
@@ -476,9 +476,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.
 
 ##### 2.2.2.4 Spawners
-`arena_lib.set_spawner(sender, mod, arena_name, <teamID>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. Spawners can't exceed the maximum players of an arena and, more specifically, they must be the same number. A spawner is a table with `pos` and `team_ID` as values.
-* `param` is a string, specifically `"overwrite"`, `"delete"` or `"deleteall"`. `"deleteall"` aside, the other ones need an ID after them. Also, if a team is specified with `"deleteall"`, it will only delete the spawners belonging to that team
-* `ID` is the spawner ID, for `param`
+`arena_lib.set_spawner(sender, mod, arena_name, <teamID>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. `param` is a string, specifically `"delete"` or `"deleteall"`. `"delete"` needs an ID after them. If a team is specified alongside `"deleteall"`, arena_lib will only delete the spawners belonging to that team
 
 ##### 2.2.2.5 Entering and leaving
 To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.10 Custom entrances](#110-custom-entrances).  

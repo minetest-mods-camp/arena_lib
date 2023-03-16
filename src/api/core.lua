@@ -648,7 +648,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
   arena.max_players = max_players or arena.max_players
 
   -- se ha parametri assurdi, annullo
-  if arena.min_players > arena.max_players or arena.min_players <= 0 then
+  if (arena.max_players ~= -1 and arena.min_players > arena.max_players) or arena.min_players <= 0 then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     arena.min_players = old_min_players
     arena.max_players = old_max_players
@@ -785,7 +785,7 @@ end
 
 -- I punti rinascita si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più punti rinascita del numero massimo di giocatori.
--- 'param' può essere: "overwrite", "delete", "deleteall"
+-- 'param' può essere "delete" o "deleteall"
 function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
@@ -796,106 +796,87 @@ function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_e
   local mod_ref = arena_lib.mods[mod]
 
   -- se l'eventuale squadra non esiste, annullo
-  if team_ID and not mod_ref.teams[team_ID] then
+  if team_ID and not arena.teams[team_ID] then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
     return end
 
   local pos = vector.round(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
 
-  -- controllo parametri
+  -- o sto modificando un punto già esistente...
   if param then
-    -- se `overwrite`, sovrascrivo
-    if param == "overwrite" then
-      -- se il punto rinascita da sovrascrivere non esiste, annullo
-      if arena.spawn_points[ID].pos == nil then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to overwrite!")))
+    if param == "delete" then
+      local spawner = not team_ID and arena.spawn_points[ID] or arena.spawn_points[team_ID][ID]
+      if not spawner then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with ID @1 has been found!", ID)))
         return end
 
-      arena.spawn_points[ID].pos = pos
-      minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully overwritten", ID))
-
-    -- se `delete`, cancello
-    elseif param == "delete" then
-      if arena.spawn_points[ID] == nil then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with that ID to delete!")))
-        return end
-
-      arena.spawn_points[ID] = nil
-      arena_lib.update_waypoints(sender, mod, arena)
+      if team_ID then
+        table.remove(arena.spawn_points[team_ID], ID)
+      else
+        table.remove(arena.spawn_points, ID)
+      end
       minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
 
-    -- se `deleteall`, li cancello tutti
     elseif param == "deleteall" then
       if team_ID then
-        for id, spawner in pairs(arena.spawn_points) do
-          if spawner.teamID == team_ID then
-            arena.spawn_points[id] = nil
-          end
-        end
+        arena.spawn_points[team_ID] = {}
         minetest.chat_send_player(sender, S("All the spawn points belonging to team @1 have been removed", mod_ref.teams[team_ID]))
       else
-        arena.spawn_points = {}
-        minetest.chat_send_player(sender, S("All the spawn points have been removed"))
+        if arena.teams_enabled then
+          for i = 1, #arena.teams do
+            arena.spawn_points[i] = {}
+          end
+        else
+          arena.spawn_points = {}
+        end
+        minetest.chat_send_player(sender, S("All spawn points have been removed"))
       end
-
-      arena_lib.update_waypoints(sender, mod, arena)
 
     else
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
     end
 
-  update_storage(false, mod, id, arena)
-  return
+    arena_lib.update_waypoints(sender, mod, arena)
+    update_storage(false, mod, id, arena)
+    return
   end
 
-  -- sennò sto creando un nuovo punto rinascita
-
-  -- se c'è già un punto rinascita a quelle coordinate, annullo
-  for id, spawn in pairs(arena.spawn_points) do
-    if vector.equals(pos, spawn.pos) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
-      return end
-  end
-
+  -- ...sennò sto creando un nuovo punto rinascita
   local spawn_points_count = arena_lib.get_arena_spawners_count(arena, team_ID)    -- (se team_ID è nil, ritorna in automatico i punti rinascita totali)
 
   -- se provo a impostare un punto rinascita di troppo, annullo
-  if spawn_points_count == arena.max_players then
+  if arena.max_players ~= -1 and spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
     return end
 
-  local next_available_spawnID = 1
-
-  if team_ID then
-    -- prendo il primo punto rinascita di quella squadra
-    next_available_spawnID = 1 + (arena.max_players * (team_ID -1))
-
-    -- se già esiste...
-    if arena.spawn_points[next_available_spawnID] then
-
-      -- ...itero tra i punti seguenti finché non ne trovo uno vuoto
-      while next(arena.spawn_points, next_available_spawnID) do
-        -- ma se il next mi trova un punto rinascita con distacco > 1, vuol dire che sono al capolinea
-        -- perché quello trovato appartiene o a un'altra squadra o è un buco nella stessa squadra (ottenuto dal cancellare). Rompo l'iterare
-        if next(arena.spawn_points, next_available_spawnID) ~= next_available_spawnID +1 then
-          break
-        end
-        next_available_spawnID = next_available_spawnID +1
+  -- se c'è già un punto di rinascita a quelle coordinate, annullo
+  if not team_ID then
+    for id, spawn in pairs(arena.spawn_points) do
+      if vector.equals(pos, spawn) then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
+        return
       end
-
-      -- trovato quello vuoto, porto next_available_spawnID alla sua posizione (+1)
-      next_available_spawnID = next_available_spawnID +1
     end
-
   else
-    -- ottengo l'ID del prossimo punto rinascita disponibile
-    for k, v in ipairs(arena.spawn_points) do
-      next_available_spawnID = k +1
+    for i = 1, #arena.teams do
+      for id, spawn in pairs(arena.spawn_points[i]) do
+        if vector.equals(pos, spawn) then
+          minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There's already a spawn in this point!")))
+          return
+        end
+      end
     end
   end
 
+  local spawn_points = team_ID and arena.spawn_points[team_ID] or arena.spawn_points
+  local next_available_spawnID = #spawn_points +1
+
   -- imposto il punto di rinascita
-  arena.spawn_points[next_available_spawnID] = {pos = pos, teamID = team_ID}
+  if team_ID then
+    arena.spawn_points[team_ID][next_available_spawnID] = pos
+  else
+    arena.spawn_points[next_available_spawnID] = pos
+  end
 
   arena_lib.update_waypoints(sender, mod, arena)
   minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully set", next_available_spawnID))
@@ -1126,19 +1107,30 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  local arena_max_players = arena.max_players * #arena.teams
+  local has_sufficient_spawners = true
+
+  if arena.teams_enabled then
+    for i = 1, #arena.teams do
+      if #arena.spawn_points[i] == 0 then
+        has_sufficient_spawners = false
+        break
+      end
+    end
+  elseif #arena.spawn_points == 0 then
+    has_sufficient_spawners = false
+  end
 
   -- se non ci sono abbastanza punti rinascita
-  if arena_lib.get_arena_spawners_count(arena) < arena_max_players then
+  if not has_sufficient_spawners then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Insufficient spawners, the arena can't be enabled!")))
     arena.enabled = false
-  return end
+    return end
 
   -- se non c'è l'entrata
   if not arena.entrance then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Entrance not set, the arena can't be enabled!")))
     arena.enabled = false
-  return end
+    return end
 
   local mod_ref = arena_lib.mods[mod]
 
@@ -1323,10 +1315,35 @@ function init_storage(mod, mod_ref)
   for i = 1, arena_lib.mods[mod].highest_arena_ID do
     local arena_str = storage:get_string(mod .. "." .. i)
 
-    -- se c'è una stringa con quell'ID, aggiungo l'arena e ne aggiorno l'eventuale cartello
+    -- se c'è una stringa con quell'ID, aggiungo l'arena e inizializzo l'entrata
     if arena_str ~= "" then
       local arena = minetest.deserialize(arena_str)
       local to_update = false
+
+      --v------------------ LEGACY UPDATE, to remove in 8.0 -------------------v
+      if arena.spawn_points[1] and arena.spawn_points[1].pos then
+        local spawn_points = {}
+
+        if arena.spawn_points[1].teamID then
+          for i = 1, #arena.teams do
+            spawn_points[i] = {}
+          end
+          for _, spawner in pairs(arena.spawn_points) do
+            table.insert(spawn_points[spawner.teamID], spawner.pos)
+          end
+          arena.spawn_points = spawn_points
+
+        else
+          for _, spawner in pairs(arena.spawn_points) do
+            table.insert(spawn_points, spawner.pos)
+          end
+          arena.spawn_points = spawn_points
+        end
+        minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
+          " has been converted into the new format")
+        to_update = true
+      end
+      --^------------------ LEGACY UPDATE, to remove in 8.0 -------------------^
 
       --v------------------ LEGACY UPDATE, to remove in 7.0 -------------------v
       if not arena.spectators then
@@ -1357,32 +1374,49 @@ function init_storage(mod, mod_ref)
       --^------------------ LEGACY UPDATE, to remove in 7.0 -------------------^
 
       -- gestione squadre
-      if arena.teams_enabled and not (#mod_ref.teams > 1) then                  -- se avevo abilitato le squadre e ora le ho rimosse
+      -- se avevo abilitato le squadre e ora le ho rimosse dalla mod
+      if arena.teams_enabled and not (#mod_ref.teams > 1) then
         arena.teams = {-1}
         arena.teams_enabled = false
         arena.players_amount_per_team = nil
         arena.spectators_amount_per_team = nil
-      elseif #mod_ref.teams > 1 and not arena.teams_enabled then                -- sennò le genero per tutte le arene con teams_enabled
+        arena.spawn_points = {}
+        arena.enabled = false
+        to_update = true
+
+      -- se la mod ha le squadre, ma l'arena no e non è abilitata, arena_lib
+      -- gliele mette nel dubbio (che tanto non se ne accorgono).
+      -- Al contrario, non posso sapere se le squadre sono state appena inserite e
+      -- tutte le arene vanno convertite; l'onere di conversione spetta allɜ amministratorɜ
+      elseif #mod_ref.teams > 1 and not arena.teams_enabled and not arena.enabled then
         arena.players_amount_per_team = {}
         arena.spectators_amount_per_team = {}
         arena.teams = {}
-
-        for k, t_name in pairs(mod_ref.teams) do
-          arena.players_amount_per_team[k] = 0
-          arena.spectators_amount_per_team[k] = 0
-          arena.teams[k] = {name = t_name}
-        end
-      end
-
-      local arena_max_players = arena.max_players * #arena.teams
-
-      -- reimposto punti rinascita se ho cambiato il numero di squadre
-      if arena_max_players ~= #arena.spawn_points and arena.enabled then
-        to_update = true
-        arena.enabled = false
         arena.spawn_points = {}
-        minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
-          " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
+
+        for i, t_name in pairs(mod_ref.teams) do
+          arena.players_amount_per_team[i] = 0
+          arena.spectators_amount_per_team[i] = 0
+          arena.teams[i] = {name = t_name}
+          arena.spawn_points[i] = {}
+        end
+
+        arena.teams_enabled = true
+        to_update = true
+
+      -- se l'arena ha le squadre, non supporta n° variabile e il n° non coincide, le aggiorno
+      elseif arena.teams_enabled and not mod_ref.variable_teams_amount and #mod_ref.teams ~= #arena.teams then
+        for i, t_name in pairs(mod_ref.teams) do
+          arena.players_amount_per_team[i] = 0
+          arena.spectators_amount_per_team[i] = 0
+          arena.teams[i] = {name = t_name}
+          arena.spawn_points[i] = {}
+        end
+
+        arena.enabled = false
+        to_update = true
+        minetest.log("action", "[ARENA_LIB] teams amount of arena " .. arena.name ..
+            " has changed: resetting arena spawn points")
       end
 
       -- aggiorna lɜ giocatorɜ minimɜ in caso di conflitto
@@ -1395,10 +1429,6 @@ function init_storage(mod, mod_ref)
         arena.min_players = mod_ref.min_players
         if arena.max_players < mod_ref.min_players then
           arena.max_players = mod_ref.min_players
-          arena.spawn_points = {}
-          arena.enabled = false
-          minetest.log("action", "[ARENA_LIB] spawn points of arena " .. arena.name ..
-            " has been reset due to not coinciding with the maximum amount of players (" .. arena_max_players .. ")")
         end
         to_update = true
       end

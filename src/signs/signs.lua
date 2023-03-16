@@ -176,21 +176,25 @@ end
 
 
 function update_sign(mod, arena)
-  local p_count = 0
-  local t_count = #arena.teams
   local mod_ref = arena_lib.mods[mod]
+  local p_count = 0
 
   -- non uso il getter perché dovrei richiamare 2 funzioni (ID e count)
   for pl, stats in pairs(arena.players) do
     p_count = p_count +1
   end
 
+  local curr_max_pl = p_count
+
+  if arena.max_players ~= -1 then
+    curr_max_pl = curr_max_pl .. "/".. arena.max_players * #arena.teams
+  end
+
   signs_lib.update_sign(arena.entrance, {text = [[
     ]] .. "\n\n" .. [[
     ]] .. arena.name .. "\n" .. [[
-    ]] .. p_count .. "/".. arena.max_players * t_count .. "\n" .. [[
+    ]] .. curr_max_pl .. "\n" .. [[
     ]] .. in_game_txt(arena, mod_ref.endless) .. "\n" .. [[
-
     ]]})
 
   for pl_name, pl_data in pairs(displaying_infobox) do
@@ -340,8 +344,8 @@ function get_infobox_formspec(mod, arenaID, player)
     "image[0,2.8;0.9,0.9;arenalib_infobox_bgm.png]",
     -- scritte
     "hypertext[0.76,0.08;3.7,1;name;<global valign=middle><style size=23 font=mono color=#ffffff>" .. FS(arena.name) .. "</style>]",
-    "hypertext[1,1.59;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
-    "hypertext[1,2.67;3.52,1;name;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
+    "hypertext[1,1.59;3.52,1;author;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(arena.author) .. "</style>]",
+    "hypertext[1,2.67;3.52,1;bgm;<global valign=middle><style size=19 font=mono color=#5a5353>" .. FS(bgm_info) .. "</style>]",
     -- suggerimenti e pulsanti
     "tooltip[play;" .. S(play_tip) .. "]",
     "tooltip[spectate;" .. S(spec_tip) .. "]",

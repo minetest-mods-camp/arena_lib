@@ -58,7 +58,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
   local mod_ref = arena_lib.mods[mod]
   local arena_min_players = arena.min_players * #arena.teams
-  local arena_max_players = arena.max_players * #arena.teams
+  local arena_max_players = arena.max_players == -1 and -1 or arena.max_players * #arena.teams
   local teams = ""
   local min_players_per_team = ""
   local max_players_per_team = ""
@@ -188,19 +188,17 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   local spawners_pos = ""
   if arena.teams_enabled then
 
-    for i = 1, #arena.teams do
-      spawners_pos = spawners_pos .. arena.teams[i].name .. ": "
-      for j = 1 + (arena.max_players * (i-1)), arena.max_players * i  do
-        if arena.spawn_points[j] then
-          spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(arena.spawn_points[j].pos) .. " "
-        end
+    for team_ID = 1, #arena.teams do
+      spawners_pos = spawners_pos .. arena.teams[team_ID].name .. ": "
+      for _, pos in pairs(arena.spawn_points[team_ID])  do
+        spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(pos) .. " "
       end
       spawners_pos = spawners_pos .. "; "
     end
 
   else
-    for spawn_id, spawn_params in pairs(arena.spawn_points) do
-      spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(spawn_params.pos) .. " "
+    for _, pos in pairs(arena.spawn_points) do
+      spawners_pos = spawners_pos .. " " .. minetest.pos_to_string(pos) .. " "
     end
   end
 
@@ -309,7 +307,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Entrance: ")) .. minetest.colorize("#cfc6b8", "(" .. arena.entrance_type .. ") " .. entrance) .. "\n" ..
     minetest.colorize("#eea160", S("Custom return point: ")) .. minetest.colorize("#cfc6b8", custom_return_point) .. "\n" ..
-    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", #arena.spawn_points .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
+    minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", arena_lib.get_arena_spawners_count(arena) .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
 
     time ..
     minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", celvault) .. "\n" ..

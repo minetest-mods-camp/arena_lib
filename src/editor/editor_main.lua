@@ -116,8 +116,20 @@ function arena_lib.enter_editor(sender, mod, arena_name)
   end
 
   -- se c'è almeno un punto di rinascita, teletrasporto
-  if next(arena.spawn_points) then
-    player:set_pos(arena.spawn_points[next(arena.spawn_points)].pos)
+  if arena_lib.get_arena_spawners_count(arena) > 0 then
+    local spawner
+    if not arena.teams_enabled then
+      spawner = arena.spawn_points[1]
+    else
+      for i = 1, #arena.teams do
+        if next(arena.spawn_points[i]) then
+          spawner = arena.spawn_points[i][1]
+          break
+        end
+      end
+    end
+
+    player:set_pos(spawner)
     minetest.chat_send_player(sender, S("Wooosh!"))
   end
 

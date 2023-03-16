@@ -367,8 +367,12 @@ end
 
 -- es. Foresta | 3/4 | Il match inizierà a breve
 function queue_format(arena, msg)
-  local arena_max_players = arena.max_players * #arena.teams
-  return arena.name .. " | " .. arena.players_amount .. "/" .. arena_max_players  .. " | " .. msg
+  if arena.max_players == -1 then
+    return arena.name .. " | " .. arena.players_amount .. " | " .. msg
+  else
+    local max_players = arena.max_players * #arena.teams
+    return arena.name .. " | " .. arena.players_amount .. "/" ..  max_players  .. " | " .. msg
+  end
 end
 
 

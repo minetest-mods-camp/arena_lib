@@ -54,28 +54,28 @@ end
 
 
 function arena_lib.get_arena_spawners_count(arena, team_ID)
-  local count = 0
-  for _, spawner in pairs(arena.spawn_points) do
-    if team_ID then
-      if spawner.teamID == team_ID then
-        count = count +1
+  if team_ID and arena.teams_enabled then
+    return #arena.spawn_points[team_ID]
+  else
+    if arena.teams_enabled then
+      local count = 0
+      for i = 1, #arena.teams do
+        count = count + #arena.spawn_points[i]
       end
+      return count
     else
-      count = count +1
+      return #arena.spawn_points
     end
   end
-  return count
 end
 
 
 
 function arena_lib.get_random_spawner(arena, team_ID)
   if arena.teams_enabled then
-    local min = 1 + (arena.max_players * (team_ID - 1))
-    local max = arena.max_players * team_ID
-    return arena.spawn_points[math.random(min, max)].pos
+    return arena.spawn_points[team_ID][math.random(1, table.maxn(arena.spawn_points[team_ID]))]
   else
-    return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))].pos
+    return arena.spawn_points[math.random(1,table.maxn(arena.spawn_points))]
   end
 end
 

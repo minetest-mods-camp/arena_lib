@@ -8,19 +8,6 @@ end
 
 
 
-function arena_lib.is_team_declared(mod_ref, team_name)
-  if not mod_ref.teams then return false end
-
-  for _, t_name in pairs(mod_ref.teams) do
-    if team_name == t_name then
-      return true
-    end
-  end
-  return false
-end
-
-
-
 
 
 ----------------------------------------------
