@@ -719,8 +719,14 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     player:hud_set_flags({minimap = false})
   end
 
-  -- chiudo eventuali formspec
-  minetest.close_formspec(p_name, "")
+  -- chiudo eventuali formspec; invoco un formspec fantoccio per chiuderlo subito
+  -- dopo, perché se usassi close_formspec(p_name, ""), per Minetest il formspec
+  -- da chiudere risulterebbe ancora aperto. Questo permette alla gente che clicca
+  -- nel momento prima di essere teletrasportata di eseguire azioni e potenzialmente
+  -- rompere i minigiochi (teletrasporto, cambio skin ecc.)
+  -- Vedasi https://github.com/minetest/minetest/issues/13331
+  minetest.show_formspec(p_name, "arena_lib:empty", "formspec_version[4]no_prepend[]bgcolor[;neither]label[1,1;]")
+  minetest.close_formspec(p_name, "arena_lib:empty")
 
   -- svuoto eventualmente l'inventario, decidendo se e come salvarlo
   if not mod_ref.keep_inventory then
