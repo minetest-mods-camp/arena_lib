@@ -40,7 +40,7 @@ local arena_default = {
   spectators_amount_per_team = nil,
   spectate_entities_amount = nil,
   spectate_areas_amount = nil,
-  spawn_points = {},                  -- KEY: ids, VALUE: {pos, teamID}
+  spawn_points = {},
   max_players = 4,
   min_players = 2,
   celestial_vault = nil,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
@@ -437,15 +437,16 @@ function arena_lib.create_arena(sender, mod, arena_name, min_players, max_player
     arena.teams_enabled = true
     arena.players_amount_per_team = {}
 
-    for k, t_name in pairs(mod_ref.teams) do
-      arena.teams[k] = {name = t_name}
-      arena.players_amount_per_team[k] = 0
+    for i, t_name in pairs(mod_ref.teams) do
+      arena.spawn_points[i] = {}
+      arena.teams[i] = {name = t_name}
+      arena.players_amount_per_team[i] = 0
     end
 
     if mod_ref.spectate_mode then
       arena.spectators_amount_per_team = {}
-      for k, t_name in pairs(mod_ref.teams) do
-        arena.spectators_amount_per_team[k] = 0
+      for i = 1, #mod_ref.teams do
+        arena.spectators_amount_per_team[i] = 0
       end
     end
   end
