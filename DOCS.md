@@ -473,7 +473,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 `arena_lib.change_teams_amount(sender, mod, arena_name, amount)` changes the amount of teams in a specific arena. It'll use the first N teams declared, where N is `amount`. It returns `true` if it succeeds.
 
 ##### 2.2.2.3 Enabling/Disabling teams
-`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is an int, where `0` disables teams and `1` enables them.
+`arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable)` enables/disables teams per single arena. `enable` is a boolean.
 
 ##### 2.2.2.4 Spawners
 `arena_lib.set_spawner(sender, mod, arena_name, <teamID>, <param>, <ID>)` creates a spawner where the sender is standing, so be sure to stand where you want the spawn point to be. `param` is a string, specifically `"delete"` or `"deleteall"`. `"delete"` needs an ID after them. If a team is specified alongside `"deleteall"`, arena_lib will only delete the spawners belonging to that team

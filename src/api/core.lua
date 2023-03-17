@@ -727,7 +727,7 @@ end
 
 
 
-function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_editor)      -- enable can be 0 or 1
+function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -739,13 +739,17 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Teams are not enabled!")))
     return end
 
+  if type(enable) ~= "boolean" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
   -- se le squadre sono già in quello stato, annullo
   if enable == arena.teams_enabled then
     minetest.chat_send_player(sender, minetest.colorize("#cfc6b8", S("[!] Nothing to do here!")))
     return end
 
   -- se abilito
-  if enable == 1 then
+  if enable == true then
     arena.teams = {}
     arena.players_amount_per_team = {}
 
@@ -755,20 +759,14 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
     end
 
     arena.teams_enabled = true
-
     minetest.chat_send_player(sender, S("Teams successfully enabled for the arena @1", arena_name))
 
   -- se disabilito
-  elseif enable == 0 then
+  else
     arena.teams = {-1}
     arena.players_amount_per_team = nil
     arena.teams_enabled = false
     minetest.chat_send_player(sender, S("Teams successfully disabled for the arena @1", arena_name))
-
-  -- sennò ho scritto male e annullo
-  else
-    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
-    return
   end
 
   -- svuoto i vecchi punti rinascita per evitare problemi

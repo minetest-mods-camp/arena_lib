@@ -154,7 +154,7 @@ minetest.register_tool("arena_lib:players_teams_on", {
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 0, true)
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, false, true)
 
       user:get_inventory():set_stack("main", 3, "")
       user:get_inventory():set_stack("main", 6, "arena_lib:players_teams_off")
@@ -176,7 +176,7 @@ minetest.register_tool("arena_lib:players_teams_off", {
       local mod = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name = user:get_meta():get_string("arena_lib_editor.arena")
 
-      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, 1, true)
+      arena_lib.toggle_teams_per_arena(user:get_player_name(), mod, arena_name, true, true)
 
       if arena_lib.mods[mod].variable_teams_amount then
         local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
