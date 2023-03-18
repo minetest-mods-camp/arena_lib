@@ -14,12 +14,21 @@ local displaying_infobox = {}                   -- KEY: player name, VALUE: {(st
 --------------------------------------------------------------------------------
 -- There is no reliable way to know when someone closes a formspec, thus I override
 -- the basic `minetest.close_formspec` function, also calling it in `fields.quit` down below
-local original = minetest.close_formspec
+local original_close = minetest.close_formspec
 function minetest.close_formspec(p_name, formname)
   if formname == "arena_lib:infobox" or formname == "" then
     displaying_infobox[p_name] = nil
   end
-  original(p_name, formname)
+  original_close(p_name, formname)
+end
+
+-- se un formspec si sovrappone a quello del cartello
+local original_show = minetest.show_formspec
+function minetest.show_formspec(p_name, formname, formspec)
+  if formname ~= "arena_lib:infobox" and displaying_infobox[p_name] then
+    displaying_infobox[p_name] = nil
+  end
+  original_show(p_name, formname, formspec)
 end
 --------------------------------------------------------------------------------
 
