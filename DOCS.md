@@ -93,9 +93,9 @@ The second field, on the contrary, is a table of optional parameters: they defin
   * `background_image =`: (string) the background image
   * `selected_image =`: (string) the image to show when a slot is selected  
   If a field is not declared, it'll keep the server defaults
-* `min_players`: (int) The mimimum amount of players every arena must have. Default is `1`
-* `endless`: (bool) Whether the minigame is of type endless. If `true`, `join_while_in_progress` is automatically `true` and `min_players` is `0`. Default is `false`. For further information, check out the specific section [1.9 Endless minigames](#19-endless-minigames)
-* `end_when_too_few`: (bool) Whether the minigame should end its matches when only one player/team is left. Default il `true`
+* `min_players`: (int) the mimimum amount of players every arena must have. Default is `1`
+* `endless`: (bool) whether the minigame is of type endless. If `true`, `join_while_in_progress` is automatically `true` and `min_players` is `0`. Default is `false`. For further information, check out the specific section [1.9 Endless minigames](#19-endless-minigames)
+* `end_when_too_few`: (bool) whether the minigame should end its matches when only one player/team is left. Default is `true`
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
