@@ -168,7 +168,6 @@ function arena_lib.quit_editor(player)
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
   player:get_meta():set_int("arena_lib_editor.players_number", 0)
-  player:get_meta():set_int("arena_lib_editor.spawner_ID", 0)
   player:get_meta():set_int("arena_lib_editor.team_ID", 0)
 
   arena_lib.remove_waypoints(p_name)

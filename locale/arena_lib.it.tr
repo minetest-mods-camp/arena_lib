@@ -1,4 +1,4 @@
-# version 6.0.0
+# version 6.1.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -79,7 +79,8 @@ Teams amount successfully changed (@1)=Numero delle squadre modificato con succe
 Teams successfully enabled for the arena @1=Squadre abilitate con successo nell'arena @1
 Teams successfully disabled for the arena @1=Squadre disabilitate con successo nell'arena @1
 [!] This team doesn't exist!=[!] Questa squadra non esiste!
-[!] No spawner with ID @1 has been found!==[!] Non è stato trovato nessun punto di rinascita con ID @1!
+[!] A team ID must be specified!=[!] È necessario specificare l'ID della squadra!
+[!] There are no spawners to remove!=[!] Non ci sono punti di rinascita da rimuovere!
 Spawn point #@1 successfully deleted=Punto di rinascita #@1 cancellato con successo
 All the spawn points belonging to team @1 have been removed=Tutti i punti di rinascita appartenenti alla squadra @1 sono stati rimossi
 All spawn points have been removed=Tutti i punti di rinascita sono stati rimossi
@@ -154,7 +155,6 @@ Players=Giocatorɜ
 Players | num to set: @1 (left/right click slot #4 to change)=Giocatorɜ | num: @1 (click sx/dx su casella #4 per cambiare)
 Values are PER TEAM!=I valori sono PER SQUADRA!
 Spawners=Punti di rinascita
-Spawners | sel. ID: @1 (right click slot #2 to change)=Punto di rinascita | ID sel.: @1 (tasto dx su casella #2 per cambiare)
 Customise=Personalizza
 Pimp my arena=Rendila bella bellina
 Settings=Impostazioni
@@ -241,9 +241,9 @@ Speed=Velocità
 
 # editor/tools_spawner.lua
 Add spawner=Aggiungi punto di rinascita
-Remove spawner=Rimuovi punto di rinascita
+Remove the closest spawner=Rimuovi il punto di rinascita più vicino
 Add team spawner=Aggiungi punto di rinascita squadra
-Remove team spawner=Rimuovi punto di rinascita squadra
+Remove the closest spawner of the selected team=Rimuovi il punto di rinascita più vicino della squadra selezionata
 Switch team=Cambia squadra
 Selected team: @1=Squadra selezionata: @1
 Delete all spawners=Cancella tutti i punti di rinascita

@@ -725,6 +725,7 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
   -- nel momento prima di essere teletrasportata di eseguire azioni e potenzialmente
   -- rompere i minigiochi (teletrasporto, cambio skin ecc.)
   -- Vedasi https://github.com/minetest/minetest/issues/13331
+  -- Remove once MT 5.7 is out
   minetest.show_formspec(p_name, "arena_lib:empty", "formspec_version[4]no_prepend[]bgcolor[;neither]label[1,1;]")
   minetest.close_formspec(p_name, "arena_lib:empty")
 

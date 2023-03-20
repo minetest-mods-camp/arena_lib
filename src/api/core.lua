@@ -16,6 +16,7 @@ local function init_storage() end
 local function update_storage() end
 local function file_exists() end
 local function deprecated_audio_exists() end
+local function deprecated_spawner_ID_param() end
 local function check_for_properties() end
 local function next_available_ID() end
 local function is_arena_name_allowed() end
@@ -664,7 +665,7 @@ function arena_lib.change_players_amount(sender, mod, arena_name, min_players, m
 
   -- se lɜ giocatorɜ massimɜ sono cambiatɜ, svuoto i vecchi punti rinascita per evitare problemi
   if max_players and old_max_players ~= max_players then
-    arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
+    arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", in_editor)
   end
 
   -- aggiorno l'entrata, se esiste
@@ -706,7 +707,7 @@ function arena_lib.change_teams_amount(sender, mod, arena_name, amount, in_edito
     return end
 
   -- svuoto i vecchi punti rinascita per evitare problemi
-  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", in_editor)
 
   arena.teams = {}
   for i = 1, amount do
@@ -770,7 +771,7 @@ function arena_lib.toggle_teams_per_arena(sender, mod, arena_name, enable, in_ed
   end
 
   -- svuoto i vecchi punti rinascita per evitare problemi
-  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", nil, in_editor)
+  arena_lib.set_spawner(sender, mod, arena_name, nil, "deleteall", in_editor)
 
   -- aggiorno l'entrata, se esiste
   if arena.entrance then
@@ -785,8 +786,13 @@ end
 -- I punti rinascita si impostano prendendo la coordinata del giocatore che lancia il comando.
 -- Non ci possono essere più punti rinascita del numero massimo di giocatori.
 -- 'param' può essere "delete" o "deleteall"
-function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_editor)
+function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, in_editor)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if type(in_editor) == "number" then
+    deprecated_spawner_ID_param(in_editor)
+    in_editor = false
+  end
 
   if not in_editor then
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
@@ -799,22 +805,37 @@ function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_e
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] This team doesn't exist!")))
     return end
 
-  local pos = vector.round(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
-
   -- o sto modificando un punto già esistente...
   if param then
     if param == "delete" then
-      local spawner = not team_ID and arena.spawn_points[ID] or arena.spawn_points[team_ID][ID]
-      if not spawner then
-        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] No spawner with ID @1 has been found!", ID)))
+      -- se le squadre son abilitate ma non è specificato l'ID della squadra, annullo
+      if arena.teams_enabled and not team_ID then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] A team ID must be specified!")))
         return end
 
-      if team_ID then
-        table.remove(arena.spawn_points[team_ID], ID)
-      else
-        table.remove(arena.spawn_points, ID)
+      local spawners = team_ID and table.copy(arena.spawn_points[team_ID]) or table.copy(arena.spawn_points)
+
+      -- se non ci sono punti di rinascita, annullo
+      if not next(spawners) then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There are no spawners to remove!")))
+        return end
+
+      local curr_spawner = {ID = 1, pos = spawners[1]}
+      local p_pos = minetest.get_player_by_name(sender):get_pos()
+
+      for i, pos in pairs(spawners) do
+        if vector.distance(pos, p_pos) < vector.distance(curr_spawner.pos, p_pos) then
+          curr_spawner = {ID = i, pos = pos}
+        end
       end
-      minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", ID))
+
+      if team_ID then
+        table.remove(arena.spawn_points[team_ID], curr_spawner.ID)
+      else
+        table.remove(arena.spawn_points, curr_spawner.ID)
+      end
+
+      minetest.chat_send_player(sender, mod_ref.prefix .. S("Spawn point #@1 successfully deleted", curr_spawner.ID))
 
     elseif param == "deleteall" then
       if team_ID then
@@ -847,6 +868,8 @@ function arena_lib.set_spawner(sender, mod, arena_name, team_ID, param, ID, in_e
   if arena.max_players ~= -1 and spawn_points_count == arena.max_players then
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Spawn points can't exceed the maximum number of players!")))
     return end
+
+  local pos = vector.round(minetest.get_player_by_name(sender):get_pos())       -- tolgo i decimali per immagazzinare un int
 
   -- se c'è già un punto di rinascita a quelle coordinate, annullo
   if not team_ID then
@@ -1677,4 +1700,8 @@ function deprecated_audio_exists(mod, track, p_name)
       .. "put it into the world folder instead!"))
     return true
   end
+end
+
+function deprecated_spawner_ID_param()
+  minetest.log("warning", "[ARENA_LIB] set_spawner(...) with `ID` is deprecated, please remove this parameter")
 end

@@ -12,7 +12,6 @@ minetest.register_on_joinplayer(function(player)
     p_meta:set_string("arena_lib_editor.mod", "")
     p_meta:set_string("arena_lib_editor.arena", "")
     p_meta:set_int("arena_lib_editor.players_number", 0)
-    p_meta:set_int("arena_lib_editor.spawner_ID", 0)
     p_meta:set_int("arena_lib_editor.team_ID", 0)
 
     if minetest.get_modpath("hub_core") then return end          -- se c'è Hub, ci pensa quest'ultimo allo svuotamento dell'inventario

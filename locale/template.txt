@@ -1,4 +1,4 @@
-# version 6.0.0
+# version 6.1.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -79,7 +79,8 @@ Teams amount successfully changed (@1)=
 Teams successfully enabled for the arena @1=
 Teams successfully disabled for the arena @1=
 [!] This team doesn't exist!=
-[!] No spawner with ID @1 has been found!=
+[!] A team ID must be specified!=
+[!] There are no spawners to remove!=
 Spawn point #@1 successfully deleted=
 All the spawn points belonging to team @1 have been removed=
 All spawn points have been removed=
@@ -154,7 +155,6 @@ Players=
 Players | num to set: @1 (left/right click slot #4 to change)=
 Values are PER TEAM!=
 Spawners=
-Spawners | sel. ID: @1 (right click slot #2 to change)=
 Customise=
 Pimp my arena=
 Settings=
@@ -241,9 +241,9 @@ Speed=
 
 # editor/tools_spawner.lua
 Add spawner=
-Remove spawner=
+Remove the closest spawner=
 Add team spawner=
-Remove team spawner=
+Remove the closest spawner of the selected team=
 Switch team=
 Selected team: @1=
 Delete all spawners=
