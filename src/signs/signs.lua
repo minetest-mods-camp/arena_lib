@@ -93,6 +93,10 @@ signs_lib.register_sign("arena_lib:sign", {
     local arenaID = minetest.get_meta(pos):get_int("arenaID")
     local p_name = clicker:get_player_name()
 
+    if not arena_lib.mods[mod] then
+      minetest.chat_send_player(p_name, minetest.colorize("#e6482e", S("[!] This minigame doesn't exist!") .. " (" .. mod .. ")"))
+      return end
+
     displaying_infobox[p_name] = {mod = mod, arena_id = arenaID}
     minetest.show_formspec(p_name, "arena_lib:infobox", get_infobox_formspec(mod, arenaID, clicker))
   end,
