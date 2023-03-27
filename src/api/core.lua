@@ -237,6 +237,7 @@ function arena_lib.register_minigame(mod, def)
   end
 
   if def.time_mode then
+    assert(not def.endless or def.time_mode ~= "decremental", "[ARENA_LIB] endless minigames can't have a timer! (time_mode = \"decremental\")")
     mod_ref.time_mode = def.time_mode
   end
 

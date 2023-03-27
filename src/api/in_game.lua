@@ -119,7 +119,7 @@ function arena_lib.start_arena(mod, arena)
   local mod_ref = arena_lib.mods[mod]
 
   -- parte l'eventuale tempo
-  if not mod_ref.endless and mod_ref.time_mode ~= "none" then
+  if mod_ref.time_mode ~= "none" then
     arena.current_time = arena.initial_time
     minetest.after(1, function()
       time_start(mod_ref, arena)

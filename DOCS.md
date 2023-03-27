@@ -337,7 +337,7 @@ As the name suggests, endless minigames have got no end. When the server starts,
 
 Endless minigames have got no celebration phase: if this phase is called, arena_lib will ignore it. On the contrary, they do have a loading phase, which is useful to get the arena ready and avoid collateral damage through the entrance of players.  
 
-If declared, minigame parameters `join_while_in_progress` and `min_players` are ignored, as they're forced respectively to `true` and `0`. Minigame parameter `end_when_too_few` is ignored as well, since the match can't end anyway. The same applies to the arena parameter `min_players` (always `0`) and to whatever timer setting (timers won't start).
+If declared, minigame parameters `join_while_in_progress` and `min_players` are ignored, as they're forced respectively to `true` and `0`. Minigame parameter `end_when_too_few` is ignored as well, since the match can't end anyway. The same applies to the arena parameter `min_players` (always `0`) and to `time_mode = "decremental"`.
 
 ### 1.10 Custom entrances
 Since 5.3, signs are not the only way anymore to link an arena with the rest of the world. Instead, modders can create third party mods to register their own custom entrance type. To do that, the function is
