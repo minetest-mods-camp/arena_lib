@@ -1,7 +1,7 @@
 local S = minetest.get_translator("arena_lib")
 
 local arenas_in_edit_mode = {}      -- KEY: arena name; VALUE: name of the player inside the editor
-local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv, pos, hotbar_slots, hotbar_bg }  (it stores the listed player properties to restore them when they leave the editor)
+local players_in_edit_mode = {}     -- KEY: player name; VALUE: {inv, pos, hotbar_slots, hotbar_bg, item_in_hand }
 local editor_tools = {
   "arena_lib:editor_players",
   "arena_lib:editor_spawners",
@@ -16,10 +16,26 @@ local editor_tools = {
 
 
 
+----------------------------------------
+-- VISUALIZZAZIONE NOMI OGGETTI SU GLOBALSTEP
+--
+minetest.register_globalstep(function(dtime)
+  for pl_name, pl_data in pairs(players_in_edit_mode) do
+    local item = minetest.get_player_by_name(pl_name):get_wielded_item()
+    if item:get_name() ~= pl_data.item_in_hand then
+      local i_name = item:get_description()
+      arena_lib.HUD_send_msg("hotbar", pl_name, i_name)
+      pl_data.item_in_hand = i_name
+    end
+  end
+end)
+----------------------------------------
+
+
+
 function arena_lib.register_editor_section(mod, def)
 
   local name = def.name or "Rename me via `name = something`"
-  local hotbar_msg = def.hotbar_message or "Rename me via `hotbar_message = something`"
 
   -- non posso tradurla perché chiamata all'avvio ¯\_(ツ)_/¯
   assert(type(def.give_items) == "function", "[ARENA_LIB] (" .. mod .. ") give_items function missing in register_editor_section!")
@@ -40,8 +56,6 @@ function arena_lib.register_editor_section(mod, def)
         local item_list = def.give_items(itemstack, user, arena)
 
         if not item_list then return end
-
-        arena_lib.HUD_send_msg("hotbar", user:get_player_name(), hotbar_msg)
 
         local inv = user:get_inventory()
 
@@ -213,8 +227,6 @@ function arena_lib.show_main_editor(player)
   if minetest.registered_items[mod .. ":arenalib_editor_slot_custom"] then
     player:get_inventory():set_stack("main", 6, mod .. ":arenalib_editor_slot_custom")
   end
-
-  arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Arena_lib editor | Now editing: @1", arena_name))
 end
 
 

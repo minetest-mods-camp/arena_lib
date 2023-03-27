@@ -369,13 +369,12 @@ If the registration was successful, it'll appear in the list of entrances type d
 ### 1.11 Extendable editor
 Since 4.0, every minigame can extend the editor with an additional custom section on the 6th slot. To do that, the function is
 ```lua
-arena_lib.register_editor_section("yourmod", {parameter1, parameter2 etc})
+arena_lib.register_editor_section("yourmod", {param1, param2 etc})
 ```
-On the contrary of when an arena is registered, every parameter here is mandatory. They are:
-* `name`: the name of the item that will represent the section
+Every parameter here is mandatory. They are:
+* `name`: the name of the item that will represent the section (it'll also appear in the hotbar HUD)
 * `icon`: the icon of the item that will represent the section
-* `hotbar_message`: the message that will appear in the hotbar HUD once the section has been opened
-* `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or nil if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly
+* `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or `nil` if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly. The name of each item will be displayed in the hotbar HUD when wielded
 
 When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
 
@@ -455,7 +454,7 @@ If you love yourself, there is a built-in editor that allows you to easily make 
 
 ### 2.2.1 Editor
 arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands.  
-In order to use the editor, no other players shall be editing the same arena and there shall not be any ongoing game. When entering, the arena is disabled automatically. The rest is pretty straightforward :D if you're not sure of what something does, just open the inventory and read its name.  
+In order to use the editor, no other players shall be editing the same arena and there shall not be any ongoing game. When entering, the arena is disabled automatically. The rest is pretty straightforward :D
 
 The command calling the editor is `/arenas edit (<minigame>) <arena>`. Feel now free to skip to [2.3 Arena phases](#23-arena-phases).
 

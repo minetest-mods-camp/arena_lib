@@ -20,8 +20,6 @@ minetest.register_tool("arena_lib:editor_players", {
       end
 
       user:get_meta():set_int("arena_lib_editor.players_number", 2)
-
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Players | num to set: @1 (left/right click slot #4 to change)", 2))
       arena_lib.give_players_tools(user:get_inventory(), mod, arena)
     end
 })
@@ -38,8 +36,6 @@ minetest.register_tool("arena_lib:editor_spawners", {
 
     on_use = function(itemstack, user)
       user:get_meta():set_int("arena_lib_editor.team_ID", 1)
-
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Spawners"))
       arena_lib.give_spawners_tools(user)
     end
 })
@@ -55,7 +51,6 @@ minetest.register_tool("arena_lib:editor_customise", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Pimp my arena"))
       arena_lib.give_customise_tools(user)
     end
 })
@@ -71,7 +66,6 @@ minetest.register_tool("arena_lib:editor_settings", {
     on_drop = function() end,
 
     on_use = function(itemstack, user)
-      arena_lib.HUD_send_msg("hotbar", user:get_player_name(), S("Arena settings"))
       arena_lib.give_settings_tools(user)
     end
 

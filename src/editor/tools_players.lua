@@ -235,7 +235,6 @@ function change_amount(player, decrease)
   end
 
   player:get_meta():set_int("arena_lib_editor.players_number", amount)
-  arena_lib.HUD_send_msg("hotbar", player:get_player_name(), S("Players | num to set: @1 (left/right click slot #4 to change)", amount))
 end
 
 

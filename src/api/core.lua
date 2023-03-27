@@ -320,7 +320,6 @@ function arena_lib.register_entrance_type(mod, entrance, def)
       table.insert(items, 8, "arena_lib:editor_return")
       table.insert(items, 9, "arena_lib:editor_quit")
 
-      arena_lib.HUD_send_msg("hotbar", p_name, editor.description)
       user:get_inventory():set_list("main", items)
     end
   })
