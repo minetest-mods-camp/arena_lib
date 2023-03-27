@@ -152,13 +152,10 @@ Arena_lib editor | Now editing: @1=
 
 # editor/editor_icons.lua
 Players=
-Players | num to set: @1 (left/right click slot #4 to change)=
-Values are PER TEAM!=
+Values are PER TEAM! Use item #4 to change value=
 Spawners=
 Customise=
-Pimp my arena=
 Settings=
-Arena settings=
 Info=
 Go back=
 Enable and leave=
@@ -183,7 +180,7 @@ Players required=
 Players supported (right click to remove the limit)=
 Players supported (click to set a limit)=
 Teams amount=
-Change the current number=
+Change value (LMB increases, RMB decreases)=
 Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 

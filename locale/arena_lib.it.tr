@@ -152,13 +152,10 @@ Arena_lib editor | Now editing: @1=Arena_lib editor | Stai modificando: @1
 
 # editor/editor_icons.lua
 Players=Giocatorɜ
-Players | num to set: @1 (left/right click slot #4 to change)=Giocatorɜ | num: @1 (click sx/dx su casella #4 per cambiare)
-Values are PER TEAM!=I valori sono PER SQUADRA!
+Values are PER TEAM! Use item #4 to change value=I valori sono PER SQUADRA! Usa il 4° oggetto per cambiare valore
 Spawners=Punti di rinascita
 Customise=Personalizza
-Pimp my arena=Rendila bella bellina
 Settings=Impostazioni
-Arena settings=Impostazioni arena
 Info=Info
 Go back=Torna indietro
 Enable and leave=Abilita ed esci
@@ -183,7 +180,7 @@ Players required=Giocatorɜ minimɜ
 Players supported (right click to remove the limit)=Giocatorɜ massimɜ (tasto dx per rimuovere il limite)
 Players supported (click to set a limit)=Giocatorɜ massimɜ (premi per impostare un limite)
 Teams amount=Numero squadre
-Change the current number=Cambia il numero attuale
+Change value (LMB increases, RMB decreases)=Cambia valore (sx aumenta, dx diminuisce)
 Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 

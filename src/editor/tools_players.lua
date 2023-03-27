@@ -8,7 +8,7 @@ local players_tools = {
   "",                                 -- arena_lib:players_min
   "",                                 -- arena_lib:players_max or players_max_inf
   "",                                 -- arena_lib:teams_amount
-  "arena_lib:players_change",
+  "arena_lib:players_change 2",
   "",
   "",                                 -- arena_lib:players_teams_on/off
   "",
@@ -119,10 +119,11 @@ minetest.register_node("arena_lib:players_teams_amount", {
 
 
 
-minetest.register_tool("arena_lib:players_change", {
+minetest.register_node("arena_lib:players_change", {
 
-    description = S("Change the current number"),
+    description = S("Change value (LMB increases, RMB decreases)"),
     inventory_image = "arenalib_tool_players_change.png",
+    wield_image = "arenalib_tool_players_change.png",
     groups = {not_in_creative_inventory = 1},
     on_drop = function() end,
 
@@ -234,6 +235,7 @@ function change_amount(player, decrease)
     else return end
   end
 
+  player:set_wielded_item("arena_lib:players_change " .. amount)
   player:get_meta():set_int("arena_lib_editor.players_number", amount)
 end
 
