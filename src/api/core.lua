@@ -25,9 +25,7 @@ local arena_default = {
   name = "",
   author = "???",
   thumbnail = "",
-  entrance = nil,
   entrance_type = arena_lib.DEFAULT_ENTRANCE,
-  custom_return_point = nil,
   players = {},                       -- KEY: player name, VALUE: {deaths, teamID, <player_properties>}
   spectators = {},                    -- KEY: player name, VALUE: true
   players_and_spectators = {},        -- KEY: pl/sp name,  VALUE: true
@@ -36,24 +34,32 @@ local arena_default = {
   teams = {-1},
   teams_enabled = false,
   players_amount = 0,
-  players_amount_per_team = nil,
   spectators_amount = 0,
-  spectators_amount_per_team = nil,
-  spectate_entities_amount = nil,
-  spectate_areas_amount = nil,
   spawn_points = {},
   max_players = 4,
   min_players = 2,
-  celestial_vault = nil,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
-  lighting = nil,                      -- light = override_day_night_ratio
-  bgm = nil,
-  initial_time = nil,
-  current_time = nil,
   in_queue = false,
   in_loading = false,
   in_game = false,
   in_celebration = false,
   enabled = false
+}
+
+-- these fields are `nil` by default; this list is only used in check_for_properties
+-- local function, to be sure no minigame uses any of these fields as a custom
+-- arena property
+local arena_optional_fields = {
+  entrance = true,
+  custom_return_point = true,
+  players_amount_per_team = true,
+  spectators_amount_per_team = true,
+  spectate_entities_amount = true,
+  spectate_areas_amount = true,
+  celestial_vault = true,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
+  lighting = true,                      -- light = override_day_night_ratio
+  bgm = true,
+  initial_time = true,
+  current_time = true
 }
 
 
@@ -1020,7 +1026,7 @@ function arena_lib.set_lighting(sender, mod, arena_name, light_table, in_editor)
   arena.lighting = light_table
 
   update_storage(false, mod, id, arena)
-  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Lighting of arena @1 successfully overwritten", arena.name))
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Lighting of arena @1 successfully overwritten", arena_name))
 end
 
 
@@ -1056,7 +1062,7 @@ function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params,
   element = element:gsub("^%l", string.upper) -- per non tradurre sia Sky che sky
 
   update_storage(false, mod, id, arena)
-  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("(@1) Celestial vault of arena @2 successfully overwritten", S(element), arena.name))
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("(@1) Celestial vault of arena @2 successfully overwritten", S(element), arena_name))
 end
 
 
@@ -1090,7 +1096,7 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume
   end
 
   update_storage(false, mod, id, arena)
-  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Background music of arena @1 successfully overwritten", arena.name))
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Background music of arena @1 successfully overwritten", arena_name))
 end
 
 
@@ -1602,8 +1608,8 @@ function check_for_properties(mod, mod_ref)
   -- aggiungo le nuove proprietà
   for property, v in pairs(mod_ref.properties) do
     if old_properties_table[property] == nil then
-      assert(arena_default[property] == nil, "[ARENA_LIB] Custom property " .. property .. " can't be added " ..
-                                      " as it has the same name of an arena default property. Please change name")
+      assert(arena_default[property] == nil and arena_optional_fields[property] == nil, "[ARENA_LIB] Custom property " .. property ..
+              " of mod " .. mod_ref.name .. " can't be added as it has got the same name of an arena default property. Please rename it")
       minetest.log("action", "[ARENA_LIB] Adding property " .. property)
 
       for id, arena in pairs(mod_ref.arenas) do
@@ -1611,7 +1617,6 @@ function check_for_properties(mod, mod_ref)
         update_storage(false, mod, id, arena)
       end
     end
-
   end
 
   -- rimuovo quelle non più presenti
