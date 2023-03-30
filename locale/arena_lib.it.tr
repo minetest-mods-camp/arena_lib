@@ -109,6 +109,7 @@ Background music of arena @1 successfully overwritten=Musica di sottofondo dell'
 Arena @1's timer is now @2 seconds=Il timer dell'arena @1 è ora @2 secondi
 [!] Insufficient spawners, the arena can't be enabled!=[!] Punti di rinascita insufficienti, l'arena non può essere abilitata!
 [!] Entrance not set, the arena can't be enabled!=[!] Entrata non dichiarata, l'arena non può essere abilitata!
+[!] If the arena region is declared, all the existing spawn points must be placed inside it!=[!] Se si dichiara la regione dell'arena, tutti i punti di rinascita presenti devono essere posizionati al suo interno!
 Arena @1 successfully enabled=Arena @1 abilitata con successo
 [!] The arena is already disabled=[!] L'arena è già disabilitata
 [!] You can't disable an arena during an ongoing game!=[!] Non puoi disabilitare un'arena mentre una partita è in corso!

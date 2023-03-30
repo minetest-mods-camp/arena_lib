@@ -453,7 +453,7 @@ Arenas and their settings are stored inside the mod storage. What is *not* store
 Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
 
 ### 2.2 Setting up an arena
-In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, at least one spawner has to be set (it's per team if teams are enabled), an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through.  
+In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, at least one spawner has to be set (it's per team if teams are enabled), an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through. Additionally, arenas having a [region](#25-arena-region) set must also have all the declared spawners inside the region.
 
 If you love yourself, there is a built-in editor that allows you to easily make these things and many many more. Or, if you don't love yourself, you can connect every setup function to your custom CLI. Either way, run `/arenas create <minigame> <arena>` to create your first arena.
 
@@ -534,7 +534,9 @@ By default, spectate mode allows to follow players, but it also allows modders t
 <br>  
 
 ### 2.5 Arena region
-An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside of it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
+An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
+When a region is declared, be sure that every existing spawn point is placed inside the region, or it won't be possible to enable the arena.  
+
 An util function that comes with it is `arena_lib.is_player_in_region(..)`
 
 ## 3. About the author(s)

@@ -109,6 +109,7 @@ Background music of arena @1 successfully overwritten=
 Arena @1's timer is now @2 seconds=
 [!] Insufficient spawners, the arena can't be enabled!=
 [!] Entrance not set, the arena can't be enabled!=
+[!] If the arena region is declared, all the existing spawn points must be placed inside it!=
 Arena @1 successfully enabled=
 [!] The arena is already disabled!=
 [!] You can't disable an arena during an ongoing game!=

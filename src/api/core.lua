@@ -955,7 +955,6 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
   local entrance = arena_lib.entrances[arena.entrance_type]
 
   if action == "add" then
-
     if arena.entrance then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is already an entrance for this arena!")))
       return end
@@ -968,7 +967,6 @@ function arena_lib.set_entrance(sender, mod, arena_name, action, ...)
     minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Entrance of arena @1 successfully set", arena_name))
 
   elseif action == "remove" then
-
     if not arena.entrance then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] There is no entrance to remove assigned to @1!", arena_name)))
       return end
@@ -1026,6 +1024,7 @@ function arena_lib.set_region(sender, mod, arena_name, pos1, pos2, in_editor)
     arena.pos2 = nil
 
   else
+    -- controllo che i parametri siano corretti
     if not pos1 or not pos2 or not vector.check(pos1) or not vector.check(pos2) then
       minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
       return end
@@ -1188,6 +1187,28 @@ function arena_lib.enable_arena(sender, mod, arena_name, in_editor)
     minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Entrance not set, the arena can't be enabled!")))
     arena.enabled = false
     return end
+
+  -- se c'è una regione ma qualche punto rinascita sta al di fuori
+  if arena.pos1 then
+    local v1, v2  = vector.sort(arena.pos1, arena.pos2)
+    local region  = VoxelArea:new({MinEdge=v1, MaxEdge=v2})
+
+    if not arena.teams_enabled then
+      for _, spawner in pairs(arena.spawn_points) do
+        if not region:containsp(spawner) then
+          minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] If the arena region is declared, all the existing spawn points must be placed inside it!")))
+          return end
+      end
+    else
+      for _, team_table in pairs(arena.spawn_points) do
+        for _, spawner in pairs(team_table) do
+          if not region:containsp(spawner) then
+            minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] If the arena region is declared, all the existing spawn points must be placed inside it!")))
+            return end
+        end
+      end
+    end
+  end
 
   local mod_ref = arena_lib.mods[mod]
 
