@@ -38,8 +38,10 @@
 			* [2.2.2.8 Music](#2228-music)
 			* [2.2.2.9 Celestial vault](#2229-celestial-vault)
 			* [2.2.2.10 Lighting](#22210-lighting)
+			* [2.2.2.11 Region](#22211-region)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
+	* [2.5 Arena region](#25-arena-region)
 * [3. About the author(s)](#3-about-the-authors)
 
 ## 1. Minigame configuration
@@ -312,6 +314,7 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.is_area_spectated(mod, arena_name, pos_name)`: returns whether an area is being spectated
 * `arena_lib.is_arena_in_edit_mode(arena_name)`: returns whether the arena is in edit mode or not, as a boolean
 * `arena_lib.is_player_in_edit_mode(p_name)`: returns whether a player is editing an arena, as a boolean
+* `arena_lib.is_player_in_region(arena, p_name)`: returns whether a player is inside the region of `arena`, if declared
 
 ### 1.8 Getters
 * `arena_lib.get_arena_by_name(mod, arena_name)`: returns the ID and the whole arena. Contrary to the duo `get_arena_by_player` and `get_arenaID_by_player`, this is not split in two as these two variables are often needed together inside arena_lib
@@ -398,6 +401,8 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
 * `custom_return_point`: (table) a position that, if declared, overrides the `hub_spawn_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
+* `pos1`: (table) one of the corners that determine the region of the arena, alongside `pos2`. Check [#2.5 - Arena region](#25-arena-region) to learn more. Default is `nil`
+* `pos2`: ^
 * `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
 * `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
 * `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
@@ -512,6 +517,9 @@ NOTE: EXPERIMENTAL FEATURE. EXPECT BREAKAGE IN THE FUTURE (according to the dire
 By default, the arena's lighting settings reflect the lighting settings of the player before entering the match (meaning there are no default values inside arena_lib).  
 `arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. As for now, `light_table` only takes one field, `light`, a float between 0 and 1 that changes the intensity of the global lighting. If `light_table` is `nil`, it'll reset the whole lighting settings.  
 
+##### 2.2.2.11 Region
+`arena_lib.set_region(sender, mod, arena_name, pos1, pos2)` allows you to set the region of the arena. `pos1` and `pos2` are both mandatory and they both need to be vectors (sending a table such as `{x=3,z=4,y=2}` won't work).
+
 ### 2.3 Arena phases
 An arena comes in 4 phases:
 * `queuing phase`: the queuing process. People interact with the entrance waiting for other players to play with
@@ -524,6 +532,10 @@ An arena comes in 4 phases:
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), whereas the other is through the very entrance of the arena (if implemented). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
 By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(...)` and `arena_lib.add_spectate_area(...)`
 <br>  
+
+### 2.5 Arena region
+An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside of it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
+An util function that comes with it is `arena_lib.is_player_in_region(..)`
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [Liberapay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`

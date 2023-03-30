@@ -1,4 +1,4 @@
-# version 6.1.0
+# version 6.2.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -93,6 +93,7 @@ Entrance type of arena @1 successfully changed (@2)=
 Entrance of arena @1 successfully removed=
 Custom return point of arena @1 succesfully removed=
 Custom return point of arena @1 succesfully set=
+Region of arena @1 successfully overwritten=
 [!] There is already an entrance for this arena!=
 Entrance of arena @1 successfully set=
 Lighting of arena @1 successfully overwritten=
@@ -185,10 +186,12 @@ Teams: on (click to toggle off)=
 Teams: off (click to toggle on)=
 
 # editor/tools_settings.lua
+Arena region (LMB pos1, RMB pos2, Q removes)=
+Custom return point (LMB sets, RMB removes)=
 Arena name, author and thumbnail=
 Arena properties=
-Custom return point (LMB sets, RMB removes)=
 Delete arena=
+Are you sure you want to delete the region of the arena?=
 Rename arena=
 Set author=
 Set thumbnail=
@@ -317,6 +320,7 @@ Past and present players inside: =
 Enabled: =
 Status: =
 Entrance: =
+Region: =
 Custom return point: =
 Spawn points: =
 Custom sky: =

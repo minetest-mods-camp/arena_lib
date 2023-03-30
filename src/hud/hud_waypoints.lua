@@ -50,6 +50,34 @@ function arena_lib.show_waypoints(p_name, mod, arena)
     })
 
     table.insert(waypoints[p_name], HUD_ID)
+
+    -- eventuale regione
+    -- TODO: si potrebbe usare https://github.com/minetest/minetest/pull/13020 in
+    -- futuro per renderizzare i bordi della regione. Questo renderebbe tuttavia
+    -- impossibile fare catture senza avere i bordi renderizzati; per ovviare,
+    -- si è ipotizzato di nascondere la regione al premere E su qualsiasi casella,
+    -- anche se sarebbe un po' un'esagerazione dato che non penso ci sarebbero altri
+    -- elementi grafici da nascondere (i marcatori già spariscono con F2). Un'altra
+    -- opzione è aggiungere /arenas tp <arena>, ma questo non appplicherebbe le
+    -- personalizzazioni grafiche dell'arena (quindi prob anche peggio)
+    if arena.pos1 then
+      local pos1 = player:hud_add({
+        name = "Pos1",
+        hud_elem_type = "waypoint",
+        precision = 0,
+        world_pos = arena.pos1
+      })
+
+      local pos2 = player:hud_add({
+        name = "Pos2",
+        hud_elem_type = "waypoint",
+        precision = 0,
+        world_pos = arena.pos2
+      })
+
+      table.insert(waypoints[p_name], pos1)
+      table.insert(waypoints[p_name], pos2)
+    end
   end)
 end
 

@@ -23,6 +23,7 @@ function arena_lib.print_minigames(sender)
 end
 
 
+
 function arena_lib.print_arenas(sender, mod)
   local mod_ref = arena_lib.mods[mod]
 
@@ -174,11 +175,16 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     status = S("waiting")
   end
 
-  -- calcolo entrata
-  if arena.entrance == nil then
-    entrance = "---"
-  else
+  -- calcolo eventuale entrata
+  local entrance = "---"
+  if arena.entrance ~= nil then
     entrance = arena_lib.entrances[arena.entrance_type].print(arena.entrance)
+  end
+
+  -- calcolo eventuale regione
+  local region = "---"
+  if arena.pos1 then
+    region = "Pos1 " .. minetest.pos_to_string(arena.pos1) .. " Pos2 " .. minetest.pos_to_string(arena.pos2) .. ""
   end
 
   -- calcolo eventuale punto di ritorno personalizzato
@@ -222,11 +228,9 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
   end
 
   -- calcolo eventuale illuminazione personalizzata
-  local lighting = ""
+  local lighting = "---"
   if arena.lighting then
     lighting = table_to_string(arena.lighting)
-  else
-    lighting = "---"
   end
 
   --calcolo proprietà
@@ -277,7 +281,6 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     end
   end
 
-
   minetest.chat_send_player(sender,
     minetest.colorize("#cfc6b8", "====================================") .. "\n" ..
     minetest.colorize("#eea160", S("Name: ")) .. minetest.colorize("#cfc6b8", arena_name ) .. "\n" ..
@@ -306,6 +309,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
     minetest.colorize("#eea160", S("Enabled: ")) .. minetest.colorize("#cfc6b8", tostring(arena.enabled)) .. "\n" ..
     minetest.colorize("#eea160", S("Status: ")) .. minetest.colorize("#cfc6b8", status) .. "\n" ..
     minetest.colorize("#eea160", S("Entrance: ")) .. minetest.colorize("#cfc6b8", "(" .. arena.entrance_type .. ") " .. entrance) .. "\n" ..
+    minetest.colorize("#eea160", S("Region: ")) .. minetest.colorize("#cfc6b8", region) .. "\n" ..
     minetest.colorize("#eea160", S("Custom return point: ")) .. minetest.colorize("#cfc6b8", custom_return_point) .. "\n" ..
     minetest.colorize("#eea160", S("Spawn points: ")) .. minetest.colorize("#cfc6b8", arena_lib.get_arena_spawners_count(arena) .. " ( " .. spawners_pos .. ")") .. "\n\n" ..
 

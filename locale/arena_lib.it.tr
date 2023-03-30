@@ -1,4 +1,4 @@
-# version 6.1.0
+# version 6.2.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -93,6 +93,7 @@ Entrance type of arena @1 successfully changed (@2)=Tipo d'entrata dell'arena @1
 Entrance of arena @1 successfully removed=Entrata dell'arena @1 rimosso con successo
 Custom return point of arena @1 succesfully removed=Punto di ritorno personalizzato dell'arena @1 rimosso con successo
 Custom return point of arena @1 succesfully set=Punto di ritorno personalizzato dell'arena @1 impostato con successo
+Region of arena @1 successfully overwritten=Regione dell'arena @1 sovrascritta con successo
 [!] There is already an entrance for this arena!=[!] Esiste già un'entrata per quest'arena!
 Entrance of arena @1 successfully set=Entrata dell'arena @1 impostata con successo
 Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
@@ -185,10 +186,12 @@ Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
 Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
 
 # editor/tools_settings.lua
+Arena region (LMB pos1, RMB pos2, Q removes)=Regione dell'arena (sx pos1, dx pos2, Q rimuovi)
+Custom return point (LMB sets, RMB removes)=Punto di ritorno personalizzato (sx imposta, dx rimuove)
 Arena name, author and thumbnail=Nome arena, autorə e miniatura
 Arena properties=Proprietà arena
-Custom return point (LMB sets, RMB removes)=Punto di ritorno personalizzato (sx imposta, dx rimuove)
 Delete arena=Cancella arena
+Are you sure you want to delete the region of the arena?=Sei sicurə di voler eliminare la regione dell'arena?
 Rename arena=Rinomina arena
 Set author=Imposta autorə
 Set thumbnail=Imposta miniatura
@@ -317,6 +320,7 @@ Past and present players inside: =Giocatorɜ presenti e passatɜ dentro:
 Enabled: =Abilitata: 
 Status: =Stato: 
 Entrance: =Entrata: 
+Region: =Regione: 
 Custom return point: =Punto di ritorno personalizzato: 
 Spawn points: =Punti di rinascita: 
 Custom sky: =Cielo personalizzato: 

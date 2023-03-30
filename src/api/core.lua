@@ -55,6 +55,8 @@ local arena_optional_fields = {
   spectators_amount_per_team = true,
   spectate_entities_amount = true,
   spectate_areas_amount = true,
+  pos1 = true,
+  pos2 = true,
   celestial_vault = true,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
   lighting = true,                      -- light = override_day_night_ratio
   bgm = true,
@@ -1008,6 +1010,33 @@ function arena_lib.set_custom_return_point(sender, mod, arena_name, pos, in_edit
 
   update_storage(false, mod, id, arena)
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S(msg, arena_name))
+end
+
+
+
+function arena_lib.set_region(sender, mod, arena_name, pos1, pos2, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not arena_lib.is_player_in_edit_mode(sender) then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if not pos1 and not pos2 then
+    arena.pos1 = nil
+    arena.pos2 = nil
+
+  else
+    if not pos1 or not pos2 or not vector.check(pos1) or not vector.check(pos2) then
+      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+      return end
+
+    arena.pos1 = vector.round(pos1)
+    arena.pos2 = vector.round(pos2)
+  end
+
+  arena_lib.update_waypoints(sender, mod, arena)
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Region of arena @1 successfully overwritten", arena_name))
 end
 
 

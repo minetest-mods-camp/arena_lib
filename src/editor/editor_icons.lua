@@ -68,7 +68,6 @@ minetest.register_tool("arena_lib:editor_settings", {
     on_use = function(itemstack, user)
       arena_lib.give_settings_tools(user)
     end
-
 })
 
 
@@ -87,7 +86,6 @@ minetest.register_tool("arena_lib:editor_info", {
 
       arena_lib.print_arena_info(user:get_player_name(), mod, arena_name)
     end
-
 })
 
 
@@ -103,7 +101,6 @@ minetest.register_tool("arena_lib:editor_return", {
     on_use = function(itemstack, user)
       arena_lib.show_main_editor(user)
     end
-
 })
 
 
@@ -122,7 +119,6 @@ minetest.register_tool("arena_lib:editor_enable", {
 
       arena_lib.enable_arena(user:get_player_name(), mod, arena_name, true)
     end
-
 })
 
 
@@ -138,5 +134,4 @@ minetest.register_tool("arena_lib:editor_quit", {
     on_use = function(itemstack, user)
       arena_lib.quit_editor(user)
     end
-
 })

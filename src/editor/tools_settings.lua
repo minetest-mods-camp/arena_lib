@@ -1,17 +1,18 @@
 local S = minetest.get_translator("arena_lib")
 local FS = minetest.formspec_escape
 
+local function get_region_formspec() end
 local function get_rename_author_thumbnail_formspec() end
 local function get_properties_formspec() end
 local function get_timer_formspec() end
 local function get_delete_formspec() end
 
 local settings_tools = {
-  "arena_lib:settings_rename_author",
+  "arena_lib:settings_region",
   "arena_lib:settings_returnpoint",
+  "arena_lib:settings_rename_author",
   "arena_lib:settings_properties",
   "",                                       -- timer_off/_on
-  "",
   "arena_lib:settings_delete",
   "",
   "arena_lib:editor_return",
@@ -19,6 +20,85 @@ local settings_tools = {
 }
 
 local sel_property_attr = {}     --KEY: p_name; VALUE: {id = idx, name = property_name}
+
+
+
+minetest.register_tool("arena_lib:settings_region", {
+
+  description = S("Arena region (LMB pos1, RMB pos2, Q removes)"),
+  inventory_image = "arenalib_tool_settings_region.png",
+  groups = {not_in_creative_inventory = 1},
+
+  on_drop = function(itemstack, dropper, pos)
+    local arena_name  = dropper:get_meta():get_string("arena_lib_editor.arena")
+    minetest.show_formspec(dropper:get_player_name(), "arena_lib:settings_region", get_region_formspec(arena_name))
+  end,
+
+  on_use = function(itemstack, user, pointed_thing)
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+    local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
+    local p_pos       = user:get_pos()
+    local pos2        = arena.pos2 or p_pos
+
+    -- copio perché arena.pos2 non è creato da vector.*, fallendo vector.check() in arena_lib.set_region()
+    arena_lib.set_region(user:get_player_name(), mod, arena_name, p_pos, vector.copy(pos2), in_editor)
+  end,
+
+  on_secondary_use = function(itemstack, user, pointed_thing)
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+    local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
+    local p_pos       = user:get_pos()
+    local pos1        = arena.pos1 or p_pos
+
+    arena_lib.set_region(user:get_player_name(), mod, arena_name, vector.copy(pos1), p_pos, in_editor)
+  end,
+
+  on_place = function(itemstack, placer, pointed_thing)
+    local mod         = placer:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = placer:get_meta():get_string("arena_lib_editor.arena")
+    local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
+    local p_pos       = placer:get_pos()
+    local pos1        = arena.pos1 or p_pos
+
+    arena_lib.set_region(placer:get_player_name(), mod, arena_name, vector.copy(pos1), p_pos, in_editor)
+  end
+})
+
+
+
+minetest.register_tool("arena_lib:settings_returnpoint", {
+
+  description = S("Custom return point (LMB sets, RMB removes)"),
+  inventory_image = "arenalib_tool_settings_returnpoint.png",
+  groups = {not_in_creative_inventory = 1},
+  on_drop = function() end,
+
+  on_use = function(itemstack, user, pointed_thing)
+    local p_name      = user:get_player_name()
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, vector.round(user:get_pos()), true)
+  end,
+
+  on_secondary_use = function(itemstack, user, pointed_thing)
+    local p_name      = user:get_player_name()
+    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
+  end,
+
+  on_place = function(itemstack, placer, pointed_thing)
+    local p_name      = placer:get_player_name()
+    local mod         = placer:get_meta():get_string("arena_lib_editor.mod")
+    local arena_name  = placer:get_meta():get_string("arena_lib_editor.arena")
+
+    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
+  end
+})
 
 
 
@@ -57,40 +137,6 @@ minetest.register_tool("arena_lib:settings_properties", {
 
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, 1))
     end
-})
-
-
-
-minetest.register_tool("arena_lib:settings_returnpoint", {
-
-  description = S("Custom return point (LMB sets, RMB removes)"),
-  inventory_image = "arenalib_tool_settings_returnpoint.png", -- TODO: immagine
-  groups = {not_in_creative_inventory = 1},
-  on_drop = function() end,
-
-  on_use = function(itemstack, user, pointed_thing)
-    local p_name      = user:get_player_name()
-    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-
-    arena_lib.set_custom_return_point(p_name, mod, arena_name, vector.round(user:get_pos()), true)
-  end,
-
-  on_secondary_use = function(itemstack, placer, pointed_thing)
-    local p_name      = placer:get_player_name()
-    local mod         = placer:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name  = placer:get_meta():get_string("arena_lib_editor.arena")
-
-    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
-  end,
-
-  on_place = function(itemstack, user, pointed_thing)
-    local p_name      = user:get_player_name()
-    local mod         = user:get_meta():get_string("arena_lib_editor.mod")
-    local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-
-    arena_lib.set_custom_return_point(p_name, mod, arena_name, nil, true)
-  end
 })
 
 
@@ -139,7 +185,7 @@ function arena_lib.give_settings_tools(user)
   local mod_ref = arena_lib.mods[mod]
 
   if mod_ref.time_mode == "decremental" then
-    inv:set_stack("main", 4, "arena_lib:timer")
+    inv:set_stack("main", 5, "arena_lib:timer")
   end
 end
 
@@ -150,6 +196,21 @@ end
 ----------------------------------------------
 ---------------FUNZIONI LOCALI----------------
 ----------------------------------------------
+
+function get_region_formspec(arena_name)
+  local formspec = {
+    "size[5,1.3]",
+    "style[region_delete_confirm;bgcolor=red]",
+    "hypertext[0.25,-0.1;5,1;delete_msg;<global halign=center>" .. S("Are you sure you want to delete the region of the arena?") .. "]",
+    "button[3,0.7;1.5,0.5;region_delete_confirm;" .. S("Yes") .. "]",
+    "button[0.5,0.7;1.5,0.5;region_delete_cancel;" .. S("Cancel") .. "]",
+    "field_close_on_enter[;false]"
+  }
+
+  return table.concat(formspec, "")
+end
+
+
 
 function get_rename_author_thumbnail_formspec(arena)
   local formspec = {
@@ -253,7 +314,7 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 
-  if formname ~= "arena_lib:settings_timer" and formname ~= "arena_lib:settings_rename_author_thumbnail"
+  if formname ~= "arena_lib:settings_timer" and formname ~= "arena_lib:settings_region" and formname ~= "arena_lib:settings_rename_author_thumbnail"
   and formname ~= "arena_lib:settings_properties" and formname ~= "arena_lib:settings_delete" then
   return end
 
@@ -263,7 +324,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   -- GUI per rinominare arena e cambiare autore e miniatura
   if formname == "arena_lib:settings_rename_author_thumbnail" then
-
     if fields.key_enter then
       if fields.key_enter_field == "rename" then
         if not arena_lib.rename_arena(p_name, mod, arena_name, fields.rename, true) then return end
@@ -295,9 +355,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       arena_lib.set_thumbnail(p_name, mod, arena_name, fields.thumbnail, true)
     end
 
+  -- GUI per cancellare regione
+  elseif formname == "arena_lib:settings_region" then
+    if fields.region_delete_confirm then
+      minetest.close_formspec(p_name, formname)
+
+      arena_lib.set_region(p_name, mod, arena_name, nil, nil, true)
+    elseif fields.region_delete_cancel then
+      minetest.close_formspec(p_name, formname)
+    end
+
   -- GUI per modificare proprietà
   elseif formname == "arena_lib:settings_properties" then
-
     local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
     -- se clicco sulla lista
@@ -317,7 +386,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   -- GUI per timer
   elseif formname == "arena_lib:settings_timer" then
-
     if fields.timer_confirm or fields.key_enter then
 
       local timer = tonumber(fields.set_timer)
@@ -332,7 +400,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   -- GUI per cancellare arena
   else
-
     if fields.delete_confirm then
       arena_lib.quit_editor(player)
       minetest.close_formspec(p_name, formname)
