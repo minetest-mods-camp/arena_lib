@@ -39,9 +39,9 @@
 			* [2.2.2.9 Celestial vault](#2229-celestial-vault)
 			* [2.2.2.10 Lighting](#22210-lighting)
 			* [2.2.2.11 Region](#22211-region)
+		* [2.2.3 Arena regions](#223-arena-regions)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
-	* [2.5 Arena region](#25-arena-region)
 * [3. About the author(s)](#3-about-the-authors)
 
 ## 1. Minigame configuration
@@ -401,9 +401,9 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
 * `custom_return_point`: (table) a position that, if declared, overrides the `hub_spawn_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
-* `pos1`: (table) one of the corners that determine the region of the arena, alongside `pos2`. Check [#2.5 - Arena region](#25-arena-region) to learn more. Default is `nil`
+* `pos1`: (table) one of the corners that determine the region of the arena, alongside `pos2`. Check [#2.2.3 - Arena regions](#223-arena-regions) to learn more. Default is `nil`
 * `pos2`: ^
-* `players`: (table) where to store players information, such as their team ID (`teamID`) and `player_properties`. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ...}`
+* `players`: (table) where to store players information. Default fields are `teamID` (if teams are enabled) and the death counter `deaths`. `player_properties` fields expand the list. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ..}`
 * `spectators`: (table) where to store spectators information. Format `{[sp_name] = true}`
 * `players_and_spectators`: (table) where to store both players and spectators names. Format `{[psp_name] = true}`
 * `past_present_players`: (table) keeps track of every player who took part to the match, even if they are spectators now or they left. Contrary to `players` and `players_and_spectators`, this is created when the arena loads, so it doesn't consider people who joined and left during the queue. Format `{[ppp_name] = true}`
@@ -453,7 +453,7 @@ Arenas and their settings are stored inside the mod storage. What is *not* store
 Better said, these kind of parameters are emptied every time the server starts. And not when it ends, because handling situations like crashes is simply not possible.
 
 ### 2.2 Setting up an arena
-In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, at least one spawner has to be set (it's per team if teams are enabled), an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through. Additionally, arenas having a [region](#25-arena-region) set must also have all the declared spawners inside the region.
+In order for an arena to be playable, four conditions must be satisfied: the arena has to exist, at least one spawner has to be set (it's per team if teams are enabled), an arena entrance must be put (to allow players to enter the minigame), and any potential custom check in the `arena_lib.on_enable` callback must go through. Additionally, arenas having a [region](#223-arena-regions) must not have spawners outside it.
 
 If you love yourself, there is a built-in editor that allows you to easily make these things and many many more. Or, if you don't love yourself, you can connect every setup function to your custom CLI. Either way, run `/arenas create <minigame> <arena>` to create your first arena.
 
@@ -461,7 +461,7 @@ If you love yourself, there is a built-in editor that allows you to easily make 
 arena_lib comes with a fancy editor via hotbar so you don't have to configure and memorise a lot of commands.  
 In order to use the editor, no other players shall be editing the same arena and there shall not be any ongoing game. When entering, the arena is disabled automatically. The rest is pretty straightforward :D
 
-The command calling the editor is `/arenas edit (<minigame>) <arena>`. Feel now free to skip to [2.3 Arena phases](#23-arena-phases).
+The command calling the editor is `/arenas edit (<minigame>) <arena>`. Feel now free to skip to [2.2.3 Arena regions](#223-arena-regions).
 
 #### 2.2.2 CLI
 If you don't want to rely on the hotbar, or you want both the editor and the commands via chat, here's how the commands work. Note that there actually is another parameter at the end of each of these functions named `in_editor` but, since it's solely used by the editor itself in order to run less checks, I've chosen to omit it.
@@ -520,6 +520,12 @@ By default, the arena's lighting settings reflect the lighting settings of the p
 ##### 2.2.2.11 Region
 `arena_lib.set_region(sender, mod, arena_name, pos1, pos2)` allows you to set the region of the arena. `pos1` and `pos2` are both mandatory and they both need to be vectors (sending a table such as `{x=3,z=4,y=2}` won't work).
 
+### 2.2.3 Arena regions
+An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
+When a region is declared, be sure that every existing spawn point is placed inside the region, or it won't be possible to enable the arena.  
+
+An util function that comes with it is `arena_lib.is_player_in_region(..)`
+
 ### 2.3 Arena phases
 An arena comes in 4 phases:
 * `queuing phase`: the queuing process. People interact with the entrance waiting for other players to play with
@@ -533,11 +539,6 @@ Every minigame has this mode enabled by default. As the name suggests, it allows
 By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(...)` and `arena_lib.add_spectate_area(...)`
 <br>  
 
-### 2.5 Arena region
-An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
-When a region is declared, be sure that every existing spawn point is placed inside the region, or it won't be possible to enable the arena.  
-
-An util function that comes with it is `arena_lib.is_player_in_region(..)`
 
 ## 3. About the author(s)
 I'm Zughy (Marco), a professional Italian pixel artist who fights for FOSS and digital ethics. If this library spared you a lot of time and you want to support me somehow, please consider donating on [Liberapay](https://liberapay.com/Zughy/). Also, this project wouldn't have been possible if it hadn't been for some friends who helped me testing through: `Giov4`, `SonoMichele`, `_Zaizen_` and `Xx_Crazyminer_xX`
