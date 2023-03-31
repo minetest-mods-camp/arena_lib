@@ -520,7 +520,7 @@ By default, the arena's lighting settings reflect the lighting settings of the p
 ##### 2.2.2.11 Region
 `arena_lib.set_region(sender, mod, arena_name, pos1, pos2)` allows you to set the region of the arena. `pos1` and `pos2` are both mandatory and they both need to be vectors (sending a table such as `{x=3,z=4,y=2}` won't work).
 
-### 2.2.3 Arena regions
+#### 2.2.3 Arena regions
 An arena region is an optional cuboid wrapping the arena (there can be only one per arena), that can be used for several purposes. An example is to save and then restore the arena map once the match is over, or eliminate any player that goes outside it. As for now, a region serves no purpose by default, so it's up to the single minigame to implement the logic behind it. However, with arena_lib 7.0, the map reset is going to be a built-in feature.  
 When a region is declared, be sure that every existing spawn point is placed inside the region, or it won't be possible to enable the arena.  
 
