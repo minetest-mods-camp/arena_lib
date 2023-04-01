@@ -171,15 +171,15 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator, was_spectator))`: called when a user joins an ongoing match. `as_spectator` returns true if they join as a spectator. `was_spectator` returns true if the user was spectating the arena when joining as an actual player
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_respawn(mod, function(arena, p_name))`: called when a player respawns
-* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated, is_forced))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena. `is_forced` returns true when the change is a result of `spectate_target(...)`
+* `arena_lib.on_change_spectated_target(mod, function(arena, sp_name, t_type, t_name, prev_type, prev_spectated, is_forced))`: called when a spectator (`sp_name`) changes who or what they're spectating, including when they get assigned someone to spectate at entering the arena. `is_forced` returns true when the change is a result of `spectate_target(..)`
     * `t_type` represents the type of the target (either `"player"`, `"entity"` or `"area"`)
-    * `t_name` its name. If it's an entity or an area, it'll be the name used to register it through the `arena_lib.add_spectate...` functions
+    * `t_name` its name. If it's an entity or an area, it'll be the name used to register it through the `arena_lib.add_spectate_*` functions
     * if they were following someone/something else earlier, `prev_type` and `prev_spectated` follow the same logic of the aforementioned parameters
     * Beware: as this gets called also when entering, keep in mind that it gets called before the `on_join` callback
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
-* `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(...)`)
-* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from a match. See `arena_lib.remove_player_from_arena(...)` to learn about the `reason` parameter
+* `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(..)`)
+* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from a match. See `arena_lib.remove_player_from_arena(..)` to learn about the `reason` parameter
 * `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit with `/quit`. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
 
 > **BEWARE**: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
@@ -232,7 +232,7 @@ Let's say you want to add a kill leader parameter. `Arena_lib` doesn't provide s
 No matter the type of property, they're all shared between arenas. Better said, their values can change, but there can't be an arena with more or less properties than another.
 
 #### 1.5.1 Arena properties
-The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(...)` and write:
+The difference between `properties` and temp/player/team's is that the former will be stored by the the mod so that when the server reboots it'll still be there, while the others won't and they reset every time a match ends. Everything but `properties` is temporary. In our case, for instance, we don't want the kill leader to be preserved outside of a match, thus we go to our `arena_lib.register_minigame(..)` and write:
 
 ```lua
 arena_lib.register_minigame("mymod", {
@@ -303,7 +303,7 @@ There are also some other functions which might turn useful. They are:
 		* All these reasons call `on_quit`, with the only exception of `1`, that calls `on_eliminate` if declared, and that only calls `on_quit` if there is no spectator mode
 	* `executioner` can be passed to tell who removed the player. By default, this happens when someone uses `/arenas kick` and `/forceend`, so that these commands can't be abused without consequences for the admin
 * `arena_lib.send_message_in_arena(arena, channel, msg, <teamID>, <except_teamID>)`: sends a message to all the players/spectators in that specific arena, according to what `channel` is: `"players"`, `"spectators"` or `"both"`. If `teamID` is specified, it'll be only sent to the players inside that very team. On the contrary, if `except_teamID` is `true`, it'll be sent to every player BUT the ones in the specified team. These last two fields are pointless if `channel` is equal to `"spectators"`
-* `arena_lib.add_spectate_entity(mod, arena, e_name, entity)`: adds to the current ongoing match a spectatable entity, allowing spectators to spectate more than just players. `e_name` is the name that will appear in the spectator info hotbar, and `entity` the `luaentity` table. When the entity is removed/unloaded, automatically calls `remove_spectate_entity(...)`
+* `arena_lib.add_spectate_entity(mod, arena, e_name, entity)`: adds to the current ongoing match a spectatable entity, allowing spectators to spectate more than just players. `e_name` is the name that will appear in the spectator info hotbar, and `entity` the `luaentity` table. When the entity is removed/unloaded, automatically calls `remove_spectate_entity(..)`
 * `arena_lib.add_spectate_area(mod, arena, pos_name, pos)`: same as `add_spectate_entity`, but it adds an area instead. `pos` is a table containing the coordinates of the area to spectate
 * `arena_lib.remove_spectate_entity(mod, arena, e_name)`: removes an entity from the spectatable entities of an ongoing match
 * `arena_lib.remove_spectate_area(mod, arena, pos_name)`: removes an area from the spectatable areas of an ongoing match
@@ -329,10 +329,10 @@ There are also some other functions which might turn useful. They are:
 * `arena_lib.get_players_in_team(arena, team_ID, <to_player>)`: returns a table containing as value either the names of the players inside the specified team or, if `to_player` is `true`, the players themselves
 * `arena_lib.get_active_teams(arena)`: returns an ordered table having as values the ID of teams that are not empty
 * `arena_lib.get_target_spectators(mod, arena_name, type, t_name)`: returns a list containing all the spectators currently following `t_name`. Format `{sp_name = true}`. For players, consider using the next function instead
-* `arena_lib.get_player_spectators(p_name)`: Like `get_target_spectators(...)` but cleaner and just for players. It's cleaner since there can't be two players with the same name, contrary to areas and entities
+* `arena_lib.get_player_spectators(p_name)`: Like `get_target_spectators(..)` but cleaner and just for players. It's cleaner since there can't be two players with the same name, contrary to areas and entities
 * `arena_lib.get_player_spectated(sp_name)`: returns the player `sp_name` is currently spectating, if any
-* `arena_lib.get_spectate_entities(mod, arena_name)`: returns a table containing all the spectatable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectate_entity(...)` and `entity` the `luaentity` table
-* `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(...)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
+* `arena_lib.get_spectate_entities(mod, arena_name)`: returns a table containing all the spectatable entities of `arena_name`, if any. Format `{e_name = entity}`, where `e_name` is the name used to register the entity in `add_spectate_entity(..)` and `entity` the `luaentity` table
+* `arena_lib.get_spectate_areas(mod, arena_name)`: same as in `get_spectate_entities(..)` but for areas. Entities returned in the table are the dummy ObjectRef entities put at the area coordinates
 * `arena_lib.get_player_in_edit_mode(arena_name)`: returns the name of the player who's editing `arena_name`, if any
 
 ### 1.9 Endless minigames
@@ -363,7 +363,7 @@ arena_lib.register_entrance_type(mod, entrance, def)
 		* `on_enter`: (function(p_name, mod, arena)) called when entering the editor. Useful to reset entrance properties bound to `p_name`, as it's the only way the player has to know that the editor has been entered by someone
 	* `debug_output`: (function(entrance)): what the debug log should print (via `arena_lib.print_arena_info()`)
 
-Then, a useful function you want to call through the tools in the editor section is `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`, where `action` is a string taking either `"add"` or `"remove"`. In case of `"add"`, you can also attach whatever parameter you want after (`...`). For instance, built-in signs pass the pointed position, which is then checked on `on_add` and lastly returned so that arena_lib can add it. These checks are not run in the tool itself because this won't allow to run them outside the editor (i.e. CLI and custom calls from other mods).  
+Then, a useful function you want to call through the tools in the editor section is `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`, where `action` is a string taking either `"add"` or `"remove"`. In case of `"add"`, you can also attach whatever parameter(s) you want after `action`. For instance, built-in signs pass the pointed position, which is then checked on `on_add` and lastly returned so that arena_lib can add it. These checks are not run in the tool itself because this won't allow to run them outside the editor (i.e. CLI and custom calls from other mods).  
 
 If you're a bit confused, have a look at [this mod](https://gitlab.com/marco_a/arena_lib-entrance-test) for a practical implementation.  
 
@@ -500,7 +500,7 @@ To customise the arena return point (by default `hub_spawn_point`), use `arena_l
 
 ##### 2.2.2.9 Celestial vault
 By default, the arena's celestial vault reflects the celestial vault of the player before entering the match (meaning there are no default values inside arena_lib).  
-`arena_lib.set_celestial_vault(sender, mod, arena_name, element, params)` allows you to change parts of the vault, forcing it to players entering the arena. `element` is a string representing the part of the vault to be changed (`"sky"`, `"sun"`, `"moon"`, `"stars"`, `"clouds"`, or the explained later `"all"`), and `params` a table with the new values. This table is the same as the one used in the Minetest API `set_sky(...)`, `set_sun(...)` etc. functions, so for instance doing
+`arena_lib.set_celestial_vault(sender, mod, arena_name, element, params)` allows you to change parts of the vault, forcing it to players entering the arena. `element` is a string representing the part of the vault to be changed (`"sky"`, `"sun"`, `"moon"`, `"stars"`, `"clouds"`, or the explained later `"all"`), and `params` a table with the new values. This table is the same as the one used in the Minetest API `set_sky(..)`, `set_sun(..)` etc. functions, so for instance doing
 
 ```lua
 	local sun_params = {
@@ -531,12 +531,12 @@ An arena comes in 4 phases:
 * `queuing phase`: the queuing process. People interact with the entrance waiting for other players to play with
 * `loading phase`: the pre-match. By default players get teleported in the arena, waiting for the game to start. Relevant callback: `on_load`
 * `fighting phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
-* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant function: `arena_lib.load_celebration(...)`. Relevant callbacks: `on_celebration`, `on_end`.
+* `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant function: `arena_lib.load_celebration(..)`. Relevant callbacks: `on_celebration`, `on_end`.
 
 
 ### 2.4 Spectate mode
 Every minigame has this mode enabled by default. As the name suggests, it allows people to spectate a match, and there are two ways to enter this mode: the first is by getting eliminated (`remove_player_from_arena` with `1` as a reason), whereas the other is through the very entrance of the arena (if implemented). While in this state, they can't interact in any way with the actual match: neither by hitting entities/blocks, nor by writing in chat. The latter, more precisely, is a separated chat that spectators and spectators only are able to read. Vice versa, they're not able to read the players one.  
-By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(...)` and `arena_lib.add_spectate_area(...)`
+By default, spectate mode allows to follow players, but it also allows modders to expand it to entities and areas. To do that, have a look at `arena_lib.add_spectate_entity(..)` and `arena_lib.add_spectate_area(..)`
 <br>  
 
 
