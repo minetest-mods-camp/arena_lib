@@ -1235,7 +1235,6 @@ function time_start(mod_ref, arena)
   end
 
   if arena.current_time <= 0 then
-    assert(mod_ref.on_timeout, "[ARENA_LIB] " .. S("[!] on_timeout callback must be declared to properly use a decreasing timer!"))
     mod_ref.on_timeout(arena)
     return
   elseif mod_ref.on_time_tick then

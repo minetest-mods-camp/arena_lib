@@ -245,7 +245,10 @@ function arena_lib.register_minigame(mod, def)
   end
 
   if def.time_mode then
-    assert(not def.endless or def.time_mode ~= "decremental", "[ARENA_LIB] endless minigames can't have a timer! (time_mode = \"decremental\")")
+    assert(not def.endless or def.time_mode ~= "decremental", "[ARENA_LIB] (" .. mod_ref.name .. ") endless minigames can't have a timer! (time_mode = \"decremental\")")
+    minetest.after(0.1, function()  -- deve caricare la registrazione del richiamo
+      assert(def.time_mode ~= "decremental" or mod_ref.on_timeout ~= nil, "[ARENA_LIB] (" .. mod_ref.name ..") on_timeout callback is mandatory when time_mode = \"decremental\"!")
+    end)
     mod_ref.time_mode = def.time_mode
   end
 
@@ -254,7 +257,7 @@ function arena_lib.register_minigame(mod, def)
   end
 
   if def.celebration_time then
-    assert(def.celebration_time > 0 or def.endless, "[ARENA_LIB] celebration_time must be greater than 0 (everyone deserves to celebrate!)")
+    assert(def.celebration_time > 0 or def.endless, "[ARENA_LIB] (" .. mod_ref.name .. ") celebration_time must be greater than 0 (everyone deserves to celebrate!)")
     mod_ref.celebration_time = def.celebration_time
   end
 
