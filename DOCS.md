@@ -121,7 +121,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 
 ### 1.1 Per server configuration
 There are also a couple of settings that can only be set in game via `/arenas settings <minigame>`. This because different servers might need different parameters. They are:
-* `hub_spawn_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
+* `return_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimum amount of players has been reached to start the queue. Default is `10`
 
 > **BEWARE**: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub](https://gitlab.com/zughy-friends-minetest/hub). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
@@ -400,7 +400,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `thumbnail`: (string) the name of the optional file representing the arena, extension included. Default is `""`, meaning no thumbnail is associated with the arena. It must be put inside the `arena_lib/Thumbnails` world folder. If present, it can be seen by right-clicking built-in arena signs.
 * `entrance_type`: (string) the type of the entrance of the arena. By default it takes the `arena_lib.DEFAULT_ENTRANCE` settings (which is `"sign"` by default)
 * `entrance`: (can vary) the value used by arena_lib to retrieve the entrance linked to the arena. Built-in signs use their coordinates
-* `custom_return_point`: (table) a position that, if declared, overrides the `hub_spawn_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
+* `custom_return_point`: (table) a position that, if declared, overrides the `return_point` server setting (see [1.1 Per server configuration](#11-per-server-configuration)). Default is `nil`
 * `pos1`: (table) one of the corners that determine the region of the arena, alongside `pos2`. Check [#2.2.3 - Arena regions](#223-arena-regions) to learn more. Default is `nil`
 * `pos2`: ^
 * `players`: (table) where to store players information. Default fields are `teamID` (if teams are enabled) and the death counter `deaths`. `player_properties` fields expand the list. Format `{[p_name] = {stuff}, [p_name2] = {stuff}, ..}`
@@ -486,7 +486,7 @@ If you don't want to rely on the hotbar, or you want both the editor and the com
 To set an entrance, use `arena_lib.set_entrance(sender, mod, arena_name, action, ...)`. For further documentation, see [1.10 Custom entrances](#110-custom-entrances).  
 To change entrance type, use `arena_lib.set_entrance_type(sender, mod, arena_name, type)`, where `type` is a string representing the name of the registered entrance type you want to use.
 
-To customise the arena return point (by default `hub_spawn_point`), use `arena_lib.set_custom_return_point(sender, mod, arena_name, pos)`. To remove the custom return point, set `pos` to `nil`.
+To customise the arena return point (by default `return_point`), use `arena_lib.set_custom_return_point(sender, mod, arena_name, pos)`. To remove the custom return point, set `pos` to `nil`.
 
 ##### 2.2.2.6 Arena properties
 [Arena properties](#151-arena-properties) allow you to create additional persistent attributes specifically suited for what you have in mind (e.g. a score to reach to win the game).
