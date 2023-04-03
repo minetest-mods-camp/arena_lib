@@ -16,7 +16,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 ### Dependencies
 * (bundled) [ChatCMDBuilder](https://github.com/rubenwardy/ChatCmdBuilder/) by rubenwardy
 * [signs_lib](https://content.minetest.net/packages/VanessaE/signs_lib/) by Vanessa Dannenberg  
-* (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team with your friends
+* (optional) [Parties](https://gitlab.com/zughy-friends-minetest/parties) by me: use it to be sure to join the same arena/team as your friends
 
 #### Add-ons
 * [Hub](https://gitlab.com/zughy-friends-minetest/hub) by me: use it if you're aiming for a full minigame server. It can't be set as an optional dependency, since arena_lib is a hard dependency of Hub in the first place (and MT doesn't like cross dependencies) 
