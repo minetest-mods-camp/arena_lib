@@ -79,7 +79,12 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
       return true
     end
 
-    -- se sono nella stessa partita e nella stessa squadra, annullo
+    -- se sono nella stessa partita e l'arena è o in caricamento o in celebrazione, annullo
+    if p_arena.in_loading or p_arena.in_celebration then
+      return true
+    end
+
+    -- idem se sono nella stessa squadra, annullo
     if p_arena.teams_enabled and arena_lib.is_player_in_same_team(p_arena, p_name, t_name) then
       return true
     end
