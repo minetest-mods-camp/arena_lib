@@ -2,22 +2,6 @@
 --------------------UTILS---------------------
 ----------------------------------------------
 
-function arena_lib.is_player_in_region(arena, p_name)
-  if not arena then return end
-
-  if not arena.pos1 then
-    minetest.log("[ARENA_LIB] Attempt to check whether a player is inside an arena region (" .. arena.name .. "), when the arena has got no region declared")
-    return end
-
-  local v1, v2  = vector.sort(arena.pos1, arena.pos2)
-  local region  = VoxelArea:new({MinEdge=v1, MaxEdge=v2})
-  local p_pos   = minetest.get_player_by_name(p_name):get_pos()
-
-  return region:containsp(p_pos)
-end
-
-
-
 -- channel: "players", "spectators", "both"
 function arena_lib.send_message_in_arena(arena, channel, msg, teamID, except_teamID)
 
