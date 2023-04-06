@@ -116,6 +116,7 @@ function arena_lib.register_minigame(mod, def)
   mod_ref.join_while_in_progress = false
   mod_ref.spectate_mode = true
   mod_ref.can_build = false
+  mod_ref.can_drop = true
   mod_ref.disable_inventory = false
   mod_ref.keep_inventory = false
   mod_ref.keep_attachments = false
@@ -227,6 +228,10 @@ function arena_lib.register_minigame(mod, def)
 
   if def.can_build == true then
     mod_ref.can_build = true
+  end
+
+  if def.can_drop == false then
+    mod_ref.can_drop = false
   end
 
   if def.disable_inventory == true then

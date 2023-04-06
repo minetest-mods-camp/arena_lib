@@ -100,7 +100,8 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `end_when_too_few`: (bool) Whether the minigame should end its matches when only one player/team is left. Default il `true`
 * `join_while_in_progress`: (bool) whether the minigame allows to join an ongoing match. Default is `false`
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
-* `can_build`: (bool) whether players are allowed to place or dig nodes whilst playing. Default is `false`
+* `can_build`: (bool) whether players are allowed to place or dig nodes during a match. Default is `false`
+* `can_drop`: (bool) whether players can drop items during a match. Default is `true`
 * `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
 * `keep_inventory`: (bool) whether to keep players' inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
 * `keep_attachments`: (bool) whether to keep the entities attached to the player. If `false`, entities are removed when entering, and re-created (alongside their properties) when leaving. No matter the option, players are always detached. Default is `false`
@@ -531,7 +532,7 @@ An util function that comes with it is `arena_lib.is_player_in_region(..)`
 An arena comes in 4 phases:
 * `queuing phase`: the queuing process. People interact with the entrance waiting for other players to play with
 * `loading phase`: the pre-match. By default players get teleported in the arena, waiting for the game to start. Relevant callback: `on_load`
-* `fighting phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
+* `playing phase`: the actual game. Relevant callbacks: `on_start`, `on_join`
 * `celebration phase`: the after-match. By default people stroll around for the arena knowing who won, waiting to be teleported. Relevant function: `arena_lib.load_celebration(..)`. Relevant callbacks: `on_celebration`, `on_end`.
 
 
