@@ -102,7 +102,7 @@ The second field, on the contrary, is a table of optional parameters: they defin
 * `spectate_mode`: (bool) whether the minigame features the spectator mode. Default is `true`
 * `can_build`: (bool) whether players are allowed to place or dig nodes during a match. Default is `false`
 * `can_drop`: (bool) whether players can drop items during a match. Default is `true`
-* `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). Default is `false`
+* `disable_inventory`: (bool) whether to completely disable the inventory (pressing the inventory key won't do anything). In case an external inventory is opened, players won't be able to move items around. Default is `false`
 * `keep_inventory`: (bool) whether to keep players' inventories when joining an arena. Default is `false`. No matter the option, players' inventories are stored when entering an arena and restored when leaving (or reconnecting, in case of crash)
 * `keep_attachments`: (bool) whether to keep the entities attached to the player. If `false`, entities are removed when entering, and re-created (alongside their properties) when leaving. No matter the option, players are always detached. Default is `false`
 * `show_nametags`: (bool) whether to show players' nametags while in game. Default is `false`

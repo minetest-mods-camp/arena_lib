@@ -39,6 +39,20 @@ end
 
 
 
+-- stop people from editing their inventories in case disable_inventory is true and
+-- they've opened some inventory through a node (e.g. chests)
+minetest.register_allow_player_inventory_action(function(player, action, inventory, inventory_info)
+  local p_name = player:get_player_name()
+  if not arena_lib.is_player_in_arena(p_name) then return end
+
+  local mod = arena_lib.get_mod_by_player(p_name)
+
+  if arena_lib.mods[mod].disable_inventory then return 0 end
+end)
+
+
+
+
 
 
 ----------------------------------------------
