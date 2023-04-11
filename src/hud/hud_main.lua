@@ -1,17 +1,8 @@
---
--- la HUD si divide in due tipi: "broadcast", quella in alto, e "hotbar", quella
--- sopra la hotbar. Oltre che essere usata nativamente da arena_lib, può essere
--- richiamata e sovrascritta da qualsiasi altra mod, per esempio per annunci
--- in partita. HUD_hide prende anche "all" come tipo, per nasconderli entrambi
---
-
-
 local player_huds = {}    -- KEY: p_name, INDEX: {HUD_BG_ID, HUD_TXT_ID}
 
 
 
 function arena_lib.HUD_add(player)
-
   local HUD_TITLE_TXT = player:hud_add({
     hud_elem_type = "text",
     position  = { x = 0.5, y = 0.5},
@@ -68,7 +59,6 @@ end
 
 
 function arena_lib.HUD_send_msg(HUD_type, p_name, msg, duration, sound, color)
-
   local player = minetest.get_player_by_name(p_name)
   local p_HUD = player_huds[p_name]
   color = color or "0xFFFFFF"
@@ -111,17 +101,14 @@ function arena_lib.HUD_send_msg(HUD_type, p_name, msg, duration, sound, color)
       arena_lib.HUD_hide(HUD_type, p_name)
     end)
   end
-
 end
 
 
 
 function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound, color)
-
   color = color == nil and "0xFFFFFF" or color
 
   for pl_name, _ in pairs(arena.players_and_spectators) do
-
     local pl = minetest.get_player_by_name(pl_name)
     local pl_HUD = player_huds[pl_name]
 
@@ -166,11 +153,9 @@ end
 
 
 function arena_lib.HUD_hide(HUD_type, player_or_arena)
-
   -- la funzione può prendere sia un giocatore che una tabella di giocatori.
   -- Controllo quale dei due è stato usato
   if type(player_or_arena) == "string" then
-
     local player = minetest.get_player_by_name(player_or_arena)
     local p_HUD = player_huds[player_or_arena]
 
@@ -192,9 +177,7 @@ function arena_lib.HUD_hide(HUD_type, player_or_arena)
     end
 
   elseif type(player_or_arena) == "table" then
-
     for pl_name, _ in pairs(player_or_arena.players_and_spectators) do
-
       local pl = minetest.get_player_by_name(pl_name)
       local pl_HUD = player_huds[pl_name]
 
@@ -212,7 +195,6 @@ function arena_lib.HUD_hide(HUD_type, player_or_arena)
         pl:hud_change(pl_HUD[4], "text", "")
         pl:hud_change(pl_HUD[5], "text", "")
       end
-
     end
   end
 end

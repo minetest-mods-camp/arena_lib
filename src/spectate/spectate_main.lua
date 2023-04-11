@@ -75,7 +75,6 @@ end
 ----------------------------
 
 function arena_lib.enter_spectate_mode(p_name, arena)
-
   local mod      = arena_lib.get_mod_by_player(p_name)
   local arena_ID = arena_lib.get_arenaID_by_player(p_name)
   local team_ID  = #arena.teams > 1 and 1 or nil
@@ -139,7 +138,6 @@ end
 
 
 function arena_lib.leave_spectate_mode(p_name)
-
   local arena = arena_lib.get_arena_by_player(p_name)
 
   arena.spectators[p_name] = nil

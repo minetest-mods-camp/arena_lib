@@ -1004,7 +1004,10 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   -- ripristino nomi
   player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
 
-  -- svuoto lo storage temporaneo
+  -- faccio saprire eventuali HUD
+  arena_lib.HUD_hide("all", p_name)
+
+  -- svuoto lo spazio d'archiviazione temporaneo
   players_temp_storage[p_name] = nil
 end
 
