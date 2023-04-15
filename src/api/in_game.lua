@@ -15,7 +15,7 @@ local function deprecated_start_arena() end
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle,
                                       --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs).
-                                      --                           (table) attachments}
+                                      --                           (table) attachments, (table) nametag}
 
 
 
@@ -280,7 +280,7 @@ function arena_lib.load_celebration(mod, arena, winners)
   for pl_name, stats in pairs(arena.players) do
     local player = minetest.get_player_by_name(pl_name)
 
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+    player:set_nametag_attributes({text = pl_name, color = {a = 255, r = 255, g = 255, b = 255}})
   end
 
   local winning_message = ""
@@ -709,7 +709,9 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     end
   end
 
-  -- nascondo i nomi se l'opzione è abilitata
+  -- salvo la targhetta ed eventualmente la nascondo
+  players_temp_storage[p_name].nametag = player:get_nametag_attributes()
+
   if not mod_ref.show_nametags then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
   end
@@ -1002,7 +1004,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   player:hud_set_flags({minimap = true})
 
   -- ripristino nomi
-  player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+  player:set_nametag_attributes(players_temp_storage[p_name].nametag)
 
   -- faccio saprire eventuali HUD
   arena_lib.HUD_hide("all", p_name)

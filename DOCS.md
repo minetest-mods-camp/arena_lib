@@ -286,6 +286,8 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players and spectators inside the arena
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both the name of the player/spectator and a whole arena. Also, a special parameter `"all"` can be used in `HUD_type` to make all the HUDs disappear. Automatically called when a player leaves an arena (with `"all"`)
 
+Keep also in mind that nametags are stored when entering and restored when leaving. This means that nametags can be used as a custom HUD too (e.g. to display the score of a certain player above their head), using the default Minetest API.
+
 ### 1.7 Utils
 There are also some other functions which might turn useful. They are:
 * `arena_lib.is_player_in_queue(p_name, <mod>)`: returns a boolean. If a mod is specified, returns true only if it's inside a queue of that specific mod
