@@ -379,8 +379,8 @@ Since 4.0, every minigame can extend the editor with an additional custom sectio
 arena_lib.register_editor_section("yourmod", {param1, param2 etc})
 ```
 Every parameter here is mandatory. They are:
-* `name`: the name of the item that will represent the section (it'll also appear in the hotbar HUD)
-* `icon`: the icon of the item that will represent the section
+* `name`: the name of the section, it'll appear in the hotbar HUD
+* `icon`: the icon that will represent the section
 * `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or `nil` if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly. The name of each item will be displayed in the hotbar HUD when wielded
 
 When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
