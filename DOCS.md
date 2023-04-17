@@ -161,8 +161,6 @@ A few more are available for players having the `arenalib_admin` privilege:
 Callbacks are divided in two types: minigame callbacks and global callbacks. The former allow you to customise your mod even more and can be called just once per minigame, whilst the latter are great for external mods that want to customise the experience outside of a specific minigame (e.g. a server giving players some currency when winning, a HUD telling players what game is in progress).
 
 #### 1.4.1 Minigame callbacks
-* `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
-* `arena_lib.on_disable(mod, function(arena, p_name)`: run more checks before disabling an arena. Must return `true` or the arena won't be disabled
 * `arena_lib.on_prejoin_queue(mod, function(arena, p_name)`: run more checks when entering a queue. Must return `true` or the player won't be added
 * `arena_lib.on_join_queue(mod, function(arena, p_name)`: additional actions to perform after a player has successfully joined a queue
 * `arena_lib.on_leave_queue(mod, function(arena, p_name)`: same as above, but for when they leave
@@ -183,6 +181,10 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(..)`)
 * `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from a match. See `arena_lib.remove_player_from_arena(..)` to learn about the `reason` parameter
 * `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit with `/quit`. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
+* `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
+* `arena_lib.on_disable(mod, function(arena, p_name)`: run more checks before disabling an arena. Must return `true` or the arena won't be disabled
+* `arena_lib.on_join_editor(mod, function(arena, p_name)`: called when a player enters the editor of an arena
+* `arena_lib.on_leave_editor(mod, function(arena, p_name)`: same as above, but for when they leave
 
 > **BEWARE**: there is a default behaviour already for most of these situations: for instance when a player dies, their deaths increase by 1. These callbacks exist just in case you want to add some extra behaviour to arena_lib's.
 

@@ -48,6 +48,18 @@ end
 
 
 
+function arena_lib.on_join_editor(mod, func)
+  arena_lib.mods[mod].on_join_editor = func
+end
+
+
+
+function arena_lib.on_leave_editor(mod, func)
+  arena_lib.mods[mod].on_leave_editor = func
+end
+
+
+
 -- Queues
 
 function arena_lib.on_prejoin_queue(mod, func)

@@ -34,14 +34,12 @@ end)
 
 
 function arena_lib.register_editor_section(mod, def)
-
   local name = def.name or "Rename me via `name = something`"
 
   -- non posso tradurla perché chiamata all'avvio ¯\_(ツ)_/¯
   assert(type(def.give_items) == "function", "[ARENA_LIB] (" .. mod .. ") give_items function missing in register_editor_section!")
 
   minetest.register_tool(mod .. ":arenalib_editor_slot_custom", {
-
       description = name,
       inventory_image = def.icon,
       groups = {not_in_creative_inventory = 1},
@@ -156,6 +154,11 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   -- cambio l'inventario
   arena_lib.show_main_editor(player)
+
+  -- richiami eventuali
+  if mod_ref.on_join_editor then
+    mod_ref.on_join_editor(sender, arena)
+  end
 end
 
 
@@ -206,6 +209,13 @@ function arena_lib.quit_editor(player)
 
   -- restituisco l'inventario
   player:get_inventory():set_list("main", inv)
+
+  local mod_ref = arena_lib.mods[mod]
+
+  -- richiami eventuali
+  if mod_ref.on_leave_editor then
+    mod_ref.on_leave_editor(p_name, arena)
+  end
 end
 
 
