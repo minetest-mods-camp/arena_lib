@@ -601,7 +601,7 @@ end
 
 
 
-function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor)
+function arena_lib.change_arena_property(sender, mod, arena_name, property, new_value, in_editor, in_editor_ui)
   local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if not in_editor then
@@ -614,8 +614,8 @@ function arena_lib.change_arena_property(sender, mod, arena_name, property, new_
     else minetest.log("warning", "[ARENA_LIB] [!] Properties - Parameters don't seem right!") end
     return end
 
-  -- se da editor, converto la stringa nel tipo corrispettivo
-  if in_editor then
+  -- se si sta usando l'UI base dell'editor, converto la stringa nel tipo corrispettivo
+  if in_editor_ui then
     local func, error_msg = loadstring("return (" .. new_value .. ")")
 
     -- se non ritorna una sintassi corretta

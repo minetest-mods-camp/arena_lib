@@ -383,7 +383,9 @@ Every parameter here is mandatory. They are:
 * `icon`: the icon that will represent the section
 * `give_items = function(itemstack, user, arena)`: this function must return the list of items to give to the player once the section has been opened, or `nil` if we want to deny the access. Having a function instead of a list is useful as it allows to run whatever check inside of it, and to give different items accordingly. The name of each item will be displayed in the hotbar HUD when wielded
 
-When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua)
+When a player is inside the editor, they have 2 string metadata containing the name of the mod and the name of the arena that's currently being modified. These are necessary to do whatever arena operation with items passed via `give_items`, as they allow to obtain the arena ID and the arena itself via `arena_lib.get_arena_by_name(mod, arena_name)`. To better understand this, have a look at how [arena_lib does](src/editor/tools_players.lua).  
+
+If you want to use an arena_lib function inside the logic of the items of your section, you must pass an additional parameter at the end: `true`. This tells arena_lib that the action is run whilst being inside the editor - e.g. instead of `arena_lib.change_teams_amount(sender, mod, arena_name, amount)`, you shall use `arena_lib.change_teams_amount(sender, mod, arena_name, amount, true)`. If you don't, the function will most likely stop you from running it.  
 
 ### 1.12 Things you don't want to do with a light heart
 * Changing the number of teams, if `variable_teams_amount` is false: it'll delete your spawners (this has to be done in order to avoid further problems)

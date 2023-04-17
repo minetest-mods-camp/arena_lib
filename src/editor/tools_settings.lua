@@ -380,7 +380,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     -- se premo per sovrascrivere
     elseif fields.property_overwrite or fields.key_enter then
-      arena_lib.change_arena_property(p_name, mod, arena_name, sel_property_attr[p_name].name, fields.sel_property_value, true)
+      arena_lib.change_arena_property(p_name, mod, arena_name, sel_property_attr[p_name].name, fields.sel_property_value, true, true)
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, sel_property_attr[p_name].id))
     end
 
