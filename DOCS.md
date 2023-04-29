@@ -134,7 +134,7 @@ There are also a couple of settings that can only be set in game via `/arenas se
 ### 1.3 Commands
 A couple of general commands are already declared inside arena_lib, them being:
 
-* `/quit`: quits a game
+* `/quit`: quits a queue or an ongoing game
 * `/all`: writes in the arena global chat
 * `/t`: writes in the arena team chat (if teams are enabled)
 
@@ -179,8 +179,8 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_time_tick(mod, function(arena))`: called every second if `time_mode` is different from `"none"`
 * `arena_lib.on_timeout(mod, function(arena))`: called when the timer of an arena, if exists (`time_mode = "decremental"`), reaches 0. Not declaring it will make the server crash when time runs out
 * `arena_lib.on_eliminate(mod, function(arena, p_name))`: called when a player is eliminated (see `arena_lib.remove_player_from_arena(..)`)
-* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from a match. See `arena_lib.remove_player_from_arena(..)` to learn about the `reason` parameter
-* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit with `/quit`. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
+* `arena_lib.on_quit(mod, function(arena, p_name, is_spectator, reason))`: called when a player/spectator quits from an ongoing match. See `arena_lib.remove_player_from_arena(..)` to learn about the `reason` parameter
+* `arena_lib.on_prequit(mod, function(arena, p_name))`: called when a player tries to quit an ongoing game with `/quit`. If it returns false, quit is cancelled. Useful to ask confirmation first, or simply to impede a player to quit
 * `arena_lib.on_enable(mod, function(arena, p_name)`: run more checks before enabling an arena. Must return `true` or the arena won't be enabled
 * `arena_lib.on_disable(mod, function(arena, p_name)`: run more checks before disabling an arena. Must return `true` or the arena won't be disabled
 * `arena_lib.on_join_editor(mod, function(arena, p_name)`: called when a player enters the editor of an arena

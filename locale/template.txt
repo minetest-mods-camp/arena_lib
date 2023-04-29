@@ -1,4 +1,4 @@
-# version 6.2.0-dev
+# version 6.3.0-dev
 # author(s):
 # reviewer(s):
 # textdomain: arena_lib
@@ -14,7 +14,8 @@ minigame=
 player=
 Manage arena_lib arenas; it requires arenalib_admin=
 arena name=
-Quits an ongoing game=
+Quits a queue or an ongoing game=
+[!] You must be in a game or in queue to perform this action!=
 [!] You must be in a game to perform this action!=
 [!] You can't perform this action during the celebration phase!=
 message=

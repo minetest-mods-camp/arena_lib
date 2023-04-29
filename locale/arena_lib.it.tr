@@ -1,4 +1,4 @@
-# version 6.2.0
+# version 6.3.0-dev
 # author(s): Zughy
 # reviewer(s):
 # textdomain: arena_lib
@@ -14,7 +14,8 @@ minigame=minigioco
 player=giocatorə
 Manage arena_lib arenas; it requires arenalib_admin=Gestisce le arene di arena_lib; richiede arenalib_admin
 arena name=nome arena
-Quits an ongoing game=Abbandona una partita in corso
+Quits a queue or an ongoing game=Abbandona una coda o una partita in corso
+[!] You must be in a game or in queue to perform this action!=[!] Devi essere in partita o in coda per eseguire questa azione!
 [!] You must be in a game to perform this action!=[!] Devi essere in partita per eseguire questa azione!
 [!] You can't perform this action during the celebration phase!=[!] Non puoi eseguire quest'azione durante la fase di celebrazione!
 message=messaggio

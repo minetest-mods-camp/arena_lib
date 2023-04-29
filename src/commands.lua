@@ -192,39 +192,45 @@ end, {
 ----------------------------------------------
 
 minetest.register_chatcommand("quit", {
-
-  description = S("Quits an ongoing game"),
+  description = S("Quits a queue or an ongoing game"),
 
   func = function(name, param)
-
-    if not arena_lib.is_player_in_arena(name) then
-      minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game to perform this action!")))
-      return false end
+    if not arena_lib.is_player_in_arena(name) and not arena_lib.is_player_in_queue(name) then
+      minetest.chat_send_player(name, minetest.colorize("#e6482e" , S("[!] You must be in a game or in queue to perform this action!")))
+      return end
 
     local arena = arena_lib.get_arena_by_player(name)
 
-    -- se l'arena è in celebrazione, annullo
-    if arena.in_celebration then
-      minetest.chat_send_player(name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action during the celebration phase!")))
-      return end
+    -- se è in gioco...
+    if arena.in_game then
 
-    local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(name)]
+      -- se l'arena è in celebrazione, annullo
+      if arena.in_celebration then
+        minetest.chat_send_player(name, minetest.colorize("#e6482e" ,S("[!] You can't perform this action during the celebration phase!")))
+        return end
 
-    -- se uso /quit e on_prequit ritorna false, annullo
-    if mod_ref.on_prequit then
-      if mod_ref.on_prequit(arena, name) == false then
-      return false end
+      local mod_ref = arena_lib.mods[arena_lib.get_mod_by_player(name)]
+
+      -- se uso /quit e on_prequit ritorna false, annullo
+      if mod_ref.on_prequit then
+        if mod_ref.on_prequit(arena, name) == false then
+        return end
+      end
+
+      arena_lib.remove_player_from_arena(name, 3)
+      return true
+
+    -- ..sennò è in coda
+    else
+      arena_lib.remove_player_from_queue(name)
+      return true
     end
-
-    arena_lib.remove_player_from_arena(name, 3)
-    return true
   end
 })
 
 
 
 minetest.register_chatcommand("all", {
-
   params = "<" .. S("message") .. ">",
   description = S("Writes a message in the arena global chat while in a game"),
 
