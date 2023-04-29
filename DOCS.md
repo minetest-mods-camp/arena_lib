@@ -126,7 +126,7 @@ There are also a couple of settings that can only be set in game via `/arenas se
 * `return_point`: where players will be teleported when a match _in your mod_ ends. Default is `{ x = 0, y = 20, z = 0 }`. A bit of noise is applied on the x and z axis, ranging between `-1.5` and `1.5`.
 * `queue_waiting_time`: the time to wait before the loading phase starts. It gets triggered when the minimum amount of players has been reached to start the queue. Default is `10`
 
-> **BEWARE**: as you noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub](https://gitlab.com/zughy-friends-minetest/hub). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
+> **BEWARE**: as you've noticed, the hub spawn point is bound to the very minigame. In fact, there is no global spawn point as arena_lib could be used even in a survival server that wants to feature just a couple minigames. If you're looking for a hub manager because your goal is to create a full minigame server, have a look at my other mod [Hub](https://gitlab.com/zughy-friends-minetest/hub). Also, if you want to be sure to join the same arena/team with your friends, you need to install my other mod [Parties](https://gitlab.com/zughy-friends-minetest/parties)
 
 ### 1.2 Privileges
 * `arenalib_admin`: allows to use a few more commands
@@ -203,7 +203,8 @@ end)
 ```
 
 #### 1.4.2 Global callbacks
-Global callbacks act in the same way of minigame callbacks with the same name. Keep in mind that not every minigame callback has a global counterpart.
+Global callbacks act in the same way of minigame callbacks with the same name. Keep in mind that not every minigame callback has a global counterpart.  
+`mod_ref` is the minigame table (so the one at the beginning of [Minigame configuration](#1-minigame-configuration)) and it can retrieved by doing `arena_lib.mods[<mod>]`
 * `arena_lib.register_on_enable(function(mod_ref, arena, p_name))`
 * `arena_lib.register_on_disable(function(mod_ref, arena, p_name))`
 * `arena_lib.register_on_prejoin_queue(function(mod_ref, arena, p_name))`
