@@ -128,6 +128,16 @@ function arena_lib.enter_spectate_mode(p_name, arena)
   -- (assegnarlo a 0 equivale ad azzerarlo, ma l'ho specificato per chiarezza nel codice)
   player:get_meta():set_int("arenalib_watchID", 0)
 
+  local curr_spectators = S("Spectators inside: ")
+
+  -- dì chi sta già seguendo
+  for sp_name, _ in pairs(arena.spectators) do
+    curr_spectators = curr_spectators .. sp_name .. ", "
+  end
+
+  curr_spectators = curr_spectators:sub(1, -3)
+  minetest.chat_send_player(p_name, minetest.colorize("#cfc6b8", curr_spectators))
+
   -- inizia a seguire
   arena_lib.find_and_spectate_player(p_name)
 

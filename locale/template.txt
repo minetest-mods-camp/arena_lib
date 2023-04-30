@@ -281,6 +281,7 @@ Teleport onto the sign=
 Return where you were=
 
 # spectate/spectate_main.lua
+Spectators inside: =
 Currently spectating: @1=
 
 # spectate/spectate_tools.lua
@@ -315,7 +316,6 @@ Disabled damage types: =
 Players required: =
 Players supported: =
 Players inside: =
-Spectators inside: =
 Players and spectators inside: =
 Past and present players: =
 Past and present players inside: =

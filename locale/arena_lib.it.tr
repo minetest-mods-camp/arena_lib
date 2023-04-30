@@ -52,7 +52,7 @@ Minigame settings=Impostazioni minigioco
 
 # api/core.lua
 team=squadra
-spectator=spettatore
+spectator=spettatorə
 @1 has been eliminated by @2=@1 è statə eliminatə da @2
 @1 has been eliminated=@1 è statə eliminatə
 You're the last player standing: you win!=Sei l'ultimə giocatorə rimastə in partita: hai vinto!
@@ -281,6 +281,7 @@ Teleport onto the sign=Teletrasportati al cartello
 Return where you were=Torna dov'eri
 
 # spectate/spectate_main.lua
+Spectators inside: =Spettatorɜ attuali: 
 Currently spectating: @1=Stai seguendo: @1
 
 # spectate/spectate_tools.lua
@@ -314,9 +315,8 @@ Teams: =Squadre:
 Disabled damage types: =Tipi di danno disabilitati: 
 Players required: =Giocatorɜ minimɜ: 
 Players supported: =Giocatorɜ massimɜ: 
-Players inside: =Giocatorɜ dentro: 
-Spectators inside: =Spettatorɜ dentro: 
-Players and spectators inside: =Giocatorɜ e spettatorɜ dentro: 
+Players inside: =Giocatorɜ attuali: 
+Players and spectators inside: =Giocatorɜ e spettatorɜ attuali: 
 Past and present players: =Giocatorɜ presenti e passatɜ: 
 Past and present players inside: =Giocatorɜ presenti e passatɜ dentro: 
 Enabled: =Abilitata: 
