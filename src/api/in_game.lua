@@ -1226,17 +1226,17 @@ end
 function time_start(mod_ref, arena)
   if arena.on_celebration or not arena.in_game then return end
 
-  if mod_ref.time_mode == "incremental" then
-    arena.current_time = arena.current_time + 1
-  else
-    arena.current_time = arena.current_time - 1
-  end
-
   if arena.current_time <= 0 then
     mod_ref.on_timeout(arena)
     return
   elseif mod_ref.on_time_tick then
     mod_ref.on_time_tick(arena)
+  end
+
+  if mod_ref.time_mode == "incremental" then
+    arena.current_time = arena.current_time + 1
+  else
+    arena.current_time = arena.current_time - 1
   end
 
   minetest.after(1, function()
