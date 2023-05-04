@@ -287,6 +287,7 @@ Same as above, but for teams. For instance, you could count how many rounds of a
 `arena_lib` also comes with a triple practical HUD: `title`, `broadcast` and `hotbar`. These HUDs only appear when a message is sent to them and they can be easily used via the following functions:
 * `arena_lib.HUD_send_msg(HUD_type, p_name, msg, <duration>, <sound>, <color>)`: sends a message to the specified player/spectator in the specified HUD type (`"title"`, `"broadcast"` or `"hotbar"`). If no duration is declared, it won't disappear by itself. If a sound is declared, it'll be played at the very showing of the HUD. `color` must be in a hexadecimal format and, if not specified, it defaults to white (`0xFFFFFF`).
 * `arena_lib.HUD_send_msg_all(HUD_type, arena, msg, <duration>, <sound>, <color>)`: same as above, but for all the players and spectators inside the arena
+* `arena_lib.HUD_send_msg_team(HUD_type, arena, teamID, msg, <duration>, <sound>, <color>)`: same as above, but just for the players in team `teamID`
 * `arena_lib.HUD_hide(HUD_type, player_or_arena)`: makes the specified HUD disappear; it can take both the name of the player/spectator and a whole arena. Also, a special parameter `"all"` can be used in `HUD_type` to make all the HUDs disappear. Automatically called when a player leaves an arena (with `"all"`)
 
 Keep also in mind that nametags are stored when entering and restored when leaving. This means that nametags can be used as a custom HUD too (e.g. to display the score of a certain player above their head), using the default Minetest API.

@@ -106,47 +106,22 @@ end
 
 
 function arena_lib.HUD_send_msg_all(HUD_type, arena, msg, duration, sound, color)
-  color = color == nil and "0xFFFFFF" or color
-
   for pl_name, _ in pairs(arena.players_and_spectators) do
-    local pl = minetest.get_player_by_name(pl_name)
-    local pl_HUD = player_huds[pl_name]
+    arena_lib.HUD_send_msg(HUD_type, pl_name, msg, duration, sound, color)
+  end
+end
 
-    -- controllo il tipo di HUD
-    if HUD_type == "title" then
-      pl:hud_change(pl_HUD[1], "text", msg)
-      pl:hud_change(pl_HUD[1], "number", color)
-    elseif HUD_type == "broadcast" then
-      pl:hud_change(pl_HUD[2], "text", "arenalib_hud_bg.png")
-      pl:hud_change(pl_HUD[3], "text", msg)
-      pl:hud_change(pl_HUD[3], "number", color)
-    elseif HUD_type == "hotbar" then
-      pl:hud_change(pl_HUD[4], "text", "arenalib_hud_bg2.png")
-      pl:hud_change(pl_HUD[5], "text", msg)
-      pl:hud_change(pl_HUD[5], "number", color)
+
+
+function arena_lib.HUD_send_msg_team(HUD_type, arena, teamID, msg, duration, sound, color)
+  for pl_name, pl_data in pairs(arena.players) do
+    if pl_data.teamID == teamID then
+      arena_lib.HUD_send_msg(HUD_type, pl_name, msg, duration, sound, color)
+
+      for sp_name, _ in pairs(arena_lib.get_player_spectators(pl_name)) do
+        arena_lib.HUD_send_msg(HUD_type, sp_name, msg, duration, sound, color)
+      end
     end
-
-    -- riproduco eventuale suono
-    if sound then
-      minetest.sound_play(sound, {
-        to_player = pl_name
-      })
-    end
-
-    -- se duration non è specificata, permane all'infinito
-    if duration then
-      minetest.after(duration, function()
-        if minetest.get_player_by_name(pl_name) == nil then return end
-        -- se è stato aggiornato il messaggio, interrompo questo timer e lascio il controllo a quello nuovo
-        if HUD_type == "title"     and pl:hud_get(pl_HUD[1]).text ~= msg or
-           HUD_type == "broadcast" and pl:hud_get(pl_HUD[3]).text ~= msg or
-           HUD_type == "hotbar"    and pl:hud_get(pl_HUD[5]).text ~= msg then
-          return end
-
-        arena_lib.HUD_hide(HUD_type, pl_name)
-      end)
-    end
-
   end
 end
 
