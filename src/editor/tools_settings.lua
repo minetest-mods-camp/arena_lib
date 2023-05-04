@@ -133,7 +133,7 @@ minetest.register_tool("arena_lib:settings_properties", {
       local p_name      = user:get_player_name()
       local mod         = user:get_meta():get_string("arena_lib_editor.mod")
       local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
-      local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+      local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
 
       minetest.show_formspec(p_name, "arena_lib:settings_properties", get_properties_formspec(p_name, mod, arena, 1))
     end
@@ -150,7 +150,12 @@ minetest.register_craftitem("arena_lib:timer", {
     on_drop = function() end,
 
     on_use = function(itemstack, user, pointed_thing)
-      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec())
+      local mod         = user:get_meta():get_string("arena_lib_editor.mod")
+      local arena_name  = user:get_meta():get_string("arena_lib_editor.arena")
+      local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
+      local time       = arena.initial_time
+
+      minetest.show_formspec(user:get_player_name(), "arena_lib:settings_timer", get_timer_formspec(time))
     end
 })
 
@@ -276,12 +281,12 @@ end
 
 
 
-function get_timer_formspec()
+function get_timer_formspec(time)
   local formspec = {
     "size[5.2,0.4]",
     "no_prepend[]",
     "bgcolor[;neither]",
-    "field[0.2,0.25;4,1;set_timer;;]",
+    "field[0.2,0.25;4,1;set_timer;;" .. time .."]",
     "button[3.8,-0.05;1.7,1;timer_confirm;" .. S("Set timer") .. "]",
     "field_close_on_enter[set_timer;false]"
   }
