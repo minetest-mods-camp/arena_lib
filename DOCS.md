@@ -167,7 +167,7 @@ Callbacks are divided in two types: minigame callbacks and global callbacks. The
 * `arena_lib.on_load(mod, function(arena)`: see [2.3 Arena phases](#23-arena-phases)
 * `arena_lib.on_start(mod, function(arena))`: same as above
 * `arena_lib.on_celebration(mod, function(arena, winners)`: same as above. `winners` can be either a string, an integer or a table of string/integers. If you want to have a single winner, return their name (string). If you want to have a whole team, return the team ID (integer). If you want to have more single winners, a table of strings, and more teams, a table of integers.
-* `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because arena_lib has already deleted them - hence these are a copy. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
+* `arena_lib.on_end(mod, function(arena, players, winners, spectators, is_forced))`: same as above. Players and spectators are given here because arena_lib has already deleted them - hence these are a copy. On the contrary, temporary properties can still be retrieved. `is_forced` returns `true` when the match has been forcibly terminated (via `force_arena_ending`)
 * `arena_lib.on_join(mod, function(p_name, arena, as_spectator, was_spectator))`: called when a user joins an ongoing match. `as_spectator` returns true if they join as a spectator. `was_spectator` returns true if the user was spectating the arena when joining as an actual player
 * `arena_lib.on_death(mod, function(arena, p_name, reason))`: called when a player dies
 * `arena_lib.on_respawn(mod, function(arena, p_name))`: called when a player respawns

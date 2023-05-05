@@ -389,6 +389,17 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
   -- azzero il timer
   arena.current_time = nil
 
+  victory_particles(arena, players, winners)
+
+  -- eventuale codice aggiuntivo
+  if mod_ref.on_end then
+    mod_ref.on_end(arena, players, winners, spectators, is_forced)
+  end
+
+  for _, callback in ipairs(arena_lib.registered_on_end) do
+    callback(mod_ref, arena, players, winners, spectators, is_forced)
+  end
+
   -- rimuovo eventuali proprietà temporanee
   for temp_property, v in pairs(mod_ref.temp_properties) do
     arena[temp_property] = nil
@@ -401,17 +412,6 @@ function arena_lib.end_arena(mod_ref, mod, arena, winners, is_forced)
         arena.teams[i][t_property] = nil
       end
     end
-  end
-
-  victory_particles(arena, players, winners)
-
-  -- eventuale codice aggiuntivo
-  if mod_ref.on_end then
-    mod_ref.on_end(arena, players, winners, spectators, is_forced)
-  end
-
-  for _, callback in ipairs(arena_lib.registered_on_end) do
-    callback(mod_ref, arena, players, winners, spectators, is_forced)
   end
 
   arena.in_loading = false                                                      -- nel caso venga forzata mentre sta caricando, sennò rimane a caricare all'infinito
