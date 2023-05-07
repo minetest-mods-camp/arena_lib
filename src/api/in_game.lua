@@ -122,10 +122,6 @@ function arena_lib.start_arena(mod, arena)
   if mod_ref.time_mode ~= "none" then
     arena.current_time = arena.initial_time
 
-    if mod_ref.on_time_tick then
-      mod_ref.on_time_tick(arena)
-    end
-
     minetest.after(1, function()
       time_loop(mod_ref, arena)
     end)
