@@ -9,7 +9,7 @@ local function eliminate_player() end
 local function handle_leaving_callbacks() end
 local function victory_particles() end
 local function show_victory_particles() end
-local function time_start() end
+local function time_loop() end
 local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
@@ -121,8 +121,13 @@ function arena_lib.start_arena(mod, arena)
   -- parte l'eventuale tempo
   if mod_ref.time_mode ~= "none" then
     arena.current_time = arena.initial_time
+
+    if mod_ref.on_time_tick then
+      mod_ref.on_time_tick(arena)
+    end
+
     minetest.after(1, function()
-      time_start(mod_ref, arena)
+      time_loop(mod_ref, arena)
     end)
   end
 
@@ -1223,8 +1228,14 @@ end
 
 
 
-function time_start(mod_ref, arena)
+function time_loop(mod_ref, arena)
   if arena.on_celebration or not arena.in_game then return end
+
+  if mod_ref.time_mode == "incremental" then
+    arena.current_time = arena.current_time + 1
+  else
+    arena.current_time = arena.current_time - 1
+  end
 
   if arena.current_time <= 0 then
     mod_ref.on_timeout(arena)
@@ -1233,14 +1244,8 @@ function time_start(mod_ref, arena)
     mod_ref.on_time_tick(arena)
   end
 
-  if mod_ref.time_mode == "incremental" then
-    arena.current_time = arena.current_time + 1
-  else
-    arena.current_time = arena.current_time - 1
-  end
-
   minetest.after(1, function()
-    time_start(mod_ref, arena)
+    time_loop(mod_ref, arena)
   end)
 end
 
