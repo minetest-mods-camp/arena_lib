@@ -1116,17 +1116,18 @@ function arena_lib.set_bgm(sender, mod, arena_name, track, title, author, volume
     if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
   end
 
-  local bgm_dir = minetest.get_worldpath() .. "/arena_lib/BGM/"
-
-  if not file_exists(bgm_dir, track .. ".ogg") then
-    if not deprecated_audio_exists(mod, track, sender) then
-      minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
-      return end
-  end
-
   if track == nil or track == "" then
     arena.bgm = nil
+
   else
+    local bgm_dir = minetest.get_worldpath() .. "/arena_lib/BGM/"
+
+    if not file_exists(bgm_dir, track .. ".ogg") then
+      if not deprecated_audio_exists(mod, track, sender) then
+        minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] File not found!")))
+        return end
+    end
+
     arena.bgm = {
       track  = track,
       title  = title,
