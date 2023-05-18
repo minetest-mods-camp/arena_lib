@@ -151,7 +151,6 @@ Get ready!=
 # editor/editor_main.lua
 [!] You must leave the editor first!=
 Wooosh!=
-Arena_lib editor | Now editing: @1=
 
 # editor/editor_icons.lua
 Players=

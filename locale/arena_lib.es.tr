@@ -151,7 +151,6 @@ Get ready!=¡Prepárate!
 [!] The party leader must not be in game to perform this action!=[!] ¡El líder del grupo no debe estar en partida para realizar esta acción!
 
 # _editor/editor_main.lua
-Arena_lib editor | Now editing: @1=Editor de arena_lib | Ahora editando: @1
 
 # _editor/editor_icons.lua
 Players=Jugadores

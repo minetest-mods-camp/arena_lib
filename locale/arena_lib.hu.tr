@@ -150,7 +150,6 @@ Get ready!=Készülj fel!
 # editor/editor_main.lua
 [!] You must leave the editor first!=[!] El kell hagynod a szerkesztőt először!
 Wooosh!=Wuuush!
-Arena_lib editor | Now editing: @1=Arena_lib szerkesztő | Most szerkesztés alatt áll: @1
 
 # editor/editor_icons.lua
 Players=Játékos
