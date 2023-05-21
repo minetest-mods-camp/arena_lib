@@ -310,7 +310,7 @@ function get_infobox_formspec(mod, arenaID, player)
     if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
       play_btn = "arenalib_infobox_play_leave.png"
       play_tip = "Leave the queue" .. LMB_TIP
-    elseif arena.players_amount == arena.max_players and (arena.in_queue or (arena.in_game and (mod_ref.join_while_in_progress or mod_ref.endless))) then
+    elseif arena.players_amount == arena.max_players * #arena.teams and (arena.in_queue or (arena.in_game and (mod_ref.join_while_in_progress or mod_ref.endless))) then
       play_btn = "arenalib_infobox_play_full.png"
       play_tip = "Full"
     elseif arena.in_game then
