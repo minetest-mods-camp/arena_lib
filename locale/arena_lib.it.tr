@@ -176,6 +176,7 @@ Apply=Applica
 # editor/tools_lighting.lua
 Lighting=Illuminazione
 Global light=Luce globale
+Saturation=Saturazione
 
 # editor/tools_players.lua
 Players required=Giocatorɜ minimɜ

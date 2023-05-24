@@ -523,9 +523,11 @@ will increase the size of the sun inside the arena and hide the sunrise texture.
 Last but not least, the special element `"all"` allows you to change everything, and it needs a table with the following optional parameters: `{sky={...}, sun={...}, moon={...}, stars={...}, clouds={...}}`. If `params` is nil, it'll reset the whole celestial vault.
 
 ##### 2.2.2.10 Lighting
-NOTE: EXPERIMENTAL FEATURE. EXPECT BREAKAGE IN THE FUTURE (according to the direction Minetest will choose to go with lighting)
+NOTE: EXPERIMENTAL FEATURE. EXPECT BREAKAGE IN THE FUTURE (according to the direction Minetest will choose to go with lighting)  
 By default, the arena's lighting settings reflect the lighting settings of the player before entering the match (meaning there are no default values inside arena_lib).  
-`arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. As for now, `light_table` only takes one field, `light`, a float between 0 and 1 that changes the intensity of the global lighting. If `light_table` is `nil`, it'll reset the whole lighting settings.  
+`arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. If `light_table` is `nil`, it'll reset the whole lighting settings. It can contain the following fields:  
+  * `light`: (float) 0-1, changes the intensity of the global lighting
+  * `saturation`: (float) 0-1, changes the saturation
 
 ##### 2.2.2.11 Region
 `arena_lib.set_region(sender, mod, arena_name, pos1, pos2)` allows you to set the region of the arena. `pos1` and `pos2` are both mandatory and they both need to be vectors (sending a table such as `{x=3,z=4,y=2}` won't work).

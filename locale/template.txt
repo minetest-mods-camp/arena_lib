@@ -176,6 +176,7 @@ Apply=
 # editor/tools_lighting.lua
 Lighting=
 Global light=
+Saturation=
 
 # editor/tools_players.lua
 Players required=

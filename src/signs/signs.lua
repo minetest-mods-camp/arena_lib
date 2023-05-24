@@ -223,7 +223,7 @@ end
 function in_game_txt(arena, endless)
   local txt
 
-  -- it's not possible to translate them => https://gitlab.com/VanessaE/signs_lib/-/issues/9
+  -- it's not possible to translate them, as they're entities. Needed https://github.com/minetest/minetest/issues/1367
   if not arena.enabled        then txt = "#dWIP"
   elseif arena.in_loading     then txt = "#4Loading"
   elseif endless              then txt = "#2oo"

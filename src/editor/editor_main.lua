@@ -85,19 +85,22 @@ function arena_lib.enter_editor(sender, mod, arena_name)
 
   local player = minetest.get_player_by_name(sender)
   local p_cvault = {}
+  local p_lighting = {}
 
   -- salvo le info
-  p_cvault.sky = player:get_sky(true)
-  p_cvault.sun = player:get_sun()
-  p_cvault.moon = player:get_moon()
-  p_cvault.stars = player:get_stars()
-  p_cvault.clouds = player:get_clouds()
+  p_cvault.sky        = player:get_sky(true)
+  p_cvault.sun        = player:get_sun()
+  p_cvault.moon       = player:get_moon()
+  p_cvault.stars      = player:get_stars()
+  p_cvault.clouds     = player:get_clouds()
+  p_lighting.light    = player:get_day_night_ratio()
+  p_lighting.shaders  = player:get_lighting()
 
   players_in_edit_mode[sender] = {
     inv           = player:get_inventory():get_list("main"),
     pos           = player:get_pos(),
     celvault      = p_cvault,
-    lighting      = {light = player:get_day_night_ratio()},
+    lighting      = p_lighting,
     hotbar_slots  = player:hud_get_hotbar_itemcount(),
     hotbar_bg     = player:hud_get_hotbar_image()
   }
@@ -122,9 +125,11 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     if celvault.clouds then player:set_clouds(celvault.clouds) end
   end
 
-  -- imposto eventuale luce
+  -- imposto eventuale illuminazione e filtri
   if arena.lighting then
-    player:override_day_night_ratio(arena.lighting.light)
+    local lighting = arena.lighting
+    if lighting.light   then player:override_day_night_ratio(lighting.light)  end
+    if lighting.shaders then player:set_lighting(lighting.shaders)            end
   end
 
   -- se c'è almeno un punto di rinascita, teletrasporto
@@ -167,20 +172,10 @@ function arena_lib.quit_editor(player)
 
   local mod = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name = player:get_meta():get_string("arena_lib_editor.arena")
-  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   if arena_name == "" then return end
 
   local p_name = player:get_player_name()
-  local inv = players_in_edit_mode[p_name].inv
-  local pos = players_in_edit_mode[p_name].pos
-  local celvault = table.copy(players_in_edit_mode[p_name].celvault)
-  local lighting = players_in_edit_mode[p_name].lighting
-  local hotbar_slots = players_in_edit_mode[p_name].hotbar_slots
-  local hotbar_bg = players_in_edit_mode[p_name].hotbar_bg
-
-  arenas_in_edit_mode[arena_name] = nil
-  players_in_edit_mode[p_name] = nil
 
   player:get_meta():set_string("arena_lib_editor.mod", "")
   player:get_meta():set_string("arena_lib_editor.arena", "")
@@ -190,27 +185,34 @@ function arena_lib.quit_editor(player)
   arena_lib.remove_waypoints(p_name)
   arena_lib.HUD_hide("hotbar", p_name)
 
-  player:hud_set_hotbar_itemcount(hotbar_slots)
-  player:hud_set_hotbar_image(hotbar_bg)
-
-  -- teletrasporto
-  player:set_pos(pos)
+  local celvault = players_in_edit_mode[p_name].celvault
 
   -- ripristino volta celeste
-  if arena.celestial_vault then
-    player:set_sky(celvault.sky)
-    player:set_sun(celvault.sun)
-    player:set_moon(celvault.moon)
-    player:set_stars(celvault.stars)
-    player:set_clouds(celvault.clouds)
-  end
+  player:set_sky(celvault.sky)
+  player:set_sun(celvault.sun)
+  player:set_moon(celvault.moon)
+  player:set_stars(celvault.stars)
+  player:set_clouds(celvault.clouds)
 
+  local lighting = players_in_edit_mode[p_name].lighting
+
+  -- ripristino illuminazione
   player:override_day_night_ratio(lighting.light)
+  player:set_lighting(lighting.shaders)
 
-  -- restituisco l'inventario
-  player:get_inventory():set_list("main", inv)
+  -- teletrasporto
+  player:set_pos(players_in_edit_mode[p_name].pos)
+
+  -- ripristino l'inventario
+  player:hud_set_hotbar_itemcount(players_in_edit_mode[p_name].hotbar_slots)
+  player:hud_set_hotbar_image(players_in_edit_mode[p_name].hotbar_bg)
+  player:get_inventory():set_list("main", players_in_edit_mode[p_name].inv)
+
+  arenas_in_edit_mode[arena_name] = nil
+  players_in_edit_mode[p_name] = nil
 
   local mod_ref = arena_lib.mods[mod]
+  local _, arena = arena_lib.get_arena_by_name(mod, arena_name)
 
   -- richiami eventuali
   if mod_ref.on_leave_editor then

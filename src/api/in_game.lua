@@ -670,13 +670,19 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
 
   -- cambio eventuale illuminazione
   if arena.lighting then
+    local lighting = arena.lighting
+
     players_temp_storage[p_name].lighting = {
-      light = player:get_day_night_ratio()
+      light   = player:get_day_night_ratio(),
+      shaders = player:get_lighting()
     }
 
-    local lighting = arena.lighting
     if lighting.light then
       player:override_day_night_ratio(lighting.light)
+    end
+
+    if lighting.shaders then
+      player:set_lighting(lighting.shaders)
     end
   end
 
@@ -871,6 +877,7 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
   -- reimposto eventuale illuminazione
   if arena.lighting then
     player:override_day_night_ratio(players_temp_storage[p_name].lighting.light)
+    player:set_lighting(players_temp_storage[p_name].lighting.shaders)
   end
 
   -- reimposto eventuale volta celeste
