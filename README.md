@@ -11,7 +11,7 @@ It comes with an arena manager and a signs system. The latter creates a bridge i
 
 2) Launch the world at least once with arena_lib enabled and then check `worlds/nameofyourworld/arena_lib` to customise it
 
-3) (modders only) First time? Check out the [wiki](https://gitlab.com/zughy-friends-minetest/arena_lib/-/wikis/Your-first-minigame) to create your first minigame! Otherwise, dive into the [full documentation](DOCS.md)
+3) (modders only) First time? Check out the [wiki](https://gitlab.com/zughy-friends-minetest/arena_lib/-/wikis/Your-first-minigame) to create your first minigame. Otherwise, dive into the [full documentation](DOCS.md)
 
 ### Dependencies
 * (bundled) [ChatCMDBuilder](https://github.com/rubenwardy/ChatCmdBuilder/) by rubenwardy

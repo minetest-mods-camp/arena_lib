@@ -62,7 +62,7 @@ function get_lighting_formspec(p_name)
     "label[5.8,0.41;1]",
     "scrollbaroptions[max=100;smallstep=1;largestep=10;arrows=hide]",
     "scrollbar[0.4,0.3;5.2,0.2;;light;" .. light .. "]",
-    "label[0,1;Saturation]",
+    "label[0,1;" .. S("Saturation") .. "]",
     "label[0,1.41;0]",
     "label[5.8,1.41;1]",
     "scrollbar[0.4,1.3;5.2,0.2;;saturation;" .. saturation .. "]",

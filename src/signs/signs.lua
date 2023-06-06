@@ -419,7 +419,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     if arena.in_game then
       arena_lib.join_arena(mod, p_name, arenaID)
     else
-      if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_queueID_by_player(p_name) == arenaID then
+      if arena_lib.is_player_in_queue(p_name, mod) and arena_lib.get_arenaID_by_player(p_name) == arenaID then
         arena_lib.remove_player_from_queue(p_name)
       else
         arena_lib.join_queue(mod, arena, p_name)
