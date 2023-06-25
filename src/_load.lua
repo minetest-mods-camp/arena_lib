@@ -62,6 +62,24 @@ if arena_lib.STORE_INVENTORY_MODE then
 end
 
 -- to remove in 8.0
+-- rename PALETTE `_default` into `___`
 if arena_lib.PALETTE._default then
-  minetest.log("warning", "[ARENA_LIB] Settings: PALETTE option `_default` has been renamed into `___`. In order to avoid issues, please manually change it from SETTINGS.lua (inside the arena_lib world folder)")
+  local file_content = {}
+  local settings = io.open(minetest.get_worldpath() .. "/arena_lib/SETTINGS.lua", "r")
+
+  for line in settings:lines() do
+    if string.match(line, "_default") then
+      line = line:gsub("_default", "___")
+    end
+    table.insert(file_content, line)
+  end
+
+  settings:close()
+
+  settings = io.open(minetest.get_worldpath() .. "/arena_lib/SETTINGS.lua", "w")
+  for k, v in ipairs(file_content) do
+    settings:write(v .. "\n")
+  end
+
+  settings:close()
 end

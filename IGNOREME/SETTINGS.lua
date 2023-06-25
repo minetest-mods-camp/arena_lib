@@ -20,7 +20,7 @@ arena_lib.SERVER_PHYSICS = {
 -- that's me) => https://lospec.com/palette-list/zughy-32. I invite you *not* to
 -- edit it manually; instead, if you want to change it, pick your favourite from
 -- Lospec: https://lospec.com/palette-list, edit the list and it'll be
--- automatically updated in game. Do not remove "_default" and keep all letters
+-- automatically updated in game. Do not remove "___" and keep all letters
 -- uppercase
 arena_lib.PALETTE = {
   ___ = "",
