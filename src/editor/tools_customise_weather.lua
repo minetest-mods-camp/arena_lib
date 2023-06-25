@@ -242,7 +242,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       amount = amount,
       vel = -0.25,
       scale = 0.35 * strength,
-      opacity = {0.3 * strength, 1}
+      opacity = {0.4, 1}
     }
   end
 
