@@ -10,15 +10,14 @@ local function get_clouds_params() end
 local function get_clouds_col_alpha() end
 local function calc_clouds_col() end
 local function colstr() end
-local function get_palette_col_and_sorted_table() end
 local function same_table() end
 
-local temp_sky_settings = {}          -- KEY = p_name; VALUE = {all the sky settings}
+local temp_sky_settings = {}            -- KEY = p_name; VALUE = {all the sky settings}
+local palette_str, palette_id = arena_lib.get_palette_col_and_sorted_table()    -- palette id KEY = hex value; VALUE = id
 
 
 
 minetest.register_tool("arena_lib:customise_sky", {
-
     description = S("Celestial vault"),
     inventory_image = "arenalib_customise_sky.png",
     groups = {not_in_creative_inventory = 1},
@@ -69,11 +68,9 @@ end
 
 
 function get_celvault_formspec(p_name, section)
-
   local formspec = {
     "formspec_version[4]",
     "size[9.72,10]",
-    "position[0.5,0.5]",
     "no_prepend[]",
     "style_type[image_button;border=false]",
     "scrollbaroptions[min=0;max=100;arrows=hide]",
@@ -120,7 +117,6 @@ end
 
 
 function get_sky_params(p_name)
-
   local temp_sky = temp_sky_settings[p_name].sky
   local clouds = true
   local sky_type = 1
@@ -136,7 +132,6 @@ function get_sky_params(p_name)
   end
 
   local temp_sky_col = temp_sky.sky_color
-  local palette_str, palette_id = get_palette_col_and_sorted_table()            -- palette id KEY = hex value, VALUE = id
   local sky_params = {}
   local sky = {
     "label[0,0.25;" .. S("Type") .. "]",
@@ -215,7 +210,6 @@ end
 
 
 function get_sun_params(p_name)
-
   local temp_sun = temp_sky_settings[p_name].sun
   local is_sun_visible = temp_sun.visible ~= false
   local is_sunrise_visible = temp_sun.sunrise_visible ~= false
@@ -255,7 +249,6 @@ end
 
 
 function get_moon_params(p_name)
-
   local temp_moon = temp_sky_settings[p_name].moon
   local is_moon_visible = temp_moon.visible ~= false
 
@@ -291,7 +284,6 @@ function get_stars_params(p_name)
   }
 
   if are_stars_visible then
-    local palette_str, palette_id = get_palette_col_and_sorted_table()
     local stars_params = {
       "field[6.9,0.7;1,0.6;stars_size;" .. S("Size") .. ";" .. (temp_stars.scale or 1) .. "]",
       "container[0,1.6]",
@@ -326,7 +318,6 @@ function get_clouds_params(p_name)
     }
 
   else
-    local palette_str, palette_id = get_palette_col_and_sorted_table()
     local col, alpha = get_clouds_col_alpha(temp_clouds.color)
     clouds = {
       "container[0,0.5]",
@@ -396,29 +387,6 @@ end
 
 
 
-function get_palette_col_and_sorted_table()
-  -- inverto chiavi con valori
-  local inverted = {}
-  for k in pairs(arena_lib.PALETTE) do
-    table.insert(inverted, k)
-  end
-
-  table.sort(inverted, function(a, b) return a:lower() < b:lower() end)
-
-  local palette = ""
-  local palette_table = {}
-  local i = 1
-  for _, col in pairs(inverted) do
-    palette = palette .. col .. ","
-    palette_table[arena_lib.PALETTE[col]] = i
-    i = i+1
-  end
-
-  return palette:sub(1, -2), palette_table
-end
-
-
-
 function same_table(t1,t2)
   return minetest.serialize(t1) == minetest.serialize(t2)
 end
@@ -432,7 +400,6 @@ end
 ----------------------------------------------
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-
   if formname ~= "arena_lib:celestial_vault" then return end
 
   local p_name = player:get_player_name()
@@ -445,7 +412,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   local mod         = player:get_meta():get_string("arena_lib_editor.mod")
   local arena_name  = player:get_meta():get_string("arena_lib_editor.arena")
-  local _, arena   = arena_lib.get_arena_by_name(mod, arena_name)
+  local _, arena    = arena_lib.get_arena_by_name(mod, arena_name)
   local celvault    = arena.celestial_vault
 
   -- se abbandona...

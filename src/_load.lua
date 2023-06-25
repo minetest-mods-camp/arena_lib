@@ -60,3 +60,8 @@ dofile(minetest.get_worldpath() .. "/arena_lib/SETTINGS.lua")
 if arena_lib.STORE_INVENTORY_MODE then
   minetest.log("warning", "[ARENA_LIB] Setting 'STORE_INVENTORY_MODE' is of no use now, please delete it from SETTINGS.lua (inside the arena_lib world folder)")
 end
+
+-- to remove in 8.0
+if arena_lib.PALETTE._default then
+  minetest.log("warning", "[ARENA_LIB] Settings: PALETTE option `_default` has been renamed into `___`. In order to avoid issues, please manually change it from SETTINGS.lua (inside the arena_lib world folder)")
+end

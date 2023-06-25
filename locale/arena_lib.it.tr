@@ -99,6 +99,7 @@ Region of arena @1 successfully overwritten=Regione dell'arena @1 sovrascritta c
 Entrance of arena @1 successfully set=Entrata dell'arena @1 impostata con successo
 Lighting of arena @1 successfully overwritten=Illuminazione dell'arena @1 sovrascritta con successo
 (@1) Celestial vault of arena @2 successfully overwritten=(@1) Volta celeste dell'arena @2 sovrascritta con successo
+Weather condition of arena @1 successfully overwritten=Condizione meteo dell'arena @1 sovrascritta con successo
 All=Tutto
 Sky=Cielo
 Sun=Sole
@@ -163,7 +164,7 @@ Go back=Torna indietro
 Enable and leave=Abilita ed esci
 Leave=Esci
 
-# editor/tools_bgm.lua
+# editor/tools_customise_bgm.lua
 Background music=Musica di sottofondo
 leave empty to remove the current track=lascia vuoto per rimuovere la traccia corrente
 Audio file=File audio
@@ -173,36 +174,12 @@ Volume=Volume
 Pitch=Tono
 Apply=Applica
 
-# editor/tools_lighting.lua
+# editor/tools_customise_lighting.lua
 Lighting=Illuminazione
 Global light=Luce globale
 Saturation=Saturazione
 
-# editor/tools_players.lua
-Players required=Giocatorɜ minimɜ
-Players supported (right click to remove the limit)=Giocatorɜ massimɜ (tasto dx per rimuovere il limite)
-Players supported (click to set a limit)=Giocatorɜ massimɜ (premi per impostare un limite)
-Teams amount=Numero squadre
-Change value (LMB increases, RMB decreases)=Cambia valore (sx aumenta, dx diminuisce)
-Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
-Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
-
-# editor/tools_settings.lua
-Arena region (LMB pos1, RMB pos2, Q removes)=Regione dell'arena (sx pos1, dx pos2, Q rimuovi)
-Custom return point (LMB sets, RMB removes)=Punto di ritorno personalizzato (sx imposta, dx rimuove)
-Arena name, author and thumbnail=Nome arena, autorə e miniatura
-Arena properties=Proprietà arena
-Delete arena=Cancella arena
-Are you sure you want to delete the region of the arena?=Sei sicurə di voler eliminare la regione dell'arena?
-Rename arena=Rinomina arena
-Set author=Imposta autorə
-Set thumbnail=Imposta miniatura
-Set timer=Imposta timer
-Are you sure you want to delete arena @1?=Sei sicurə di voler eliminare l'arena @1?
-Cancel=Annulla
-Yes=Sì
-
-# editor/tools_sky.lua
+# editor/tools_customise_sky.lua
 Celestial vault=Volta celeste
 Reset=Ripristina
 Type=Tipo
@@ -240,6 +217,34 @@ Density=Densità
 Thickness=Spessore
 Height=Altezza
 Speed=Velocità
+
+# editor/tools_customise_weather.lua
+Weather condition=Condizione meteo
+Strength=Intensità
+
+# editor/tools_players.lua
+Players required=Giocatorɜ minimɜ
+Players supported (right click to remove the limit)=Giocatorɜ massimɜ (tasto dx per rimuovere il limite)
+Players supported (click to set a limit)=Giocatorɜ massimɜ (premi per impostare un limite)
+Teams amount=Numero squadre
+Change value (LMB increases, RMB decreases)=Cambia valore (sx aumenta, dx diminuisce)
+Teams: on (click to toggle off)=Squadre: attive (premi per disattivare)
+Teams: off (click to toggle on)=Squadre: non attive (premi per attivare)
+
+# editor/tools_settings.lua
+Arena region (LMB pos1, RMB pos2, Q removes)=Regione dell'arena (sx pos1, dx pos2, Q rimuovi)
+Custom return point (LMB sets, RMB removes)=Punto di ritorno personalizzato (sx imposta, dx rimuove)
+Arena name, author and thumbnail=Nome arena, autorə e miniatura
+Arena properties=Proprietà arena
+Delete arena=Cancella arena
+Are you sure you want to delete the region of the arena?=Sei sicurə di voler eliminare la regione dell'arena?
+Rename arena=Rinomina arena
+Set author=Imposta autorə
+Set thumbnail=Imposta miniatura
+Set timer=Imposta timer
+Are you sure you want to delete arena @1?=Sei sicurə di voler eliminare l'arena @1?
+Cancel=Annulla
+Yes=Sì
 
 # editor/tools_spawner.lua
 Add spawner=Aggiungi punto di rinascita
@@ -307,6 +312,10 @@ celebrating=in celebrazione
 waiting=in attesa
 Initial time: =Tempo iniziale: 
 current: =corrente: 
+rain=pioggia
+snow=neve
+dust=pulviscolo
+custom=personalizzato
 Name: =Nome: 
 Author: =Autore: 
 Thumbnail: =Miniatura: 
@@ -326,6 +335,7 @@ Region: =Regione:
 Custom return point: =Punto di ritorno personalizzato: 
 Spawn points: =Punti di rinascita: 
 Custom sky: =Cielo personalizzato: 
+Weather: =Meteo: 
 Custom lighting: =Illuminazione personalizzata: 
 Properties: =Proprietà: 
 Temp properties: =Proprietà temporanee: 

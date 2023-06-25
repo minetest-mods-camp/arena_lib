@@ -40,6 +40,29 @@ end
 
 
 
+function arena_lib.get_palette_col_and_sorted_table()
+  -- inverto chiavi con valori
+  local inverted = {}
+  for k in pairs(arena_lib.PALETTE) do
+    table.insert(inverted, k)
+  end
+
+  table.sort(inverted, function(a, b) return a:lower() < b:lower() end)
+
+  local palette = ""
+  local palette_table = {}
+  local i = 1
+  for _, col in pairs(inverted) do
+    palette = palette .. col .. ","
+    palette_table[arena_lib.PALETTE[col]] = i
+    i = i+1
+  end
+
+  return palette:sub(1, -2), palette_table
+end
+
+
+
 
 
 ----------------------------------------------

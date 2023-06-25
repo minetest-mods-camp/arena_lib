@@ -223,9 +223,36 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
         celvault = celvault .. string.upper(elem) .. ": " .. table_to_string(params) .. "\n"
       end
     end
+    celvault = celvault:sub(1,-2)
   else
     celvault = "---"
   end
+
+  -- calcolo eventuale effetto meteo
+  local weather = ""
+  if arena.weather then
+    local wt_type, strength
+    local particles = arena.weather
+    local texture = particles.texture.name
+    if texture == "arenalib_particle_rain.png" then
+      wt_type = S("rain")
+    elseif texture == "arenalib_particle_snow.png" then
+      wt_type = S("snow")
+    elseif string.match(texture, "arenalib_particle_dust.png") then
+      wt_type = S("dust")
+    else
+      wt_type = S("custom")
+    end
+
+    if wt_type ~= S("custom") then
+      strength = ", " .. string.lower(S("Strength")) .. ": " .. particles.amount / 500  -- ogni quantità è amount * 5 (editor) * 100 (API)
+    end
+
+    weather = wt_type .. strength
+  else
+    weather = "---"
+  end
+
 
   -- calcolo eventuale illuminazione personalizzata
   local lighting = "---"
@@ -315,6 +342,7 @@ function arena_lib.print_arena_info(sender, mod, arena_name)
 
     time ..
     minetest.colorize("#eea160", S("Custom sky: ")) .. minetest.colorize("#cfc6b8", celvault) .. "\n" ..
+    minetest.colorize("#eea160", S("Weather: ")) .. minetest.colorize("#cfc6b8", weather) .. "\n" ..
     minetest.colorize("#eea160", S("Custom lighting: ")) .. minetest.colorize("#cfc6b8", lighting) .. "\n\n" ..
 
     minetest.colorize("#eea160", S("Properties: ")) .. minetest.colorize("#cfc6b8", properties) .. "\n" ..

@@ -14,9 +14,9 @@ local function deprecated_start_arena() end
 
 local players_in_game = {}            -- KEY: player name, VALUE: {(string) minigame, (int) arenaID}
 local players_temp_storage = {}       -- KEY: player_name, VALUE: {(int) hotbar_slots, (string) hotbar_background_image, (string) hotbar_selected_image, (int) bgm_handle,
-                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs).
-                                      --                           (table) attachments, (table) nametag}
-
+                                      --                           (table) player_aspect, (int) fov, (table) camera_offset, (table) armor_groups, (string) inventory_fs,
+                                      --                           (table) attachments, (table) nametag, (table) celvault_sky, (table) celvault_sun, (table) celvault_moon,
+                                      --                           (table) celvault_stars, (table) celvault_clouds, (int) weather_ID}
 
 
 function arena_lib.load_arena(mod, arena_ID)
@@ -716,6 +716,15 @@ function operations_before_entering_arena(mod_ref, mod, arena, arena_ID, p_name,
     end
   end
 
+  -- cambio eventuale effetto
+  if arena.weather then
+    local particles = table.copy(arena.weather)
+
+    particles.playername = p_name
+    particles.attached = player
+    players_temp_storage[p_name].weather_ID = minetest.add_particlespawner(particles)
+  end
+
   -- salvo la targhetta ed eventualmente la nascondo
   players_temp_storage[p_name].nametag = player:get_nametag_attributes()
 
@@ -899,6 +908,11 @@ function operations_before_leaving_arena(mod_ref, arena, p_name, reason)
     if celvault.clouds then
       player:set_clouds(players_temp_storage[p_name].celvault_clouds)
     end
+  end
+
+  -- rimuovo eventuale effetto meteo
+  if arena.weather then
+    minetest.delete_particlespawner(players_temp_storage[p_name].weather_ID)
   end
 
   -- svuoto eventualmente l'inventario e ripristino gli oggetti
@@ -1225,7 +1239,7 @@ function show_victory_particles(p_pos)
     maxvel = {x=2, y=2, z=2},
     minsize = 1,
     maxsize = 3,
-    texture = "arenalib_winparticle.png"
+    texture = "arenalib_particle_win.png"
   })
 end
 

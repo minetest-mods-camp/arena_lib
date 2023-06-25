@@ -102,7 +102,8 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     celvault      = p_cvault,
     lighting      = p_lighting,
     hotbar_slots  = player:hud_get_hotbar_itemcount(),
-    hotbar_bg     = player:hud_get_hotbar_image()
+    hotbar_bg     = player:hud_get_hotbar_image(),
+    weather_ID    = nil
   }
 
   -- metto l'arena in modalità modifica, associandoci lə giocatorə
@@ -123,6 +124,15 @@ function arena_lib.enter_editor(sender, mod, arena_name)
     if celvault.moon   then player:set_moon(celvault.moon)     end
     if celvault.stars  then player:set_stars(celvault.stars)   end
     if celvault.clouds then player:set_clouds(celvault.clouds) end
+  end
+
+  -- imposto eventuale effetto meteo
+  if arena.weather then
+    local particles = table.copy(arena.weather)
+
+    particles.playername = sender
+    particles.attached = player
+    players_in_edit_mode[sender].weather_ID = minetest.add_particlespawner(particles)
   end
 
   -- imposto eventuale illuminazione e filtri
@@ -193,6 +203,13 @@ function arena_lib.quit_editor(player)
   player:set_moon(celvault.moon)
   player:set_stars(celvault.stars)
   player:set_clouds(celvault.clouds)
+
+  -- rimuovo eventuale effetto particellare
+  local weather_ID = players_in_edit_mode[p_name].weather_ID
+
+  if weather_ID then
+    minetest.delete_particlespawner(weather_ID)
+  end
 
   local lighting = players_in_edit_mode[p_name].lighting
 
@@ -270,4 +287,29 @@ end
 
 function arena_lib.get_player_in_edit_mode(arena_name)
   return arenas_in_edit_mode[arena_name]
+end
+
+
+
+-- internal use only
+function arena_lib.get_editor_particlespawner(p_name)
+  return players_in_edit_mode[p_name].weather_ID
+end
+
+
+
+
+----------------------------------------------
+-----------------SETTERS----------------------
+----------------------------------------------
+
+-- internal use only
+function arena_lib.set_editor_particlespawner(p_name, ID)
+  local p_data = players_in_edit_mode[p_name]
+
+  if p_data.weather_ID then
+    minetest.delete_particlespawner(p_data.weather_ID)
+  end
+
+  p_data.weather_ID = ID
 end

@@ -23,7 +23,7 @@ arena_lib.SERVER_PHYSICS = {
 -- automatically updated in game. Do not remove "_default" and keep all letters
 -- uppercase
 arena_lib.PALETTE = {
-  _default = "",
+  ___ = "",
   skin_cocoa = "#5E3643",
   skin_toffee = "#7A444A",
   skin_bronze = "#A05B5E",

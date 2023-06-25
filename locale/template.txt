@@ -99,6 +99,7 @@ Region of arena @1 successfully overwritten=
 Entrance of arena @1 successfully set=
 Lighting of arena @1 successfully overwritten=
 (@1) Celestial vault of arena @2 successfully overwritten=
+Weather condition of arena @1 successfully overwritten=
 All=
 Sky=
 Sun=
@@ -163,7 +164,7 @@ Go back=
 Enable and leave=
 Leave=
 
-# editor/tools_bgm.lua
+# editor/tools_customise_bgm.lua
 Background music=
 leave empty to remove the current track=
 Audio file=
@@ -173,36 +174,12 @@ Volume=
 Pitch=
 Apply=
 
-# editor/tools_lighting.lua
+# editor/tools_customise_lighting.lua
 Lighting=
 Global light=
 Saturation=
 
-# editor/tools_players.lua
-Players required=
-Players supported (right click to remove the limit)=
-Players supported (click to set a limit)=
-Teams amount=
-Change value (LMB increases, RMB decreases)=
-Teams: on (click to toggle off)=
-Teams: off (click to toggle on)=
-
-# editor/tools_settings.lua
-Arena region (LMB pos1, RMB pos2, Q removes)=
-Custom return point (LMB sets, RMB removes)=
-Arena name, author and thumbnail=
-Arena properties=
-Delete arena=
-Are you sure you want to delete the region of the arena?=
-Rename arena=
-Set author=
-Set thumbnail=
-Set timer=
-Are you sure you want to delete arena @1?=
-Cancel=
-Yes=
-
-# editor/tools_sky.lua
+# editor/tools_customise_sky.lua
 Celestial vault=
 Reset=
 Type=
@@ -240,6 +217,34 @@ Density=
 Thickness=
 Height=
 Speed=
+
+# editor/tools_customise_weather.lua
+Weather condition=
+Strength=
+
+# editor/tools_players.lua
+Players required=
+Players supported (right click to remove the limit)=
+Players supported (click to set a limit)=
+Teams amount=
+Change value (LMB increases, RMB decreases)=
+Teams: on (click to toggle off)=
+Teams: off (click to toggle on)=
+
+# editor/tools_settings.lua
+Arena region (LMB pos1, RMB pos2, Q removes)=
+Custom return point (LMB sets, RMB removes)=
+Arena name, author and thumbnail=
+Arena properties=
+Delete arena=
+Are you sure you want to delete the region of the arena?=
+Rename arena=
+Set author=
+Set thumbnail=
+Set timer=
+Are you sure you want to delete arena @1?=
+Cancel=
+Yes=
 
 # editor/tools_spawner.lua
 Add spawner=
@@ -307,6 +312,10 @@ celebrating=
 waiting=
 Initial time: =
 current: =
+rain=
+snow=
+dust=
+custom=
 Name: =
 Author: =
 Thumbnail: =
@@ -326,6 +335,7 @@ Region: =
 Custom return point: =
 Spawn points: =
 Custom sky: =
+Weather: =
 Custom lighting: =
 Properties: =
 Temp properties: =

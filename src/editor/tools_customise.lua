@@ -1,10 +1,8 @@
-local S = minetest.get_translator("arena_lib")
-
 local customise_tools = {
   "arena_lib:customise_bgm",
   "arena_lib:customise_sky",
+  "arena_lib:customise_weather",
   "arena_lib:customise_lighting",
-  "",
   "",
   "",
   "",

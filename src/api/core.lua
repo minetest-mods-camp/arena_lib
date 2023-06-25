@@ -58,6 +58,7 @@ local arena_optional_fields = {
   pos1 = true,
   pos2 = true,
   celestial_vault = true,               -- sky = {...}, sun = {...}, moon = {...}, stars = {...}, clouds = {...}
+  weather = true,
   lighting = true,                      -- light = override_day_night_ratio
   bgm = true,
   initial_time = true,
@@ -1104,6 +1105,55 @@ function arena_lib.set_celestial_vault(sender, mod, arena_name, element, params,
 
   update_storage(false, mod, id, arena)
   minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("(@1) Celestial vault of arena @2 successfully overwritten", S(element), arena_name))
+end
+
+
+
+function arena_lib.set_weather_condition(sender, mod, arena_name, particles, in_editor)
+  local id, arena = arena_lib.get_arena_by_name(mod, arena_name)
+
+  if not in_editor then
+    if not ARENA_LIB_EDIT_PRECHECKS_PASSED(sender, arena) then return end
+  end
+
+  if particles ~= nil and type(particles) ~= "table" then
+    minetest.chat_send_player(sender, minetest.colorize("#e6482e", S("[!] Parameters don't seem right!")))
+    return end
+
+  if not particles then
+    arena.weather = nil
+
+  else
+    arena.weather = {
+      amount = 100 * particles.amount,
+      time = 0,
+      pos = {
+        min = {x = -50, y = particles.height - 3.5, z = -50},
+        max = {x = 50, y = particles.height + 3.5, z = 50}
+      },
+      vel = {
+        min = vector.new(0, particles.vel - 0.15, 0),
+        max = vector.new(0, particles.vel + 0.15, 0),
+      },
+      minsize = particles.scale - 1.5,
+      maxsize = particles.scale + 1.5,
+      texture = {
+        name = particles.texture,
+        alpha_tween = particles.opacity,
+        scale_tween = {
+          {x = 1, y = 1},
+          {x = 0.2, y = 0.2},
+        },
+      },
+      collisiondetection = particles.collide,
+      collision_removal = particles.remove_on_coll,
+      minexptime = 3,
+      maxexptime = 5,
+    }
+  end
+
+  update_storage(false, mod, id, arena)
+  minetest.chat_send_player(sender, arena_lib.mods[mod].prefix .. S("Weather condition of arena @1 successfully overwritten", arena_name))
 end
 
 

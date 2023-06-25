@@ -37,8 +37,9 @@
 			* [2.2.2.7 Timers](#2227-timers)
 			* [2.2.2.8 Music](#2228-music)
 			* [2.2.2.9 Celestial vault](#2229-celestial-vault)
-			* [2.2.2.10 Lighting](#22210-lighting)
-			* [2.2.2.11 Region](#22211-region)
+			* [2.2.2.10 Weather](#22210-weather)
+			* [2.2.2.11 Lighting](#22210-lighting)
+			* [2.2.2.12 Region](#22211-region)
 		* [2.2.3 Arena regions](#223-arena-regions)
 	* [2.3 Arena phases](#23-arena-phases)
 	* [2.4 Spectate mode](#24-spectate-mode)
@@ -432,6 +433,7 @@ An arena is a table having as a key an ID and as a value its parameters. They ar
 * `initial_time`: (int) in seconds. It's `nil` when the mod doesn't keep track of time, it's 0 when the mod does it incrementally and it's inherited by the mod if the mod has a timer. In this case, every arena can have its specific value. By default time tracking is disabled, hence it's `nil`
 * `current_time`: (int) in seconds. It requires `initial_time` and it exists only when a game is in progress, keeping track of the current time
 * `celestial_vault`: (table) if present, contains the information about the celestial vault to display to each player whilst in game, overriding the default one. Default is `nil`.
+* `weather`: (table) if present, contains the particle to assign to players whilst in game. Default is `nil`.
 * `lighting`: (table) if present, contains the information about the lighting settings of the arena, overriding players' default ones. Default is `nil`
 * `bgm`: (table) if present, contains the information about the audio track to play whilst in game. Audio tracks must be placed in the world folder in `/arena_lib/BGM` in order to be found. Default is `nil`
   In-depth fields, all empty by default, are:
@@ -522,14 +524,26 @@ By default, the arena's celestial vault reflects the celestial vault of the play
 will increase the size of the sun inside the arena and hide the sunrise texture. `params` can also be `nil`, and in that case will remove any custom setting previously set.  
 Last but not least, the special element `"all"` allows you to change everything, and it needs a table with the following optional parameters: `{sky={...}, sun={...}, moon={...}, stars={...}, clouds={...}}`. If `params` is nil, it'll reset the whole celestial vault.
 
-##### 2.2.2.10 Lighting
+##### 2.2.2.10 Weather
+Arenas can have a custom weather condition, in the shape of a particle spawner assigned per player. The editor offers 3 states (rain, snow and dust), but using the API call allows to customise the particle spawner with basically no limits. The function is
+`arena_lib.set_weather_condition(sender, mod, arena_name, particles)`, where `particles` is a table that can contain the following fields:
+* `image`: (string) the image of the particle
+* `height`: (int) the height where particles will spawn (±3.5)
+* `amount`: (int) the amount of particles
+* `vel`: (int) the Y speed of particles (±0.15)
+* `scale`: (int) the size of particles (±1.5)
+* `opacity`: (table) table containing the minimum and the amount opacity of particles, between 0 and 1 (e.g. `{0.7, 1}`)
+* `collide`: (boolean) whether particles collide
+* `remove_on_coll`: (boolean) whether particles are removed when colliding (requires `collide`)
+
+##### 2.2.2.11 Lighting
 NOTE: EXPERIMENTAL FEATURE. EXPECT BREAKAGE IN THE FUTURE (according to the direction Minetest will choose to go with lighting)  
 By default, the arena's lighting settings reflect the lighting settings of the player before entering the match (meaning there are no default values inside arena_lib).  
 `arena_lib.set_lighting(sender, mod, arena_name, light_table)` allows you to override those settings. If `light_table` is `nil`, it'll reset the whole lighting settings. It can contain the following fields:  
   * `light`: (float) 0-1, changes the intensity of the global lighting
   * `saturation`: (float) 0-1, changes the saturation
 
-##### 2.2.2.11 Region
+##### 2.2.2.12 Region
 `arena_lib.set_region(sender, mod, arena_name, pos1, pos2)` allows you to set the region of the arena. `pos1` and `pos2` are both mandatory and they both need to be vectors (sending a table such as `{x=3,z=4,y=2}` won't work).
 
 #### 2.2.3 Arena regions
