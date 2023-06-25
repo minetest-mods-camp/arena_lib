@@ -1,4 +1,4 @@
-local version = "6.3.0"
+local version = "7.0.0-dev"
 local modpath = minetest.get_modpath("arena_lib")
 local srcpath = modpath .. "/src"
 
